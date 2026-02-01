@@ -1,66 +1,49 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from "next/link";
+import { getOnboardings } from "@/lib/db";
 
-export default function Home() {
+export default async function OnboardingsListPage() {
+  const onboardings = await getOnboardings();
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
+    <main style={{ maxWidth: 720, margin: "40px auto", padding: 16, display: "grid", gap: 16 }}>
+      <h1 className="text-4xl font-bold underline">Onboarding Orchestrator</h1>
+      <p style={{ fontSize: 14, color: "#4b5563" }}>
+        Pick an onboarding to view tasks and health. (Vendor auth + CRUD coming next.)
+      </p>
+
+      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 12 }}>
+        {onboardings.map((ob) => (
+          <li key={ob.id}>
+            <Link
+              href={`/onboardings/${ob.id}`}
+              style={{
+                display: "block",
+                padding: 16,
+                border: "1px solid #e5e7eb",
+                borderRadius: 12,
+                textDecoration: "none",
+                color: "inherit",
+              }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+                <span style={{ fontWeight: 600 }}>{ob.companyName}</span>
+                <span
+                  style={{
+                    fontSize: 14,
+                    color: ob.health === "At risk" ? "#b91c1c" : "#166534",
+                  }}
+                >
+                  {ob.health}
+                  {ob.blockedCount > 0 && ` (${ob.blockedCount} blocked)`}
+                </span>
+              </div>
+              <div style={{ fontSize: 13, color: "#6b7280", marginTop: 4 }}>
+                {ob.taskCount} tasks
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </main>
   );
 }
