@@ -6,7 +6,8 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "npx tsx prisma/seed.js"
   },
   "dependencies": {
     "next": "16.1.5",
@@ -17,11 +18,14 @@
     "seed": "node --import=tsx prisma/seed.js"
   },
   "devDependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@tailwindcss/postcss": "^4.1.18",
     "autoprefixer": "^10.4.24",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.5",
+    "pg": "^8.18.0",
     "postcss": "^8.5.6",
     "prisma": "^7.3.0",
     "tailwindcss": "^4.1.18",

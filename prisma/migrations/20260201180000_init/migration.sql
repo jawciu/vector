@@ -1,0 +1,2 @@
+-- Baseline: tables (Company, Onboarding, Task) were created manually in Supabase.
+-- This migration is marked as applied so future schema changes use migrate dev.

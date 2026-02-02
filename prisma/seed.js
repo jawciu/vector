@@ -1,8 +1,16 @@
-import { PrismaClient } from "../lib/generated/prisma/client.js";
+// Log immediately so we see the script started (imports can be slow)
+console.log("Seed script starting...");
 
-const prisma = new PrismaClient({
-  datasources: { db: { url: process.env.DATABASE_URL } },
-});
+import "dotenv/config";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../lib/generated/prisma/client";
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) throw new Error("DATABASE_URL is not set in .env");
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
+
+console.log("Running seed...");
 
 async function main() {
   await prisma.task.deleteMany();
@@ -27,11 +35,18 @@ async function main() {
     ],
   });
 
+  const companyCount = await prisma.company.count();
+  const taskCount = await prisma.task.count();
   console.log("Seeded: Acme Co, TechCorp with tasks.");
+  console.log("DB now has", companyCount, "companies and", taskCount, "tasks.");
 }
 
 main()
   .then(() => prisma.$disconnect())
+  .then(() => {
+    console.log("Done.");
+    process.exit(0);
+  })
   .catch((e) => {
     console.error(e);
     prisma.$disconnect();

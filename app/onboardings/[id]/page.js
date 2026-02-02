@@ -3,7 +3,7 @@ import { getOnboarding, getTasksForOnboarding } from "@/lib/db";
 import OnboardingDetailClient from "./OnboardingDetailClient";
 
 export default async function OnboardingDetailPage({ params }) {
-  const id = params?.id;
+  const { id } = await params;
   const [onboarding, tasks] = await Promise.all([
     getOnboarding(id),
     getTasksForOnboarding(id),

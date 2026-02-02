@@ -31,17 +31,21 @@ Then run **step 3** below (push schema + seed).
 
 ## 3. Create tables and seed data
 
-From the project root:
+**First-time setup (Supabase):** `npx prisma db push` often does nothing with Prisma 7 + Supabase in this setup. Create tables manually:
 
-```bash
-# Create tables (Prisma 7: uses prisma.config.ts + DATABASE_URL from .env)
-npx prisma db push
-
-# Seed demo data (Acme Co + TechCorp and their tasks)
-npx prisma db seed
-```
+1. In **Supabase** → **SQL Editor** → **New query**, paste and run the SQL from **`prisma/supabase-create-tables.sql`** (creates Company, Onboarding, Task).
+2. From the project root run: **`npm run seed`** (seeds Acme Co + TechCorp and their tasks).
 
 After this, `npm run dev` will read from Postgres. List page (`/`) and detail pages (`/onboardings/1`, `/onboardings/2`) use the seeded data.
+
+**Future schema changes (new columns, tables):** Use Prisma Migrate so you don’t have to write SQL by hand:
+
+1. Edit **`prisma/schema.prisma`** (add a column, table, etc.).
+2. Run: **`npx prisma migrate dev --name descriptive_name`** (e.g. `add_contact_email`).
+   - Prisma creates a migration file under `prisma/migrations/` and applies it to the DB.
+3. If the CLI fails to connect (e.g. TLS error), generate the migration only: **`npx prisma migrate dev --name descriptive_name --create-only`**, then open the new `prisma/migrations/.../migration.sql` file, copy its contents, and run that SQL in **Supabase → SQL Editor**. Then run **`npx prisma migrate resolve --applied <migration_folder_name>`** so Prisma marks it as applied.
+
+A baseline migration (`prisma/migrations/20260201180000_init`) is in place so Prisma knows the current schema; you only add new migrations when you change the schema.
 
 ## 4. Useful commands
 

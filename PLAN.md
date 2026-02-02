@@ -2,6 +2,8 @@
 
 Portfolio-strong B2B onboarding workflow tool. Lightweight MVP, not full enterprise.
 
+*Caroline calls the AI assistant "Cakes".*
+
 ## Product
 
 - **Vendor view**: Track onboarding tasks (owners, due dates, status, “waiting on”, blockers).
@@ -38,10 +40,13 @@ Startup buying tools / vendor onboarding (procurement + setup + rollout). Valida
 
 ## Key decisions (log)
 
+*Full log with rationale: **`DECISIONS.md`**.*
+
 - **Tailwind**: Keep Tailwind for styling.
 - **Demo clients**: Acme Co = client 1 (onboarding id `1`), TechCorp = client 2 (onboarding id `2`).
 - **Read DB**: Postgres + Prisma. App reads from DB only for now (no create/update/delete from UI yet). See `DATABASE_SETUP.md` for setup.
 - **Supabase for Postgres**: Use Supabase as the Postgres host for this portfolio project — beginner-friendly, no local DB, free tier; when we add vendor auth later, Supabase Auth (magic link, OAuth) fits well.
+- **Schema changes**: First tables (Company, Onboarding, Task) were created manually in Supabase (Prisma 7 `db push` doesn’t apply in this setup). For future changes: use **Prisma Migrate** — edit `prisma/schema.prisma`, run `npx prisma migrate dev --name descriptive_name`; if CLI can’t connect, use `--create-only` and run the generated SQL in Supabase SQL Editor. Baseline migration `20260201180000_init` is in place.
 
 ## Entities (for backend)
 

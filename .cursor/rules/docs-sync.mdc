@@ -1,0 +1,23 @@
+---
+description: Keep DECISIONS.md and DEFINITIONS.md in sync when making changes
+alwaysApply: true
+---
+
+# Update project docs when changing the project
+
+When you make changes to this repo, update the docs so they stay accurate.
+
+## DECISIONS.md
+
+- **When:** You make a major choice (tech, workflow, config, or "why we did it this way").
+- **What:** Add a row (or section) with the decision and a short rationale.
+- **Where:** Under the right section (Product & scope, Database & backend, Next.js & build, Docs & structure) or add a new section.
+
+## DEFINITIONS.md
+
+- **When:** You add, remove, or change the role of a file or folder.
+- **What:** Add or edit the relevant entry in the right section (Root, app/, lib/, prisma/, etc.) so the project map stays correct.
+
+## Both
+
+- Keep DECISIONS.md and DEFINITIONS.md in sync: if a change affects both (e.g. new file + a decision about it), update both.
