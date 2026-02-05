@@ -16,11 +16,12 @@ Quick reference for what you can do from each part of the Onboarding Orchestrato
 | **`public/`** | Static assets (images, favicons, etc.) served at `/`. |
 | **`package.json`** | Dependencies and scripts: `npm run dev`, `npm run build`, `npm run seed`, etc. |
 | **`next.config.mjs`** | Next.js config (default for now). |
+| **`proxy.js`** | Next.js 16 proxy: runs on each request to refresh Supabase auth session and redirect unauthenticated users to `/login`. Calls `lib/supabase/proxy.js`. |
 | **`postcss.config.js`** | PostCSS config: Tailwind via `@tailwindcss/postcss`. |
 | **`prisma.config.ts`** | Prisma 7 config: schema path, migrations path, seed command, `DATABASE_URL`. |
 | **`jsconfig.json`** | JS project config: path alias `@/*` → project root. |
 | **`eslint.config.mjs`** | ESLint rules. |
-| **`.env`** | Local env vars (not committed). `DATABASE_URL` for Supabase. |
+| **`.env`** | Local env vars (not committed). `DATABASE_URL` for Postgres; `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` for Supabase Auth (same project as DB). |
 | **`.gitignore`** | Files/folders Git ignores. |
 | **`PLAN.md`** | Product/MVP plan and key decisions. |
 | **`DATABASE_SETUP.md`** | How to set up Postgres (Supabase), create tables, seed, and use migrations. |
@@ -41,6 +42,10 @@ Quick reference for what you can do from each part of the Onboarding Orchestrato
 | **`app/components/`** | Reusable UI pieces used by pages. |
 | **`app/components/StatusBadge.js`** | Renders a status pill (Todo, In progress, Blocked, Done) with colors. |
 | **`app/components/TaskCard.js`** | Renders one task row: title, waiting on, status badge, due date. |
+| **`app/components/AppShell.js`** | Client wrapper: shows header with Sign out on app routes; no header on `/login`. |
+| **`app/components/SignOut.js`** | Client component: “Sign out” button when user is logged in; calls Supabase signOut and redirects to `/login`. |
+| **`app/login/page.js`** | Login page: email/password form; Supabase `signInWithPassword`; redirect to `/` on success. |
+| **`app/auth/callback/route.js`** | GET route: exchanges Supabase auth code for session (e.g. email confirmation); redirects to `/` or `?next=`. |
 | **`app/onboardings/[id]/`** | Dynamic route: one onboarding by id (e.g. `/onboardings/1`, `/onboardings/2`). |
 | **`app/onboardings/[id]/page.js`** | Server Component: loads onboarding + tasks by id, then renders detail client or “not found”. |
 | **`app/onboardings/[id]/OnboardingDetailClient.js`** | Client Component: task list, status filter, health. Uses the data passed from `page.js`. |
@@ -55,6 +60,9 @@ Quick reference for what you can do from each part of the Onboarding Orchestrato
 |---------------|----------------|
 | **`lib/db.js`** | Database read layer: Prisma client + helpers. Use **`getOnboardings()`**, **`getOnboarding(id)`**, **`getTasksForOnboarding(id)`**, **`STATUSES`** from Server Components or API routes. |
 | **`lib/health.js`** | Pure helper: **`computeHealth(tasks)`** → `"At risk"` or `"On track"`. No DB; safe to use in client components. |
+| **`lib/supabase/client.js`** | **`createClient()`** for browser: use in Client Components (login form, sign out). |
+| **`lib/supabase/server.js`** | **`createClient()`** for server: use in Server Components, Server Actions, Route Handlers; uses `cookies()` from `next/headers`. |
+| **`lib/supabase/proxy.js`** | **`updateSession(request)`**: creates Supabase server client from request cookies, calls `getClaims()` to refresh session, redirects to `/login` if no user. Used by root `proxy.js`. |
 | **`lib/generated/prisma/`** | Generated Prisma client (from `prisma/schema.prisma`). Don’t edit; regenerate with `npx prisma generate` after schema changes. |
 
 **What you can do:** Add new DB helpers in `lib/db.js`. Add small pure helpers in `lib/` (e.g. formatters, validators). When you add CRUD, you’ll add write functions in `lib/db.js` or in API routes.

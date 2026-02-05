@@ -30,6 +30,18 @@ All significant decisions for the Onboarding Orchestrator project. Add new entri
 
 ---
 
+## Auth
+
+| Decision | Rationale |
+|----------|-----------|
+| **Supabase Auth (email/password only)** — Sign up, sign in, sign out, session via Supabase. No OAuth for now. | Matches “vendor” use case; can add magic link or OAuth later. |
+| **No roles or seeded personas yet** — No role-based views or seed users. | Caroline will define vendor vs customer roles and what each view shows later; auth is in place so we can add roles when ready. |
+| **Session refresh** — Use Next.js 16 **proxy** (`proxy.js` at root) to call `supabase.auth.getClaims()`, refresh tokens, and redirect unauthenticated users to `/login`. | Supabase SSR pattern: proxy is the only place that can write cookies for the session; getClaims() validates the JWT. |
+| **Supabase client split** — **Browser client** (`lib/supabase/client.js`) for Client Components (login form, sign out). **Server client** (`lib/supabase/server.js`) for Server Components and Route Handlers. | Per Supabase Next.js guide; server client uses `cookies()` from `next/headers`. |
+| **Env for Auth** — `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`) in `.env`; same Supabase project as DB. | Anon key from Project Settings → API; needed for auth and cookie-based session. |
+
+---
+
 ## Next.js & build
 
 | Decision | Rationale |

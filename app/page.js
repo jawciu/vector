@@ -8,7 +8,7 @@ export default async function OnboardingsListPage() {
     <main style={{ maxWidth: 720, margin: "40px auto", padding: 16, display: "grid", gap: 16 }}>
       <h1 className="text-4xl font-bold underline">Onboarding Orchestrator</h1>
       <p style={{ fontSize: 14, color: "#4b5563" }}>
-        Pick an onboarding to view tasks and health. (Vendor auth + CRUD coming next.)
+        Pick an onboarding to view tasks and health. (Sign in above; roles and personas later.)
       </p>
 
       <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 12 }}>

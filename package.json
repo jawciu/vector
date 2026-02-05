@@ -10,6 +10,8 @@
     "seed": "npx tsx prisma/seed.js"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.95.1",
     "next": "16.1.5",
     "react": "19.2.3",
     "react-dom": "19.2.3"
