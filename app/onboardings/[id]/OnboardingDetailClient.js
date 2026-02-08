@@ -12,22 +12,40 @@ export default function OnboardingDetailClient({ onboarding, tasks }) {
   const visibleTasks = filter === "All" ? tasks : tasks.filter((t) => t.status === filter);
 
   return (
-    <main style={{ maxWidth: 720, margin: "40px auto", padding: 16, display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-        <Link href="/" style={{ fontSize: 14, color: "#6b7280" }}>← Onboardings</Link>
-        <h1 className="text-4xl font-bold underline">{onboarding.companyName} Onboarding</h1>
+    <main className="max-w-3xl grid gap-4">
+      <div className="flex items-center gap-3 flex-wrap">
+        <Link
+          href="/"
+          className="text-sm transition-colors hover:opacity-80"
+          style={{ color: "var(--text-muted)" }}
+        >
+          ← Companies
+        </Link>
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--text)" }}>
+          {onboarding.companyName} Onboarding
+        </h1>
       </div>
 
-      <div style={{ fontSize: 14, color: health === "At risk" ? "#b91c1c" : "#166534" }}>
+      <div
+        className="text-sm font-medium"
+        style={{ color: health === "At risk" ? "var(--danger)" : "var(--success)" }}
+      >
         Health: <strong>{health}</strong> ({blockedCount} blocked)
       </div>
 
-      <label style={{ display: "grid", gap: 6, maxWidth: 220 }}>
-        <span style={{ fontSize: 13, color: "#4b5563" }}>Filter by status</span>
+      <label className="grid gap-1.5" style={{ maxWidth: 220 }}>
+        <span className="text-sm" style={{ color: "var(--text-muted)" }}>
+          Filter by status
+        </span>
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          style={{ padding: 10, borderRadius: 10, border: "1px solid #e5e7eb" }}
+          className="py-2.5 px-3 rounded-lg text-sm transition-colors"
+          style={{
+            border: "1px solid var(--border)",
+            background: "var(--surface)",
+            color: "var(--text)",
+          }}
         >
           <option>All</option>
           <option>Todo</option>
@@ -37,7 +55,7 @@ export default function OnboardingDetailClient({ onboarding, tasks }) {
         </select>
       </label>
 
-      <div style={{ display: "grid", gap: 12 }}>
+      <div className="grid gap-3">
         {visibleTasks.map((t) => (
           <TaskCard key={t.id} task={t} />
         ))}

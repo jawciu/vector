@@ -11,9 +11,11 @@ export default async function OnboardingDetailPage({ params }) {
 
   if (!onboarding) {
     return (
-      <main style={{ maxWidth: 720, margin: "40px auto", padding: 16 }}>
-        <p>Onboarding not found.</p>
-        <Link href="/" style={{ color: "#2563eb" }}>Back to list</Link>
+      <main className="max-w-3xl">
+        <p style={{ color: "var(--text-muted)" }}>Onboarding not found.</p>
+        <Link href="/" className="mt-2 inline-block" style={{ color: "var(--accent)" }}>
+          ← Companies
+        </Link>
       </main>
     );
   }

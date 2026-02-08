@@ -42,14 +42,10 @@ export default function SignOut() {
     <button
       type="button"
       onClick={handleSignOut}
+      className="w-full h-9 text-center px-3 py-2 rounded-xl text-sm font-bold transition-opacity hover:opacity-90"
       style={{
-        padding: "6px 12px",
-        fontSize: 14,
-        color: "#6b7280",
-        background: "transparent",
-        border: "1px solid #e5e7eb",
-        borderRadius: 6,
-        cursor: "pointer",
+        color: "var(--action-text)",
+        background: "var(--action)",
       }}
     >
       Sign out

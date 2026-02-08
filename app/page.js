@@ -5,45 +5,45 @@ export default async function OnboardingsListPage() {
   const onboardings = await getOnboardings();
 
   return (
-    <main style={{ maxWidth: 720, margin: "40px auto", padding: 16, display: "grid", gap: 16 }}>
-      <h1 className="text-4xl font-bold underline">Onboarding Orchestrator</h1>
-      <p style={{ fontSize: 14, color: "#4b5563" }}>
-        Pick an onboarding to view tasks and health. (Sign in above; roles and personas later.)
+    <div className="max-w-3xl">
+      <h1 className="text-xl font-semibold" style={{ color: "var(--text)" }}>
+        Companies
+      </h1>
+      <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
+        Pick a company to view onboarding tasks and health.
       </p>
-
-      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 12 }}>
+      <ul className="mt-6 list-none p-0 m-0 flex flex-col gap-3">
         {onboardings.map((ob) => (
           <li key={ob.id}>
             <Link
               href={`/onboardings/${ob.id}`}
+              className="block p-4 rounded-xl text-inherit no-underline transition-colors hover:opacity-95"
               style={{
-                display: "block",
-                padding: 16,
-                border: "1px solid #e5e7eb",
-                borderRadius: 12,
-                textDecoration: "none",
-                color: "inherit",
+                border: "1px solid var(--border)",
+                background: "var(--surface)",
               }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
-                <span style={{ fontWeight: 600 }}>{ob.companyName}</span>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-medium" style={{ color: "var(--text)" }}>
+                  {ob.companyName}
+                </span>
                 <span
+                  className="text-sm font-medium"
                   style={{
-                    fontSize: 14,
-                    color: ob.health === "At risk" ? "#b91c1c" : "#166534",
+                    color: ob.health === "At risk" ? "var(--danger)" : "var(--success)",
                   }}
                 >
                   {ob.health}
                   {ob.blockedCount > 0 && ` (${ob.blockedCount} blocked)`}
                 </span>
               </div>
-              <div style={{ fontSize: 13, color: "#6b7280", marginTop: 4 }}>
+              <div className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
                 {ob.taskCount} tasks
               </div>
             </Link>
           </li>
         ))}
       </ul>
-    </main>
+    </div>
   );
 }

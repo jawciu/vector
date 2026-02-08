@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import SignOut from "./SignOut";
+import Sidebar from "./Sidebar";
 
 export default function AppShell({ children }) {
   const pathname = usePathname();
@@ -12,19 +12,11 @@ export default function AppShell({ children }) {
   }
 
   return (
-    <>
-      <header
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          padding: "12px 16px",
-          borderBottom: "1px solid #e5e7eb",
-        }}
-      >
-        <SignOut />
-      </header>
-      {children}
-    </>
+    <div className="flex min-h-screen" style={{ background: "var(--bg)" }}>
+      <Sidebar />
+      <main className="flex-1 overflow-auto" style={{ background: "var(--bg-elevated)" }}>
+        <div className="p-6 md:p-8">{children}</div>
+      </main>
+    </div>
   );
 }

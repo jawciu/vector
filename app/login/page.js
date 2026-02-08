@@ -44,75 +44,51 @@ function LoginForm() {
 
   return (
     <main
-      style={{
-        maxWidth: 400,
-        margin: "80px auto",
-        padding: 24,
-        display: "grid",
-        gap: 16,
-      }}
+      className="max-w-[400px] mx-auto py-20 px-6 grid gap-4"
+      style={{ background: "var(--bg)" }}
     >
-      <h1 className="text-2xl font-bold">Sign in</h1>
-      <p style={{ fontSize: 14, color: "#6b7280" }}>
+      <h1 className="text-2xl font-semibold" style={{ color: "var(--text)" }}>Sign in</h1>
+      <p className="text-sm" style={{ color: "var(--text-muted)" }}>
         Use your email and password. No roles or personas yet — we’ll add those
         when you’re ready.
       </p>
 
       {(error || errorParam) && (
-        <p
-          role="alert"
-          style={{ fontSize: 14, color: "#b91c1c", margin: 0 }}
-        >
+        <p role="alert" className="text-sm m-0" style={{ color: "var(--danger)" }}>
           {error || (errorParam === "auth" && "Authentication failed.")}
         </p>
       )}
 
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-        <label style={{ display: "grid", gap: 4 }}>
-          <span style={{ fontSize: 14, fontWeight: 500 }}>Email</span>
+      <form onSubmit={handleSubmit} className="grid gap-4">
+        <label className="grid gap-1.5">
+          <span className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>Email</span>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
-            style={{
-              padding: "10px 12px",
-              border: "1px solid #e5e7eb",
-              borderRadius: 8,
-              fontSize: 16,
-            }}
+            className="py-2.5 px-3 rounded-lg text-base w-full"
+            style={{ border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text)" }}
           />
         </label>
-        <label style={{ display: "grid", gap: 4 }}>
-          <span style={{ fontSize: 14, fontWeight: 500 }}>Password</span>
+        <label className="grid gap-1.5">
+          <span className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>Password</span>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="current-password"
-            style={{
-              padding: "10px 12px",
-              border: "1px solid #e5e7eb",
-              borderRadius: 8,
-              fontSize: 16,
-            }}
+            className="py-2.5 px-3 rounded-lg text-base w-full"
+            style={{ border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text)" }}
           />
         </label>
         <button
           type="submit"
           disabled={loading}
-          style={{
-            padding: "10px 16px",
-            background: "#171717",
-            color: "#fff",
-            border: "none",
-            borderRadius: 8,
-            fontSize: 16,
-            fontWeight: 500,
-            cursor: loading ? "not-allowed" : "pointer",
-          }}
+          className="py-2.5 px-4 rounded-lg text-base font-medium transition-opacity disabled:opacity-50"
+          style={{ background: "var(--accent)", color: "#0a0a0a", border: "none", cursor: loading ? "not-allowed" : "pointer" }}
         >
           {loading ? "Signing in…" : "Sign in"}
         </button>
@@ -123,7 +99,16 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<main style={{ maxWidth: 400, margin: "80px auto", padding: 24 }}><p>Loading…</p></main>}>
+    <Suspense
+      fallback={
+        <main
+          className="max-w-[400px] mx-auto py-20 px-6"
+          style={{ background: "var(--bg)", color: "var(--text-muted)" }}
+        >
+          <p>Loading…</p>
+        </main>
+      }
+    >
       <LoginForm />
     </Suspense>
   );
