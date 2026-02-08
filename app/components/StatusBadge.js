@@ -9,10 +9,17 @@ export default function StatusBadge({ status }) {
 
   return (
     <span
-      className="px-2 py-0.5 rounded-full text-xs font-medium"
+      className="inline-flex h-fit rounded text-xs font-medium"
       style={{
+        paddingTop: 2,
+        paddingBottom: 2,
+        paddingLeft: 4,
+        paddingRight: 4,
         background: s.bg,
-        border: `1px solid ${s.border}`,
+        borderRadius: 6,
+        borderWidth: "0.5px",
+        borderStyle: "solid",
+        borderColor: s.border,
         color: s.color,
       }}
     >

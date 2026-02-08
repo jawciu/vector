@@ -12,6 +12,7 @@ All significant decisions for the Onboarding Orchestrator project. Add new entri
 |----------|-----------|
 | **Tailwind** — Keep Tailwind for styling. | Faster styling, good for portfolio; can mix with inline/CSS as needed. |
 | **Demo clients** — Acme Co = client 1 (onboarding id `1`), TechCorp = client 2 (onboarding id `2`). | Clear mapping for list/detail and seed data. |
+| **Companies list layout** — Title “Companies”, then 1px border (same as below sidebar username), then action bar (e.g. “All Companies” dropdown), then border, then table. Columns: Company, Status (risk/on track), Stage, Priority, Tasks, Blocked. Stage/Priority placeholders (“—”) until schema supports them. | Matches Attio-style structure; B2B onboarding tool so companies = clients being onboarded. |
 
 ---
 
@@ -38,6 +39,7 @@ All significant decisions for the Onboarding Orchestrator project. Add new entri
 | **No roles or seeded personas yet** — No role-based views or seed users. | Caroline will define vendor vs customer roles and what each view shows later; auth is in place so we can add roles when ready. |
 | **Session refresh** — Use Next.js 16 **proxy** (`proxy.js` at root) to call `supabase.auth.getClaims()`, refresh tokens, and redirect unauthenticated users to `/login`. | Supabase SSR pattern: proxy is the only place that can write cookies for the session; getClaims() validates the JWT. |
 | **Supabase client split** — **Browser client** (`lib/supabase/client.js`) for Client Components (login form, sign out). **Server client** (`lib/supabase/server.js`) for Server Components and Route Handlers. | Per Supabase Next.js guide; server client uses `cookies()` from `next/headers`. |
+| **Sign out in user dropdown** — Sign out moved from a dedicated nav button to the sidebar user block: click user name → dropdown → “Sign out”. | Cleaner nav; sign out is a user action, not a primary nav item. |
 | **Env for Auth** — `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`) in `.env`; same Supabase project as DB. | Anon key from Project Settings → API; needed for auth and cookie-based session. |
 
 ---

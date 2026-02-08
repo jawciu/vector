@@ -35,15 +35,17 @@ Quick reference for what you can do from each part of the Onboarding Orchestrato
 | File / folder | What it’s for |
 |---------------|----------------|
 | **`app/layout.js`** | Root layout: wraps every page (HTML, body, fonts, global CSS). Edit here to change site-wide structure or metadata. |
-| **`app/page.js`** | Home page (`/`): list of onboardings (company name, health, task count). Server Component; fetches from DB. |
+| **`app/page.js`** | Home page (`/`): Companies list — title, border, action bar (e.g. “All Companies” dropdown), table of clients with Company, Status, Stage, Priority, Tasks, Blocked. Server Component; fetches from DB. |
 | **`app/globals.css`** | Global styles and Tailwind (`@import "tailwindcss"`). |
 | **`app/page.module.css`** | Unused for now; you can use it for page-specific styles or delete. |
 | **`app/favicon.ico`** | Browser tab icon. |
 | **`app/components/`** | Reusable UI pieces used by pages. |
 | **`app/components/StatusBadge.js`** | Renders a status pill (Todo, In progress, Blocked, Done) with colors. |
 | **`app/components/TaskCard.js`** | Renders one task row: title, waiting on, status badge, due date. |
-| **`app/components/AppShell.js`** | Client wrapper: shows header with Sign out on app routes; no header on `/login`. |
-| **`app/components/SignOut.js`** | Client component: “Sign out” button when user is logged in; calls Supabase signOut and redirects to `/login`. |
+| **`app/components/AppShell.js`** | Client wrapper: layout with sidebar on app routes; no shell on `/login`. |
+| **`app/components/Sidebar.js`** | Sidebar: nav links (Companies, Settings), user block at top with dropdown (Sign out). |
+| **`app/components/SignOut.js`** | Unused: standalone “Sign out” button component; sign out is in Sidebar user dropdown. |
+| **`app/components/CompaniesActionBar.js`** | Client component: action bar on Companies page — “All Companies” dropdown (placeholder for future filtering), same border style as sidebar. |
 | **`app/login/page.js`** | Login page: email/password form; Supabase `signInWithPassword`; redirect to `/` on success. |
 | **`app/auth/callback/route.js`** | GET route: exchanges Supabase auth code for session (e.g. email confirmation); redirects to `/` or `?next=`. |
 | **`app/onboardings/[id]/`** | Dynamic route: one onboarding by id (e.g. `/onboardings/1`, `/onboardings/2`). |

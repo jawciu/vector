@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import SignOut from "./SignOut";
 
 const navItems = [
   { href: "/", label: "Companies", icon: CompaniesIcon },
@@ -32,7 +31,10 @@ function SettingsIcon({ className, style }) {
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [user, setUser] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     let subscription;
@@ -49,6 +51,26 @@ export default function Sidebar() {
     return () => subscription?.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownOpen]);
+
+  async function handleSignOut() {
+    const supabase = await createClient();
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    setDropdownOpen(false);
+    router.push("/login");
+    router.refresh();
+  }
+
   const initial = user?.email?.[0]?.toUpperCase() ?? "?";
   const label = user?.email ?? "Account";
 
@@ -58,28 +80,59 @@ export default function Sidebar() {
       style={{
         width: 240,
         minHeight: "100vh",
-        background: "var(--bg)",
+        background: "var(--bg-elevated)",
         borderColor: "var(--border)",
       }}
     >
-      <div
-        className="flex items-center gap-3 border-b py-2 px-2"
-        style={{ borderColor: "var(--border)" }}
-      >
-        <div
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full py-2 px-1 text-sm font-semibold"
-          style={{ background: "var(--surface-hover)", color: "var(--text)" }}
+      <div ref={dropdownRef} className="relative">
+        <button
+          type="button"
+          onClick={() => setDropdownOpen((open) => !open)}
+          className="flex w-full items-center gap-3 border-b py-2 px-2 text-left transition-colors hover:opacity-90"
+          style={{
+            height: "44px",
+            paddingTop: 0,
+            paddingBottom: 0,
+            paddingLeft: "8px",
+            paddingRight: "8px",
+            borderColor: "var(--border)",
+          }}
+          aria-expanded={dropdownOpen}
+          aria-haspopup="true"
         >
-          {initial}
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium" style={{ color: "var(--text)" }}>
-            {label}
-          </p>
-        </div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-muted)", flexShrink: 0 }} aria-hidden>
-          <path d="M6 9l6 6 6-6" />
-        </svg>
+          <div
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+            style={{ background: "var(--surface-hover)", color: "var(--text)" }}
+          >
+            {initial}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium" style={{ color: "var(--text)" }}>
+              {label}
+            </p>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-muted)", flexShrink: 0 }} aria-hidden>
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+        {dropdownOpen && (
+          <div
+            className="absolute left-2 right-2 top-full z-10 mt-1 rounded-lg border py-1 shadow-lg"
+            style={{
+              background: "var(--bg)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="w-full px-3 py-2 text-left text-sm font-medium transition-colors hover:opacity-90"
+              style={{ color: "var(--text)" }}
+            >
+              Sign out
+            </button>
+          </div>
+        )}
       </div>
       <nav className="flex-1 flex flex-col gap-0.5 p-2" style={{ padding: "8px" }}>
         {navItems.map(({ href, label: itemLabel, icon: Icon }) => {
@@ -104,12 +157,6 @@ export default function Sidebar() {
           );
         })}
       </nav>
-      <div
-        className="p-3 border-t w-full"
-        style={{ borderColor: "var(--border)" }}
-      >
-        <SignOut />
-      </div>
     </aside>
   );
 }
