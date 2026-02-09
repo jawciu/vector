@@ -65,7 +65,7 @@ export default async function OnboardingsListPage() {
       >
         {/* Header row: full-width border, padded content */}
         <div
-          className="grid grid-cols-[1fr_1fr_1fr_1fr_80px_80px] gap-4 pt-3 pb-3 text-left text-sm border-b"
+          className="grid grid-cols-[1.2fr_100px_1fr_120px_60px_60px_110px] gap-4 pt-3 pb-3 text-left text-sm border-b"
           style={{
             width: "100%",
             borderColor: "var(--border)",
@@ -78,16 +78,17 @@ export default async function OnboardingsListPage() {
         >
           <span className="font-medium">Company</span>
           <span className="font-medium">Status</span>
-          <span className="font-medium">Stage</span>
-          <span className="font-medium">Priority</span>
+          <span className="font-medium">Next action</span>
+          <span className="font-medium">Owner</span>
           <span className="font-medium">Tasks</span>
           <span className="font-medium">Blocked</span>
+          <span className="font-medium">Last activity</span>
         </div>
         {/* Data rows: full-width border under each row, padded content */}
         {onboardings.map((ob) => (
           <div
             key={ob.id}
-            className="grid grid-cols-[1fr_1fr_1fr_1fr_80px_80px] gap-4 py-4 text-left text-sm border-b last:border-b-0"
+            className="grid grid-cols-[1.2fr_100px_1fr_120px_60px_60px_110px] gap-4 py-4 text-left text-sm border-b last:border-b-0"
             style={{
               width: "100%",
               borderColor: "var(--border-subtle)",
@@ -140,8 +141,12 @@ export default async function OnboardingsListPage() {
                 {ob.health}
               </span>
             </span>
-            <span style={{ color: "var(--text-muted)" }}>—</span>
-            <span style={{ color: "var(--text-muted)" }}>—</span>
+            <span className="truncate" style={{ color: "var(--text)" }}>
+              {ob.nextAction ?? <span style={{ color: "var(--text-muted)" }}>—</span>}
+            </span>
+            <span className="truncate" style={{ color: "var(--text)" }}>
+              {ob.owner ?? <span style={{ color: "var(--text-muted)" }}>—</span>}
+            </span>
             <span style={{ color: "var(--text)" }}>{ob.taskCount}</span>
             <span style={{ color: "var(--text)" }}>
               {ob.blockedCount > 0 ? (
@@ -149,6 +154,14 @@ export default async function OnboardingsListPage() {
               ) : (
                 "—"
               )}
+            </span>
+            <span style={{ color: "var(--text-muted)" }}>
+              {ob.lastActivity
+                ? new Date(ob.lastActivity).toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                  })
+                : "—"}
             </span>
           </div>
         ))}

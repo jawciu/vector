@@ -20,9 +20,11 @@ model Company {
 }
 
 model Onboarding {
-  id        Int    @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   companyId Int
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  owner     String   @default("")
+  updatedAt DateTime @default(now()) @updatedAt
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   tasks     Task[]
 }
 

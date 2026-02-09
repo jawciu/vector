@@ -10,6 +10,9 @@ export default defineConfig({
     seed: "npx tsx prisma/seed.js",
   },
   datasource: {
-    url: env("DATABASE_URL"),
+    // Direct connection (port 5432) for migrations — bypasses PgBouncer pooler
+    // which doesn't support advisory locks needed by Prisma Migrate.
+    // Falls back to DATABASE_URL if DIRECT_DATABASE_URL isn't set.
+    url: env("DIRECT_DATABASE_URL") ?? env("DATABASE_URL"),
   },
 });

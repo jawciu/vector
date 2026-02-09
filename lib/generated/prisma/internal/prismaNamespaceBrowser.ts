@@ -82,7 +82,9 @@ export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeo
 
 export const OnboardingScalarFieldEnum = {
   id: 'id',
-  companyId: 'companyId'
+  companyId: 'companyId',
+  owner: 'owner',
+  updatedAt: 'updatedAt'
 } as const
 
 export type OnboardingScalarFieldEnum = (typeof OnboardingScalarFieldEnum)[keyof typeof OnboardingScalarFieldEnum]

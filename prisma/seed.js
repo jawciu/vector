@@ -20,8 +20,12 @@ async function main() {
   const acme = await prisma.company.create({ data: { name: "Acme Co" } });
   const techcorp = await prisma.company.create({ data: { name: "TechCorp" } });
 
-  const ob1 = await prisma.onboarding.create({ data: { companyId: acme.id } });
-  const ob2 = await prisma.onboarding.create({ data: { companyId: techcorp.id } });
+  const ob1 = await prisma.onboarding.create({
+    data: { companyId: acme.id, owner: "Jess Park" },
+  });
+  const ob2 = await prisma.onboarding.create({
+    data: { companyId: techcorp.id, owner: "Alex Chen" },
+  });
 
   await prisma.task.createMany({
     data: [
