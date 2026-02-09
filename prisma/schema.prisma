@@ -23,6 +23,7 @@ model Onboarding {
   id        Int      @id @default(autoincrement())
   companyId Int
   owner     String   @default("")
+  status    String   @default("Active") // Active | Completed | Paused
   updatedAt DateTime @default(now()) @updatedAt
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   tasks     Task[]

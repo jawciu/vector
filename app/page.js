@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 import { getOnboardings } from "@/lib/db";
 import CompaniesActionBar from "./components/CompaniesActionBar";
@@ -21,8 +22,22 @@ function companyLogoColor(name) {
   return LOGO_COLORS[n % LOGO_COLORS.length];
 }
 
-export default async function OnboardingsListPage() {
-  const onboardings = await getOnboardings();
+/** Returns { label, color } for the status badge.
+ *  Active onboardings show health (On track / At risk / Blocked).
+ *  Completed and Paused show their own status. */
+function statusBadge(ob) {
+  if (ob.onboardingStatus === "Completed") return { label: "Completed", color: "var(--mint)" };
+  if (ob.onboardingStatus === "Paused") return { label: "Paused", color: "var(--rose)" };
+  // Active — derive from health
+  if (ob.health === "At risk") return { label: "At risk", color: "var(--alert)" };
+  if (ob.health === "Blocked") return { label: "Blocked", color: "var(--danger)" };
+  return { label: "On track", color: "var(--success)" };
+}
+
+export default async function OnboardingsListPage({ searchParams }) {
+  const params = await searchParams;
+  const statusFilter = params?.status || "Active";
+  const onboardings = await getOnboardings(statusFilter);
 
   return (
     <div className="w-full pt-3 pb-3">
@@ -60,111 +75,137 @@ export default async function OnboardingsListPage() {
         style={{ borderColor: "var(--border)" }}
       />
       <div
-        className="mt-0 border-b w-full overflow-x-auto"
-        style={{ borderColor: "var(--border)" }}
+        className="w-full overflow-x-auto grid text-left text-sm"
+        style={{
+          gridTemplateColumns: "1fr 100px 80px 80px 1.2fr 120px 140px",
+          borderColor: "var(--border)",
+          borderBottom: "1px solid var(--border)",
+        }}
       >
-        {/* Header row: full-width border, padded content */}
-        <div
-          className="grid grid-cols-[1.2fr_100px_1fr_120px_60px_60px_110px] gap-4 pt-3 pb-3 text-left text-sm border-b"
-          style={{
-            width: "100%",
-            borderColor: "var(--border)",
-            color: "var(--text-muted)",
-            paddingLeft: 20,
-            paddingRight: 20,
-            paddingTop: 12,
-            paddingBottom: 12,
-          }}
-        >
-          <span className="font-medium">Company</span>
-          <span className="font-medium">Status</span>
-          <span className="font-medium">Next action</span>
-          <span className="font-medium">Owner</span>
-          <span className="font-medium">Tasks</span>
-          <span className="font-medium">Blocked</span>
-          <span className="font-medium">Last activity</span>
-        </div>
-        {/* Data rows: full-width border under each row, padded content */}
-        {onboardings.map((ob) => (
-          <div
-            key={ob.id}
-            className="grid grid-cols-[1.2fr_100px_1fr_120px_60px_60px_110px] gap-4 py-4 text-left text-sm border-b last:border-b-0"
-            style={{
-              width: "100%",
-              borderColor: "var(--border-subtle)",
-              paddingLeft: 20,
-              paddingRight: 20,
-              paddingTop: 8,
-              paddingBottom: 8,
-            }}
-          >
-            <span className="flex items-center gap-2">
-              <span
-                className="flex shrink-0 w-4 h-4 rounded items-center justify-center text-[10px] font-semibold"
-                style={{
-                  background: companyLogoColor(ob.companyName),
-                  color: "rgba(255,255,255,0.95)",
-                }}
-                aria-hidden
-              >
-                {companyInitials(ob.companyName)}
+        {/* Header cells */}
+        {["Company", "Status", "Tasks", "Blocked", "Next action", "Last activity", "Owner"].map(
+          (label, i) => (
+            <span
+              key={label}
+              className="font-medium"
+              style={{
+                color: "var(--text-muted)",
+                paddingTop: 12,
+                paddingBottom: 12,
+                paddingLeft: i === 0 ? 20 : 12,
+                paddingRight: i === 6 ? 20 : 12,
+                borderBottom: "1px solid var(--border)",
+                borderLeft: i > 0 ? "1px solid var(--border)" : undefined,
+              }}
+            >
+              {label}
+            </span>
+          )
+        )}
+        {/* Data rows */}
+        {onboardings.map((ob, rowIdx) => {
+          const isLast = rowIdx === onboardings.length - 1;
+          const cellStyle = (colIdx) => ({
+            paddingTop: 8,
+            paddingBottom: 8,
+            paddingLeft: colIdx === 0 ? 20 : 12,
+            paddingRight: colIdx === 6 ? 20 : 12,
+            borderBottom: isLast ? undefined : "1px solid var(--border-subtle)",
+            borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
+          });
+          return (
+            <React.Fragment key={ob.id}>
+              {/* Company */}
+              <span className="flex items-center gap-2" style={cellStyle(0)}>
+                <span
+                  className="flex shrink-0 w-4 h-4 rounded items-center justify-center text-[10px] font-semibold"
+                  style={{
+                    background: companyLogoColor(ob.companyName),
+                    color: "rgba(255,255,255,0.95)",
+                  }}
+                  aria-hidden
+                >
+                  {companyInitials(ob.companyName)}
+                </span>
+                <Link
+                  href={`/onboardings/${ob.id}`}
+                  className="font-medium no-underline hover:underline"
+                  style={{ color: "var(--text)" }}
+                >
+                  {ob.companyName}
+                </Link>
               </span>
-              <Link
-                href={`/onboardings/${ob.id}`}
-                className="font-medium no-underline hover:underline"
-                style={{ color: "var(--text)" }}
-              >
-                {ob.companyName}
-              </Link>
-            </span>
-            <span>
-              <span
-                className="inline-flex h-fit rounded text-xs font-medium"
-                style={{
-                  paddingTop: 2,
-                  paddingBottom: 2,
-                  paddingLeft: 4,
-                  paddingRight: 4,
-                  borderRadius: 6,
-                  color:
-                    ob.health === "At risk"
-                      ? "var(--danger)"
-                      : "var(--success)",
-                  borderWidth: "0.5px",
-                  borderStyle: "solid",
-                  borderColor:
-                    ob.health === "At risk"
-                      ? "var(--danger)"
-                      : "var(--success)",
-                }}
-              >
-                {ob.health}
+              {/* Status */}
+              <span className="flex items-center" style={cellStyle(1)}>
+                {(() => {
+                  const badge = statusBadge(ob);
+                  return (
+                    <span
+                      className="inline-flex h-fit rounded text-xs font-medium"
+                      style={{
+                        paddingTop: 2,
+                        paddingBottom: 2,
+                        paddingLeft: 4,
+                        paddingRight: 4,
+                        borderRadius: 6,
+                        color: badge.color,
+                        borderWidth: "0.5px",
+                        borderStyle: "solid",
+                        borderColor: badge.color,
+                      }}
+                    >
+                      {badge.label}
+                    </span>
+                  );
+                })()}
               </span>
-            </span>
-            <span className="truncate" style={{ color: "var(--text)" }}>
-              {ob.nextAction ?? <span style={{ color: "var(--text-muted)" }}>—</span>}
-            </span>
-            <span className="truncate" style={{ color: "var(--text)" }}>
-              {ob.owner ?? <span style={{ color: "var(--text-muted)" }}>—</span>}
-            </span>
-            <span style={{ color: "var(--text)" }}>{ob.taskCount}</span>
-            <span style={{ color: "var(--text)" }}>
-              {ob.blockedCount > 0 ? (
-                <span style={{ color: "var(--danger)" }}>{ob.blockedCount}</span>
-              ) : (
-                "—"
-              )}
-            </span>
-            <span style={{ color: "var(--text-muted)" }}>
-              {ob.lastActivity
-                ? new Date(ob.lastActivity).toLocaleDateString("en-GB", {
-                    day: "numeric",
-                    month: "short",
-                  })
-                : "—"}
-            </span>
-          </div>
-        ))}
+              {/* Tasks */}
+              <span className="flex items-center" style={{ ...cellStyle(2), color: "var(--text)" }}>{ob.taskCount}</span>
+              {/* Blocked */}
+              <span className="flex items-center" style={{ ...cellStyle(3), color: "var(--text)" }}>
+                {ob.blockedCount > 0 ? (
+                  <span style={{ color: "var(--danger)" }}>{ob.blockedCount}</span>
+                ) : (
+                  "—"
+                )}
+              </span>
+              {/* Next action */}
+              <span className="flex items-center truncate" style={{ ...cellStyle(4), color: "var(--text)" }}>
+                {ob.nextAction ?? <span style={{ color: "var(--text-muted)" }}>—</span>}
+              </span>
+              {/* Last activity */}
+              <span className="flex items-center" style={{ ...cellStyle(5), color: "var(--text-muted)" }}>
+                {ob.lastActivity
+                  ? new Date(ob.lastActivity).toLocaleDateString("en-GB", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })
+                  : "—"}
+              </span>
+              {/* Owner */}
+              <span className="flex items-center gap-2 truncate" style={cellStyle(6)}>
+                {ob.owner ? (
+                  <>
+                    <span
+                      className="flex shrink-0 w-5 h-5 rounded-full items-center justify-center text-[10px] font-semibold"
+                      style={{
+                        background: companyLogoColor(ob.owner),
+                        color: "rgba(255,255,255,0.95)",
+                      }}
+                      aria-hidden
+                    >
+                      {companyInitials(ob.owner)}
+                    </span>
+                    <span style={{ color: "var(--text)" }}>{ob.owner}</span>
+                  </>
+                ) : (
+                  <span style={{ color: "var(--text-muted)" }}>—</span>
+                )}
+              </span>
+            </React.Fragment>
+          );
+        })}
       </div>
       {onboardings.length > 0 && (
         <div

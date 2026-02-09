@@ -14,6 +14,8 @@ All significant decisions for the Onboarding Orchestrator project. Add new entri
 | **Demo clients** — Acme Co = client 1 (onboarding id `1`), TechCorp = client 2 (onboarding id `2`). | Clear mapping for list/detail and seed data. |
 | **Companies list columns** — Company, Status, Next action, Owner, Tasks, Blocked, Last activity. Replaced earlier Stage/Priority placeholders. | Next action = first incomplete task title; Owner and Last activity from Onboarding model (`owner`, `updatedAt`). |
 | **Onboarding schema: owner + updatedAt** — Added `owner` (String, default `""`) and `updatedAt` (DateTime, `@updatedAt`) to the Onboarding model. Migration: `20260209000000_add_owner_and_updated_at`. | Owner tracks who runs the onboarding; updatedAt powers "Last activity" column. |
+| **Status badge logic** — Active onboardings derive badge from task health: *On track* (--success), *At risk* (--alert), *Blocked* (--danger). Completed → *Completed* (--mint). Paused → *Paused* (--rose). | Keeps status dynamic for active work; static for terminal/paused states. Inputs for deriving health to be refined later. |
+| **Demo seed — 10 companies** — Seed script creates 10 companies with a mix of Active (5), Completed (3), Paused (2) onboardings plus 28 tasks across all of them. | Enough data to exercise all badge states and filter views. |
 
 ---
 
