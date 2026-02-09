@@ -14,11 +14,16 @@
   --accent-muted: #0891b2;
   --action: #C098FF;
   --action-text: #18181E;
-  --danger: #FF5D76;
-  --success: #2DFFA0;
-  --alert: #FFBA7D;
-  --mint: #85FFE3;
-  --rose: #DF85FF;
+  --danger: #FF647C;
+  --success: #3FFFA9;
+  --alert: #FFEB94;
+  --mint: #85FFF1;
+  --rose: #DE82FF;
+  --sunset: #FFBA7D;
+  --lilac: #8D78FF;
+  --sky: #85C0FF;
+  --candy: #FE6DD7;
+  --text-dark: #18181E;
   --warning: #fbbf24;
 }
 

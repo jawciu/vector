@@ -6,13 +6,13 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
-  { href: "/", label: "Companies", icon: CompaniesIcon },
+  { href: "/", label: "Onboardings", icon: OnboardingsIcon },
   { href: "/settings", label: "Settings", icon: SettingsIcon },
 ];
 
 const iconSize = 14;
 
-function CompaniesIcon({ className, style }) {
+function OnboardingsIcon({ className, style }) {
   return (
     <svg className={className} width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={style}>
       <path d="M2 20h20M6 20V8l6-4 6 4v12M6 12h12" />

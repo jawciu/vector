@@ -1,14 +1,17 @@
 import React from "react";
 import Link from "next/link";
 import { getOnboardings } from "@/lib/db";
-import CompaniesActionBar from "./components/CompaniesActionBar";
+import OnboardingsActionBar from "./components/OnboardingsActionBar";
 
-const LOGO_COLORS = [
-  "#3b82f6", // blue
-  "#8b5cf6", // violet
-  "#06b6d4", // cyan
-  "#10b981", // emerald
-  "#f59e0b", // amber
+const AVATAR_COLORS = [
+  "var(--sunset)",
+  "var(--lilac)",
+  "var(--sky)",
+  "var(--candy)",
+  "var(--mint)",
+  "var(--rose)",
+  "var(--alert)",
+  "var(--success)",
 ];
 
 function companyInitials(name) {
@@ -19,7 +22,7 @@ function companyInitials(name) {
 
 function companyLogoColor(name) {
   const n = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  return LOGO_COLORS[n % LOGO_COLORS.length];
+  return AVATAR_COLORS[n % AVATAR_COLORS.length];
 }
 
 /** Returns { label, color } for the status badge.
@@ -55,7 +58,7 @@ export default async function OnboardingsListPage({ searchParams }) {
           className="text-base font-semibold"
           style={{ color: "var(--text)" }}
         >
-          Companies
+          Onboardings
         </h1>
       </div>
       <div
@@ -68,7 +71,7 @@ export default async function OnboardingsListPage({ searchParams }) {
           boxSizing: "border-box",
         }}
       >
-        <CompaniesActionBar />
+        <OnboardingsActionBar />
       </div>
       <div
         className="border-b w-full"
@@ -121,7 +124,7 @@ export default async function OnboardingsListPage({ searchParams }) {
                   className="flex shrink-0 w-4 h-4 rounded items-center justify-center text-[10px] font-semibold"
                   style={{
                     background: companyLogoColor(ob.companyName),
-                    color: "rgba(255,255,255,0.95)",
+                    color: "var(--text-dark)",
                   }}
                   aria-hidden
                 >
@@ -191,7 +194,7 @@ export default async function OnboardingsListPage({ searchParams }) {
                       className="flex shrink-0 w-5 h-5 rounded-full items-center justify-center text-[10px] font-semibold"
                       style={{
                         background: companyLogoColor(ob.owner),
-                        color: "rgba(255,255,255,0.95)",
+                        color: "var(--text-dark)",
                       }}
                       aria-hidden
                     >
@@ -222,7 +225,7 @@ export default async function OnboardingsListPage({ searchParams }) {
             className="mt-2 text-sm"
             style={{ color: "var(--text-muted)" }}
           >
-            {onboardings.length} {onboardings.length === 1 ? "company" : "companies"}
+            {onboardings.length} {onboardings.length === 1 ? "onboarding" : "onboardings"}
           </p>
         </div>
       )}
