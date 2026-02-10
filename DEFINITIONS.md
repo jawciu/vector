@@ -45,7 +45,8 @@ Quick reference for what you can do from each part of the Onboarding Orchestrato
 | **`app/components/AppShell.js`** | Client wrapper: layout with sidebar on app routes; no shell on `/login`. |
 | **`app/components/Sidebar.js`** | Sidebar: nav links (Onboardings, Settings), user block at top with dropdown (Sign out). |
 | **`app/components/SignOut.js`** | Unused: standalone "Sign out" button component; sign out is in Sidebar user dropdown. |
-| **`app/components/OnboardingsActionBar.js`** | Client component: action bar on Onboardings page — "All Onboardings" dropdown filter, same border style as sidebar. |
+| **`app/components/OnboardingsActionBar.js`** | Client component: action bar on Onboardings page — "All Onboardings" dropdown filter, same border style as sidebar. Uses shared menu primitives from `Menu.js`. |
+| **`app/components/Menu.js`** | Reusable menu primitives: `MenuTriggerButton`, `MenuList`, and `MenuOption` with shared dropdown styles used for filters and other listbox-style menus. |
 | **`app/login/page.js`** | Login page: email/password form; Supabase `signInWithPassword`; redirect to `/` on success. |
 | **`app/auth/callback/route.js`** | GET route: exchanges Supabase auth code for session (e.g. email confirmation); redirects to `/` or `?next=`. |
 | **`app/onboardings/[id]/`** | Dynamic route: one onboarding by id (e.g. `/onboardings/1`, `/onboardings/2`). |
