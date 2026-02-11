@@ -147,7 +147,7 @@ export default function Sidebar() {
               className={`flex h-fit items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium transition-colors ${
                 isActive
                   ? "bg-[var(--surface-hover)] text-[var(--text)]"
-                  : "text-[var(--text-muted)] hover:bg-[var(--nav-hover)] hover:text-[var(--text)]"
+                  : "text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text)]"
               }`}
               style={{ padding: "4px 8px" }}
             >

@@ -3,6 +3,7 @@
 :root {
   --bg: #18181E;
   --bg-elevated: #1D1C24;
+  --bg-hover: #211F29;
   --surface: #1f1e26;
   --surface-hover: #26242F;
   --nav-hover: #211F29;
@@ -56,3 +57,27 @@ a {
   text-decoration: none;
 }
 
+/* Menu option hover styles */
+.menu-option:hover {
+  background-color: var(--bg-hover);
+}
+
+.menu-option-active {
+  background-color: var(--surface-hover);
+}
+
+/* Company cell hover styles */
+.company-cell-link {
+  transition: background-color 0.15s ease;
+}
+
+.company-cell-link:hover {
+  background-color: var(--bg-hover);
+  cursor: pointer;
+}.company-name {
+  transition: color 0.15s ease;
+}
+
+.company-cell-link:hover .company-name {
+  color: var(--action);
+}

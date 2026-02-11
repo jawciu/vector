@@ -119,7 +119,11 @@ export default async function OnboardingsListPage({ searchParams }) {
           return (
             <React.Fragment key={ob.id}>
               {/* Company */}
-              <span className="flex items-center gap-2" style={cellStyle(0)}>
+              <Link
+                href={`/onboardings/${ob.id}`}
+                className="flex items-center gap-2 no-underline company-cell-link"
+                style={cellStyle(0)}
+              >
                 <span
                   className="flex shrink-0 w-4 h-4 rounded items-center justify-center text-[10px] font-semibold"
                   style={{
@@ -130,14 +134,13 @@ export default async function OnboardingsListPage({ searchParams }) {
                 >
                   {companyInitials(ob.companyName)}
                 </span>
-                <Link
-                  href={`/onboardings/${ob.id}`}
-                  className="font-medium no-underline hover:underline"
+                <span
+                  className="font-medium company-name"
                   style={{ color: "var(--text)" }}
                 >
                   {ob.companyName}
-                </Link>
-              </span>
+                </span>
+              </Link>
               {/* Status */}
               <span className="flex items-center" style={cellStyle(1)}>
                 {(() => {

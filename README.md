@@ -1,5 +1,14 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Frameworks & tools
+
+- **[Next.js](https://nextjs.org)** — React framework and app router
+- **[React](https://react.dev)** — UI library
+- **[Tailwind CSS](https://tailwindcss.com)** — Styling
+- **[Supabase](https://supabase.com)** — Auth and backend (SSR + JS client)
+- **[Prisma](https://www.prisma.io)** — Database ORM and migrations
+- **ESLint** — Linting
+
 ## Getting Started
 
 First, run the development server:

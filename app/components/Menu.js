@@ -71,8 +71,8 @@ export function MenuOption({
   ...rest
 }) {
   const baseClassName =
-    "flex w-full items-center rounded text-left text-sm transition-colors hover:bg-[#211F29]";
-  const activeClassName = active ? "bg-[#26242F]" : "";
+    "flex w-full items-center rounded text-left text-sm transition-colors menu-option";
+  const activeClassName = active ? "menu-option-active" : "";
   const baseStyle = {
     color: active ? "var(--text)" : "var(--text-muted)",
     fontWeight: active ? 600 : 400,
