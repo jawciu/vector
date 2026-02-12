@@ -51,7 +51,7 @@ Quick reference for what you can do from each part of the Onboarding Orchestrato
 | **`app/auth/callback/route.js`** | GET route: exchanges Supabase auth code for session (e.g. email confirmation); redirects to `/` or `?next=`. |
 | **`app/onboardings/[id]/`** | Dynamic route: one onboarding by id (e.g. `/onboardings/1`, `/onboardings/2`). |
 | **`app/onboardings/[id]/page.js`** | Server Component: loads onboarding + tasks by id, then renders detail client or "not found". |
-| **`app/onboardings/[id]/OnboardingDetailClient.js`** | Client Component: task list, status filter, health. Uses the data passed from `page.js`. |
+| **`app/onboardings/[id]/OnboardingDetailClient.js`** | Client Component: company header, health, and Kanban board showing tasks in columns by status (Todo, In progress, Blocked, Done). Uses the data passed from `page.js`. |
 
 **What you can do:** Add new pages under `app/` (e.g. `app/about/page.js` → `/about`). Add components in `app/components/` and import them where needed. Change layout or global styles in `layout.js` and `globals.css`.
 

@@ -1,18 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { computeHealth } from "@/lib/health";
 import TaskCard from "@/app/components/TaskCard";
+
+const STATUSES = ["Todo", "In progress", "Blocked", "Done"];
 
 export default function OnboardingDetailClient({ onboarding, tasks }) {
   const health = computeHealth(tasks);
   const blockedCount = tasks.filter((t) => t.status === "Blocked").length;
-  const [filter, setFilter] = useState("All");
-  const visibleTasks = filter === "All" ? tasks : tasks.filter((t) => t.status === filter);
+
+  const columns = STATUSES.map((status) => ({
+    status,
+    tasks: tasks.filter((t) => t.status === status),
+  }));
 
   return (
-    <main className="max-w-3xl grid gap-4">
+    <main className="max-w-6xl grid gap-4">
       <div className="flex items-center gap-3 flex-wrap">
         <Link
           href="/"
@@ -33,33 +37,43 @@ export default function OnboardingDetailClient({ onboarding, tasks }) {
         Health: <strong>{health}</strong> ({blockedCount} blocked)
       </div>
 
-      <label className="grid gap-1.5" style={{ maxWidth: 220 }}>
-        <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-          Filter by status
-        </span>
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="py-2.5 px-3 rounded-lg text-sm transition-colors"
-          style={{
-            border: "1px solid var(--border)",
-            background: "var(--surface)",
-            color: "var(--text)",
-          }}
-        >
-          <option>All</option>
-          <option>Todo</option>
-          <option>In progress</option>
-          <option>Blocked</option>
-          <option>Done</option>
-        </select>
-      </label>
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {columns.map(({ status, tasks }) => (
+          <div
+            key={status}
+            className="flex flex-col gap-3 rounded-2xl p-3 md:p-4"
+            style={{
+              border: "1px solid var(--border)",
+              background: "var(--surface)",
+            }}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <h2
+                className="text-xs font-semibold tracking-wide uppercase"
+                style={{ color: "var(--text-muted)" }}
+              >
+                {status}
+              </h2>
+              <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+                {tasks.length}
+              </span>
+            </div>
 
-      <div className="grid gap-3">
-        {visibleTasks.map((t) => (
-          <TaskCard key={t.id} task={t} />
+            <div className="flex flex-col gap-3">
+              {tasks.length === 0 ? (
+                <div
+                  className="rounded-lg border border-dashed px-3 py-4 text-center text-xs md:text-sm"
+                  style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+                >
+                  No tasks in this column.
+                </div>
+              ) : (
+                tasks.map((t) => <TaskCard key={t.id} task={t} />)
+              )}
+            </div>
+          </div>
         ))}
-      </div>
+      </section>
     </main>
   );
 }

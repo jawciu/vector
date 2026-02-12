@@ -57,6 +57,7 @@ All significant decisions for the Onboarding Orchestrator project. Add new entri
 | **Dev and build** — Use **`next dev --webpack`** and **`next build --webpack`** in `package.json` scripts. | Avoids Turbopack PostCSS "error evaluating node" in the browser; Webpack handles PostCSS correctly. |
 | **Dynamic route params** — In `app/onboardings/[id]/page.js`, **await `params`** before reading `id`: `const { id } = await params`. | Next.js 15+ passes `params` as a Promise; using `params?.id` without await gave `undefined` and "Onboarding not found". |
 | **DB helpers and invalid ids** — In `lib/db.js`, **validate `id` / `onboardingId`** before calling Prisma: if `Number(id)` is `NaN`, return `null` or `[]` instead of calling Prisma. | Passing `NaN` to Prisma (e.g. from undefined during nav/hot reload) caused `PrismaClientValidationError`. |
+| **Onboarding detail layout — Kanban** — The company onboarding detail page (`/onboardings/[id]`) now shows tasks in a Kanban-style board with one column per status (Todo, In progress, Blocked, Done) instead of a single filtered list. | Makes it easier to scan workload by status at a glance and feels closer to real-world onboarding boards vendors are used to. |
 
 ---
 
