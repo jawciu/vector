@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Onboarding Orchestrator",
+  title: "Vector",
   description: "Lightweight B2B onboarding workflow — track tasks, health, and follow-ups.",
 };
 
