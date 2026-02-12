@@ -1,0 +1,2 @@
+# Ignore generated Prisma client files
+lib/generated/
