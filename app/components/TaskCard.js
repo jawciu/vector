@@ -10,16 +10,16 @@ export default function TaskCard({ task }) {
         padding: "12px 16px",
       }}
     >
-      <div className="font-medium" style={{ color: "var(--text)" }}>
+      <div className="text-sm font-medium" style={{ color: "var(--text)" }}>
         {task.title}
       </div>
 
-      <div className="flex items-center justify-between gap-3 text-xs">
-        <div style={{ color: "var(--text-muted)" }}>
-          Waiting on: <span style={{ color: "var(--text)" }}>{task.waitingOn}</span>
-        </div>
+      <div className="flex flex-col gap-1 text-xs">
         <div style={{ color: "var(--text-muted)" }}>
           Due: {task.due}
+        </div>
+        <div style={{ color: "var(--text-muted)" }}>
+          Waiting on: <span style={{ color: "var(--text)" }}>{task.waitingOn}</span>
         </div>
       </div>
     </div>

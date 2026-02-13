@@ -38,7 +38,7 @@ export default function OnboardingDetailClient({ onboarding, tasks }) {
   }));
 
   return (
-    <main className="w-full grid gap-4">
+    <main className="w-full flex flex-col" style={{ minHeight: "100vh" }}>
       <nav
         className="w-full flex items-center gap-2 text-sm border-b"
         style={{
@@ -72,26 +72,8 @@ export default function OnboardingDetailClient({ onboarding, tasks }) {
           </span>
         </div>
       </nav>
-      <div className="max-w-6xl grid gap-4" style={{ paddingLeft: 16, paddingRight: 16 }}>
-
-      <div className="flex items-center gap-2 flex-wrap">
-        <span
-          className="inline-flex rounded text-xs font-medium"
-          style={{
-            paddingTop: 4,
-            paddingBottom: 4,
-            paddingLeft: 8,
-            paddingRight: 8,
-            borderRadius: 6,
-            color: health === "Blocked" || health === "At risk" ? "var(--danger)" : "var(--success)",
-            borderWidth: "1px",
-            borderStyle: "solid",
-            borderColor: health === "Blocked" || health === "At risk" ? "var(--danger)" : "var(--success)",
-          }}
-        >
-          {health}
-        </span>
-        {blockedCount > 0 && (
+      <div className="max-w-6xl" style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 16, paddingBottom: 16 }}>
+        <div className="flex items-center gap-2 flex-wrap">
           <span
             className="inline-flex rounded text-xs font-medium"
             style={{
@@ -100,24 +82,53 @@ export default function OnboardingDetailClient({ onboarding, tasks }) {
               paddingLeft: 8,
               paddingRight: 8,
               borderRadius: 6,
-              color: "var(--danger)",
+              color: health === "Blocked" || health === "At risk" ? "var(--danger)" : "var(--success)",
               borderWidth: "1px",
               borderStyle: "solid",
-              borderColor: "var(--danger)",
+              borderColor: health === "Blocked" || health === "At risk" ? "var(--danger)" : "var(--success)",
             }}
           >
-            {blockedCount} blocked
+            {health}
           </span>
-        )}
+          {blockedCount > 0 && (
+            <span
+              className="inline-flex rounded text-xs font-medium"
+              style={{
+                paddingTop: 4,
+                paddingBottom: 4,
+                paddingLeft: 8,
+                paddingRight: 8,
+                borderRadius: 6,
+                color: "var(--danger)",
+                borderWidth: "1px",
+                borderStyle: "solid",
+                borderColor: "var(--danger)",
+              }}
+            >
+              {blockedCount} blocked
+            </span>
+          )}
+        </div>
       </div>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {columns.map(({ status, tasks }) => (
-          <div key={status} className="flex flex-col gap-3">
-            <div className="flex items-center gap-2 px-1">
+      <section className="flex-1 flex flex-col" style={{ borderTop: "1px solid var(--border)" }}>
+        {/* Header row */}
+        <div className="grid md:grid-cols-2 xl:grid-cols-5" style={{ borderBottom: "1px solid var(--border)" }}>
+          {columns.map(({ status, tasks }, colIdx) => (
+            <div
+              key={status}
+              className="flex items-center gap-2"
+              style={{
+                paddingTop: 12,
+                paddingBottom: 12,
+                paddingLeft: 16,
+                paddingRight: 16,
+                borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
+              }}
+            >
               <h2
-                className="text-xs font-semibold tracking-wide uppercase"
-                style={{ color: "var(--text-muted)" }}
+                className="text-base font-bold"
+                style={{ color: "var(--text)" }}
               >
                 {status}
               </h2>
@@ -128,8 +139,41 @@ export default function OnboardingDetailClient({ onboarding, tasks }) {
                 {tasks.length}
               </span>
             </div>
+          ))}
+          {/* Add section header */}
+          <div
+            className="flex items-center gap-2"
+            style={{
+              paddingTop: 12,
+              paddingBottom: 12,
+              paddingLeft: 16,
+              paddingRight: 16,
+              borderLeft: "1px solid var(--border)",
+            }}
+          >
+            <h2
+              className="text-base font-bold"
+              style={{ color: "var(--text)" }}
+            >
+              + Add section
+            </h2>
+          </div>
+        </div>
 
-            <div className="flex flex-col gap-3">
+        {/* Content row */}
+        <div className="grid md:grid-cols-2 xl:grid-cols-5 flex-1">
+          {columns.map(({ status, tasks }, colIdx) => (
+            <div
+              key={status}
+              className="flex flex-col gap-3"
+              style={{
+                paddingTop: 16,
+                paddingLeft: 16,
+                paddingRight: 16,
+                paddingBottom: 16,
+                borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
+              }}
+            >
               {tasks.length === 0 ? (
                 <div
                   className="rounded-lg border border-dashed px-4 py-8 text-center text-sm"
@@ -141,10 +185,20 @@ export default function OnboardingDetailClient({ onboarding, tasks }) {
                 tasks.map((t) => <TaskCard key={t.id} task={t} />)
               )}
             </div>
-          </div>
-        ))}
+          ))}
+          {/* Add section content */}
+          <div
+            className="flex flex-col gap-3"
+            style={{
+              paddingTop: 16,
+              paddingLeft: 16,
+              paddingRight: 16,
+              paddingBottom: 16,
+              borderLeft: "1px solid var(--border)",
+            }}
+          />
+        </div>
       </section>
-      </div>
     </main>
   );
 }
