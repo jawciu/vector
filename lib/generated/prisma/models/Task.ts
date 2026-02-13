@@ -43,6 +43,8 @@ export type TaskMinAggregateOutputType = {
   status: string | null
   due: string | null
   waitingOn: string | null
+  owner: string | null
+  notes: string | null
 }
 
 export type TaskMaxAggregateOutputType = {
@@ -52,6 +54,8 @@ export type TaskMaxAggregateOutputType = {
   status: string | null
   due: string | null
   waitingOn: string | null
+  owner: string | null
+  notes: string | null
 }
 
 export type TaskCountAggregateOutputType = {
@@ -61,6 +65,8 @@ export type TaskCountAggregateOutputType = {
   status: number
   due: number
   waitingOn: number
+  owner: number
+  notes: number
   _all: number
 }
 
@@ -82,6 +88,8 @@ export type TaskMinAggregateInputType = {
   status?: true
   due?: true
   waitingOn?: true
+  owner?: true
+  notes?: true
 }
 
 export type TaskMaxAggregateInputType = {
@@ -91,6 +99,8 @@ export type TaskMaxAggregateInputType = {
   status?: true
   due?: true
   waitingOn?: true
+  owner?: true
+  notes?: true
 }
 
 export type TaskCountAggregateInputType = {
@@ -100,6 +110,8 @@ export type TaskCountAggregateInputType = {
   status?: true
   due?: true
   waitingOn?: true
+  owner?: true
+  notes?: true
   _all?: true
 }
 
@@ -196,6 +208,8 @@ export type TaskGroupByOutputType = {
   status: string
   due: string
   waitingOn: string
+  owner: string
+  notes: string
   _count: TaskCountAggregateOutputType | null
   _avg: TaskAvgAggregateOutputType | null
   _sum: TaskSumAggregateOutputType | null
@@ -228,6 +242,8 @@ export type TaskWhereInput = {
   status?: Prisma.StringFilter<"Task"> | string
   due?: Prisma.StringFilter<"Task"> | string
   waitingOn?: Prisma.StringFilter<"Task"> | string
+  owner?: Prisma.StringFilter<"Task"> | string
+  notes?: Prisma.StringFilter<"Task"> | string
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
 }
 
@@ -238,6 +254,8 @@ export type TaskOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   due?: Prisma.SortOrder
   waitingOn?: Prisma.SortOrder
+  owner?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
   onboarding?: Prisma.OnboardingOrderByWithRelationInput
 }
 
@@ -251,6 +269,8 @@ export type TaskWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.StringFilter<"Task"> | string
   due?: Prisma.StringFilter<"Task"> | string
   waitingOn?: Prisma.StringFilter<"Task"> | string
+  owner?: Prisma.StringFilter<"Task"> | string
+  notes?: Prisma.StringFilter<"Task"> | string
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
 }, "id">
 
@@ -261,6 +281,8 @@ export type TaskOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   due?: Prisma.SortOrder
   waitingOn?: Prisma.SortOrder
+  owner?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
   _count?: Prisma.TaskCountOrderByAggregateInput
   _avg?: Prisma.TaskAvgOrderByAggregateInput
   _max?: Prisma.TaskMaxOrderByAggregateInput
@@ -278,6 +300,8 @@ export type TaskScalarWhereWithAggregatesInput = {
   status?: Prisma.StringWithAggregatesFilter<"Task"> | string
   due?: Prisma.StringWithAggregatesFilter<"Task"> | string
   waitingOn?: Prisma.StringWithAggregatesFilter<"Task"> | string
+  owner?: Prisma.StringWithAggregatesFilter<"Task"> | string
+  notes?: Prisma.StringWithAggregatesFilter<"Task"> | string
 }
 
 export type TaskCreateInput = {
@@ -285,6 +309,8 @@ export type TaskCreateInput = {
   status: string
   due: string
   waitingOn: string
+  owner?: string
+  notes?: string
   onboarding: Prisma.OnboardingCreateNestedOneWithoutTasksInput
 }
 
@@ -295,6 +321,8 @@ export type TaskUncheckedCreateInput = {
   status: string
   due: string
   waitingOn: string
+  owner?: string
+  notes?: string
 }
 
 export type TaskUpdateInput = {
@@ -302,6 +330,8 @@ export type TaskUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   due?: Prisma.StringFieldUpdateOperationsInput | string
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutTasksNestedInput
 }
 
@@ -312,6 +342,8 @@ export type TaskUncheckedUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   due?: Prisma.StringFieldUpdateOperationsInput | string
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TaskCreateManyInput = {
@@ -321,6 +353,8 @@ export type TaskCreateManyInput = {
   status: string
   due: string
   waitingOn: string
+  owner?: string
+  notes?: string
 }
 
 export type TaskUpdateManyMutationInput = {
@@ -328,6 +362,8 @@ export type TaskUpdateManyMutationInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   due?: Prisma.StringFieldUpdateOperationsInput | string
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TaskUncheckedUpdateManyInput = {
@@ -337,6 +373,8 @@ export type TaskUncheckedUpdateManyInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   due?: Prisma.StringFieldUpdateOperationsInput | string
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TaskListRelationFilter = {
@@ -356,6 +394,8 @@ export type TaskCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   due?: Prisma.SortOrder
   waitingOn?: Prisma.SortOrder
+  owner?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
 }
 
 export type TaskAvgOrderByAggregateInput = {
@@ -370,6 +410,8 @@ export type TaskMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   due?: Prisma.SortOrder
   waitingOn?: Prisma.SortOrder
+  owner?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
 }
 
 export type TaskMinOrderByAggregateInput = {
@@ -379,6 +421,8 @@ export type TaskMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   due?: Prisma.SortOrder
   waitingOn?: Prisma.SortOrder
+  owner?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
 }
 
 export type TaskSumOrderByAggregateInput = {
@@ -433,6 +477,8 @@ export type TaskCreateWithoutOnboardingInput = {
   status: string
   due: string
   waitingOn: string
+  owner?: string
+  notes?: string
 }
 
 export type TaskUncheckedCreateWithoutOnboardingInput = {
@@ -441,6 +487,8 @@ export type TaskUncheckedCreateWithoutOnboardingInput = {
   status: string
   due: string
   waitingOn: string
+  owner?: string
+  notes?: string
 }
 
 export type TaskCreateOrConnectWithoutOnboardingInput = {
@@ -479,6 +527,8 @@ export type TaskScalarWhereInput = {
   status?: Prisma.StringFilter<"Task"> | string
   due?: Prisma.StringFilter<"Task"> | string
   waitingOn?: Prisma.StringFilter<"Task"> | string
+  owner?: Prisma.StringFilter<"Task"> | string
+  notes?: Prisma.StringFilter<"Task"> | string
 }
 
 export type TaskCreateManyOnboardingInput = {
@@ -487,6 +537,8 @@ export type TaskCreateManyOnboardingInput = {
   status: string
   due: string
   waitingOn: string
+  owner?: string
+  notes?: string
 }
 
 export type TaskUpdateWithoutOnboardingInput = {
@@ -494,6 +546,8 @@ export type TaskUpdateWithoutOnboardingInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   due?: Prisma.StringFieldUpdateOperationsInput | string
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TaskUncheckedUpdateWithoutOnboardingInput = {
@@ -502,6 +556,8 @@ export type TaskUncheckedUpdateWithoutOnboardingInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   due?: Prisma.StringFieldUpdateOperationsInput | string
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TaskUncheckedUpdateManyWithoutOnboardingInput = {
@@ -510,6 +566,8 @@ export type TaskUncheckedUpdateManyWithoutOnboardingInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   due?: Prisma.StringFieldUpdateOperationsInput | string
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -521,6 +579,8 @@ export type TaskSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   status?: boolean
   due?: boolean
   waitingOn?: boolean
+  owner?: boolean
+  notes?: boolean
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["task"]>
 
@@ -531,6 +591,8 @@ export type TaskSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   status?: boolean
   due?: boolean
   waitingOn?: boolean
+  owner?: boolean
+  notes?: boolean
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["task"]>
 
@@ -541,6 +603,8 @@ export type TaskSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   status?: boolean
   due?: boolean
   waitingOn?: boolean
+  owner?: boolean
+  notes?: boolean
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["task"]>
 
@@ -551,9 +615,11 @@ export type TaskSelectScalar = {
   status?: boolean
   due?: boolean
   waitingOn?: boolean
+  owner?: boolean
+  notes?: boolean
 }
 
-export type TaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "onboardingId" | "title" | "status" | "due" | "waitingOn", ExtArgs["result"]["task"]>
+export type TaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "onboardingId" | "title" | "status" | "due" | "waitingOn" | "owner" | "notes", ExtArgs["result"]["task"]>
 export type TaskInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
 }
@@ -576,6 +642,8 @@ export type $TaskPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     status: string
     due: string
     waitingOn: string
+    owner: string
+    notes: string
   }, ExtArgs["result"]["task"]>
   composites: {}
 }
@@ -1006,6 +1074,8 @@ export interface TaskFieldRefs {
   readonly status: Prisma.FieldRef<"Task", 'String'>
   readonly due: Prisma.FieldRef<"Task", 'String'>
   readonly waitingOn: Prisma.FieldRef<"Task", 'String'>
+  readonly owner: Prisma.FieldRef<"Task", 'String'>
+  readonly notes: Prisma.FieldRef<"Task", 'String'>
 }
     
 

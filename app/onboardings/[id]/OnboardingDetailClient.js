@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { computeHealth } from "@/lib/health";
 import TaskCard from "@/app/components/TaskCard";
+import CreateTaskCard from "@/app/components/CreateTaskCard";
 
 const STATUSES = ["Todo", "In progress", "Blocked", "Done"];
 
@@ -28,7 +30,10 @@ function companyLogoColor(name) {
   return AVATAR_COLORS[n % AVATAR_COLORS.length];
 }
 
-export default function OnboardingDetailClient({ onboarding, tasks }) {
+export default function OnboardingDetailClient({ onboarding, tasks: initialTasks }) {
+  const [tasks, setTasks] = useState(initialTasks);
+  const [error, setError] = useState("");
+
   const health = computeHealth(tasks);
   const blockedCount = tasks.filter((t) => t.status === "Blocked").length;
 
@@ -36,6 +41,20 @@ export default function OnboardingDetailClient({ onboarding, tasks }) {
     status,
     tasks: tasks.filter((t) => t.status === status),
   }));
+
+  function handleTaskCreated(newTask) {
+    setTasks(prevTasks => [...prevTasks, newTask]);
+  }
+
+  function handleTaskUpdated(updatedTask) {
+    setTasks(prevTasks =>
+      prevTasks.map(t => t.id === updatedTask.id ? updatedTask : t)
+    );
+  }
+
+  function handleTaskDeleted(taskId) {
+    setTasks(prevTasks => prevTasks.filter(t => t.id !== taskId));
+  }
 
   return (
     <main className="w-full flex flex-col" style={{ minHeight: "100vh" }}>
@@ -73,24 +92,20 @@ export default function OnboardingDetailClient({ onboarding, tasks }) {
         </div>
       </nav>
       <div className="max-w-6xl" style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 16, paddingBottom: 16 }}>
-        <div className="flex items-center gap-2 flex-wrap">
-          <span
-            className="inline-flex rounded text-xs font-medium"
-            style={{
-              paddingTop: 4,
-              paddingBottom: 4,
-              paddingLeft: 8,
-              paddingRight: 8,
-              borderRadius: 6,
-              color: health === "Blocked" || health === "At risk" ? "var(--danger)" : "var(--success)",
-              borderWidth: "1px",
-              borderStyle: "solid",
-              borderColor: health === "Blocked" || health === "At risk" ? "var(--danger)" : "var(--success)",
-            }}
-          >
-            {health}
-          </span>
-          {blockedCount > 0 && (
+        <div className="flex flex-col gap-2">
+          {error && (
+            <div
+              className="text-sm px-3 py-2 rounded"
+              style={{
+                color: "var(--danger)",
+                background: "rgba(255, 137, 155, 0.1)",
+                border: "1px solid var(--danger)",
+              }}
+            >
+              {error}
+            </div>
+          )}
+          <div className="flex items-center gap-2 flex-wrap">
             <span
               className="inline-flex rounded text-xs font-medium"
               style={{
@@ -99,15 +114,33 @@ export default function OnboardingDetailClient({ onboarding, tasks }) {
                 paddingLeft: 8,
                 paddingRight: 8,
                 borderRadius: 6,
-                color: "var(--danger)",
+                color: health === "Blocked" || health === "At risk" ? "var(--danger)" : "var(--success)",
                 borderWidth: "1px",
                 borderStyle: "solid",
-                borderColor: "var(--danger)",
+                borderColor: health === "Blocked" || health === "At risk" ? "var(--danger)" : "var(--success)",
               }}
             >
-              {blockedCount} blocked
+              {health}
             </span>
-          )}
+            {blockedCount > 0 && (
+              <span
+                className="inline-flex rounded text-xs font-medium"
+                style={{
+                  paddingTop: 4,
+                  paddingBottom: 4,
+                  paddingLeft: 8,
+                  paddingRight: 8,
+                  borderRadius: 6,
+                  color: "var(--danger)",
+                  borderWidth: "1px",
+                  borderStyle: "solid",
+                  borderColor: "var(--danger)",
+                }}
+              >
+                {blockedCount} blocked
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -174,16 +207,19 @@ export default function OnboardingDetailClient({ onboarding, tasks }) {
                 borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
               }}
             >
-              {tasks.length === 0 ? (
-                <div
-                  className="rounded-lg border border-dashed px-4 py-8 text-center text-sm"
-                  style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
-                >
-                  No tasks
-                </div>
-              ) : (
-                tasks.map((t) => <TaskCard key={t.id} task={t} />)
-              )}
+              {tasks.map((t) => (
+                <TaskCard
+                  key={t.id}
+                  task={t}
+                  onTaskUpdated={handleTaskUpdated}
+                  onTaskDeleted={handleTaskDeleted}
+                />
+              ))}
+              <CreateTaskCard
+                onboardingId={onboarding.id}
+                defaultStatus={status}
+                onTaskCreated={handleTaskCreated}
+              />
             </div>
           ))}
           {/* Add section content */}

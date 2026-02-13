@@ -37,4 +37,6 @@ model Task {
   status        String   // Todo | In progress | Blocked | Done
   due           String   // e.g. "Mon", "Tue"
   waitingOn     String
+  owner         String   @default("")
+  notes         String   @default("")
 }
