@@ -205,7 +205,7 @@ The customer-facing experience. This is the differentiator — if customers actu
 #### 4.3 Integrations
 - **Slack**: notifications, task updates, follow-up messages posted to a channel
 - **Email**: send follow-ups directly from the tool (not just copy/paste)
-- **CRM link**: associate onboarding with a CRM deal (Salesforce, HubSpot) — link field, not deep integration
+- **CRM link**: associate onboarding with a CRM deal (Salesforce, HubSpot, Attio) — link field, not deep integration. Attio is a priority — it's the CRM our ICP actually uses.
 - **Webhooks**: fire events on task completion, phase completion, health changes — let vendors build their own integrations
 - **CSV import/export**: bulk create tasks, export onboarding data for reporting
 
@@ -213,6 +213,8 @@ The customer-facing experience. This is the differentiator — if customers actu
 - Structured handoff form: deal size, customer requirements, key contacts, timeline expectations, special notes
 - Sales fills this out when the deal closes → creates the onboarding automatically
 - CS/Implementation team gets full context without a "handoff meeting" that covers things already written down
+- **Linear import**: customers on trial often already have tickets/issues in Linear (bugs, setup tasks, feature requests). Pull these in during handoff so nothing falls through the cracks when moving from trial → paid onboarding.
+- **Attio deal context**: pull deal metadata (size, stage, contacts, notes) from Attio directly into the handoff form — no manual re-entry for teams already using Attio as their CRM.
 
 ---
 
