@@ -29,6 +29,7 @@ model Onboarding {
   company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   tasks         Task[]
   contacts      Contact[]
+  phases        Phase[]
 }
 
 model Contact {
@@ -40,14 +41,30 @@ model Contact {
   role          String     @default("")
 }
 
-model Task {
-  id            Int    @id @default(autoincrement())
+model Phase {
+  id            Int        @id @default(autoincrement())
   onboardingId  Int
   onboarding    Onboarding @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
-  title         String
-  status        String   // Todo | In progress | Blocked | Done
-  due           String   // e.g. "Mon", "Tue"
-  waitingOn     String
-  owner         String   @default("")
-  notes         String   @default("")
+  name          String
+  sortOrder     Int
+  targetDate    DateTime?
+  isComplete    Boolean    @default(false)
+  tasks         Task[]
+}
+
+model Task {
+  id              Int     @id @default(autoincrement())
+  onboardingId    Int
+  onboarding      Onboarding @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
+  phaseId         Int
+  phase           Phase   @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  title           String
+  status          String  // To do | In progress | Done
+  due             String  // e.g. "2026-03-01"
+  waitingOn       String
+  owner           String  @default("")
+  notes           String  @default("")
+  blockedByTaskId Int?
+  blockedByTask   Task?   @relation("TaskBlocks", fields: [blockedByTaskId], references: [id], onDelete: SetNull)
+  blockedTasks    Task[]  @relation("TaskBlocks")
 }

@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { getOnboarding, getTasksForOnboarding, getContactsForOnboarding } from "@/lib/db";
+import { getOnboarding, getTasksForOnboarding, getContactsForOnboarding, getPhasesForOnboarding } from "@/lib/db";
 import OnboardingDetailClient from "./OnboardingDetailClient";
 
 export default async function OnboardingDetailPage({ params }) {
   const { id } = await params;
-  const [onboarding, tasks, contacts] = await Promise.all([
+  const [onboarding, tasks, contacts, phases] = await Promise.all([
     getOnboarding(id),
     getTasksForOnboarding(id),
     getContactsForOnboarding(id),
+    getPhasesForOnboarding(id),
   ]);
 
   if (!onboarding) {
@@ -21,5 +22,5 @@ export default async function OnboardingDetailPage({ params }) {
     );
   }
 
-  return <OnboardingDetailClient onboarding={onboarding} tasks={tasks} contacts={contacts} />;
+  return <OnboardingDetailClient onboarding={onboarding} tasks={tasks} contacts={contacts} phases={phases} />;
 }

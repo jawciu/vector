@@ -7,8 +7,7 @@ import TaskCard from "@/app/components/TaskCard";
 import CreateTaskCard from "@/app/components/CreateTaskCard";
 import OnboardingActions from "@/app/components/OnboardingActions";
 import ContactsPanel from "@/app/components/ContactsPanel";
-
-const STATUSES = ["Todo", "In progress", "Blocked", "Done"];
+import PhaseHeader from "@/app/components/PhaseHeader";
 
 const AVATAR_COLORS = [
   "var(--sunset)",
@@ -32,28 +31,47 @@ function companyLogoColor(name) {
   return AVATAR_COLORS[n % AVATAR_COLORS.length];
 }
 
-const TASK_FILTERS = ["Pending", "All", "Done"];
+function isTaskBlocked(task) {
+  if (task.blockedByTask && task.blockedByTask.status !== "Done") return true;
+  if (task.waitingOn && task.waitingOn.trim() !== "") return true;
+  return false;
+}
 
-export default function OnboardingDetailClient({ onboarding, tasks: initialTasks, contacts: initialContacts }) {
+const TASK_FILTERS = ["Active", "Blocked", "Done", "All"];
+
+export default function OnboardingDetailClient({ onboarding, tasks: initialTasks, contacts: initialContacts, phases: initialPhases }) {
   const [tasks, setTasks] = useState(initialTasks);
   const [contacts, setContacts] = useState(initialContacts || []);
+  const [phases, setPhases] = useState(initialPhases || []);
   const [error, setError] = useState("");
-  const [taskFilter, setTaskFilter] = useState("Pending");
+  const [taskFilter, setTaskFilter] = useState("Active");
 
   const health = computeHealth(tasks);
-  const blockedCount = tasks.filter((t) => t.status === "Blocked").length;
+  const blockedCount = tasks.filter((t) => isTaskBlocked(t)).length;
 
   // Filter tasks based on selected filter
   const filteredTasks = tasks.filter((t) => {
-    if (taskFilter === "Pending") return t.status !== "Done";
+    if (taskFilter === "Active") return t.status !== "Done";
     if (taskFilter === "Done") return t.status === "Done";
+    if (taskFilter === "Blocked") return isTaskBlocked(t) && t.status !== "Done";
     return true; // "All"
   });
 
-  const columns = STATUSES.map((status) => ({
-    status,
-    tasks: filteredTasks.filter((t) => t.status === status),
+  // Build columns from phases
+  const columns = phases.map((phase) => ({
+    phase,
+    tasks: filteredTasks.filter((t) => t.phaseId === phase.id),
   }));
+
+  // Recompute phase counts from current tasks state
+  const phasesWithCounts = phases.map((phase) => {
+    const phaseTasks = tasks.filter((t) => t.phaseId === phase.id);
+    return {
+      ...phase,
+      taskCount: phaseTasks.length,
+      doneCount: phaseTasks.filter((t) => t.status === "Done").length,
+    };
+  });
 
   // Collect unique people from contacts, tasks, and onboarding
   const people = Array.from(
@@ -78,6 +96,39 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
   function handleTaskDeleted(taskId) {
     setTasks(prevTasks => prevTasks.filter(t => t.id !== taskId));
   }
+
+  function handlePhaseUpdated(updatedPhase) {
+    setPhases(prev => prev.map(p => p.id === updatedPhase.id ? updatedPhase : p));
+  }
+
+  function handlePhaseDeleted(phaseId) {
+    setPhases(prev => prev.filter(p => p.id !== phaseId));
+  }
+
+  async function handleAddPhase() {
+    const name = prompt("Phase name:");
+    if (!name || !name.trim()) return;
+
+    try {
+      const maxSort = phases.reduce((max, p) => Math.max(max, p.sortOrder), -1);
+      const res = await fetch("/api/phases", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          onboardingId: Number(onboarding.id),
+          name: name.trim(),
+          sortOrder: maxSort + 1,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to create phase");
+      const newPhase = await res.json();
+      setPhases(prev => [...prev, newPhase]);
+    } catch {
+      setError("Failed to add phase");
+    }
+  }
+
+  const colCount = phases.length + 1; // +1 for "Add section" column
 
   return (
     <main className="w-full flex flex-col" style={{ minHeight: "100vh" }}>
@@ -228,16 +279,20 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
                   ({tasks.filter(t => t.status === "Done").length})
                 </span>
               )}
+              {filter === "Blocked" && blockedCount > 0 && (
+                <span className="ml-1" style={{ color: "var(--text-muted)" }}>
+                  ({blockedCount})
+                </span>
+              )}
             </button>
           ))}
         </div>
 
         {/* Header row */}
-        <div className="grid md:grid-cols-2 xl:grid-cols-5" style={{ borderBottom: "1px solid var(--border)" }}>
-          {columns.map(({ status, tasks }, colIdx) => (
+        <div style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, 1fr)`, borderBottom: "1px solid var(--border)" }}>
+          {phasesWithCounts.map((phase, colIdx) => (
             <div
-              key={status}
-              className="flex items-center gap-2"
+              key={phase.id}
               style={{
                 paddingTop: 12,
                 paddingBottom: 12,
@@ -246,18 +301,11 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
                 borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
               }}
             >
-              <h2
-                className="text-base font-bold"
-                style={{ color: "var(--text)" }}
-              >
-                {status}
-              </h2>
-              <span
-                className="text-xs font-medium"
-                style={{ color: "var(--text-muted)" }}
-              >
-                {tasks.length}
-              </span>
+              <PhaseHeader
+                phase={phase}
+                onPhaseUpdated={handlePhaseUpdated}
+                onPhaseDeleted={handlePhaseDeleted}
+              />
             </div>
           ))}
           {/* Add section header */}
@@ -271,20 +319,21 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
               borderLeft: "1px solid var(--border)",
             }}
           >
-            <h2
+            <button
+              onClick={handleAddPhase}
               className="text-base font-bold"
-              style={{ color: "var(--text)" }}
+              style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}
             >
               + Add section
-            </h2>
+            </button>
           </div>
         </div>
 
         {/* Content row */}
-        <div className="grid md:grid-cols-2 xl:grid-cols-5 flex-1">
-          {columns.map(({ status, tasks }, colIdx) => (
+        <div className="flex-1" style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, 1fr)` }}>
+          {columns.map(({ phase, tasks: colTasks }, colIdx) => (
             <div
-              key={status}
+              key={phase.id}
               className="flex flex-col gap-3"
               style={{
                 paddingTop: 16,
@@ -294,20 +343,22 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
                 borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
               }}
             >
-              {tasks.map((t) => (
+              {colTasks.map((t) => (
                 <TaskCard
                   key={t.id}
                   task={t}
                   onTaskUpdated={handleTaskUpdated}
                   onTaskDeleted={handleTaskDeleted}
                   people={people}
+                  allTasks={tasks}
                 />
               ))}
               <CreateTaskCard
                 onboardingId={onboarding.id}
-                defaultStatus={status}
+                phaseId={phase.id}
                 onTaskCreated={handleTaskCreated}
                 people={people}
+                allTasks={tasks}
               />
             </div>
           ))}

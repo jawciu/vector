@@ -33,6 +33,11 @@ export type Onboarding = Prisma.OnboardingModel
  */
 export type Contact = Prisma.ContactModel
 /**
+ * Model Phase
+ * 
+ */
+export type Phase = Prisma.PhaseModel
+/**
  * Model Task
  * 
  */

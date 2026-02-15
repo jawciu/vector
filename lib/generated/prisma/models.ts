@@ -11,5 +11,6 @@
 export type * from './models/Company.ts'
 export type * from './models/Onboarding.ts'
 export type * from './models/Contact.ts'
+export type * from './models/Phase.ts'
 export type * from './models/Task.ts'
 export type * from './commonInputTypes.ts'

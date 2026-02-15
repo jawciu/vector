@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { createTask } from "@/lib/db";
+import { createPhase } from "@/lib/db";
 import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request) {
   try {
-    // Auth check
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -13,20 +12,19 @@ export async function POST(request) {
 
     const body = await request.json();
 
-    // Validation
-    if (!body.onboardingId || !body.title || !body.phaseId) {
+    if (!body.onboardingId || !body.name) {
       return NextResponse.json(
-        { error: "onboardingId, phaseId, and title are required" },
+        { error: "onboardingId and name are required" },
         { status: 400 }
       );
     }
 
-    const task = await createTask(body);
-    return NextResponse.json(task, { status: 201 });
+    const phase = await createPhase(body);
+    return NextResponse.json(phase, { status: 201 });
   } catch (error) {
-    console.error("Error creating task:", error);
+    console.error("Error creating phase:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to create task" },
+      { error: error.message || "Failed to create phase" },
       { status: 500 }
     );
   }

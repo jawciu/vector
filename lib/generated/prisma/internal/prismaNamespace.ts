@@ -387,6 +387,7 @@ export const ModelName = {
   Company: 'Company',
   Onboarding: 'Onboarding',
   Contact: 'Contact',
+  Phase: 'Phase',
   Task: 'Task'
 } as const
 
@@ -403,7 +404,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "company" | "onboarding" | "contact" | "task"
+    modelProps: "company" | "onboarding" | "contact" | "phase" | "task"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -629,6 +630,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Phase: {
+      payload: Prisma.$PhasePayload<ExtArgs>
+      fields: Prisma.PhaseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PhaseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhasePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PhaseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhasePayload>
+        }
+        findFirst: {
+          args: Prisma.PhaseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhasePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PhaseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhasePayload>
+        }
+        findMany: {
+          args: Prisma.PhaseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhasePayload>[]
+        }
+        create: {
+          args: Prisma.PhaseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhasePayload>
+        }
+        createMany: {
+          args: Prisma.PhaseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PhaseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhasePayload>[]
+        }
+        delete: {
+          args: Prisma.PhaseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhasePayload>
+        }
+        update: {
+          args: Prisma.PhaseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhasePayload>
+        }
+        deleteMany: {
+          args: Prisma.PhaseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PhaseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PhaseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhasePayload>[]
+        }
+        upsert: {
+          args: Prisma.PhaseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhasePayload>
+        }
+        aggregate: {
+          args: Prisma.PhaseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePhase>
+        }
+        groupBy: {
+          args: Prisma.PhaseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhaseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PhaseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhaseCountAggregateOutputType> | number
+        }
+      }
+    }
     Task: {
       payload: Prisma.$TaskPayload<ExtArgs>
       fields: Prisma.TaskFieldRefs
@@ -773,15 +848,29 @@ export const ContactScalarFieldEnum = {
 export type ContactScalarFieldEnum = (typeof ContactScalarFieldEnum)[keyof typeof ContactScalarFieldEnum]
 
 
+export const PhaseScalarFieldEnum = {
+  id: 'id',
+  onboardingId: 'onboardingId',
+  name: 'name',
+  sortOrder: 'sortOrder',
+  targetDate: 'targetDate',
+  isComplete: 'isComplete'
+} as const
+
+export type PhaseScalarFieldEnum = (typeof PhaseScalarFieldEnum)[keyof typeof PhaseScalarFieldEnum]
+
+
 export const TaskScalarFieldEnum = {
   id: 'id',
   onboardingId: 'onboardingId',
+  phaseId: 'phaseId',
   title: 'title',
   status: 'status',
   due: 'due',
   waitingOn: 'waitingOn',
   owner: 'owner',
-  notes: 'notes'
+  notes: 'notes',
+  blockedByTaskId: 'blockedByTaskId'
 } as const
 
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
@@ -856,6 +945,13 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -970,6 +1066,7 @@ export type GlobalOmitConfig = {
   company?: Prisma.CompanyOmit
   onboarding?: Prisma.OnboardingOmit
   contact?: Prisma.ContactOmit
+  phase?: Prisma.PhaseOmit
   task?: Prisma.TaskOmit
 }
 

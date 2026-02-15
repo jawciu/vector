@@ -29,44 +29,54 @@ export type AggregateTask = {
 export type TaskAvgAggregateOutputType = {
   id: number | null
   onboardingId: number | null
+  phaseId: number | null
+  blockedByTaskId: number | null
 }
 
 export type TaskSumAggregateOutputType = {
   id: number | null
   onboardingId: number | null
+  phaseId: number | null
+  blockedByTaskId: number | null
 }
 
 export type TaskMinAggregateOutputType = {
   id: number | null
   onboardingId: number | null
+  phaseId: number | null
   title: string | null
   status: string | null
   due: string | null
   waitingOn: string | null
   owner: string | null
   notes: string | null
+  blockedByTaskId: number | null
 }
 
 export type TaskMaxAggregateOutputType = {
   id: number | null
   onboardingId: number | null
+  phaseId: number | null
   title: string | null
   status: string | null
   due: string | null
   waitingOn: string | null
   owner: string | null
   notes: string | null
+  blockedByTaskId: number | null
 }
 
 export type TaskCountAggregateOutputType = {
   id: number
   onboardingId: number
+  phaseId: number
   title: number
   status: number
   due: number
   waitingOn: number
   owner: number
   notes: number
+  blockedByTaskId: number
   _all: number
 }
 
@@ -74,44 +84,54 @@ export type TaskCountAggregateOutputType = {
 export type TaskAvgAggregateInputType = {
   id?: true
   onboardingId?: true
+  phaseId?: true
+  blockedByTaskId?: true
 }
 
 export type TaskSumAggregateInputType = {
   id?: true
   onboardingId?: true
+  phaseId?: true
+  blockedByTaskId?: true
 }
 
 export type TaskMinAggregateInputType = {
   id?: true
   onboardingId?: true
+  phaseId?: true
   title?: true
   status?: true
   due?: true
   waitingOn?: true
   owner?: true
   notes?: true
+  blockedByTaskId?: true
 }
 
 export type TaskMaxAggregateInputType = {
   id?: true
   onboardingId?: true
+  phaseId?: true
   title?: true
   status?: true
   due?: true
   waitingOn?: true
   owner?: true
   notes?: true
+  blockedByTaskId?: true
 }
 
 export type TaskCountAggregateInputType = {
   id?: true
   onboardingId?: true
+  phaseId?: true
   title?: true
   status?: true
   due?: true
   waitingOn?: true
   owner?: true
   notes?: true
+  blockedByTaskId?: true
   _all?: true
 }
 
@@ -204,12 +224,14 @@ export type TaskGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type TaskGroupByOutputType = {
   id: number
   onboardingId: number
+  phaseId: number
   title: string
   status: string
   due: string
   waitingOn: string
   owner: string
   notes: string
+  blockedByTaskId: number | null
   _count: TaskCountAggregateOutputType | null
   _avg: TaskAvgAggregateOutputType | null
   _sum: TaskSumAggregateOutputType | null
@@ -238,25 +260,35 @@ export type TaskWhereInput = {
   NOT?: Prisma.TaskWhereInput | Prisma.TaskWhereInput[]
   id?: Prisma.IntFilter<"Task"> | number
   onboardingId?: Prisma.IntFilter<"Task"> | number
+  phaseId?: Prisma.IntFilter<"Task"> | number
   title?: Prisma.StringFilter<"Task"> | string
   status?: Prisma.StringFilter<"Task"> | string
   due?: Prisma.StringFilter<"Task"> | string
   waitingOn?: Prisma.StringFilter<"Task"> | string
   owner?: Prisma.StringFilter<"Task"> | string
   notes?: Prisma.StringFilter<"Task"> | string
+  blockedByTaskId?: Prisma.IntNullableFilter<"Task"> | number | null
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
+  phase?: Prisma.XOR<Prisma.PhaseScalarRelationFilter, Prisma.PhaseWhereInput>
+  blockedByTask?: Prisma.XOR<Prisma.TaskNullableScalarRelationFilter, Prisma.TaskWhereInput> | null
+  blockedTasks?: Prisma.TaskListRelationFilter
 }
 
 export type TaskOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   onboardingId?: Prisma.SortOrder
+  phaseId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   status?: Prisma.SortOrder
   due?: Prisma.SortOrder
   waitingOn?: Prisma.SortOrder
   owner?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  blockedByTaskId?: Prisma.SortOrderInput | Prisma.SortOrder
   onboarding?: Prisma.OnboardingOrderByWithRelationInput
+  phase?: Prisma.PhaseOrderByWithRelationInput
+  blockedByTask?: Prisma.TaskOrderByWithRelationInput
+  blockedTasks?: Prisma.TaskOrderByRelationAggregateInput
 }
 
 export type TaskWhereUniqueInput = Prisma.AtLeast<{
@@ -265,24 +297,31 @@ export type TaskWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.TaskWhereInput[]
   NOT?: Prisma.TaskWhereInput | Prisma.TaskWhereInput[]
   onboardingId?: Prisma.IntFilter<"Task"> | number
+  phaseId?: Prisma.IntFilter<"Task"> | number
   title?: Prisma.StringFilter<"Task"> | string
   status?: Prisma.StringFilter<"Task"> | string
   due?: Prisma.StringFilter<"Task"> | string
   waitingOn?: Prisma.StringFilter<"Task"> | string
   owner?: Prisma.StringFilter<"Task"> | string
   notes?: Prisma.StringFilter<"Task"> | string
+  blockedByTaskId?: Prisma.IntNullableFilter<"Task"> | number | null
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
+  phase?: Prisma.XOR<Prisma.PhaseScalarRelationFilter, Prisma.PhaseWhereInput>
+  blockedByTask?: Prisma.XOR<Prisma.TaskNullableScalarRelationFilter, Prisma.TaskWhereInput> | null
+  blockedTasks?: Prisma.TaskListRelationFilter
 }, "id">
 
 export type TaskOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   onboardingId?: Prisma.SortOrder
+  phaseId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   status?: Prisma.SortOrder
   due?: Prisma.SortOrder
   waitingOn?: Prisma.SortOrder
   owner?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  blockedByTaskId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.TaskCountOrderByAggregateInput
   _avg?: Prisma.TaskAvgOrderByAggregateInput
   _max?: Prisma.TaskMaxOrderByAggregateInput
@@ -296,12 +335,14 @@ export type TaskScalarWhereWithAggregatesInput = {
   NOT?: Prisma.TaskScalarWhereWithAggregatesInput | Prisma.TaskScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Task"> | number
   onboardingId?: Prisma.IntWithAggregatesFilter<"Task"> | number
+  phaseId?: Prisma.IntWithAggregatesFilter<"Task"> | number
   title?: Prisma.StringWithAggregatesFilter<"Task"> | string
   status?: Prisma.StringWithAggregatesFilter<"Task"> | string
   due?: Prisma.StringWithAggregatesFilter<"Task"> | string
   waitingOn?: Prisma.StringWithAggregatesFilter<"Task"> | string
   owner?: Prisma.StringWithAggregatesFilter<"Task"> | string
   notes?: Prisma.StringWithAggregatesFilter<"Task"> | string
+  blockedByTaskId?: Prisma.IntNullableWithAggregatesFilter<"Task"> | number | null
 }
 
 export type TaskCreateInput = {
@@ -312,17 +353,23 @@ export type TaskCreateInput = {
   owner?: string
   notes?: string
   onboarding: Prisma.OnboardingCreateNestedOneWithoutTasksInput
+  phase: Prisma.PhaseCreateNestedOneWithoutTasksInput
+  blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
+  blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
 }
 
 export type TaskUncheckedCreateInput = {
   id?: number
   onboardingId: number
+  phaseId: number
   title: string
   status: string
   due: string
   waitingOn: string
   owner?: string
   notes?: string
+  blockedByTaskId?: number | null
+  blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
 }
 
 export type TaskUpdateInput = {
@@ -333,28 +380,36 @@ export type TaskUpdateInput = {
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutTasksNestedInput
+  phase?: Prisma.PhaseUpdateOneRequiredWithoutTasksNestedInput
+  blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
+  blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
 }
 
 export type TaskUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
+  phaseId?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   due?: Prisma.StringFieldUpdateOperationsInput | string
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
 }
 
 export type TaskCreateManyInput = {
   id?: number
   onboardingId: number
+  phaseId: number
   title: string
   status: string
   due: string
   waitingOn: string
   owner?: string
   notes?: string
+  blockedByTaskId?: number | null
 }
 
 export type TaskUpdateManyMutationInput = {
@@ -369,12 +424,14 @@ export type TaskUpdateManyMutationInput = {
 export type TaskUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
+  phaseId?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   due?: Prisma.StringFieldUpdateOperationsInput | string
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type TaskListRelationFilter = {
@@ -387,47 +444,62 @@ export type TaskOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type TaskNullableScalarRelationFilter = {
+  is?: Prisma.TaskWhereInput | null
+  isNot?: Prisma.TaskWhereInput | null
+}
+
 export type TaskCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   onboardingId?: Prisma.SortOrder
+  phaseId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   status?: Prisma.SortOrder
   due?: Prisma.SortOrder
   waitingOn?: Prisma.SortOrder
   owner?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  blockedByTaskId?: Prisma.SortOrder
 }
 
 export type TaskAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   onboardingId?: Prisma.SortOrder
+  phaseId?: Prisma.SortOrder
+  blockedByTaskId?: Prisma.SortOrder
 }
 
 export type TaskMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   onboardingId?: Prisma.SortOrder
+  phaseId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   status?: Prisma.SortOrder
   due?: Prisma.SortOrder
   waitingOn?: Prisma.SortOrder
   owner?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  blockedByTaskId?: Prisma.SortOrder
 }
 
 export type TaskMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   onboardingId?: Prisma.SortOrder
+  phaseId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   status?: Prisma.SortOrder
   due?: Prisma.SortOrder
   waitingOn?: Prisma.SortOrder
   owner?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  blockedByTaskId?: Prisma.SortOrder
 }
 
 export type TaskSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   onboardingId?: Prisma.SortOrder
+  phaseId?: Prisma.SortOrder
+  blockedByTaskId?: Prisma.SortOrder
 }
 
 export type TaskCreateNestedManyWithoutOnboardingInput = {
@@ -472,6 +544,114 @@ export type TaskUncheckedUpdateManyWithoutOnboardingNestedInput = {
   deleteMany?: Prisma.TaskScalarWhereInput | Prisma.TaskScalarWhereInput[]
 }
 
+export type TaskCreateNestedManyWithoutPhaseInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutPhaseInput, Prisma.TaskUncheckedCreateWithoutPhaseInput> | Prisma.TaskCreateWithoutPhaseInput[] | Prisma.TaskUncheckedCreateWithoutPhaseInput[]
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutPhaseInput | Prisma.TaskCreateOrConnectWithoutPhaseInput[]
+  createMany?: Prisma.TaskCreateManyPhaseInputEnvelope
+  connect?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+}
+
+export type TaskUncheckedCreateNestedManyWithoutPhaseInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutPhaseInput, Prisma.TaskUncheckedCreateWithoutPhaseInput> | Prisma.TaskCreateWithoutPhaseInput[] | Prisma.TaskUncheckedCreateWithoutPhaseInput[]
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutPhaseInput | Prisma.TaskCreateOrConnectWithoutPhaseInput[]
+  createMany?: Prisma.TaskCreateManyPhaseInputEnvelope
+  connect?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+}
+
+export type TaskUpdateManyWithoutPhaseNestedInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutPhaseInput, Prisma.TaskUncheckedCreateWithoutPhaseInput> | Prisma.TaskCreateWithoutPhaseInput[] | Prisma.TaskUncheckedCreateWithoutPhaseInput[]
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutPhaseInput | Prisma.TaskCreateOrConnectWithoutPhaseInput[]
+  upsert?: Prisma.TaskUpsertWithWhereUniqueWithoutPhaseInput | Prisma.TaskUpsertWithWhereUniqueWithoutPhaseInput[]
+  createMany?: Prisma.TaskCreateManyPhaseInputEnvelope
+  set?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  disconnect?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  delete?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  connect?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  update?: Prisma.TaskUpdateWithWhereUniqueWithoutPhaseInput | Prisma.TaskUpdateWithWhereUniqueWithoutPhaseInput[]
+  updateMany?: Prisma.TaskUpdateManyWithWhereWithoutPhaseInput | Prisma.TaskUpdateManyWithWhereWithoutPhaseInput[]
+  deleteMany?: Prisma.TaskScalarWhereInput | Prisma.TaskScalarWhereInput[]
+}
+
+export type TaskUncheckedUpdateManyWithoutPhaseNestedInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutPhaseInput, Prisma.TaskUncheckedCreateWithoutPhaseInput> | Prisma.TaskCreateWithoutPhaseInput[] | Prisma.TaskUncheckedCreateWithoutPhaseInput[]
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutPhaseInput | Prisma.TaskCreateOrConnectWithoutPhaseInput[]
+  upsert?: Prisma.TaskUpsertWithWhereUniqueWithoutPhaseInput | Prisma.TaskUpsertWithWhereUniqueWithoutPhaseInput[]
+  createMany?: Prisma.TaskCreateManyPhaseInputEnvelope
+  set?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  disconnect?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  delete?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  connect?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  update?: Prisma.TaskUpdateWithWhereUniqueWithoutPhaseInput | Prisma.TaskUpdateWithWhereUniqueWithoutPhaseInput[]
+  updateMany?: Prisma.TaskUpdateManyWithWhereWithoutPhaseInput | Prisma.TaskUpdateManyWithWhereWithoutPhaseInput[]
+  deleteMany?: Prisma.TaskScalarWhereInput | Prisma.TaskScalarWhereInput[]
+}
+
+export type TaskCreateNestedOneWithoutBlockedTasksInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutBlockedTasksInput, Prisma.TaskUncheckedCreateWithoutBlockedTasksInput>
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutBlockedTasksInput
+  connect?: Prisma.TaskWhereUniqueInput
+}
+
+export type TaskCreateNestedManyWithoutBlockedByTaskInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutBlockedByTaskInput, Prisma.TaskUncheckedCreateWithoutBlockedByTaskInput> | Prisma.TaskCreateWithoutBlockedByTaskInput[] | Prisma.TaskUncheckedCreateWithoutBlockedByTaskInput[]
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutBlockedByTaskInput | Prisma.TaskCreateOrConnectWithoutBlockedByTaskInput[]
+  createMany?: Prisma.TaskCreateManyBlockedByTaskInputEnvelope
+  connect?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+}
+
+export type TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutBlockedByTaskInput, Prisma.TaskUncheckedCreateWithoutBlockedByTaskInput> | Prisma.TaskCreateWithoutBlockedByTaskInput[] | Prisma.TaskUncheckedCreateWithoutBlockedByTaskInput[]
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutBlockedByTaskInput | Prisma.TaskCreateOrConnectWithoutBlockedByTaskInput[]
+  createMany?: Prisma.TaskCreateManyBlockedByTaskInputEnvelope
+  connect?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+}
+
+export type TaskUpdateOneWithoutBlockedTasksNestedInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutBlockedTasksInput, Prisma.TaskUncheckedCreateWithoutBlockedTasksInput>
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutBlockedTasksInput
+  upsert?: Prisma.TaskUpsertWithoutBlockedTasksInput
+  disconnect?: Prisma.TaskWhereInput | boolean
+  delete?: Prisma.TaskWhereInput | boolean
+  connect?: Prisma.TaskWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TaskUpdateToOneWithWhereWithoutBlockedTasksInput, Prisma.TaskUpdateWithoutBlockedTasksInput>, Prisma.TaskUncheckedUpdateWithoutBlockedTasksInput>
+}
+
+export type TaskUpdateManyWithoutBlockedByTaskNestedInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutBlockedByTaskInput, Prisma.TaskUncheckedCreateWithoutBlockedByTaskInput> | Prisma.TaskCreateWithoutBlockedByTaskInput[] | Prisma.TaskUncheckedCreateWithoutBlockedByTaskInput[]
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutBlockedByTaskInput | Prisma.TaskCreateOrConnectWithoutBlockedByTaskInput[]
+  upsert?: Prisma.TaskUpsertWithWhereUniqueWithoutBlockedByTaskInput | Prisma.TaskUpsertWithWhereUniqueWithoutBlockedByTaskInput[]
+  createMany?: Prisma.TaskCreateManyBlockedByTaskInputEnvelope
+  set?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  disconnect?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  delete?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  connect?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  update?: Prisma.TaskUpdateWithWhereUniqueWithoutBlockedByTaskInput | Prisma.TaskUpdateWithWhereUniqueWithoutBlockedByTaskInput[]
+  updateMany?: Prisma.TaskUpdateManyWithWhereWithoutBlockedByTaskInput | Prisma.TaskUpdateManyWithWhereWithoutBlockedByTaskInput[]
+  deleteMany?: Prisma.TaskScalarWhereInput | Prisma.TaskScalarWhereInput[]
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutBlockedByTaskInput, Prisma.TaskUncheckedCreateWithoutBlockedByTaskInput> | Prisma.TaskCreateWithoutBlockedByTaskInput[] | Prisma.TaskUncheckedCreateWithoutBlockedByTaskInput[]
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutBlockedByTaskInput | Prisma.TaskCreateOrConnectWithoutBlockedByTaskInput[]
+  upsert?: Prisma.TaskUpsertWithWhereUniqueWithoutBlockedByTaskInput | Prisma.TaskUpsertWithWhereUniqueWithoutBlockedByTaskInput[]
+  createMany?: Prisma.TaskCreateManyBlockedByTaskInputEnvelope
+  set?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  disconnect?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  delete?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  connect?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
+  update?: Prisma.TaskUpdateWithWhereUniqueWithoutBlockedByTaskInput | Prisma.TaskUpdateWithWhereUniqueWithoutBlockedByTaskInput[]
+  updateMany?: Prisma.TaskUpdateManyWithWhereWithoutBlockedByTaskInput | Prisma.TaskUpdateManyWithWhereWithoutBlockedByTaskInput[]
+  deleteMany?: Prisma.TaskScalarWhereInput | Prisma.TaskScalarWhereInput[]
+}
+
 export type TaskCreateWithoutOnboardingInput = {
   title: string
   status: string
@@ -479,16 +659,22 @@ export type TaskCreateWithoutOnboardingInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  phase: Prisma.PhaseCreateNestedOneWithoutTasksInput
+  blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
+  blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
 }
 
 export type TaskUncheckedCreateWithoutOnboardingInput = {
   id?: number
+  phaseId: number
   title: string
   status: string
   due: string
   waitingOn: string
   owner?: string
   notes?: string
+  blockedByTaskId?: number | null
+  blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
 }
 
 export type TaskCreateOrConnectWithoutOnboardingInput = {
@@ -523,22 +709,194 @@ export type TaskScalarWhereInput = {
   NOT?: Prisma.TaskScalarWhereInput | Prisma.TaskScalarWhereInput[]
   id?: Prisma.IntFilter<"Task"> | number
   onboardingId?: Prisma.IntFilter<"Task"> | number
+  phaseId?: Prisma.IntFilter<"Task"> | number
   title?: Prisma.StringFilter<"Task"> | string
   status?: Prisma.StringFilter<"Task"> | string
   due?: Prisma.StringFilter<"Task"> | string
   waitingOn?: Prisma.StringFilter<"Task"> | string
   owner?: Prisma.StringFilter<"Task"> | string
   notes?: Prisma.StringFilter<"Task"> | string
+  blockedByTaskId?: Prisma.IntNullableFilter<"Task"> | number | null
 }
 
-export type TaskCreateManyOnboardingInput = {
-  id?: number
+export type TaskCreateWithoutPhaseInput = {
   title: string
   status: string
   due: string
   waitingOn: string
   owner?: string
   notes?: string
+  onboarding: Prisma.OnboardingCreateNestedOneWithoutTasksInput
+  blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
+  blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
+}
+
+export type TaskUncheckedCreateWithoutPhaseInput = {
+  id?: number
+  onboardingId: number
+  title: string
+  status: string
+  due: string
+  waitingOn: string
+  owner?: string
+  notes?: string
+  blockedByTaskId?: number | null
+  blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
+}
+
+export type TaskCreateOrConnectWithoutPhaseInput = {
+  where: Prisma.TaskWhereUniqueInput
+  create: Prisma.XOR<Prisma.TaskCreateWithoutPhaseInput, Prisma.TaskUncheckedCreateWithoutPhaseInput>
+}
+
+export type TaskCreateManyPhaseInputEnvelope = {
+  data: Prisma.TaskCreateManyPhaseInput | Prisma.TaskCreateManyPhaseInput[]
+  skipDuplicates?: boolean
+}
+
+export type TaskUpsertWithWhereUniqueWithoutPhaseInput = {
+  where: Prisma.TaskWhereUniqueInput
+  update: Prisma.XOR<Prisma.TaskUpdateWithoutPhaseInput, Prisma.TaskUncheckedUpdateWithoutPhaseInput>
+  create: Prisma.XOR<Prisma.TaskCreateWithoutPhaseInput, Prisma.TaskUncheckedCreateWithoutPhaseInput>
+}
+
+export type TaskUpdateWithWhereUniqueWithoutPhaseInput = {
+  where: Prisma.TaskWhereUniqueInput
+  data: Prisma.XOR<Prisma.TaskUpdateWithoutPhaseInput, Prisma.TaskUncheckedUpdateWithoutPhaseInput>
+}
+
+export type TaskUpdateManyWithWhereWithoutPhaseInput = {
+  where: Prisma.TaskScalarWhereInput
+  data: Prisma.XOR<Prisma.TaskUpdateManyMutationInput, Prisma.TaskUncheckedUpdateManyWithoutPhaseInput>
+}
+
+export type TaskCreateWithoutBlockedTasksInput = {
+  title: string
+  status: string
+  due: string
+  waitingOn: string
+  owner?: string
+  notes?: string
+  onboarding: Prisma.OnboardingCreateNestedOneWithoutTasksInput
+  phase: Prisma.PhaseCreateNestedOneWithoutTasksInput
+  blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
+}
+
+export type TaskUncheckedCreateWithoutBlockedTasksInput = {
+  id?: number
+  onboardingId: number
+  phaseId: number
+  title: string
+  status: string
+  due: string
+  waitingOn: string
+  owner?: string
+  notes?: string
+  blockedByTaskId?: number | null
+}
+
+export type TaskCreateOrConnectWithoutBlockedTasksInput = {
+  where: Prisma.TaskWhereUniqueInput
+  create: Prisma.XOR<Prisma.TaskCreateWithoutBlockedTasksInput, Prisma.TaskUncheckedCreateWithoutBlockedTasksInput>
+}
+
+export type TaskCreateWithoutBlockedByTaskInput = {
+  title: string
+  status: string
+  due: string
+  waitingOn: string
+  owner?: string
+  notes?: string
+  onboarding: Prisma.OnboardingCreateNestedOneWithoutTasksInput
+  phase: Prisma.PhaseCreateNestedOneWithoutTasksInput
+  blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
+}
+
+export type TaskUncheckedCreateWithoutBlockedByTaskInput = {
+  id?: number
+  onboardingId: number
+  phaseId: number
+  title: string
+  status: string
+  due: string
+  waitingOn: string
+  owner?: string
+  notes?: string
+  blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
+}
+
+export type TaskCreateOrConnectWithoutBlockedByTaskInput = {
+  where: Prisma.TaskWhereUniqueInput
+  create: Prisma.XOR<Prisma.TaskCreateWithoutBlockedByTaskInput, Prisma.TaskUncheckedCreateWithoutBlockedByTaskInput>
+}
+
+export type TaskCreateManyBlockedByTaskInputEnvelope = {
+  data: Prisma.TaskCreateManyBlockedByTaskInput | Prisma.TaskCreateManyBlockedByTaskInput[]
+  skipDuplicates?: boolean
+}
+
+export type TaskUpsertWithoutBlockedTasksInput = {
+  update: Prisma.XOR<Prisma.TaskUpdateWithoutBlockedTasksInput, Prisma.TaskUncheckedUpdateWithoutBlockedTasksInput>
+  create: Prisma.XOR<Prisma.TaskCreateWithoutBlockedTasksInput, Prisma.TaskUncheckedCreateWithoutBlockedTasksInput>
+  where?: Prisma.TaskWhereInput
+}
+
+export type TaskUpdateToOneWithWhereWithoutBlockedTasksInput = {
+  where?: Prisma.TaskWhereInput
+  data: Prisma.XOR<Prisma.TaskUpdateWithoutBlockedTasksInput, Prisma.TaskUncheckedUpdateWithoutBlockedTasksInput>
+}
+
+export type TaskUpdateWithoutBlockedTasksInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  due?: Prisma.StringFieldUpdateOperationsInput | string
+  waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
+  onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutTasksNestedInput
+  phase?: Prisma.PhaseUpdateOneRequiredWithoutTasksNestedInput
+  blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
+}
+
+export type TaskUncheckedUpdateWithoutBlockedTasksInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
+  phaseId?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  due?: Prisma.StringFieldUpdateOperationsInput | string
+  waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
+  blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+}
+
+export type TaskUpsertWithWhereUniqueWithoutBlockedByTaskInput = {
+  where: Prisma.TaskWhereUniqueInput
+  update: Prisma.XOR<Prisma.TaskUpdateWithoutBlockedByTaskInput, Prisma.TaskUncheckedUpdateWithoutBlockedByTaskInput>
+  create: Prisma.XOR<Prisma.TaskCreateWithoutBlockedByTaskInput, Prisma.TaskUncheckedCreateWithoutBlockedByTaskInput>
+}
+
+export type TaskUpdateWithWhereUniqueWithoutBlockedByTaskInput = {
+  where: Prisma.TaskWhereUniqueInput
+  data: Prisma.XOR<Prisma.TaskUpdateWithoutBlockedByTaskInput, Prisma.TaskUncheckedUpdateWithoutBlockedByTaskInput>
+}
+
+export type TaskUpdateManyWithWhereWithoutBlockedByTaskInput = {
+  where: Prisma.TaskScalarWhereInput
+  data: Prisma.XOR<Prisma.TaskUpdateManyMutationInput, Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskInput>
+}
+
+export type TaskCreateManyOnboardingInput = {
+  id?: number
+  phaseId: number
+  title: string
+  status: string
+  due: string
+  waitingOn: string
+  owner?: string
+  notes?: string
+  blockedByTaskId?: number | null
 }
 
 export type TaskUpdateWithoutOnboardingInput = {
@@ -548,20 +906,126 @@ export type TaskUpdateWithoutOnboardingInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  phase?: Prisma.PhaseUpdateOneRequiredWithoutTasksNestedInput
+  blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
+  blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
 }
 
 export type TaskUncheckedUpdateWithoutOnboardingInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  phaseId?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   due?: Prisma.StringFieldUpdateOperationsInput | string
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
 }
 
 export type TaskUncheckedUpdateManyWithoutOnboardingInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  phaseId?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  due?: Prisma.StringFieldUpdateOperationsInput | string
+  waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
+  blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+}
+
+export type TaskCreateManyPhaseInput = {
+  id?: number
+  onboardingId: number
+  title: string
+  status: string
+  due: string
+  waitingOn: string
+  owner?: string
+  notes?: string
+  blockedByTaskId?: number | null
+}
+
+export type TaskUpdateWithoutPhaseInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  due?: Prisma.StringFieldUpdateOperationsInput | string
+  waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
+  onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutTasksNestedInput
+  blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
+  blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
+}
+
+export type TaskUncheckedUpdateWithoutPhaseInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  due?: Prisma.StringFieldUpdateOperationsInput | string
+  waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
+  blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+}
+
+export type TaskUncheckedUpdateManyWithoutPhaseInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  due?: Prisma.StringFieldUpdateOperationsInput | string
+  waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
+  blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+}
+
+export type TaskCreateManyBlockedByTaskInput = {
+  id?: number
+  onboardingId: number
+  phaseId: number
+  title: string
+  status: string
+  due: string
+  waitingOn: string
+  owner?: string
+  notes?: string
+}
+
+export type TaskUpdateWithoutBlockedByTaskInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  due?: Prisma.StringFieldUpdateOperationsInput | string
+  waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
+  onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutTasksNestedInput
+  phase?: Prisma.PhaseUpdateOneRequiredWithoutTasksNestedInput
+  blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
+}
+
+export type TaskUncheckedUpdateWithoutBlockedByTaskInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
+  phaseId?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  due?: Prisma.StringFieldUpdateOperationsInput | string
+  waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
+  blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+}
+
+export type TaskUncheckedUpdateManyWithoutBlockedByTaskInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
+  phaseId?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   due?: Prisma.StringFieldUpdateOperationsInput | string
@@ -570,80 +1034,138 @@ export type TaskUncheckedUpdateManyWithoutOnboardingInput = {
   notes?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
+
+/**
+ * Count Type TaskCountOutputType
+ */
+
+export type TaskCountOutputType = {
+  blockedTasks: number
+}
+
+export type TaskCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  blockedTasks?: boolean | TaskCountOutputTypeCountBlockedTasksArgs
+}
+
+/**
+ * TaskCountOutputType without action
+ */
+export type TaskCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TaskCountOutputType
+   */
+  select?: Prisma.TaskCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * TaskCountOutputType without action
+ */
+export type TaskCountOutputTypeCountBlockedTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TaskWhereInput
+}
 
 
 export type TaskSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   onboardingId?: boolean
+  phaseId?: boolean
   title?: boolean
   status?: boolean
   due?: boolean
   waitingOn?: boolean
   owner?: boolean
   notes?: boolean
+  blockedByTaskId?: boolean
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
+  phase?: boolean | Prisma.PhaseDefaultArgs<ExtArgs>
+  blockedByTask?: boolean | Prisma.Task$blockedByTaskArgs<ExtArgs>
+  blockedTasks?: boolean | Prisma.Task$blockedTasksArgs<ExtArgs>
+  _count?: boolean | Prisma.TaskCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["task"]>
 
 export type TaskSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   onboardingId?: boolean
+  phaseId?: boolean
   title?: boolean
   status?: boolean
   due?: boolean
   waitingOn?: boolean
   owner?: boolean
   notes?: boolean
+  blockedByTaskId?: boolean
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
+  phase?: boolean | Prisma.PhaseDefaultArgs<ExtArgs>
+  blockedByTask?: boolean | Prisma.Task$blockedByTaskArgs<ExtArgs>
 }, ExtArgs["result"]["task"]>
 
 export type TaskSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   onboardingId?: boolean
+  phaseId?: boolean
   title?: boolean
   status?: boolean
   due?: boolean
   waitingOn?: boolean
   owner?: boolean
   notes?: boolean
+  blockedByTaskId?: boolean
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
+  phase?: boolean | Prisma.PhaseDefaultArgs<ExtArgs>
+  blockedByTask?: boolean | Prisma.Task$blockedByTaskArgs<ExtArgs>
 }, ExtArgs["result"]["task"]>
 
 export type TaskSelectScalar = {
   id?: boolean
   onboardingId?: boolean
+  phaseId?: boolean
   title?: boolean
   status?: boolean
   due?: boolean
   waitingOn?: boolean
   owner?: boolean
   notes?: boolean
+  blockedByTaskId?: boolean
 }
 
-export type TaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "onboardingId" | "title" | "status" | "due" | "waitingOn" | "owner" | "notes", ExtArgs["result"]["task"]>
+export type TaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "onboardingId" | "phaseId" | "title" | "status" | "due" | "waitingOn" | "owner" | "notes" | "blockedByTaskId", ExtArgs["result"]["task"]>
 export type TaskInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
+  phase?: boolean | Prisma.PhaseDefaultArgs<ExtArgs>
+  blockedByTask?: boolean | Prisma.Task$blockedByTaskArgs<ExtArgs>
+  blockedTasks?: boolean | Prisma.Task$blockedTasksArgs<ExtArgs>
+  _count?: boolean | Prisma.TaskCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TaskIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
+  phase?: boolean | Prisma.PhaseDefaultArgs<ExtArgs>
+  blockedByTask?: boolean | Prisma.Task$blockedByTaskArgs<ExtArgs>
 }
 export type TaskIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
+  phase?: boolean | Prisma.PhaseDefaultArgs<ExtArgs>
+  blockedByTask?: boolean | Prisma.Task$blockedByTaskArgs<ExtArgs>
 }
 
 export type $TaskPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Task"
   objects: {
     onboarding: Prisma.$OnboardingPayload<ExtArgs>
+    phase: Prisma.$PhasePayload<ExtArgs>
+    blockedByTask: Prisma.$TaskPayload<ExtArgs> | null
+    blockedTasks: Prisma.$TaskPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     onboardingId: number
+    phaseId: number
     title: string
     status: string
     due: string
     waitingOn: string
     owner: string
     notes: string
+    blockedByTaskId: number | null
   }, ExtArgs["result"]["task"]>
   composites: {}
 }
@@ -1039,6 +1561,9 @@ readonly fields: TaskFieldRefs;
 export interface Prisma__TaskClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   onboarding<T extends Prisma.OnboardingDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OnboardingDefaultArgs<ExtArgs>>): Prisma.Prisma__OnboardingClient<runtime.Types.Result.GetResult<Prisma.$OnboardingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  phase<T extends Prisma.PhaseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PhaseDefaultArgs<ExtArgs>>): Prisma.Prisma__PhaseClient<runtime.Types.Result.GetResult<Prisma.$PhasePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  blockedByTask<T extends Prisma.Task$blockedByTaskArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Task$blockedByTaskArgs<ExtArgs>>): Prisma.Prisma__TaskClient<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  blockedTasks<T extends Prisma.Task$blockedTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Task$blockedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1070,12 +1595,14 @@ export interface Prisma__TaskClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface TaskFieldRefs {
   readonly id: Prisma.FieldRef<"Task", 'Int'>
   readonly onboardingId: Prisma.FieldRef<"Task", 'Int'>
+  readonly phaseId: Prisma.FieldRef<"Task", 'Int'>
   readonly title: Prisma.FieldRef<"Task", 'String'>
   readonly status: Prisma.FieldRef<"Task", 'String'>
   readonly due: Prisma.FieldRef<"Task", 'String'>
   readonly waitingOn: Prisma.FieldRef<"Task", 'String'>
   readonly owner: Prisma.FieldRef<"Task", 'String'>
   readonly notes: Prisma.FieldRef<"Task", 'String'>
+  readonly blockedByTaskId: Prisma.FieldRef<"Task", 'Int'>
 }
     
 
@@ -1469,6 +1996,49 @@ export type TaskDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Tasks to delete.
    */
   limit?: number
+}
+
+/**
+ * Task.blockedByTask
+ */
+export type Task$blockedByTaskArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Task
+   */
+  select?: Prisma.TaskSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Task
+   */
+  omit?: Prisma.TaskOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TaskInclude<ExtArgs> | null
+  where?: Prisma.TaskWhereInput
+}
+
+/**
+ * Task.blockedTasks
+ */
+export type Task$blockedTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Task
+   */
+  select?: Prisma.TaskSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Task
+   */
+  omit?: Prisma.TaskOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TaskInclude<ExtArgs> | null
+  where?: Prisma.TaskWhereInput
+  orderBy?: Prisma.TaskOrderByWithRelationInput | Prisma.TaskOrderByWithRelationInput[]
+  cursor?: Prisma.TaskWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TaskScalarFieldEnum | Prisma.TaskScalarFieldEnum[]
 }
 
 /**

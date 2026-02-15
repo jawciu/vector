@@ -54,6 +54,7 @@ export const ModelName = {
   Company: 'Company',
   Onboarding: 'Onboarding',
   Contact: 'Contact',
+  Phase: 'Phase',
   Task: 'Task'
 } as const
 
@@ -104,15 +105,29 @@ export const ContactScalarFieldEnum = {
 export type ContactScalarFieldEnum = (typeof ContactScalarFieldEnum)[keyof typeof ContactScalarFieldEnum]
 
 
+export const PhaseScalarFieldEnum = {
+  id: 'id',
+  onboardingId: 'onboardingId',
+  name: 'name',
+  sortOrder: 'sortOrder',
+  targetDate: 'targetDate',
+  isComplete: 'isComplete'
+} as const
+
+export type PhaseScalarFieldEnum = (typeof PhaseScalarFieldEnum)[keyof typeof PhaseScalarFieldEnum]
+
+
 export const TaskScalarFieldEnum = {
   id: 'id',
   onboardingId: 'onboardingId',
+  phaseId: 'phaseId',
   title: 'title',
   status: 'status',
   due: 'due',
   waitingOn: 'waitingOn',
   owner: 'owner',
-  notes: 'notes'
+  notes: 'notes',
+  blockedByTaskId: 'blockedByTaskId'
 } as const
 
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
