@@ -28,6 +28,16 @@ model Onboarding {
   updatedAt     DateTime  @default(now()) @updatedAt
   company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   tasks         Task[]
+  contacts      Contact[]
+}
+
+model Contact {
+  id            Int        @id @default(autoincrement())
+  onboardingId  Int
+  onboarding    Onboarding @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
+  name          String
+  email         String     @default("")
+  role          String     @default("")
 }
 
 model Task {

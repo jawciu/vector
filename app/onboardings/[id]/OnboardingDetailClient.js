@@ -6,6 +6,7 @@ import { computeHealth } from "@/lib/health";
 import TaskCard from "@/app/components/TaskCard";
 import CreateTaskCard from "@/app/components/CreateTaskCard";
 import OnboardingActions from "@/app/components/OnboardingActions";
+import ContactsPanel from "@/app/components/ContactsPanel";
 
 const STATUSES = ["Todo", "In progress", "Blocked", "Done"];
 
@@ -33,8 +34,9 @@ function companyLogoColor(name) {
 
 const TASK_FILTERS = ["Pending", "All", "Done"];
 
-export default function OnboardingDetailClient({ onboarding, tasks: initialTasks }) {
+export default function OnboardingDetailClient({ onboarding, tasks: initialTasks, contacts: initialContacts }) {
   const [tasks, setTasks] = useState(initialTasks);
+  const [contacts, setContacts] = useState(initialContacts || []);
   const [error, setError] = useState("");
   const [taskFilter, setTaskFilter] = useState("Pending");
 
@@ -53,10 +55,11 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
     tasks: filteredTasks.filter((t) => t.status === status),
   }));
 
-  // Collect unique people from tasks and onboarding
+  // Collect unique people from contacts, tasks, and onboarding
   const people = Array.from(
     new Set([
-      onboarding.companyName, // Company name as a person option
+      ...contacts.map(c => c.name).filter(Boolean),
+      onboarding.companyName,
       ...tasks.map(t => t.owner).filter(Boolean),
       ...tasks.map(t => t.waitingOn).filter(Boolean),
     ])
@@ -181,6 +184,14 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
             )}
           </div>
         </div>
+      </div>
+
+      <div style={{ paddingLeft: 16, paddingRight: 16, paddingBottom: 16 }}>
+        <ContactsPanel
+          onboardingId={onboarding.id}
+          contacts={contacts}
+          onContactsChange={setContacts}
+        />
       </div>
 
       <section className="flex-1 flex flex-col" style={{ borderTop: "1px solid var(--border)" }}>

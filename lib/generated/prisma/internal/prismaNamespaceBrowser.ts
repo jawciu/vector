@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Company: 'Company',
   Onboarding: 'Onboarding',
+  Contact: 'Contact',
   Task: 'Task'
 } as const
 
@@ -90,6 +91,17 @@ export const OnboardingScalarFieldEnum = {
 } as const
 
 export type OnboardingScalarFieldEnum = (typeof OnboardingScalarFieldEnum)[keyof typeof OnboardingScalarFieldEnum]
+
+
+export const ContactScalarFieldEnum = {
+  id: 'id',
+  onboardingId: 'onboardingId',
+  name: 'name',
+  email: 'email',
+  role: 'role'
+} as const
+
+export type ContactScalarFieldEnum = (typeof ContactScalarFieldEnum)[keyof typeof ContactScalarFieldEnum]
 
 
 export const TaskScalarFieldEnum = {

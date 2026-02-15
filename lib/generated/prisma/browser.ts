@@ -28,6 +28,11 @@ export type Company = Prisma.CompanyModel
  */
 export type Onboarding = Prisma.OnboardingModel
 /**
+ * Model Contact
+ * 
+ */
+export type Contact = Prisma.ContactModel
+/**
  * Model Task
  * 
  */

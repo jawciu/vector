@@ -230,6 +230,7 @@ export type OnboardingWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Onboarding"> | Date | string
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   tasks?: Prisma.TaskListRelationFilter
+  contacts?: Prisma.ContactListRelationFilter
 }
 
 export type OnboardingOrderByWithRelationInput = {
@@ -241,6 +242,7 @@ export type OnboardingOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   company?: Prisma.CompanyOrderByWithRelationInput
   tasks?: Prisma.TaskOrderByRelationAggregateInput
+  contacts?: Prisma.ContactOrderByRelationAggregateInput
 }
 
 export type OnboardingWhereUniqueInput = Prisma.AtLeast<{
@@ -255,6 +257,7 @@ export type OnboardingWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Onboarding"> | Date | string
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   tasks?: Prisma.TaskListRelationFilter
+  contacts?: Prisma.ContactListRelationFilter
 }, "id">
 
 export type OnboardingOrderByWithAggregationInput = {
@@ -290,6 +293,7 @@ export type OnboardingCreateInput = {
   updatedAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutOnboardingsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutOnboardingInput
+  contacts?: Prisma.ContactCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingUncheckedCreateInput = {
@@ -300,6 +304,7 @@ export type OnboardingUncheckedCreateInput = {
   targetGoLive?: Date | string | null
   updatedAt?: Date | string
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOnboardingInput
+  contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingUpdateInput = {
@@ -309,6 +314,7 @@ export type OnboardingUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutOnboardingsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutOnboardingNestedInput
+  contacts?: Prisma.ContactUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateInput = {
@@ -319,6 +325,7 @@ export type OnboardingUncheckedUpdateInput = {
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutOnboardingNestedInput
+  contacts?: Prisma.ContactUncheckedUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingCreateManyInput = {
@@ -448,6 +455,20 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type OnboardingCreateNestedOneWithoutContactsInput = {
+  create?: Prisma.XOR<Prisma.OnboardingCreateWithoutContactsInput, Prisma.OnboardingUncheckedCreateWithoutContactsInput>
+  connectOrCreate?: Prisma.OnboardingCreateOrConnectWithoutContactsInput
+  connect?: Prisma.OnboardingWhereUniqueInput
+}
+
+export type OnboardingUpdateOneRequiredWithoutContactsNestedInput = {
+  create?: Prisma.XOR<Prisma.OnboardingCreateWithoutContactsInput, Prisma.OnboardingUncheckedCreateWithoutContactsInput>
+  connectOrCreate?: Prisma.OnboardingCreateOrConnectWithoutContactsInput
+  upsert?: Prisma.OnboardingUpsertWithoutContactsInput
+  connect?: Prisma.OnboardingWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OnboardingUpdateToOneWithWhereWithoutContactsInput, Prisma.OnboardingUpdateWithoutContactsInput>, Prisma.OnboardingUncheckedUpdateWithoutContactsInput>
+}
+
 export type OnboardingCreateNestedOneWithoutTasksInput = {
   create?: Prisma.XOR<Prisma.OnboardingCreateWithoutTasksInput, Prisma.OnboardingUncheckedCreateWithoutTasksInput>
   connectOrCreate?: Prisma.OnboardingCreateOrConnectWithoutTasksInput
@@ -468,6 +489,7 @@ export type OnboardingCreateWithoutCompanyInput = {
   targetGoLive?: Date | string | null
   updatedAt?: Date | string
   tasks?: Prisma.TaskCreateNestedManyWithoutOnboardingInput
+  contacts?: Prisma.ContactCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingUncheckedCreateWithoutCompanyInput = {
@@ -477,6 +499,7 @@ export type OnboardingUncheckedCreateWithoutCompanyInput = {
   targetGoLive?: Date | string | null
   updatedAt?: Date | string
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOnboardingInput
+  contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingCreateOrConnectWithoutCompanyInput = {
@@ -517,12 +540,67 @@ export type OnboardingScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Onboarding"> | Date | string
 }
 
+export type OnboardingCreateWithoutContactsInput = {
+  owner?: string
+  status?: string
+  targetGoLive?: Date | string | null
+  updatedAt?: Date | string
+  company: Prisma.CompanyCreateNestedOneWithoutOnboardingsInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutOnboardingInput
+}
+
+export type OnboardingUncheckedCreateWithoutContactsInput = {
+  id?: number
+  companyId: number
+  owner?: string
+  status?: string
+  targetGoLive?: Date | string | null
+  updatedAt?: Date | string
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOnboardingInput
+}
+
+export type OnboardingCreateOrConnectWithoutContactsInput = {
+  where: Prisma.OnboardingWhereUniqueInput
+  create: Prisma.XOR<Prisma.OnboardingCreateWithoutContactsInput, Prisma.OnboardingUncheckedCreateWithoutContactsInput>
+}
+
+export type OnboardingUpsertWithoutContactsInput = {
+  update: Prisma.XOR<Prisma.OnboardingUpdateWithoutContactsInput, Prisma.OnboardingUncheckedUpdateWithoutContactsInput>
+  create: Prisma.XOR<Prisma.OnboardingCreateWithoutContactsInput, Prisma.OnboardingUncheckedCreateWithoutContactsInput>
+  where?: Prisma.OnboardingWhereInput
+}
+
+export type OnboardingUpdateToOneWithWhereWithoutContactsInput = {
+  where?: Prisma.OnboardingWhereInput
+  data: Prisma.XOR<Prisma.OnboardingUpdateWithoutContactsInput, Prisma.OnboardingUncheckedUpdateWithoutContactsInput>
+}
+
+export type OnboardingUpdateWithoutContactsInput = {
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  company?: Prisma.CompanyUpdateOneRequiredWithoutOnboardingsNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutOnboardingNestedInput
+}
+
+export type OnboardingUncheckedUpdateWithoutContactsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  companyId?: Prisma.IntFieldUpdateOperationsInput | number
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutOnboardingNestedInput
+}
+
 export type OnboardingCreateWithoutTasksInput = {
   owner?: string
   status?: string
   targetGoLive?: Date | string | null
   updatedAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutOnboardingsInput
+  contacts?: Prisma.ContactCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingUncheckedCreateWithoutTasksInput = {
@@ -532,6 +610,7 @@ export type OnboardingUncheckedCreateWithoutTasksInput = {
   status?: string
   targetGoLive?: Date | string | null
   updatedAt?: Date | string
+  contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingCreateOrConnectWithoutTasksInput = {
@@ -556,6 +635,7 @@ export type OnboardingUpdateWithoutTasksInput = {
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutOnboardingsNestedInput
+  contacts?: Prisma.ContactUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateWithoutTasksInput = {
@@ -565,6 +645,7 @@ export type OnboardingUncheckedUpdateWithoutTasksInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contacts?: Prisma.ContactUncheckedUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingCreateManyCompanyInput = {
@@ -581,6 +662,7 @@ export type OnboardingUpdateWithoutCompanyInput = {
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tasks?: Prisma.TaskUpdateManyWithoutOnboardingNestedInput
+  contacts?: Prisma.ContactUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateWithoutCompanyInput = {
@@ -590,6 +672,7 @@ export type OnboardingUncheckedUpdateWithoutCompanyInput = {
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutOnboardingNestedInput
+  contacts?: Prisma.ContactUncheckedUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateManyWithoutCompanyInput = {
@@ -607,10 +690,12 @@ export type OnboardingUncheckedUpdateManyWithoutCompanyInput = {
 
 export type OnboardingCountOutputType = {
   tasks: number
+  contacts: number
 }
 
 export type OnboardingCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tasks?: boolean | OnboardingCountOutputTypeCountTasksArgs
+  contacts?: boolean | OnboardingCountOutputTypeCountContactsArgs
 }
 
 /**
@@ -630,6 +715,13 @@ export type OnboardingCountOutputTypeCountTasksArgs<ExtArgs extends runtime.Type
   where?: Prisma.TaskWhereInput
 }
 
+/**
+ * OnboardingCountOutputType without action
+ */
+export type OnboardingCountOutputTypeCountContactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContactWhereInput
+}
+
 
 export type OnboardingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -640,6 +732,7 @@ export type OnboardingSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   updatedAt?: boolean
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   tasks?: boolean | Prisma.Onboarding$tasksArgs<ExtArgs>
+  contacts?: boolean | Prisma.Onboarding$contactsArgs<ExtArgs>
   _count?: boolean | Prisma.OnboardingCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["onboarding"]>
 
@@ -676,6 +769,7 @@ export type OnboardingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type OnboardingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   tasks?: boolean | Prisma.Onboarding$tasksArgs<ExtArgs>
+  contacts?: boolean | Prisma.Onboarding$contactsArgs<ExtArgs>
   _count?: boolean | Prisma.OnboardingCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OnboardingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -690,6 +784,7 @@ export type $OnboardingPayload<ExtArgs extends runtime.Types.Extensions.Internal
   objects: {
     company: Prisma.$CompanyPayload<ExtArgs>
     tasks: Prisma.$TaskPayload<ExtArgs>[]
+    contacts: Prisma.$ContactPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1094,6 +1189,7 @@ export interface Prisma__OnboardingClient<T, Null = never, ExtArgs extends runti
   readonly [Symbol.toStringTag]: "PrismaPromise"
   company<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   tasks<T extends Prisma.Onboarding$tasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Onboarding$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  contacts<T extends Prisma.Onboarding$contactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Onboarding$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1546,6 +1642,30 @@ export type Onboarding$tasksArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.TaskScalarFieldEnum | Prisma.TaskScalarFieldEnum[]
+}
+
+/**
+ * Onboarding.contacts
+ */
+export type Onboarding$contactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Contact
+   */
+  select?: Prisma.ContactSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Contact
+   */
+  omit?: Prisma.ContactOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContactInclude<ExtArgs> | null
+  where?: Prisma.ContactWhereInput
+  orderBy?: Prisma.ContactOrderByWithRelationInput | Prisma.ContactOrderByWithRelationInput[]
+  cursor?: Prisma.ContactWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContactScalarFieldEnum | Prisma.ContactScalarFieldEnum[]
 }
 
 /**
