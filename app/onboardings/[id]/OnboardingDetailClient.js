@@ -30,16 +30,26 @@ function companyLogoColor(name) {
   return AVATAR_COLORS[n % AVATAR_COLORS.length];
 }
 
+const TASK_FILTERS = ["Pending", "All", "Done"];
+
 export default function OnboardingDetailClient({ onboarding, tasks: initialTasks }) {
   const [tasks, setTasks] = useState(initialTasks);
   const [error, setError] = useState("");
+  const [taskFilter, setTaskFilter] = useState("Pending");
 
   const health = computeHealth(tasks);
   const blockedCount = tasks.filter((t) => t.status === "Blocked").length;
 
+  // Filter tasks based on selected filter
+  const filteredTasks = tasks.filter((t) => {
+    if (taskFilter === "Pending") return t.status !== "Done";
+    if (taskFilter === "Done") return t.status === "Done";
+    return true; // "All"
+  });
+
   const columns = STATUSES.map((status) => ({
     status,
-    tasks: tasks.filter((t) => t.status === status),
+    tasks: filteredTasks.filter((t) => t.status === status),
   }));
 
   // Collect unique people from tasks and onboarding
@@ -154,6 +164,43 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
       </div>
 
       <section className="flex-1 flex flex-col" style={{ borderTop: "1px solid var(--border)" }}>
+        {/* Filter bar */}
+        <div
+          className="flex items-center justify-end gap-1"
+          style={{
+            paddingTop: 8,
+            paddingBottom: 8,
+            paddingLeft: 16,
+            paddingRight: 16,
+            borderBottom: "1px solid var(--border)",
+          }}
+        >
+          <span className="text-xs mr-2" style={{ color: "var(--text-muted)" }}>Tasks:</span>
+          {TASK_FILTERS.map((filter) => (
+            <button
+              key={filter}
+              onClick={() => setTaskFilter(filter)}
+              className="task-filter-btn text-xs font-medium rounded-md"
+              style={{
+                paddingTop: 4,
+                paddingBottom: 4,
+                paddingLeft: 10,
+                paddingRight: 10,
+                color: taskFilter === filter ? "var(--text)" : "var(--text-muted)",
+                background: taskFilter === filter ? "var(--surface-hover)" : "transparent",
+                border: taskFilter === filter ? "1px solid var(--border)" : "1px solid transparent",
+              }}
+            >
+              {filter}
+              {filter === "Done" && (
+                <span className="ml-1" style={{ color: "var(--text-muted)" }}>
+                  ({tasks.filter(t => t.status === "Done").length})
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
         {/* Header row */}
         <div className="grid md:grid-cols-2 xl:grid-cols-5" style={{ borderBottom: "1px solid var(--border)" }}>
           {columns.map(({ status, tasks }, colIdx) => (

@@ -80,3 +80,38 @@ a {
 .company-cell-link:hover .company-name {
   color: var(--action);
 }
+
+/* Task completion animation */
+.task-completing {
+  animation: taskComplete 0.8s ease forwards;
+}
+
+@keyframes taskComplete {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+}
+
+/* Tick circle hover on non-completed tasks */
+.tick-circle:hover {
+  border-color: var(--success) !important;
+  background: rgba(156, 255, 166, 0.15) !important;
+}
+
+/* Filter button styles */
+.task-filter-btn {
+  transition: all 0.15s ease;
+}
+
+.task-filter-btn:hover {
+  background-color: var(--surface-hover);
+}

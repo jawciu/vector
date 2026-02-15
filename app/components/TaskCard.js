@@ -9,6 +9,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, people = 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [completing, setCompleting] = useState(false);
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
@@ -105,43 +106,129 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, people = 
     }
   }
 
+  async function handleComplete(e) {
+    e.stopPropagation();
+    if (completing) return;
+
+    setCompleting(true);
+
+    try {
+      const response = await fetch(`/api/tasks/${task.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "Done" }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || "Failed to complete task");
+      }
+
+      const updatedTask = await response.json();
+
+      // Wait for the green animation to play, then notify parent
+      setTimeout(() => {
+        if (onTaskUpdated) {
+          onTaskUpdated(updatedTask);
+        }
+      }, 800);
+    } catch (err) {
+      setError(err.message);
+      setCompleting(false);
+    }
+  }
+
   // Display mode
   if (!isEditing) {
+    const isDone = task.status === "Done" || completing;
+
     return (
       <div
-        onClick={() => setIsEditing(true)}
-        className="flex flex-col gap-3 rounded-lg cursor-pointer transition-opacity hover:opacity-80"
+        className={`task-card flex items-start gap-3 rounded-lg cursor-pointer hover:opacity-80${completing ? " task-completing" : ""}`}
         style={{
           border: "1px solid var(--border)",
           background: "var(--surface)",
           padding: "12px 16px",
+          transition: "opacity 0.3s ease, transform 0.3s ease",
         }}
       >
-        <div className="text-sm font-medium" style={{ color: "var(--text)" }}>
-          {task.title}
-        </div>
+        {/* Tick circle */}
+        <button
+          type="button"
+          onClick={handleComplete}
+          className="tick-circle flex-shrink-0"
+          style={{
+            width: 20,
+            height: 20,
+            borderRadius: "50%",
+            border: `1.5px solid ${isDone ? "var(--success)" : "var(--text-muted)"}`,
+            background: isDone ? "var(--success)" : "transparent",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            transition: "all 0.25s ease",
+            marginTop: 1,
+          }}
+          aria-label="Mark as done"
+        >
+          <svg
+            width="10"
+            height="10"
+            viewBox="0 0 10 10"
+            fill="none"
+            style={{
+              opacity: isDone ? 1 : 0,
+              transition: "opacity 0.2s ease",
+            }}
+          >
+            <path
+              d="M2 5.5L4 7.5L8 3"
+              stroke="var(--text-dark)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
 
-        <div className="flex flex-col gap-1 text-xs">
-          {task.due && (
-            <div style={{ color: "var(--text-muted)" }}>
-              Due: {task.due}
-            </div>
-          )}
-          {task.waitingOn && (
-            <div style={{ color: "var(--text-muted)" }}>
-              Waiting on: <span style={{ color: "var(--text)" }}>{task.waitingOn}</span>
-            </div>
-          )}
-          {task.owner && (
-            <div style={{ color: "var(--text-muted)" }}>
-              Owner: <span style={{ color: "var(--text)" }}>{task.owner}</span>
-            </div>
-          )}
-          {task.notes && (
-            <div style={{ color: "var(--text-muted)" }}>
-              Notes: <span style={{ color: "var(--text)" }}>{task.notes}</span>
-            </div>
-          )}
+        <div
+          className="flex-1 flex flex-col gap-3"
+          onClick={() => setIsEditing(true)}
+        >
+          <div
+            className="text-sm font-medium"
+            style={{
+              color: isDone ? "var(--text-muted)" : "var(--text)",
+              textDecoration: isDone ? "line-through" : "none",
+              transition: "color 0.25s ease",
+            }}
+          >
+            {task.title}
+          </div>
+
+          <div className="flex flex-col gap-1 text-xs">
+            {task.due && (
+              <div style={{ color: "var(--text-muted)" }}>
+                Due: {task.due}
+              </div>
+            )}
+            {task.waitingOn && (
+              <div style={{ color: "var(--text-muted)" }}>
+                Waiting on: <span style={{ color: isDone ? "var(--text-muted)" : "var(--text)" }}>{task.waitingOn}</span>
+              </div>
+            )}
+            {task.owner && (
+              <div style={{ color: "var(--text-muted)" }}>
+                Owner: <span style={{ color: isDone ? "var(--text-muted)" : "var(--text)" }}>{task.owner}</span>
+              </div>
+            )}
+            {task.notes && (
+              <div style={{ color: "var(--text-muted)" }}>
+                Notes: <span style={{ color: isDone ? "var(--text-muted)" : "var(--text)" }}>{task.notes}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
