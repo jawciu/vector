@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import PeoplePicker from "./PeoplePicker";
 
 const STATUSES = ["Todo", "In progress", "Blocked", "Done"];
 
-export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
+export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, people = [] }) {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -178,21 +179,23 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
         onChange={(e) => handleChange("title", e.target.value)}
         required
         autoFocus
-        className="py-2.5 px-3 rounded-lg text-sm w-full"
+        className="py-2 px-0 text-sm w-full outline-none transition-colors"
         style={{
-          border: "1px solid var(--border)",
-          background: "var(--surface)",
-          color: "var(--text)",
+          border: "none",
+          background: "transparent",
+          color: "var(--text-muted)",
         }}
+        onFocus={(e) => e.target.style.color = "var(--text)"}
+        onBlur={(e) => e.target.style.color = formData.title ? "var(--text)" : "var(--text-muted)"}
       />
 
       <select
         value={formData.status}
         onChange={(e) => handleChange("status", e.target.value)}
-        className="py-2.5 px-3 rounded-lg text-xs w-full"
+        className="py-2 px-0 text-xs w-full outline-none transition-colors"
         style={{
-          border: "1px solid var(--border)",
-          background: "var(--surface)",
+          border: "none",
+          background: "transparent",
           color: "var(--text)",
         }}
       >
@@ -203,43 +206,41 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
         ))}
       </select>
 
-      <input
-        type="text"
-        placeholder="Due (e.g., Mon, Tue)"
-        value={formData.due}
-        onChange={(e) => handleChange("due", e.target.value)}
-        className="py-2.5 px-3 rounded-lg text-xs w-full"
-        style={{
-          border: "1px solid var(--border)",
-          background: "var(--surface)",
-          color: "var(--text)",
-        }}
-      />
+      <div className="flex items-center gap-2 py-2">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
+          <rect x="1" y="2" width="12" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.2" fill="none" style={{ color: "var(--text-muted)" }}/>
+          <line x1="4" y1="0.5" x2="4" y2="3.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" style={{ color: "var(--text-muted)" }}/>
+          <line x1="10" y1="0.5" x2="10" y2="3.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" style={{ color: "var(--text-muted)" }}/>
+          <line x1="1" y1="5.5" x2="13" y2="5.5" stroke="currentColor" strokeWidth="1.2" style={{ color: "var(--text-muted)" }}/>
+        </svg>
+        <input
+          type="date"
+          value={formData.due}
+          onChange={(e) => handleChange("due", e.target.value)}
+          className="text-xs flex-1 outline-none transition-colors"
+          style={{
+            border: "none",
+            background: "transparent",
+            color: "var(--text-muted)",
+            colorScheme: "dark",
+          }}
+          onFocus={(e) => e.target.style.color = "var(--text)"}
+          onBlur={(e) => e.target.style.color = formData.due ? "var(--text)" : "var(--text-muted)"}
+        />
+      </div>
 
-      <input
-        type="text"
-        placeholder="Waiting on"
+      <PeoplePicker
         value={formData.waitingOn}
-        onChange={(e) => handleChange("waitingOn", e.target.value)}
-        className="py-2.5 px-3 rounded-lg text-xs w-full"
-        style={{
-          border: "1px solid var(--border)",
-          background: "var(--surface)",
-          color: "var(--text)",
-        }}
+        onChange={(value) => handleChange("waitingOn", value)}
+        placeholder="Waiting on"
+        people={people}
       />
 
-      <input
-        type="text"
-        placeholder="Owner"
+      <PeoplePicker
         value={formData.owner}
-        onChange={(e) => handleChange("owner", e.target.value)}
-        className="py-2.5 px-3 rounded-lg text-xs w-full"
-        style={{
-          border: "1px solid var(--border)",
-          background: "var(--surface)",
-          color: "var(--text)",
-        }}
+        onChange={(value) => handleChange("owner", value)}
+        placeholder="Owner"
+        people={people}
       />
 
       <textarea
@@ -247,12 +248,14 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
         value={formData.notes}
         onChange={(e) => handleChange("notes", e.target.value)}
         rows={2}
-        className="py-2.5 px-3 rounded-lg text-xs w-full resize-vertical"
+        className="py-2 px-0 text-xs w-full resize-vertical outline-none transition-colors"
         style={{
-          border: "1px solid var(--border)",
-          background: "var(--surface)",
-          color: "var(--text)",
+          border: "none",
+          background: "transparent",
+          color: "var(--text-muted)",
         }}
+        onFocus={(e) => e.target.style.color = "var(--text)"}
+        onBlur={(e) => e.target.style.color = formData.notes ? "var(--text)" : "var(--text-muted)"}
       />
 
       <div className="flex gap-2 justify-between">
@@ -260,7 +263,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
           <button
             type="submit"
             disabled={loading || deleting}
-            className="py-2.5 px-4 rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
+            className="py-1 px-2 w-fit h-fit rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
             style={{
               background: "var(--action)",
               color: "#0a0a0a",
@@ -272,7 +275,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
             type="button"
             onClick={handleCancel}
             disabled={loading || deleting}
-            className="py-2.5 px-4 rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
+            className="py-1 px-2 w-fit h-fit rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
             style={{
               border: "1px solid var(--border)",
               background: "var(--surface)",
@@ -286,7 +289,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
           type="button"
           onClick={handleDelete}
           disabled={loading || deleting}
-          className="py-2.5 px-4 rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
+          className="py-1 px-2 w-fit h-fit rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
           style={{
             background: "var(--danger)",
             color: "var(--text-dark)",

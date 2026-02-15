@@ -42,6 +42,15 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
     tasks: tasks.filter((t) => t.status === status),
   }));
 
+  // Collect unique people from tasks and onboarding
+  const people = Array.from(
+    new Set([
+      onboarding.companyName, // Company name as a person option
+      ...tasks.map(t => t.owner).filter(Boolean),
+      ...tasks.map(t => t.waitingOn).filter(Boolean),
+    ])
+  ).filter(p => p.trim().length > 0);
+
   function handleTaskCreated(newTask) {
     setTasks(prevTasks => [...prevTasks, newTask]);
   }
@@ -213,12 +222,14 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
                   task={t}
                   onTaskUpdated={handleTaskUpdated}
                   onTaskDeleted={handleTaskDeleted}
+                  people={people}
                 />
               ))}
               <CreateTaskCard
                 onboardingId={onboarding.id}
                 defaultStatus={status}
                 onTaskCreated={handleTaskCreated}
+                people={people}
               />
             </div>
           ))}
