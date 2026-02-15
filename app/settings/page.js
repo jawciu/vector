@@ -1,6 +1,6 @@
 export default function SettingsPage() {
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-2xl px-6 py-6 md:px-8 md:py-8">
       <h1 className="text-2xl font-semibold" style={{ color: "var(--text)" }}>
         Settings
       </h1>

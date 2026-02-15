@@ -291,131 +291,136 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
           ))}
         </div>
 
-        {/* Header row */}
-        <div style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, 1fr)`, borderBottom: "1px solid var(--border)" }}>
-          {phasesWithCounts.map((phase, colIdx) => (
-            <div
-              key={phase.id}
-              style={{
-                paddingTop: 12,
-                paddingBottom: 12,
-                paddingLeft: 16,
-                paddingRight: 16,
-                borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
-              }}
-            >
-              <PhaseHeader
-                phase={phase}
-                onPhaseUpdated={handlePhaseUpdated}
-                onPhaseDeleted={handlePhaseDeleted}
-              />
-            </div>
-          ))}
-          {/* Add section header */}
-          <div
-            className="flex items-center gap-2"
-            style={{
-              paddingTop: 12,
-              paddingBottom: 12,
-              paddingLeft: 16,
-              paddingRight: 16,
-              borderLeft: "1px solid var(--border)",
-            }}
-          >
-            {addingPhase ? (
-              <div className="flex flex-col gap-2 w-full">
-                <input
-                  type="text"
-                  placeholder="Phase name"
-                  value={newPhaseName}
-                  onChange={(e) => setNewPhaseName(e.target.value)}
-                  autoFocus
-                  className="text-base font-bold outline-none w-full"
+        {/* Scrollable kanban grid */}
+        <div style={{ overflowX: "auto", flex: 1, display: "flex", flexDirection: "column" }}>
+          <div style={{ minWidth: colCount * 240, display: "flex", flexDirection: "column", flex: 1 }}>
+            {/* Header row */}
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, minmax(240px, 1fr))`, borderBottom: "1px solid var(--border)" }}>
+              {phasesWithCounts.map((phase, colIdx) => (
+                <div
+                  key={phase.id}
                   style={{
-                    background: "transparent",
-                    color: "var(--text)",
-                    border: "none",
-                    borderBottom: "1px solid var(--action)",
-                    paddingBottom: 2,
+                    paddingTop: 12,
+                    paddingBottom: 12,
+                    paddingLeft: 16,
+                    paddingRight: 16,
+                    borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleAddPhase();
-                    if (e.key === "Escape") { setAddingPhase(false); setNewPhaseName(""); }
-                  }}
-                />
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleAddPhase}
-                    className="text-xs font-medium rounded px-2 py-0.5"
-                    style={{ background: "var(--action)", color: "#0a0a0a" }}
-                  >
-                    Add
-                  </button>
-                  <button
-                    onClick={() => { setAddingPhase(false); setNewPhaseName(""); }}
-                    className="text-xs font-medium"
-                    style={{ color: "var(--text-muted)" }}
-                  >
-                    Cancel
-                  </button>
+                >
+                  <PhaseHeader
+                    phase={phase}
+                    onPhaseUpdated={handlePhaseUpdated}
+                    onPhaseDeleted={handlePhaseDeleted}
+                  />
                 </div>
-              </div>
-            ) : (
-              <button
-                onClick={() => setAddingPhase(true)}
-                className="text-base font-bold"
-                style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}
-              >
-                + Add section
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Content row */}
-        <div className="flex-1" style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, 1fr)` }}>
-          {columns.map(({ phase, tasks: colTasks }, colIdx) => (
-            <div
-              key={phase.id}
-              className="flex flex-col gap-3"
-              style={{
-                paddingTop: 16,
-                paddingLeft: 16,
-                paddingRight: 16,
-                paddingBottom: 16,
-                borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
-              }}
-            >
-              {colTasks.map((t) => (
-                <TaskCard
-                  key={t.id}
-                  task={t}
-                  onTaskUpdated={handleTaskUpdated}
-                  onTaskDeleted={handleTaskDeleted}
-                  people={people}
-                  allTasks={tasks}
-                />
               ))}
-              <CreateTaskCard
-                onboardingId={onboarding.id}
-                phaseId={phase.id}
-                onTaskCreated={handleTaskCreated}
-                people={people}
-                allTasks={tasks}
+              {/* Add section header */}
+              <div
+                className="flex items-center gap-2"
+                style={{
+                  paddingTop: 12,
+                  paddingBottom: 12,
+                  paddingLeft: 16,
+                  paddingRight: 16,
+                  borderLeft: "1px solid var(--border)",
+                }}
+              >
+                {addingPhase ? (
+                  <div className="flex flex-col gap-2 w-full">
+                    <input
+                      type="text"
+                      placeholder="Phase name"
+                      value={newPhaseName}
+                      onChange={(e) => setNewPhaseName(e.target.value)}
+                      autoFocus
+                      className="text-base font-bold outline-none w-full"
+                      style={{
+                        background: "transparent",
+                        color: "var(--text)",
+                        border: "none",
+                        borderBottom: "1px solid var(--action)",
+                        paddingBottom: 2,
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddPhase();
+                        if (e.key === "Escape") { setAddingPhase(false); setNewPhaseName(""); }
+                      }}
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleAddPhase}
+                        className="text-xs font-medium rounded px-2 py-0.5"
+                        style={{ background: "var(--action)", color: "#0a0a0a" }}
+                      >
+                        Add
+                      </button>
+                      <button
+                        onClick={() => { setAddingPhase(false); setNewPhaseName(""); }}
+                        className="text-xs font-medium"
+                        style={{ color: "var(--text-muted)" }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setAddingPhase(true)}
+                    className="text-base font-bold"
+                    style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}
+                  >
+                    + Add section
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Content row */}
+            <div className="flex-1" style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, minmax(240px, 1fr))` }}>
+              {columns.map(({ phase, tasks: colTasks }, colIdx) => (
+                <div
+                  key={phase.id}
+                  className="flex flex-col gap-3"
+                  style={{
+                    paddingTop: 16,
+                    paddingLeft: 16,
+                    paddingRight: 16,
+                    paddingBottom: 16,
+                    borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
+                  }}
+                >
+                  {colTasks.map((t) => (
+                    <TaskCard
+                      key={t.id}
+                      task={t}
+                      onTaskUpdated={handleTaskUpdated}
+                      onTaskDeleted={handleTaskDeleted}
+                      people={people}
+                      allTasks={tasks}
+                    />
+                  ))}
+                  <CreateTaskCard
+                    onboardingId={onboarding.id}
+                    phaseId={phase.id}
+                    onTaskCreated={handleTaskCreated}
+                    people={people}
+                    allTasks={tasks}
+                  />
+                </div>
+              ))}
+              {/* Add section content */}
+              <div
+                className="flex flex-col gap-3"
+                style={{
+                  paddingTop: 16,
+                  paddingLeft: 16,
+                  paddingRight: 16,
+                  paddingBottom: 16,
+                  borderLeft: "1px solid var(--border)",
+                }}
               />
             </div>
-          ))}
-          {/* Add section content */}
-          <div
-            className="flex flex-col gap-3"
-            style={{
-              paddingTop: 16,
-              paddingLeft: 16,
-              paddingRight: 16,
-              paddingBottom: 16,
-              borderLeft: "1px solid var(--border)",
-            }}
-          />
+          </div>
         </div>
       </section>
     </main>
