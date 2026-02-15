@@ -45,6 +45,8 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
   const [phases, setPhases] = useState(initialPhases || []);
   const [error, setError] = useState("");
   const [taskFilter, setTaskFilter] = useState("Active");
+  const [addingPhase, setAddingPhase] = useState(false);
+  const [newPhaseName, setNewPhaseName] = useState("");
 
   const health = computeHealth(tasks);
   const blockedCount = tasks.filter((t) => isTaskBlocked(t)).length;
@@ -106,8 +108,7 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
   }
 
   async function handleAddPhase() {
-    const name = prompt("Phase name:");
-    if (!name || !name.trim()) return;
+    if (!newPhaseName.trim()) return;
 
     try {
       const maxSort = phases.reduce((max, p) => Math.max(max, p.sortOrder), -1);
@@ -116,13 +117,15 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           onboardingId: Number(onboarding.id),
-          name: name.trim(),
+          name: newPhaseName.trim(),
           sortOrder: maxSort + 1,
         }),
       });
       if (!res.ok) throw new Error("Failed to create phase");
       const newPhase = await res.json();
       setPhases(prev => [...prev, newPhase]);
+      setNewPhaseName("");
+      setAddingPhase(false);
     } catch {
       setError("Failed to add phase");
     }
@@ -319,13 +322,53 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
               borderLeft: "1px solid var(--border)",
             }}
           >
-            <button
-              onClick={handleAddPhase}
-              className="text-base font-bold"
-              style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}
-            >
-              + Add section
-            </button>
+            {addingPhase ? (
+              <div className="flex flex-col gap-2 w-full">
+                <input
+                  type="text"
+                  placeholder="Phase name"
+                  value={newPhaseName}
+                  onChange={(e) => setNewPhaseName(e.target.value)}
+                  autoFocus
+                  className="text-base font-bold outline-none w-full"
+                  style={{
+                    background: "transparent",
+                    color: "var(--text)",
+                    border: "none",
+                    borderBottom: "1px solid var(--action)",
+                    paddingBottom: 2,
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleAddPhase();
+                    if (e.key === "Escape") { setAddingPhase(false); setNewPhaseName(""); }
+                  }}
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleAddPhase}
+                    className="text-xs font-medium rounded px-2 py-0.5"
+                    style={{ background: "var(--action)", color: "#0a0a0a" }}
+                  >
+                    Add
+                  </button>
+                  <button
+                    onClick={() => { setAddingPhase(false); setNewPhaseName(""); }}
+                    className="text-xs font-medium"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setAddingPhase(true)}
+                className="text-base font-bold"
+                style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}
+              >
+                + Add section
+              </button>
+            )}
           </div>
         </div>
 
