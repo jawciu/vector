@@ -104,12 +104,36 @@ The foundation. A vendor can create and manage onboardings, and a customer can s
 - Contacts are the people on the customer side — tasks can be assigned to them
 - Contact per onboarding (same person can appear in multiple onboardings)
 
-#### 1.4 Phases / milestones
-- Break an onboarding into phases: Kickoff → Configuration → Data Migration → Training → Go-Live (customizable)
-- Each phase has its own tasks
-- Phase-level progress bar (X of Y tasks done)
-- Phase completion triggers (all tasks done → phase auto-completes, or manual)
-- Target dates per phase
+#### 1.4 Phases as Kanban columns
+
+- Kanban columns **are** phases: Kickoff → Configuration → Data Migration → Training → Go-Live (default template)
+- Vendors can rename, add, remove, or reorder columns — same flexibility as a standard Kanban board
+- Dragging a card between columns changes its **phase**, not its status
+- Task status (To do, In progress, Blocked, Done) lives on the card as a tag/badge — filterable, not structural
+
+**Dependencies & blocking:**
+- **Blocked by (task)**: user can pick another task from the same onboarding. Task is auto-blocked until the dependency is marked Done.
+- **Waiting on (person)**: user can pick a contact from the onboarding or manually enter a name. This is a manual block — user sets it, user clears it.
+- Both result in the Blocked tag on the card.
+
+**Status tags:**
+
+| Tag | How it gets set |
+|-----|----------------|
+| To do | Default when task is created |
+| In progress | User sets it manually |
+| Blocked | Automatic when a "blocked by" task isn't Done, or manual when "waiting on" a person |
+| Done | User ticks the checkbox on the card |
+
+**Done behavior:** ticking a task marks it Done → card hides from the board by default. Board shows active tasks only (already implemented).
+
+**Filtering:** filter bar to show/hide by status — active (To do + In progress + Blocked) by default, Blocked only, Done only, All.
+
+**Phase progress:** progress bar at the top of each column showing X of Y tasks done (includes hidden completed tasks).
+
+**Phase completion:** phase auto-completes when all its tasks are marked Done. Manual override available (mark phase complete even with open tasks).
+
+**Target dates:** target date per phase, displayed in the column header.
 
 #### 1.5 Health scoring v2
 - Current: blocked → "At risk", all blocked → "Blocked", else "On track"
