@@ -5,6 +5,7 @@ import Link from "next/link";
 import { computeHealth } from "@/lib/health";
 import TaskCard from "@/app/components/TaskCard";
 import CreateTaskCard from "@/app/components/CreateTaskCard";
+import OnboardingActions from "@/app/components/OnboardingActions";
 
 const STATUSES = ["Todo", "In progress", "Blocked", "Done"];
 
@@ -78,7 +79,7 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
   return (
     <main className="w-full flex flex-col" style={{ minHeight: "100vh" }}>
       <nav
-        className="w-full flex items-center gap-2 text-sm border-b"
+        className="w-full flex items-center justify-between text-sm border-b"
         style={{
           paddingLeft: 16,
           paddingRight: 16,
@@ -86,15 +87,16 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
           borderColor: "var(--border)",
         }}
       >
-        <Link
-          href="/"
-          className="transition-colors hover:opacity-80"
-          style={{ color: "var(--text-muted)" }}
-        >
-          Onboardings
-        </Link>
-        <span style={{ color: "var(--text-muted)" }}>›</span>
         <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="transition-colors hover:opacity-80"
+            style={{ color: "var(--text-muted)" }}
+          >
+            Onboardings
+          </Link>
+          <span style={{ color: "var(--text-muted)" }}>›</span>
+          <div className="flex items-center gap-2">
           <span
             className="flex shrink-0 w-5 h-5 rounded items-center justify-center text-[10px] font-semibold"
             style={{
@@ -108,6 +110,8 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
           <span className="font-medium" style={{ color: "var(--text)" }}>
             {onboarding.companyName}
           </span>
+          <OnboardingActions onboarding={onboarding} />
+          </div>
         </div>
       </nav>
       <div className="max-w-6xl" style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 16, paddingBottom: 16 }}>
@@ -157,6 +161,22 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
                 }}
               >
                 {blockedCount} blocked
+              </span>
+            )}
+            {onboarding.owner && (
+              <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+                Owner: <span style={{ color: "var(--text)" }}>{onboarding.owner}</span>
+              </span>
+            )}
+            {onboarding.targetGoLive && (
+              <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+                Go-live: <span style={{ color: "var(--text)" }}>
+                  {new Date(onboarding.targetGoLive).toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
               </span>
             )}
           </div>
