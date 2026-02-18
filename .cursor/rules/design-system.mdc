@@ -1,0 +1,14 @@
+---
+description: Design system rules for consistent UI components
+alwaysApply: true
+---
+
+# Design System
+
+Follow the design system rules defined in `skills/design-system/SKILL.md`.
+
+Key rules:
+- All dropdowns/popovers MUST use `MenuList` + `MenuOption` from `app/components/Menu.js`
+- All colors via CSS custom properties (`var(--token-name)`) defined in `app/globals.css`
+- DS primitives go in `app/ui/`, feature components in `app/components/`
+- Only add new elements to the DS when explicitly asked

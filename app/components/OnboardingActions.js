@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { MenuList, MenuOption } from "./Menu";
 
 export default function OnboardingActions({ onboarding, onUpdated }) {
   const router = useRouter();
@@ -167,48 +168,44 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
         </button>
 
         {menuOpen && (
-          <div
-            className="absolute right-0 top-full mt-1 w-48 rounded-lg py-1 z-50"
+          <MenuList
+            role="menu"
             style={{
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border)",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+              left: "auto",
+              right: 0,
+              width: "180px",
             }}
           >
-            <button
-              type="button"
+            <MenuOption
+              role="menuitem"
               onClick={() => { setMenuOpen(false); setEditOpen(true); }}
-              className="w-full text-left px-3 py-2 text-sm menu-option"
-              style={{ color: "var(--text)" }}
+              style={{ color: "var(--text)", fontWeight: 400 }}
             >
               Edit onboarding
-            </button>
-            <button
-              type="button"
+            </MenuOption>
+            <MenuOption
+              role="menuitem"
               onClick={handleDuplicate}
-              className="w-full text-left px-3 py-2 text-sm menu-option"
-              style={{ color: "var(--text)" }}
+              style={{ color: "var(--text)", fontWeight: 400 }}
             >
               Duplicate
-            </button>
-            <div style={{ borderTop: "1px solid var(--border)", margin: "4px 0" }} />
-            <button
-              type="button"
+            </MenuOption>
+            <div style={{ borderTop: "1px solid var(--border)", margin: "2px 0" }} />
+            <MenuOption
+              role="menuitem"
               onClick={handleArchive}
-              className="w-full text-left px-3 py-2 text-sm menu-option"
-              style={{ color: "var(--alert)" }}
+              style={{ color: "var(--alert)", fontWeight: 400 }}
             >
               Archive
-            </button>
-            <button
-              type="button"
+            </MenuOption>
+            <MenuOption
+              role="menuitem"
               onClick={handleDelete}
-              className="w-full text-left px-3 py-2 text-sm menu-option"
-              style={{ color: "var(--danger)" }}
+              style={{ color: "var(--danger)", fontWeight: 400 }}
             >
               Delete
-            </button>
-          </div>
+            </MenuOption>
+          </MenuList>
         )}
       </div>
 
