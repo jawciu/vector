@@ -18,7 +18,10 @@ Defined in `app/globals.css` under `:root`. Not yet migrated to `@theme`.
 | `--border` | `#25232D` | Default borders |
 | `--text` | `#F1EAF1` | Primary text |
 | `--text-muted` | `#999599` | Secondary/dimmed text |
-| `--action` | `#C098FF` | Primary action color (purple) |
+| `--action` | `#C098FF` | Primary action color (purple) — default |
+| `--action-hover` | `#CAA8FF` | Primary button hover state |
+| `--action-active` | `#9E6CEE` | Primary button active/pressed state |
+| `--action-disabled` | `#604C80` | Primary button disabled state |
 | `--danger` | `#FF899B` | Destructive actions |
 | `--success` | `#9CFFA6` | Success states |
 | `--alert` | `#FFEEB5` | Warning/caution |
@@ -34,7 +37,15 @@ Defined in `app/globals.css` under `:root`. Not yet migrated to `@theme`.
 | `--text-dark` | `#18181E` | Text on bright backgrounds |
 
 ### DS Components (in `app/ui/`)
-None yet — to be created as user requests them.
+
+#### `Button` (`app/ui/Button.js`)
+- **Variants:** `primary` (default)
+- **Primary:** solid purple, dark text, `rounded-lg`, `text-sm font-semibold`, `px-2 py-1`
+- **CSS class:** `.btn-primary` (defined in `globals.css`)
+- **Sizes:** `xs` (`py-0.5 px-2 text-xs`), `sm` default (`py-1 px-2 text-sm`)
+- **States:** default `--action`, hover `--action-hover`, active `--action-active`, disabled `--action-disabled`
+- **Usage:** `<Button variant="primary" size="sm" onClick={...}>Label</Button>`
+- **Cancel buttons** alongside a primary Button should use matching padding (`py-1 px-2` for sm, `py-0.5 px-2` for xs)
 
 ### Shared Components (in `app/components/Menu.js`)
 Currently the reusable menu primitives live here. These should be migrated to `app/ui/` when the DS is formalized.

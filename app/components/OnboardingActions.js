@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Button from "../ui/Button";
 import { useRouter } from "next/navigation";
 import { MenuList, MenuOption } from "./Menu";
 
@@ -333,7 +334,7 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
                   type="button"
                   onClick={() => setEditOpen(false)}
                   disabled={loading}
-                  className="py-2 px-4 rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
+                  className="py-1 px-2 rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
                   style={{
                     border: "1px solid var(--border)",
                     background: "var(--surface)",
@@ -342,17 +343,9 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="py-2 px-4 rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
-                  style={{
-                    background: "var(--action)",
-                    color: "var(--action-text)",
-                  }}
-                >
+                <Button type="submit" size="sm" disabled={loading}>
                   {loading ? "Saving…" : "Save"}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

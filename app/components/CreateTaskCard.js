@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import PeoplePicker from "./PeoplePicker";
+import Button from "../ui/Button";
 
 export default function CreateTaskCard({ onboardingId, phaseId, onTaskCreated, people = [], allTasks = [] }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -184,14 +185,9 @@ export default function CreateTaskCard({ onboardingId, phaseId, onTaskCreated, p
       />
 
       <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={loading}
-          className="py-1 px-2 w-fit h-fit rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
-          style={{ background: "var(--action)", color: "#0a0a0a" }}
-        >
+        <Button type="submit" size="sm" disabled={loading}>
           {loading ? "Creating…" : "Create"}
-        </button>
+        </Button>
         <button
           type="button"
           onClick={handleCancel}

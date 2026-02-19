@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import PeoplePicker from "./PeoplePicker";
+import Button from "../ui/Button";
 
 function getStatusBadge(task) {
   const isBlocked =
@@ -369,14 +370,9 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, people = 
 
       <div className="flex gap-2 justify-between">
         <div className="flex gap-2">
-          <button
-            type="submit"
-            disabled={loading || deleting}
-            className="py-1 px-2 w-fit h-fit rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
-            style={{ background: "var(--action)", color: "#0a0a0a" }}
-          >
+          <Button type="submit" size="sm" disabled={loading || deleting}>
             {loading ? "Saving…" : "Save"}
-          </button>
+          </Button>
           <button
             type="button"
             onClick={handleCancel}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Button from "../ui/Button";
 
 export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -105,14 +106,9 @@ export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted }) {
           }}
         />
         <div className="flex gap-2 items-center">
-          <button
-            onClick={handleSave}
-            disabled={loading}
-            className="text-xs font-medium rounded px-2 py-0.5"
-            style={{ background: "var(--action)", color: "#0a0a0a" }}
-          >
+          <Button size="xs" onClick={handleSave} disabled={loading}>
             Save
-          </button>
+          </Button>
           <button
             onClick={handleCancel}
             className="text-xs font-medium"

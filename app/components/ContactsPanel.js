@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Button from "../ui/Button";
 
 const CONTACT_ROLES = ["Champion", "Technical Lead", "IT Admin", "Exec Sponsor"];
 
@@ -177,14 +178,9 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
           ))}
         </select>
         <div className="flex gap-2">
-          <button
-            type="submit"
-            disabled={loading}
-            className="py-1 px-2 rounded-lg text-xs font-medium transition-opacity disabled:opacity-50"
-            style={{ background: "var(--action)", color: "#0a0a0a" }}
-          >
+          <Button type="submit" size="xs" disabled={loading}>
             {loading ? "Saving…" : submitLabel}
-          </button>
+          </Button>
           <button
             type="button"
             onClick={handleCancel}

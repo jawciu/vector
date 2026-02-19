@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
 import { MenuTriggerButton, MenuList, MenuOption } from "./Menu";
+import Button from "../ui/Button";
 import CreateOnboardingModal from "./CreateOnboardingModal";
 
 const FILTERS = ["Active", "Completed", "Paused", "Archived", "All"];
@@ -89,22 +90,9 @@ export default function OnboardingsActionBar() {
             </MenuList>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => setModalOpen(true)}
-          className="flex items-center gap-2 rounded-lg border px-2 py-1 text-sm font-semibold transition-colors hover:opacity-90"
-          style={{
-            borderColor: "var(--action)",
-            background: "var(--action)",
-            color: "var(--action-text)",
-            paddingTop: "4px",
-            paddingBottom: "4px",
-            paddingLeft: "8px",
-            paddingRight: "8px",
-          }}
-        >
+        <Button variant="primary" size="sm" onClick={() => setModalOpen(true)}>
           + Add Onboarding
-        </button>
+        </Button>
       </div>
       <CreateOnboardingModal
         open={modalOpen}

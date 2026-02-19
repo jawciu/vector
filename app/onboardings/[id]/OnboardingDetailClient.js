@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Button from "@/app/ui/Button";
 import Link from "next/link";
 import { computeHealth } from "@/lib/health";
 import TaskCard from "@/app/components/TaskCard";
@@ -347,13 +348,9 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
                       }}
                     />
                     <div className="flex gap-2">
-                      <button
-                        onClick={handleAddPhase}
-                        className="text-xs font-medium rounded px-2 py-0.5"
-                        style={{ background: "var(--action)", color: "#0a0a0a" }}
-                      >
+                      <Button size="xs" onClick={handleAddPhase}>
                         Add
-                      </button>
+                      </Button>
                       <button
                         onClick={() => { setAddingPhase(false); setNewPhaseName(""); }}
                         className="text-xs font-medium"

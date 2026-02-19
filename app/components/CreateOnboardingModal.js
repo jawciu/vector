@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Button from "../ui/Button";
 
 export default function CreateOnboardingModal({ open, onClose, onCreated }) {
   const [companies, setCompanies] = useState([]);
@@ -293,7 +294,7 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
               type="button"
               onClick={() => { resetForm(); onClose(); }}
               disabled={loading}
-              className="py-2 px-4 rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
+              className="py-1 px-2 rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
               style={{
                 border: "1px solid var(--border)",
                 background: "var(--surface)",
@@ -302,17 +303,9 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="py-2 px-4 rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
-              style={{
-                background: "var(--action)",
-                color: "var(--action-text)",
-              }}
-            >
+            <Button type="submit" size="sm" disabled={loading}>
               {loading ? "Creating…" : "Create"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
