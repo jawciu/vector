@@ -157,11 +157,10 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
         <button
           type="button"
           onClick={() => setMenuOpen((o) => !o)}
-          className="flex items-center justify-center w-7 h-7 rounded transition-colors"
-          style={{ color: "var(--text-muted)" }}
+          className={`icon-btn flex items-center justify-center w-5 h-5 rounded-full${menuOpen ? " icon-btn--active" : ""}`}
           aria-label="Onboarding actions"
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
             <circle cx="8" cy="3" r="1.5" />
             <circle cx="8" cy="8" r="1.5" />
             <circle cx="8" cy="13" r="1.5" />
@@ -330,19 +329,9 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
               </div>
 
               <div className="flex gap-2 justify-end pt-2">
-                <button
-                  type="button"
-                  onClick={() => setEditOpen(false)}
-                  disabled={loading}
-                  className="py-1 px-2 rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
-                  style={{
-                    border: "1px solid var(--border)",
-                    background: "var(--surface)",
-                    color: "var(--text)",
-                  }}
-                >
+                <Button variant="secondary" size="sm" onClick={() => setEditOpen(false)} disabled={loading}>
                   Cancel
-                </button>
+                </Button>
                 <Button type="submit" size="sm" disabled={loading}>
                   {loading ? "Saving…" : "Save"}
                 </Button>

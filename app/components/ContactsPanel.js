@@ -181,19 +181,9 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
           <Button type="submit" size="xs" disabled={loading}>
             {loading ? "Saving…" : submitLabel}
           </Button>
-          <button
-            type="button"
-            onClick={handleCancel}
-            disabled={loading}
-            className="py-1 px-2 rounded-lg text-xs font-medium transition-opacity disabled:opacity-50"
-            style={{
-              border: "1px solid var(--border)",
-              background: "var(--surface)",
-              color: "var(--text)",
-            }}
-          >
+          <Button variant="secondary" size="xs" onClick={handleCancel} disabled={loading}>
             Cancel
-          </button>
+          </Button>
         </div>
       </form>
     );

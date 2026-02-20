@@ -59,6 +59,44 @@ a {
   text-decoration: none;
 }
 
+/* Icon button (meatball menu, etc.) */
+.icon-btn {
+  color: var(--text-muted);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.icon-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text);
+}
+
+.icon-btn:active,
+.icon-btn--active {
+  background-color: var(--surface-hover);
+  color: var(--text);
+}
+
+/* Secondary button */
+.btn-secondary {
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  transition: background-color 0.15s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--bg-hover);
+}
+
+.btn-secondary:active:not(:disabled) {
+  background-color: var(--surface-hover);
+}
+
+.btn-secondary:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
 /* Primary button */
 .btn-primary {
   background-color: var(--action);

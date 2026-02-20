@@ -188,15 +188,9 @@ export default function CreateTaskCard({ onboardingId, phaseId, onTaskCreated, p
         <Button type="submit" size="sm" disabled={loading}>
           {loading ? "Creating…" : "Create"}
         </Button>
-        <button
-          type="button"
-          onClick={handleCancel}
-          disabled={loading}
-          className="py-1 px-2 w-fit h-fit rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
-          style={{ border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text)" }}
-        >
+        <Button variant="secondary" size="sm" onClick={handleCancel} disabled={loading}>
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );

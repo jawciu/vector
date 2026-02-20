@@ -39,13 +39,12 @@ Defined in `app/globals.css` under `:root`. Not yet migrated to `@theme`.
 ### DS Components (in `app/ui/`)
 
 #### `Button` (`app/ui/Button.js`)
-- **Variants:** `primary` (default)
-- **Primary:** solid purple, dark text, `rounded-lg`, `text-sm font-semibold`, `px-2 py-1`
-- **CSS class:** `.btn-primary` (defined in `globals.css`)
+- **Variants:** `primary`, `secondary`
 - **Sizes:** `xs` (`py-0.5 px-2 text-xs`), `sm` default (`py-1 px-2 text-sm`)
-- **States:** default `--action`, hover `--action-hover`, active `--action-active`, disabled `--action-disabled`
-- **Usage:** `<Button variant="primary" size="sm" onClick={...}>Label</Button>`
-- **Cancel buttons** alongside a primary Button should use matching padding (`py-1 px-2` for sm, `py-0.5 px-2` for xs)
+- **Primary:** solid purple, `font-semibold`, CSS class `.btn-primary` — default `--action`, hover `--action-hover`, active `--action-active`, disabled `--action-disabled`
+- **Secondary:** bordered surface button, `font-normal`, CSS class `.btn-secondary` — `var(--surface)` bg, `var(--border)` border, `var(--text)` color; hover `--bg-hover`, active `--surface-hover`, disabled text becomes `--text-muted` (border unchanged)
+- **Usage:** `<Button variant="primary" size="sm">Create</Button>` / `<Button variant="secondary" size="sm">Cancel</Button>`
+- Cancel/dismiss buttons alongside a primary Button always use `variant="secondary"` with matching size
 
 ### Shared Components (in `app/components/Menu.js`)
 Currently the reusable menu primitives live here. These should be migrated to `app/ui/` when the DS is formalized.

@@ -290,19 +290,9 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
 
           {/* Actions */}
           <div className="flex gap-2 justify-end pt-2">
-            <button
-              type="button"
-              onClick={() => { resetForm(); onClose(); }}
-              disabled={loading}
-              className="py-1 px-2 rounded-lg text-sm font-medium transition-opacity disabled:opacity-50"
-              style={{
-                border: "1px solid var(--border)",
-                background: "var(--surface)",
-                color: "var(--text)",
-              }}
-            >
+            <Button variant="secondary" size="sm" onClick={() => { resetForm(); onClose(); }} disabled={loading}>
               Cancel
-            </button>
+            </Button>
             <Button type="submit" size="sm" disabled={loading}>
               {loading ? "Creating…" : "Create"}
             </Button>

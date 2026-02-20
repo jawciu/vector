@@ -4,7 +4,8 @@
  * Button — DS primitive
  *
  * Variants:
- *   primary  — solid purple action button
+ *   primary    — solid purple action button
+ *   secondary  — bordered surface button (cancel, dismiss)
  *
  * Sizes:
  *   xs  — compact inline (py-0.5 px-2 text-xs)
@@ -27,6 +28,18 @@ export default function Button({
       <button
         type="button"
         className={`btn-primary flex items-center gap-2 rounded-lg font-semibold ${SIZE_CLASSES[size]} ${className}`}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  }
+
+  if (variant === "secondary") {
+    return (
+      <button
+        type="button"
+        className={`btn-secondary flex items-center gap-2 rounded-lg font-normal ${SIZE_CLASSES[size]} ${className}`}
         {...props}
       >
         {children}
