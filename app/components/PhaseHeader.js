@@ -1,56 +1,59 @@
 "use client";
 
-import { useState } from "react";
-import Button from "../ui/Button";
+import { useState, useRef, useEffect } from "react";
+import { MenuList, MenuOption } from "./Menu";
 
-export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted }) {
+export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onAddTask }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [name, setName] = useState(phase.name);
-  const [targetDate, setTargetDate] = useState(phase.targetDate ? phase.targetDate.split("T")[0] : "");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const menuRef = useRef(null);
 
-  const progress = phase.taskCount > 0 ? Math.round((phase.doneCount / phase.taskCount) * 100) : 0;
+  // Close menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClick(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [menuOpen]);
 
   async function handleSave() {
-    if (!name.trim()) return;
-    setLoading(true);
+    const trimmed = name.trim();
+    if (!trimmed) {
+      setName(phase.name);
+      setIsEditing(false);
+      return;
+    }
+    if (trimmed === phase.name) {
+      setIsEditing(false);
+      return;
+    }
     try {
       const res = await fetch(`/api/phases/${phase.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          targetDate: targetDate || null,
-        }),
+        body: JSON.stringify({ name: trimmed }),
       });
-      if (!res.ok) throw new Error("Failed to update phase");
+      if (!res.ok) throw new Error();
       const updated = await res.json();
       if (onPhaseUpdated) onPhaseUpdated(updated);
-      setIsEditing(false);
     } catch {
-      // keep editing on error
+      setName(phase.name);
     } finally {
-      setLoading(false);
+      setIsEditing(false);
     }
   }
 
-  async function handleToggleComplete() {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/phases/${phase.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isComplete: !phase.isComplete }),
-      });
-      if (!res.ok) throw new Error("Failed to update phase");
-      const updated = await res.json();
-      if (onPhaseUpdated) onPhaseUpdated(updated);
-    } finally {
-      setLoading(false);
-    }
+  function handleCancel() {
+    setName(phase.name);
+    setIsEditing(false);
   }
 
   async function handleDelete() {
+    setMenuOpen(false);
     if (!confirm(`Delete "${phase.name}" phase? It must have no tasks.`)) return;
     setLoading(true);
     try {
@@ -66,130 +69,102 @@ export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted }) {
     }
   }
 
-  function handleCancel() {
-    setName(phase.name);
-    setTargetDate(phase.targetDate ? phase.targetDate.split("T")[0] : "");
-    setIsEditing(false);
-  }
-
-  if (isEditing) {
-    return (
-      <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          autoFocus
-          className="text-base font-bold outline-none"
-          style={{
-            background: "transparent",
-            color: "var(--text)",
-            border: "none",
-            borderBottom: "1px solid var(--action)",
-            paddingBottom: 2,
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleSave();
-            if (e.key === "Escape") handleCancel();
-          }}
-        />
-        <input
-          type="date"
-          value={targetDate}
-          onChange={(e) => setTargetDate(e.target.value)}
-          className="text-xs outline-none"
-          style={{
-            background: "transparent",
-            color: "var(--text-muted)",
-            border: "none",
-            colorScheme: "dark",
-          }}
-        />
-        <div className="flex gap-2 items-center">
-          <Button size="xs" onClick={handleSave} disabled={loading}>
-            Save
-          </Button>
-          <button
-            onClick={handleCancel}
-            className="text-xs font-medium"
-            style={{ color: "var(--text-muted)" }}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleDelete}
-            disabled={loading}
-            className="text-xs font-medium ml-auto"
-            style={{ color: "var(--danger)" }}
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-center gap-2">
-        <h2
-          className="text-base font-bold cursor-pointer"
-          style={{ color: "var(--text)" }}
-          onClick={() => setIsEditing(true)}
-        >
-          {phase.name}
-        </h2>
-        <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>
+    <div className="flex items-center px-4 py-1" style={{ gap: 6 }}>
+      {/* 6-dot drag handle */}
+      <svg
+        width="8"
+        height="14"
+        viewBox="0 0 8 14"
+        fill="none"
+        style={{ color: "var(--text-muted)", flexShrink: 0, cursor: "grab", opacity: 0.5 }}
+      >
+        <circle cx="2" cy="2" r="1.2" fill="currentColor" />
+        <circle cx="6" cy="2" r="1.2" fill="currentColor" />
+        <circle cx="2" cy="7" r="1.2" fill="currentColor" />
+        <circle cx="6" cy="7" r="1.2" fill="currentColor" />
+        <circle cx="2" cy="12" r="1.2" fill="currentColor" />
+        <circle cx="6" cy="12" r="1.2" fill="currentColor" />
+      </svg>
+
+      {/* Phase name (inline edit) + task count */}
+      <div className="flex items-center flex-1 min-w-0" style={{ gap: 4 }}>
+        {isEditing ? (
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoFocus
+            className="text-sm font-semibold outline-none flex-1 min-w-0"
+            style={{
+              background: "transparent",
+              color: "var(--text)",
+              border: "none",
+              borderBottom: "1px solid var(--action)",
+              paddingBottom: 1,
+              lineHeight: 1,
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSave();
+              if (e.key === "Escape") handleCancel();
+            }}
+            onBlur={handleSave}
+          />
+        ) : (
+          <button
+            className="text-sm font-semibold text-left truncate"
+            style={{ color: "var(--text)", background: "none", border: "none", cursor: "pointer", lineHeight: 1 }}
+            onClick={() => setIsEditing(true)}
+          >
+            {phase.name}
+          </button>
+        )}
+        <span className="text-sm flex-shrink-0" style={{ color: "var(--text-muted)", lineHeight: 1 }}>
           {phase.taskCount}
         </span>
-        {phase.isComplete && (
-          <span
-            className="text-[10px] font-medium rounded px-1.5 py-0.5"
-            style={{ background: "var(--success)", color: "var(--text-dark)" }}
-          >
-            Complete
-          </span>
-        )}
-        <button
-          onClick={handleToggleComplete}
-          disabled={loading}
-          className="text-[10px] ml-auto"
-          style={{ color: "var(--text-muted)" }}
-          title={phase.isComplete ? "Mark incomplete" : "Mark complete"}
-        >
-          {phase.isComplete ? "Undo" : "Complete"}
-        </button>
       </div>
 
-      {/* Progress bar */}
-      {phase.taskCount > 0 && (
-        <div className="flex items-center gap-2">
-          <div
-            className="flex-1 rounded-full overflow-hidden"
-            style={{ height: 4, background: "var(--border)" }}
-          >
-            <div
-              className="rounded-full transition-all"
-              style={{
-                width: `${progress}%`,
-                height: "100%",
-                background: progress === 100 ? "var(--success)" : "var(--action)",
-              }}
-            />
-          </div>
-          <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-            {phase.doneCount}/{phase.taskCount}
-          </span>
-        </div>
-      )}
+      {/* Meatball menu */}
+      <div ref={menuRef} className="relative">
+        <button
+          type="button"
+          onClick={() => setMenuOpen((o) => !o)}
+          className={`icon-btn flex items-center justify-center w-5 h-5 rounded-full${menuOpen ? " icon-btn--active" : ""}`}
+          aria-label="Phase options"
+          disabled={loading}
+        >
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+            <circle cx="8" cy="3" r="1.5" />
+            <circle cx="8" cy="8" r="1.5" />
+            <circle cx="8" cy="13" r="1.5" />
+          </svg>
+        </button>
 
-      {phase.targetDate && (
-        <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-          Target: {new Date(phase.targetDate).toLocaleDateString("en-GB", {
-            day: "numeric", month: "short",
-          })}
-        </span>
-      )}
+        {menuOpen && (
+          <MenuList style={{ left: "auto", right: 0, width: 160 }}>
+            <MenuOption
+              onClick={handleDelete}
+              style={{ color: "var(--danger)", fontWeight: 400 }}
+            >
+              Delete phase
+            </MenuOption>
+          </MenuList>
+        )}
+      </div>
+
+      {/* Plus icon */}
+      <button
+        type="button"
+        onClick={() => onAddTask && onAddTask()}
+        className="flex items-center justify-center w-5 h-5 rounded icon-btn"
+        style={{ flexShrink: 0 }}
+        aria-label="Add task"
+      >
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+          <line x1="5.5" y1="1" x2="5.5" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <line x1="1" y1="5.5" x2="10" y2="5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      </button>
     </div>
   );
 }

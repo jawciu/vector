@@ -59,11 +59,14 @@ model Task {
   phaseId         Int
   phase           Phase   @relation(fields: [phaseId], references: [id], onDelete: Cascade)
   title           String
-  status          String  // To do | In progress | Done
+  status          String  // Not started | In progress | Under investigation | Blocked | Done
   due             String  // e.g. "2026-03-01"
   waitingOn       String
   owner           String  @default("")
   notes           String  @default("")
+  priority        String? // low | medium | high
+  commentCount    Int     @default(0)
+  previousStatus  String? // stores status before "Done" for toggle-back
   blockedByTaskId Int?
   blockedByTask   Task?   @relation("TaskBlocks", fields: [blockedByTaskId], references: [id], onDelete: SetNull)
   blockedTasks    Task[]  @relation("TaskBlocks")

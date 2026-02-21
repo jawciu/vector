@@ -4,22 +4,55 @@ import { useState } from "react";
 import PeoplePicker from "./PeoplePicker";
 import Button from "../ui/Button";
 
-export default function CreateTaskCard({ onboardingId, phaseId, onTaskCreated, people = [], allTasks = [] }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+const TASK_STATUSES = ["Not started", "In progress", "Under investigation", "Blocked", "Done"];
+const PRIORITIES = ["low", "medium", "high"];
+
+export default function CreateTaskCard({
+  onboardingId,
+  phaseId,
+  onTaskCreated,
+  people = [],
+  isExpanded,
+  onExpand,
+  onCollapse,
+}) {
+  const [internalExpanded, setInternalExpanded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     title: "",
+    status: "Not started",
+    priority: null,
     due: "",
     waitingOn: "",
     owner: "",
     notes: "",
-    blockedByTaskId: "",
   });
 
+  // Controlled vs uncontrolled expansion
+  const expanded = isExpanded !== undefined ? isExpanded : internalExpanded;
+
+  function expand() {
+    if (isExpanded !== undefined) {
+      if (onExpand) onExpand();
+    } else {
+      setInternalExpanded(true);
+    }
+  }
+
+  function collapse() {
+    setFormData({ title: "", status: "Not started", priority: null, due: "", waitingOn: "", owner: "", notes: "" });
+    setError("");
+    if (isExpanded !== undefined) {
+      if (onCollapse) onCollapse();
+    } else {
+      setInternalExpanded(false);
+    }
+  }
+
   function handleChange(field, value) {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   }
 
   async function handleSubmit(e) {
@@ -41,11 +74,12 @@ export default function CreateTaskCard({ onboardingId, phaseId, onTaskCreated, p
           onboardingId,
           phaseId,
           title: formData.title,
+          status: formData.status,
+          priority: formData.priority,
           due: formData.due,
           waitingOn: formData.waitingOn,
           owner: formData.owner,
           notes: formData.notes,
-          blockedByTaskId: formData.blockedByTaskId || null,
         }),
       });
 
@@ -55,10 +89,7 @@ export default function CreateTaskCard({ onboardingId, phaseId, onTaskCreated, p
       }
 
       const newTask = await response.json();
-
-      setFormData({ title: "", due: "", waitingOn: "", owner: "", notes: "", blockedByTaskId: "" });
-      setIsExpanded(false);
-
+      collapse();
       if (onTaskCreated) onTaskCreated(newTask);
     } catch (err) {
       setError(err.message);
@@ -67,21 +98,12 @@ export default function CreateTaskCard({ onboardingId, phaseId, onTaskCreated, p
     }
   }
 
-  function handleCancel() {
-    setFormData({ title: "", due: "", waitingOn: "", owner: "", notes: "", blockedByTaskId: "" });
-    setError("");
-    setIsExpanded(false);
-  }
-
-  if (!isExpanded) {
+  if (!expanded) {
     return (
       <button
-        onClick={() => setIsExpanded(true)}
-        className="w-full text-left rounded-lg border border-dashed px-4 py-3 text-sm transition-colors hover:opacity-80"
-        style={{
-          borderColor: "var(--border)",
-          color: "var(--text-muted)",
-        }}
+        onClick={expand}
+        className="text-left text-xs transition-opacity hover:opacity-70"
+        style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", paddingLeft: 16 }}
       >
         + Add task
       </button>
@@ -91,10 +113,10 @@ export default function CreateTaskCard({ onboardingId, phaseId, onTaskCreated, p
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-3 rounded-lg"
+      className="flex flex-col gap-3 rounded-lg mx-1"
       style={{
         border: "1px solid var(--border)",
-        background: "var(--surface)",
+        background: "var(--bg-elevated)",
         padding: "12px 16px",
       }}
     >
@@ -118,18 +140,49 @@ export default function CreateTaskCard({ onboardingId, phaseId, onTaskCreated, p
         onChange={(e) => handleChange("title", e.target.value)}
         required
         autoFocus
-        className="py-2 px-0 text-sm w-full outline-none transition-colors"
-        style={{ border: "none", background: "transparent", color: "var(--text-muted)" }}
-        onFocus={(e) => e.target.style.color = "var(--text)"}
-        onBlur={(e) => e.target.style.color = formData.title ? "var(--text)" : "var(--text-muted)"}
+        className="py-1 px-0 text-sm w-full outline-none transition-colors"
+        style={{ border: "none", background: "transparent", color: "var(--text)" }}
       />
 
-      <div className="flex items-center gap-2 py-2">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
-          <rect x="1" y="2" width="12" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.2" fill="none" style={{ color: "var(--text-muted)" }}/>
-          <line x1="4" y1="0.5" x2="4" y2="3.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" style={{ color: "var(--text-muted)" }}/>
-          <line x1="10" y1="0.5" x2="10" y2="3.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" style={{ color: "var(--text-muted)" }}/>
-          <line x1="1" y1="5.5" x2="13" y2="5.5" stroke="currentColor" strokeWidth="1.2" style={{ color: "var(--text-muted)" }}/>
+      {/* Priority toggle */}
+      <div className="flex items-center gap-1">
+        <span className="text-xs mr-1" style={{ color: "var(--text-muted)" }}>Priority:</span>
+        {PRIORITIES.map((p) => (
+          <button
+            key={p}
+            type="button"
+            onClick={() => handleChange("priority", formData.priority === p ? null : p)}
+            className="text-xs font-medium rounded px-2 py-0.5 capitalize"
+            style={{
+              background: formData.priority === p ? "var(--surface-hover)" : "transparent",
+              color: formData.priority === p ? "var(--text)" : "var(--text-muted)",
+              border: formData.priority === p ? "1px solid var(--border)" : "1px solid transparent",
+            }}
+          >
+            {p}
+          </button>
+        ))}
+      </div>
+
+      {/* Status selector */}
+      <select
+        value={formData.status}
+        onChange={(e) => handleChange("status", e.target.value)}
+        className="py-1 px-0 text-xs w-full outline-none"
+        style={{ border: "none", background: "transparent", color: "var(--text-muted)" }}
+      >
+        {TASK_STATUSES.map((s) => (
+          <option key={s} value={s}>{s}</option>
+        ))}
+      </select>
+
+      {/* Due date */}
+      <div className="flex items-center gap-2 py-1">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, color: "var(--text-muted)" }}>
+          <rect x="1" y="2" width="12" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.2" fill="none" />
+          <line x1="4" y1="0.5" x2="4" y2="3.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="10" y1="0.5" x2="10" y2="3.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="1" y1="5.5" x2="13" y2="5.5" stroke="currentColor" strokeWidth="1.2" />
         </svg>
         <input
           type="date"
@@ -137,27 +190,8 @@ export default function CreateTaskCard({ onboardingId, phaseId, onTaskCreated, p
           onChange={(e) => handleChange("due", e.target.value)}
           className="text-xs flex-1 outline-none transition-colors"
           style={{ border: "none", background: "transparent", color: "var(--text-muted)", colorScheme: "dark" }}
-          onFocus={(e) => e.target.style.color = "var(--text)"}
-          onBlur={(e) => e.target.style.color = formData.due ? "var(--text)" : "var(--text-muted)"}
         />
       </div>
-
-      {/* Blocked by task picker */}
-      {allTasks.length > 0 && (
-        <select
-          value={formData.blockedByTaskId}
-          onChange={(e) => handleChange("blockedByTaskId", e.target.value)}
-          className="py-2 px-0 text-xs w-full outline-none"
-          style={{ border: "none", background: "transparent", color: "var(--text-muted)" }}
-        >
-          <option value="">Not blocked</option>
-          {allTasks.map((t) => (
-            <option key={t.id} value={t.id}>
-              Blocked by: {t.title}
-            </option>
-          ))}
-        </select>
-      )}
 
       <PeoplePicker
         value={formData.waitingOn}
@@ -178,17 +212,15 @@ export default function CreateTaskCard({ onboardingId, phaseId, onTaskCreated, p
         value={formData.notes}
         onChange={(e) => handleChange("notes", e.target.value)}
         rows={2}
-        className="py-2 px-0 text-xs w-full resize-vertical outline-none transition-colors"
+        className="py-1 px-0 text-xs w-full resize-vertical outline-none transition-colors"
         style={{ border: "none", background: "transparent", color: "var(--text-muted)" }}
-        onFocus={(e) => e.target.style.color = "var(--text)"}
-        onBlur={(e) => e.target.style.color = formData.notes ? "var(--text)" : "var(--text-muted)"}
       />
 
       <div className="flex gap-2">
         <Button type="submit" size="sm" disabled={loading}>
           {loading ? "Creating…" : "Create"}
         </Button>
-        <Button variant="secondary" size="sm" onClick={handleCancel} disabled={loading}>
+        <Button variant="secondary" size="sm" onClick={collapse} disabled={loading}>
           Cancel
         </Button>
       </div>

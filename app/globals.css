@@ -29,6 +29,7 @@
   --candy: #FF9EE5;
   --text-dark: #18181E;
   --warning: #fbbf24;
+  --icon-tertiary: #5D565D;
 }
 
 html,
@@ -162,10 +163,18 @@ a {
   }
 }
 
-/* Tick circle hover on non-completed tasks */
-.tick-circle:hover {
-  border-color: var(--success) !important;
-  background: rgba(156, 255, 166, 0.15) !important;
+/* Checkbox bounce animation (plays when marking done) */
+@keyframes checkboxBounce {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.28); }
+  55%  { transform: scale(0.86); }
+  75%  { transform: scale(1.1); }
+  90%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+.checkbox-bounce {
+  animation: checkboxBounce 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
 }
 
 /* Filter button styles */

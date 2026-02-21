@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { getOnboarding, getTasksForOnboarding, getContactsForOnboarding, getPhasesForOnboarding } from "@/lib/db";
 import OnboardingDetailClient from "./OnboardingDetailClient";
@@ -22,5 +23,9 @@ export default async function OnboardingDetailPage({ params }) {
     );
   }
 
-  return <OnboardingDetailClient onboarding={onboarding} tasks={tasks} contacts={contacts} phases={phases} />;
+  return (
+    <Suspense>
+      <OnboardingDetailClient onboarding={onboarding} tasks={tasks} contacts={contacts} phases={phases} />
+    </Suspense>
+  );
 }

@@ -1,14 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import Button from "@/app/ui/Button";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { computeHealth } from "@/lib/health";
+import Button from "@/app/ui/Button";
 import TaskCard from "@/app/components/TaskCard";
 import CreateTaskCard from "@/app/components/CreateTaskCard";
 import OnboardingActions from "@/app/components/OnboardingActions";
-import ContactsPanel from "@/app/components/ContactsPanel";
 import PhaseHeader from "@/app/components/PhaseHeader";
+import OnboardingTabs from "@/app/components/OnboardingTabs";
+import DetailsTab from "@/app/components/DetailsTab";
+import MembersTab from "@/app/components/MembersTab";
+import CommunicationTab from "@/app/components/CommunicationTab";
 
 const AVATAR_COLORS = [
   "var(--sunset)",
@@ -32,41 +36,55 @@ function companyLogoColor(name) {
   return AVATAR_COLORS[n % AVATAR_COLORS.length];
 }
 
-function isTaskBlocked(task) {
-  if (task.blockedByTask && task.blockedByTask.status !== "Done") return true;
-  if (task.waitingOn && task.waitingOn.trim() !== "") return true;
-  return false;
-}
+const TASK_FILTERS = [
+  { id: "active", label: "Active" },
+  { id: "blocked", label: "Blocked" },
+  { id: "done", label: "Done" },
+  { id: "all", label: "All" },
+];
 
-const TASK_FILTERS = ["Active", "Blocked", "Done", "All"];
+export default function OnboardingDetailClient({
+  onboarding,
+  tasks: initialTasks,
+  contacts: initialContacts,
+  phases: initialPhases,
+}) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-export default function OnboardingDetailClient({ onboarding, tasks: initialTasks, contacts: initialContacts, phases: initialPhases }) {
   const [tasks, setTasks] = useState(initialTasks);
   const [contacts, setContacts] = useState(initialContacts || []);
   const [phases, setPhases] = useState(initialPhases || []);
   const [error, setError] = useState("");
-  const [taskFilter, setTaskFilter] = useState("Active");
+  const [addingInPhase, setAddingInPhase] = useState(null);
   const [addingPhase, setAddingPhase] = useState(false);
   const [newPhaseName, setNewPhaseName] = useState("");
 
-  const health = computeHealth(tasks);
-  const blockedCount = tasks.filter((t) => isTaskBlocked(t)).length;
+  const activeTab = searchParams.get("tab") || "tasks";
+  const taskFilter = searchParams.get("filter") || "active";
 
-  // Filter tasks based on selected filter
+  function setTab(tab) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    router.push(`?${params.toString()}`);
+  }
+
+  function setFilter(filter) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("filter", filter);
+    router.push(`?${params.toString()}`);
+  }
+
+  const health = computeHealth(tasks);
+  const blockedCount = tasks.filter((t) => t.status === "Blocked").length;
+
   const filteredTasks = tasks.filter((t) => {
-    if (taskFilter === "Active") return t.status !== "Done";
-    if (taskFilter === "Done") return t.status === "Done";
-    if (taskFilter === "Blocked") return isTaskBlocked(t) && t.status !== "Done";
-    return true; // "All"
+    if (taskFilter === "active") return t.status !== "Done";
+    if (taskFilter === "done") return t.status === "Done";
+    if (taskFilter === "blocked") return t.status === "Blocked";
+    return true; // "all"
   });
 
-  // Build columns from phases
-  const columns = phases.map((phase) => ({
-    phase,
-    tasks: filteredTasks.filter((t) => t.phaseId === phase.id),
-  }));
-
-  // Recompute phase counts from current tasks state
   const phasesWithCounts = phases.map((phase) => {
     const phaseTasks = tasks.filter((t) => t.phaseId === phase.id);
     return {
@@ -76,41 +94,43 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
     };
   });
 
-  // Collect unique people from contacts, tasks, and onboarding
+  const columns = phasesWithCounts.map((phase) => ({
+    phase,
+    tasks: filteredTasks.filter((t) => t.phaseId === phase.id),
+  }));
+
   const people = Array.from(
     new Set([
-      ...contacts.map(c => c.name).filter(Boolean),
+      ...contacts.map((c) => c.name).filter(Boolean),
       onboarding.companyName,
-      ...tasks.map(t => t.owner).filter(Boolean),
-      ...tasks.map(t => t.waitingOn).filter(Boolean),
+      ...tasks.map((t) => t.owner).filter(Boolean),
+      ...tasks.map((t) => t.waitingOn).filter(Boolean),
     ])
-  ).filter(p => p.trim().length > 0);
+  ).filter((p) => p.trim().length > 0);
 
   function handleTaskCreated(newTask) {
-    setTasks(prevTasks => [...prevTasks, newTask]);
+    setTasks((prev) => [...prev, newTask]);
+    setAddingInPhase(null);
   }
 
   function handleTaskUpdated(updatedTask) {
-    setTasks(prevTasks =>
-      prevTasks.map(t => t.id === updatedTask.id ? updatedTask : t)
-    );
+    setTasks((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
   }
 
   function handleTaskDeleted(taskId) {
-    setTasks(prevTasks => prevTasks.filter(t => t.id !== taskId));
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
   }
 
   function handlePhaseUpdated(updatedPhase) {
-    setPhases(prev => prev.map(p => p.id === updatedPhase.id ? updatedPhase : p));
+    setPhases((prev) => prev.map((p) => (p.id === updatedPhase.id ? updatedPhase : p)));
   }
 
   function handlePhaseDeleted(phaseId) {
-    setPhases(prev => prev.filter(p => p.id !== phaseId));
+    setPhases((prev) => prev.filter((p) => p.id !== phaseId));
   }
 
   async function handleAddPhase() {
     if (!newPhaseName.trim()) return;
-
     try {
       const maxSort = phases.reduce((max, p) => Math.max(max, p.sortOrder), -1);
       const res = await fetch("/api/phases", {
@@ -124,7 +144,7 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
       });
       if (!res.ok) throw new Error("Failed to create phase");
       const newPhase = await res.json();
-      setPhases(prev => [...prev, newPhase]);
+      setPhases((prev) => [...prev, newPhase]);
       setNewPhaseName("");
       setAddingPhase(false);
     } catch {
@@ -132,18 +152,16 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
     }
   }
 
-  const colCount = phases.length + 1; // +1 for "Add section" column
+  // Member avatars (up to 4 + overflow)
+  const memberAvatars = contacts.slice(0, 4);
+  const memberOverflow = contacts.length > 4 ? contacts.length - 4 : 0;
 
   return (
     <main className="w-full flex flex-col" style={{ minHeight: "100vh" }}>
+      {/* Breadcrumb nav */}
       <nav
         className="w-full flex items-center justify-between text-sm border-b"
-        style={{
-          paddingLeft: 16,
-          paddingRight: 16,
-          height: 44,
-          borderColor: "var(--border)",
-        }}
+        style={{ paddingLeft: 16, paddingRight: 16, height: 44, borderColor: "var(--border)" }}
       >
         <div className="flex items-center gap-2">
           <Link
@@ -155,186 +173,243 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
           </Link>
           <span style={{ color: "var(--text-muted)" }}>›</span>
           <div className="flex items-center gap-2">
-          <span
-            className="flex shrink-0 w-5 h-5 rounded items-center justify-center text-[10px] font-semibold"
-            style={{
-              background: companyLogoColor(onboarding.companyName),
-              color: "var(--text-dark)",
-            }}
-            aria-hidden
-          >
-            {companyInitials(onboarding.companyName)}
-          </span>
-          <span className="font-medium" style={{ color: "var(--text)" }}>
-            {onboarding.companyName}
-          </span>
-          <OnboardingActions onboarding={onboarding} />
+            <span
+              className="flex shrink-0 w-5 h-5 rounded items-center justify-center text-[10px] font-semibold"
+              style={{ background: companyLogoColor(onboarding.companyName), color: "var(--text-dark)" }}
+              aria-hidden
+            >
+              {companyInitials(onboarding.companyName)}
+            </span>
+            <span className="font-medium" style={{ color: "var(--text)" }}>
+              {onboarding.companyName}
+            </span>
+            <OnboardingActions onboarding={onboarding} />
           </div>
         </div>
       </nav>
-      <div className="max-w-6xl" style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 16, paddingBottom: 16 }}>
-        <div className="flex flex-col gap-2">
-          {error && (
-            <div
-              className="text-sm px-3 py-2 rounded"
-              style={{
-                color: "var(--danger)",
-                background: "rgba(255, 137, 155, 0.1)",
-                border: "1px solid var(--danger)",
-              }}
-            >
-              {error}
-            </div>
-          )}
-          <div className="flex items-center gap-2 flex-wrap">
-            <span
-              className="inline-flex rounded text-xs font-medium"
-              style={{
-                paddingTop: 4,
-                paddingBottom: 4,
-                paddingLeft: 8,
-                paddingRight: 8,
-                borderRadius: 6,
-                color: health === "Blocked" || health === "At risk" ? "var(--danger)" : "var(--success)",
-                borderWidth: "1px",
-                borderStyle: "solid",
-                borderColor: health === "Blocked" || health === "At risk" ? "var(--danger)" : "var(--success)",
-              }}
-            >
-              {health}
-            </span>
-            {blockedCount > 0 && (
-              <span
-                className="inline-flex rounded text-xs font-medium"
-                style={{
-                  paddingTop: 4,
-                  paddingBottom: 4,
-                  paddingLeft: 8,
-                  paddingRight: 8,
-                  borderRadius: 6,
-                  color: "var(--danger)",
-                  borderWidth: "1px",
-                  borderStyle: "solid",
-                  borderColor: "var(--danger)",
-                }}
-              >
-                {blockedCount} blocked
-              </span>
-            )}
-            {onboarding.owner && (
-              <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-                Owner: <span style={{ color: "var(--text)" }}>{onboarding.owner}</span>
-              </span>
-            )}
-            {onboarding.targetGoLive && (
-              <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-                Go-live: <span style={{ color: "var(--text)" }}>
-                  {new Date(onboarding.targetGoLive).toLocaleDateString("en-GB", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </span>
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
 
-      <div style={{ paddingLeft: 16, paddingRight: 16, paddingBottom: 16 }}>
-        <ContactsPanel
-          onboardingId={onboarding.id}
-          contacts={contacts}
-          onContactsChange={setContacts}
-        />
-      </div>
+      {/* Tab bar */}
+      <OnboardingTabs activeTab={activeTab} onTabChange={setTab} />
 
-      <section className="flex-1 flex flex-col" style={{ borderTop: "1px solid var(--border)" }}>
-        {/* Filter bar */}
+      {error && (
         <div
-          className="flex items-center justify-end gap-1"
+          className="mx-4 mt-3 text-sm px-3 py-2 rounded"
           style={{
-            paddingTop: 8,
-            paddingBottom: 8,
-            paddingLeft: 16,
-            paddingRight: 16,
-            borderBottom: "1px solid var(--border)",
+            color: "var(--danger)",
+            background: "rgba(255, 137, 155, 0.1)",
+            border: "1px solid var(--danger)",
           }}
         >
-          <span className="text-xs mr-2" style={{ color: "var(--text-muted)" }}>Tasks:</span>
-          {TASK_FILTERS.map((filter) => (
-            <button
-              key={filter}
-              onClick={() => setTaskFilter(filter)}
-              className="task-filter-btn text-xs font-medium rounded-md"
+          {error}
+        </div>
+      )}
+
+      {/* Tab content */}
+      {activeTab === "tasks" && (
+        <div className="flex flex-col flex-1">
+          {/* Action bar */}
+          <div
+            className="flex items-center justify-between gap-3"
+            style={{
+              paddingTop: 8,
+              paddingBottom: 8,
+              paddingLeft: 16,
+              paddingRight: 16,
+              borderBottom: "1px solid var(--border)",
+            }}
+          >
+            {/* Left: filter pills + sort + filter */}
+            <div className="flex items-center gap-1">
+              {TASK_FILTERS.map(({ id, label }) => (
+                <button
+                  key={id}
+                  onClick={() => setFilter(id)}
+                  className="text-sm font-medium rounded-md transition-colors"
+                  style={{
+                    paddingTop: 4,
+                    paddingBottom: 4,
+                    paddingLeft: 10,
+                    paddingRight: 10,
+                    color: taskFilter === id ? "var(--text)" : "var(--text-muted)",
+                    background: taskFilter === id ? "var(--surface-hover)" : "transparent",
+                    border: taskFilter === id ? "1px solid var(--border)" : "1px solid transparent",
+                  }}
+                >
+                  {label}
+                  {id === "done" && (
+                    <span className="ml-1" style={{ color: "var(--text-muted)" }}>
+                      ({tasks.filter((t) => t.status === "Done").length})
+                    </span>
+                  )}
+                  {id === "blocked" && blockedCount > 0 && (
+                    <span className="ml-1" style={{ color: "var(--text-muted)" }}>
+                      ({blockedCount})
+                    </span>
+                  )}
+                </button>
+              ))}
+
+              {/* Sort button */}
+              <button
+                className="btn-secondary flex items-center gap-1.5 text-sm rounded-md ml-2"
+                style={{ paddingTop: 4, paddingBottom: 4, paddingLeft: 8, paddingRight: 8 }}
+                disabled
+              >
+                <svg width="12" height="12" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-muted)" }}>
+                  <line x1="1" y1="3" x2="13" y2="3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                  <line x1="3" y1="7" x2="11" y2="7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                  <line x1="5" y1="11" x2="9" y2="11" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
+                <span style={{ color: "var(--text-muted)" }}>Sort</span>
+              </button>
+
+              {/* Filter button */}
+              <button
+                className="btn-secondary flex items-center gap-1.5 text-sm rounded-md"
+                style={{ paddingTop: 4, paddingBottom: 4, paddingLeft: 8, paddingRight: 8 }}
+                disabled
+              >
+                <svg width="12" height="12" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-muted)" }}>
+                  <path d="M1 2h12l-4.5 5.5V12l-3-1.5V7.5L1 2z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" fill="none" />
+                </svg>
+                <span style={{ color: "var(--text-muted)" }}>Filter</span>
+              </button>
+            </div>
+
+            {/* Right: health tags + member avatars */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {health !== "On track" && (
+                <span
+                  className="text-sm font-medium rounded px-2 py-1"
+                  style={{
+                    color: health === "Blocked" ? "var(--danger)" : "var(--alert)",
+                    border: `1px solid ${health === "Blocked" ? "var(--danger)" : "var(--alert)"}`,
+                  }}
+                >
+                  {health}
+                </span>
+              )}
+              {blockedCount > 0 && (
+                <span
+                  className="text-sm font-medium rounded px-2 py-1"
+                  style={{ color: "var(--danger)", border: "1px solid var(--danger)" }}
+                >
+                  {blockedCount} blocked
+                </span>
+              )}
+
+              {/* Member avatars */}
+              {contacts.length > 0 && (
+                <div className="flex items-center" style={{ gap: -4 }}>
+                  {memberAvatars.map((contact, i) => (
+                    <div
+                      key={contact.id}
+                      className="flex items-center justify-center text-[9px] font-semibold rounded-full"
+                      style={{
+                        width: 22,
+                        height: 22,
+                        background: companyLogoColor(contact.name),
+                        color: "var(--text-dark)",
+                        border: "1.5px solid var(--bg)",
+                        marginLeft: i > 0 ? -6 : 0,
+                        zIndex: memberAvatars.length - i,
+                        position: "relative",
+                      }}
+                      title={contact.name}
+                    >
+                      {contact.name.slice(0, 2).toUpperCase()}
+                    </div>
+                  ))}
+                  {memberOverflow > 0 && (
+                    <div
+                      className="flex items-center justify-center text-[9px] font-semibold rounded-full"
+                      style={{
+                        width: 22,
+                        height: 22,
+                        background: "var(--surface-hover)",
+                        color: "var(--text-muted)",
+                        border: "1.5px solid var(--bg)",
+                        marginLeft: -6,
+                      }}
+                    >
+                      +{memberOverflow}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Kanban board */}
+          <div style={{ overflowX: "auto", flex: 1 }}>
+            <div
               style={{
-                paddingTop: 4,
-                paddingBottom: 4,
-                paddingLeft: 10,
-                paddingRight: 10,
-                color: taskFilter === filter ? "var(--text)" : "var(--text-muted)",
-                background: taskFilter === filter ? "var(--surface-hover)" : "transparent",
-                border: taskFilter === filter ? "1px solid var(--border)" : "1px solid transparent",
+                display: "flex",
+                gap: 0,
+                minWidth: phases.length * 264,
+                padding: "16px 16px",
+                alignItems: "flex-start",
               }}
             >
-              {filter}
-              {filter === "Done" && (
-                <span className="ml-1" style={{ color: "var(--text-muted)" }}>
-                  ({tasks.filter(t => t.status === "Done").length})
-                </span>
-              )}
-              {filter === "Blocked" && blockedCount > 0 && (
-                <span className="ml-1" style={{ color: "var(--text-muted)" }}>
-                  ({blockedCount})
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* Scrollable kanban grid */}
-        <div style={{ overflowX: "auto", flex: 1, display: "flex", flexDirection: "column" }}>
-          <div style={{ minWidth: colCount * 240, display: "flex", flexDirection: "column", flex: 1 }}>
-            {/* Header row */}
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, minmax(240px, 1fr))`, borderBottom: "1px solid var(--border)" }}>
-              {phasesWithCounts.map((phase, colIdx) => (
+              {columns.map(({ phase, tasks: colTasks }) => (
                 <div
                   key={phase.id}
                   style={{
-                    paddingTop: 12,
-                    paddingBottom: 12,
-                    paddingLeft: 16,
-                    paddingRight: 16,
-                    borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
+                    minWidth: 240,
+                    flexShrink: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 0,
+                    marginRight: 24,
                   }}
                 >
-                  <PhaseHeader
-                    phase={phase}
-                    onPhaseUpdated={handlePhaseUpdated}
-                    onPhaseDeleted={handlePhaseDeleted}
-                  />
+                  {/* Column header */}
+                  <div style={{ marginBottom: 8 }}>
+                    <PhaseHeader
+                      phase={phase}
+                      onPhaseUpdated={handlePhaseUpdated}
+                      onPhaseDeleted={handlePhaseDeleted}
+                      onAddTask={() => setAddingInPhase(phase.id)}
+                    />
+                  </div>
+
+                  {/* Task cards */}
+                  <div className="flex flex-col gap-2">
+                    {colTasks.map((t) => (
+                      <TaskCard
+                        key={t.id}
+                        task={t}
+                        onTaskUpdated={handleTaskUpdated}
+                        onTaskDeleted={handleTaskDeleted}
+                        people={people}
+                      />
+                    ))}
+
+                    {/* Create task */}
+                    <CreateTaskCard
+                      onboardingId={onboarding.id}
+                      phaseId={phase.id}
+                      onTaskCreated={handleTaskCreated}
+                      people={people}
+                      isExpanded={addingInPhase === phase.id}
+                      onExpand={() => setAddingInPhase(phase.id)}
+                      onCollapse={() => setAddingInPhase(null)}
+                    />
+                  </div>
                 </div>
               ))}
-              {/* Add section header */}
-              <div
-                className="flex items-center gap-2"
-                style={{
-                  paddingTop: 12,
-                  paddingBottom: 12,
-                  paddingLeft: 16,
-                  paddingRight: 16,
-                  borderLeft: "1px solid var(--border)",
-                }}
-              >
+
+              {/* Add phase column */}
+              <div style={{ minWidth: 200, flexShrink: 0 }}>
                 {addingPhase ? (
-                  <div className="flex flex-col gap-2 w-full">
+                  <div className="flex flex-col gap-2 px-4 py-1">
                     <input
                       type="text"
                       placeholder="Phase name"
                       value={newPhaseName}
                       onChange={(e) => setNewPhaseName(e.target.value)}
                       autoFocus
-                      className="text-base font-bold outline-none w-full"
+                      className="text-sm font-semibold outline-none"
                       style={{
                         background: "transparent",
                         color: "var(--text)",
@@ -348,9 +423,7 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
                       }}
                     />
                     <div className="flex gap-2">
-                      <Button size="xs" onClick={handleAddPhase}>
-                        Add
-                      </Button>
+                      <Button size="xs" onClick={handleAddPhase}>Add</Button>
                       <button
                         onClick={() => { setAddingPhase(false); setNewPhaseName(""); }}
                         className="text-xs font-medium"
@@ -363,7 +436,7 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
                 ) : (
                   <button
                     onClick={() => setAddingPhase(true)}
-                    className="text-base font-bold"
+                    className="text-sm font-semibold px-4 py-1"
                     style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}
                   >
                     + Add section
@@ -371,55 +444,21 @@ export default function OnboardingDetailClient({ onboarding, tasks: initialTasks
                 )}
               </div>
             </div>
-
-            {/* Content row */}
-            <div className="flex-1" style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, minmax(240px, 1fr))` }}>
-              {columns.map(({ phase, tasks: colTasks }, colIdx) => (
-                <div
-                  key={phase.id}
-                  className="flex flex-col gap-3"
-                  style={{
-                    paddingTop: 16,
-                    paddingLeft: 16,
-                    paddingRight: 16,
-                    paddingBottom: 16,
-                    borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
-                  }}
-                >
-                  {colTasks.map((t) => (
-                    <TaskCard
-                      key={t.id}
-                      task={t}
-                      onTaskUpdated={handleTaskUpdated}
-                      onTaskDeleted={handleTaskDeleted}
-                      people={people}
-                      allTasks={tasks}
-                    />
-                  ))}
-                  <CreateTaskCard
-                    onboardingId={onboarding.id}
-                    phaseId={phase.id}
-                    onTaskCreated={handleTaskCreated}
-                    people={people}
-                    allTasks={tasks}
-                  />
-                </div>
-              ))}
-              {/* Add section content */}
-              <div
-                className="flex flex-col gap-3"
-                style={{
-                  paddingTop: 16,
-                  paddingLeft: 16,
-                  paddingRight: 16,
-                  paddingBottom: 16,
-                  borderLeft: "1px solid var(--border)",
-                }}
-              />
-            </div>
           </div>
         </div>
-      </section>
+      )}
+
+      {activeTab === "details" && <DetailsTab onboarding={onboarding} />}
+
+      {activeTab === "members" && (
+        <MembersTab
+          onboardingId={onboarding.id}
+          contacts={contacts}
+          onContactsChange={setContacts}
+        />
+      )}
+
+      {activeTab === "communication" && <CommunicationTab />}
     </main>
   );
 }

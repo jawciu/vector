@@ -30,6 +30,7 @@ export type TaskAvgAggregateOutputType = {
   id: number | null
   onboardingId: number | null
   phaseId: number | null
+  commentCount: number | null
   blockedByTaskId: number | null
 }
 
@@ -37,6 +38,7 @@ export type TaskSumAggregateOutputType = {
   id: number | null
   onboardingId: number | null
   phaseId: number | null
+  commentCount: number | null
   blockedByTaskId: number | null
 }
 
@@ -50,6 +52,9 @@ export type TaskMinAggregateOutputType = {
   waitingOn: string | null
   owner: string | null
   notes: string | null
+  priority: string | null
+  commentCount: number | null
+  previousStatus: string | null
   blockedByTaskId: number | null
 }
 
@@ -63,6 +68,9 @@ export type TaskMaxAggregateOutputType = {
   waitingOn: string | null
   owner: string | null
   notes: string | null
+  priority: string | null
+  commentCount: number | null
+  previousStatus: string | null
   blockedByTaskId: number | null
 }
 
@@ -76,6 +84,9 @@ export type TaskCountAggregateOutputType = {
   waitingOn: number
   owner: number
   notes: number
+  priority: number
+  commentCount: number
+  previousStatus: number
   blockedByTaskId: number
   _all: number
 }
@@ -85,6 +96,7 @@ export type TaskAvgAggregateInputType = {
   id?: true
   onboardingId?: true
   phaseId?: true
+  commentCount?: true
   blockedByTaskId?: true
 }
 
@@ -92,6 +104,7 @@ export type TaskSumAggregateInputType = {
   id?: true
   onboardingId?: true
   phaseId?: true
+  commentCount?: true
   blockedByTaskId?: true
 }
 
@@ -105,6 +118,9 @@ export type TaskMinAggregateInputType = {
   waitingOn?: true
   owner?: true
   notes?: true
+  priority?: true
+  commentCount?: true
+  previousStatus?: true
   blockedByTaskId?: true
 }
 
@@ -118,6 +134,9 @@ export type TaskMaxAggregateInputType = {
   waitingOn?: true
   owner?: true
   notes?: true
+  priority?: true
+  commentCount?: true
+  previousStatus?: true
   blockedByTaskId?: true
 }
 
@@ -131,6 +150,9 @@ export type TaskCountAggregateInputType = {
   waitingOn?: true
   owner?: true
   notes?: true
+  priority?: true
+  commentCount?: true
+  previousStatus?: true
   blockedByTaskId?: true
   _all?: true
 }
@@ -231,6 +253,9 @@ export type TaskGroupByOutputType = {
   waitingOn: string
   owner: string
   notes: string
+  priority: string | null
+  commentCount: number
+  previousStatus: string | null
   blockedByTaskId: number | null
   _count: TaskCountAggregateOutputType | null
   _avg: TaskAvgAggregateOutputType | null
@@ -267,6 +292,9 @@ export type TaskWhereInput = {
   waitingOn?: Prisma.StringFilter<"Task"> | string
   owner?: Prisma.StringFilter<"Task"> | string
   notes?: Prisma.StringFilter<"Task"> | string
+  priority?: Prisma.StringNullableFilter<"Task"> | string | null
+  commentCount?: Prisma.IntFilter<"Task"> | number
+  previousStatus?: Prisma.StringNullableFilter<"Task"> | string | null
   blockedByTaskId?: Prisma.IntNullableFilter<"Task"> | number | null
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
   phase?: Prisma.XOR<Prisma.PhaseScalarRelationFilter, Prisma.PhaseWhereInput>
@@ -284,6 +312,9 @@ export type TaskOrderByWithRelationInput = {
   waitingOn?: Prisma.SortOrder
   owner?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  priority?: Prisma.SortOrderInput | Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
+  previousStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   blockedByTaskId?: Prisma.SortOrderInput | Prisma.SortOrder
   onboarding?: Prisma.OnboardingOrderByWithRelationInput
   phase?: Prisma.PhaseOrderByWithRelationInput
@@ -304,6 +335,9 @@ export type TaskWhereUniqueInput = Prisma.AtLeast<{
   waitingOn?: Prisma.StringFilter<"Task"> | string
   owner?: Prisma.StringFilter<"Task"> | string
   notes?: Prisma.StringFilter<"Task"> | string
+  priority?: Prisma.StringNullableFilter<"Task"> | string | null
+  commentCount?: Prisma.IntFilter<"Task"> | number
+  previousStatus?: Prisma.StringNullableFilter<"Task"> | string | null
   blockedByTaskId?: Prisma.IntNullableFilter<"Task"> | number | null
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
   phase?: Prisma.XOR<Prisma.PhaseScalarRelationFilter, Prisma.PhaseWhereInput>
@@ -321,6 +355,9 @@ export type TaskOrderByWithAggregationInput = {
   waitingOn?: Prisma.SortOrder
   owner?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  priority?: Prisma.SortOrderInput | Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
+  previousStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   blockedByTaskId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.TaskCountOrderByAggregateInput
   _avg?: Prisma.TaskAvgOrderByAggregateInput
@@ -342,6 +379,9 @@ export type TaskScalarWhereWithAggregatesInput = {
   waitingOn?: Prisma.StringWithAggregatesFilter<"Task"> | string
   owner?: Prisma.StringWithAggregatesFilter<"Task"> | string
   notes?: Prisma.StringWithAggregatesFilter<"Task"> | string
+  priority?: Prisma.StringNullableWithAggregatesFilter<"Task"> | string | null
+  commentCount?: Prisma.IntWithAggregatesFilter<"Task"> | number
+  previousStatus?: Prisma.StringNullableWithAggregatesFilter<"Task"> | string | null
   blockedByTaskId?: Prisma.IntNullableWithAggregatesFilter<"Task"> | number | null
 }
 
@@ -352,6 +392,9 @@ export type TaskCreateInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
   onboarding: Prisma.OnboardingCreateNestedOneWithoutTasksInput
   phase: Prisma.PhaseCreateNestedOneWithoutTasksInput
   blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
@@ -368,6 +411,9 @@ export type TaskUncheckedCreateInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
   blockedByTaskId?: number | null
   blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
 }
@@ -379,6 +425,9 @@ export type TaskUpdateInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutTasksNestedInput
   phase?: Prisma.PhaseUpdateOneRequiredWithoutTasksNestedInput
   blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
@@ -395,6 +444,9 @@ export type TaskUncheckedUpdateInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
 }
@@ -409,6 +461,9 @@ export type TaskCreateManyInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
   blockedByTaskId?: number | null
 }
 
@@ -419,6 +474,9 @@ export type TaskUpdateManyMutationInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type TaskUncheckedUpdateManyInput = {
@@ -431,6 +489,9 @@ export type TaskUncheckedUpdateManyInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
@@ -459,6 +520,9 @@ export type TaskCountOrderByAggregateInput = {
   waitingOn?: Prisma.SortOrder
   owner?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
+  previousStatus?: Prisma.SortOrder
   blockedByTaskId?: Prisma.SortOrder
 }
 
@@ -466,6 +530,7 @@ export type TaskAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   onboardingId?: Prisma.SortOrder
   phaseId?: Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
   blockedByTaskId?: Prisma.SortOrder
 }
 
@@ -479,6 +544,9 @@ export type TaskMaxOrderByAggregateInput = {
   waitingOn?: Prisma.SortOrder
   owner?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
+  previousStatus?: Prisma.SortOrder
   blockedByTaskId?: Prisma.SortOrder
 }
 
@@ -492,6 +560,9 @@ export type TaskMinOrderByAggregateInput = {
   waitingOn?: Prisma.SortOrder
   owner?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
+  previousStatus?: Prisma.SortOrder
   blockedByTaskId?: Prisma.SortOrder
 }
 
@@ -499,6 +570,7 @@ export type TaskSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   onboardingId?: Prisma.SortOrder
   phaseId?: Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
   blockedByTaskId?: Prisma.SortOrder
 }
 
@@ -606,6 +678,10 @@ export type TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput = {
   connect?: Prisma.TaskWhereUniqueInput | Prisma.TaskWhereUniqueInput[]
 }
 
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
 export type TaskUpdateOneWithoutBlockedTasksNestedInput = {
   create?: Prisma.XOR<Prisma.TaskCreateWithoutBlockedTasksInput, Prisma.TaskUncheckedCreateWithoutBlockedTasksInput>
   connectOrCreate?: Prisma.TaskCreateOrConnectWithoutBlockedTasksInput
@@ -659,6 +735,9 @@ export type TaskCreateWithoutOnboardingInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
   phase: Prisma.PhaseCreateNestedOneWithoutTasksInput
   blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
   blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
@@ -673,6 +752,9 @@ export type TaskUncheckedCreateWithoutOnboardingInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
   blockedByTaskId?: number | null
   blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
 }
@@ -716,6 +798,9 @@ export type TaskScalarWhereInput = {
   waitingOn?: Prisma.StringFilter<"Task"> | string
   owner?: Prisma.StringFilter<"Task"> | string
   notes?: Prisma.StringFilter<"Task"> | string
+  priority?: Prisma.StringNullableFilter<"Task"> | string | null
+  commentCount?: Prisma.IntFilter<"Task"> | number
+  previousStatus?: Prisma.StringNullableFilter<"Task"> | string | null
   blockedByTaskId?: Prisma.IntNullableFilter<"Task"> | number | null
 }
 
@@ -726,6 +811,9 @@ export type TaskCreateWithoutPhaseInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
   onboarding: Prisma.OnboardingCreateNestedOneWithoutTasksInput
   blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
   blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
@@ -740,6 +828,9 @@ export type TaskUncheckedCreateWithoutPhaseInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
   blockedByTaskId?: number | null
   blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
 }
@@ -777,6 +868,9 @@ export type TaskCreateWithoutBlockedTasksInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
   onboarding: Prisma.OnboardingCreateNestedOneWithoutTasksInput
   phase: Prisma.PhaseCreateNestedOneWithoutTasksInput
   blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
@@ -792,6 +886,9 @@ export type TaskUncheckedCreateWithoutBlockedTasksInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
   blockedByTaskId?: number | null
 }
 
@@ -807,6 +904,9 @@ export type TaskCreateWithoutBlockedByTaskInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
   onboarding: Prisma.OnboardingCreateNestedOneWithoutTasksInput
   phase: Prisma.PhaseCreateNestedOneWithoutTasksInput
   blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
@@ -822,6 +922,9 @@ export type TaskUncheckedCreateWithoutBlockedByTaskInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
   blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
 }
 
@@ -853,6 +956,9 @@ export type TaskUpdateWithoutBlockedTasksInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutTasksNestedInput
   phase?: Prisma.PhaseUpdateOneRequiredWithoutTasksNestedInput
   blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
@@ -868,6 +974,9 @@ export type TaskUncheckedUpdateWithoutBlockedTasksInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
@@ -896,6 +1005,9 @@ export type TaskCreateManyOnboardingInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
   blockedByTaskId?: number | null
 }
 
@@ -906,6 +1018,9 @@ export type TaskUpdateWithoutOnboardingInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phase?: Prisma.PhaseUpdateOneRequiredWithoutTasksNestedInput
   blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
   blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
@@ -920,6 +1035,9 @@ export type TaskUncheckedUpdateWithoutOnboardingInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
 }
@@ -933,6 +1051,9 @@ export type TaskUncheckedUpdateManyWithoutOnboardingInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
@@ -945,6 +1066,9 @@ export type TaskCreateManyPhaseInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
   blockedByTaskId?: number | null
 }
 
@@ -955,6 +1079,9 @@ export type TaskUpdateWithoutPhaseInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutTasksNestedInput
   blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
   blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
@@ -969,6 +1096,9 @@ export type TaskUncheckedUpdateWithoutPhaseInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
 }
@@ -982,6 +1112,9 @@ export type TaskUncheckedUpdateManyWithoutPhaseInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
@@ -995,6 +1128,9 @@ export type TaskCreateManyBlockedByTaskInput = {
   waitingOn: string
   owner?: string
   notes?: string
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
 }
 
 export type TaskUpdateWithoutBlockedByTaskInput = {
@@ -1004,6 +1140,9 @@ export type TaskUpdateWithoutBlockedByTaskInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutTasksNestedInput
   phase?: Prisma.PhaseUpdateOneRequiredWithoutTasksNestedInput
   blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
@@ -1019,6 +1158,9 @@ export type TaskUncheckedUpdateWithoutBlockedByTaskInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
 }
 
@@ -1032,6 +1174,9 @@ export type TaskUncheckedUpdateManyWithoutBlockedByTaskInput = {
   waitingOn?: Prisma.StringFieldUpdateOperationsInput | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.StringFieldUpdateOperationsInput | string
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1075,6 +1220,9 @@ export type TaskSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   waitingOn?: boolean
   owner?: boolean
   notes?: boolean
+  priority?: boolean
+  commentCount?: boolean
+  previousStatus?: boolean
   blockedByTaskId?: boolean
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
   phase?: boolean | Prisma.PhaseDefaultArgs<ExtArgs>
@@ -1093,6 +1241,9 @@ export type TaskSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   waitingOn?: boolean
   owner?: boolean
   notes?: boolean
+  priority?: boolean
+  commentCount?: boolean
+  previousStatus?: boolean
   blockedByTaskId?: boolean
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
   phase?: boolean | Prisma.PhaseDefaultArgs<ExtArgs>
@@ -1109,6 +1260,9 @@ export type TaskSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   waitingOn?: boolean
   owner?: boolean
   notes?: boolean
+  priority?: boolean
+  commentCount?: boolean
+  previousStatus?: boolean
   blockedByTaskId?: boolean
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
   phase?: boolean | Prisma.PhaseDefaultArgs<ExtArgs>
@@ -1125,10 +1279,13 @@ export type TaskSelectScalar = {
   waitingOn?: boolean
   owner?: boolean
   notes?: boolean
+  priority?: boolean
+  commentCount?: boolean
+  previousStatus?: boolean
   blockedByTaskId?: boolean
 }
 
-export type TaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "onboardingId" | "phaseId" | "title" | "status" | "due" | "waitingOn" | "owner" | "notes" | "blockedByTaskId", ExtArgs["result"]["task"]>
+export type TaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "onboardingId" | "phaseId" | "title" | "status" | "due" | "waitingOn" | "owner" | "notes" | "priority" | "commentCount" | "previousStatus" | "blockedByTaskId", ExtArgs["result"]["task"]>
 export type TaskInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
   phase?: boolean | Prisma.PhaseDefaultArgs<ExtArgs>
@@ -1165,6 +1322,9 @@ export type $TaskPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     waitingOn: string
     owner: string
     notes: string
+    priority: string | null
+    commentCount: number
+    previousStatus: string | null
     blockedByTaskId: number | null
   }, ExtArgs["result"]["task"]>
   composites: {}
@@ -1602,6 +1762,9 @@ export interface TaskFieldRefs {
   readonly waitingOn: Prisma.FieldRef<"Task", 'String'>
   readonly owner: Prisma.FieldRef<"Task", 'String'>
   readonly notes: Prisma.FieldRef<"Task", 'String'>
+  readonly priority: Prisma.FieldRef<"Task", 'String'>
+  readonly commentCount: Prisma.FieldRef<"Task", 'Int'>
+  readonly previousStatus: Prisma.FieldRef<"Task", 'String'>
   readonly blockedByTaskId: Prisma.FieldRef<"Task", 'Int'>
 }
     
