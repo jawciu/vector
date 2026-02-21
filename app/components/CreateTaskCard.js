@@ -102,10 +102,20 @@ export default function CreateTaskCard({
     return (
       <button
         onClick={expand}
-        className="text-left text-xs transition-opacity hover:opacity-70"
-        style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", paddingLeft: 16 }}
+        className="flex items-center gap-1 w-full text-sm transition-colors hover:opacity-80"
+        style={{
+          border: "1px solid var(--border-subtle)",
+          borderRadius: 8,
+          padding: "8px 16px",
+          background: "none",
+          cursor: "pointer",
+          color: "var(--text)",
+        }}
       >
-        + Add task
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden style={{ flexShrink: 0, color: "var(--text-muted)" }}>
+          <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        </svg>
+        Add task
       </button>
     );
   }
