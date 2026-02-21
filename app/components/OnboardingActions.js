@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Button from "../ui/Button";
+import IconButton from "../ui/IconButton";
 import { useRouter } from "next/navigation";
 import { MenuList, MenuOption } from "./Menu";
 
@@ -154,10 +155,9 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
     <>
       {/* Three-dot menu trigger */}
       <div ref={menuRef} className="relative">
-        <button
-          type="button"
+        <IconButton
           onClick={() => setMenuOpen((o) => !o)}
-          className={`icon-btn flex items-center justify-center w-5 h-5 rounded-full${menuOpen ? " icon-btn--active" : ""}`}
+          isActive={menuOpen}
           aria-label="Onboarding actions"
         >
           <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
@@ -165,7 +165,7 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
             <circle cx="8" cy="8" r="1.5" />
             <circle cx="8" cy="13" r="1.5" />
           </svg>
-        </button>
+        </IconButton>
 
         {menuOpen && (
           <MenuList

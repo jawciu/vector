@@ -9,9 +9,15 @@ const AVATAR_COLORS = [
   "var(--candy)",
   "var(--mint)",
   "var(--rose)",
-  "var(--alert)",
-  "var(--success)",
 ];
+
+const AVATAR_IMAGES = {
+  "Lena Marsh":   "/avatar-lena.png",
+  "Jordan Cole":  "/avatar-jordan.png",
+  "Priya Nair":   "/avatar-priya.png",
+  "Tom Okafor":   "/avatar-tom.png",
+  "Dana Fox":     "/avatar-dana.png",
+};
 
 function avatarColor(name) {
   if (!name) return AVATAR_COLORS[0];
@@ -32,11 +38,14 @@ function formatDueDate(dateStr) {
   today.setHours(0, 0, 0, 0);
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-  if (due.getTime() === today.getTime()) return { text: "today", color: "var(--action)" };
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (due.getTime() === today.getTime()) return { text: "today", color: "var(--sunset)" };
+  if (due.getTime() === tomorrow.getTime()) return { text: "tomorrow", color: "var(--alert)" };
   if (due.getTime() === yesterday.getTime()) return { text: "yesterday", color: "var(--danger)" };
   return {
     text: due.toLocaleDateString("en-GB", { day: "numeric", month: "short" }),
-    color: "var(--text-muted)",
+    color: "var(--text-secondary)",
   };
 }
 
@@ -49,7 +58,7 @@ function getDaysLeft(dateStr) {
 }
 
 const STATUS_STYLES = {
-  "Not started": "var(--text-muted)",
+  "Not started": "var(--text-secondary)",
   "In progress": "var(--mint)",
   "Under investigation": "var(--sky)",
   "Blocked": "var(--danger)",
@@ -122,7 +131,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
   const [completing, setCompleting] = useState(false);
 
   const isDone = task.status === "Done" || completing;
-  const statusColor = STATUS_STYLES[task.status] || "var(--text-muted)";
+  const statusColor = STATUS_STYLES[task.status] || "var(--text-secondary)";
   const dueInfo = task.due ? formatDueDate(task.due) : null;
   const daysLeft = task.due ? getDaysLeft(task.due) : null;
   const ownerInitials = task.owner
@@ -187,7 +196,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
         <span
           className="text-sm flex-1 leading-snug"
           style={{
-            color: isDone ? "var(--text-muted)" : "var(--text)",
+            color: isDone ? "var(--text-secondary)" : "var(--text)",
             textDecoration: isDone ? "line-through" : "none",
             transition: "color 0.25s ease",
           }}
@@ -201,11 +210,10 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             {/* Calendar icon */}
-            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, color: "var(--text-muted)" }}>
-              <rect x="1" y="2" width="12" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.2" fill="none" />
-              <line x1="4" y1="0.5" x2="4" y2="3.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-              <line x1="10" y1="0.5" x2="10" y2="3.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-              <line x1="1" y1="5.5" x2="13" y2="5.5" stroke="currentColor" strokeWidth="1.2" />
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, color: "var(--text-secondary)" }}>
+              <path d="M0.777344 2.72046C0.777344 2.46767 0.859288 2.22524 1.00515 2.0465C1.15101 1.86775 1.34884 1.76733 1.55512 1.76733H12.444C12.6503 1.76733 12.8481 1.86775 12.994 2.0465C13.1398 2.22524 13.2218 2.46767 13.2218 2.72046V6.53296H0.777344V2.72046Z" stroke="currentColor" strokeLinejoin="round" />
+              <path d="M3.88867 2.83333V0.5M10.1109 2.83333V0.5" stroke="currentColor" strokeLinecap="round" />
+              <path d="M0.777344 6.53296H13.2218V11.7642C13.2218 11.9184 13.1398 12.0662 12.994 12.1752C12.8481 12.2842 12.6503 12.3455 12.444 12.3455H1.55512C1.34884 12.3455 1.15101 12.2842 1.00515 12.1752C0.859288 12.0662 0.777344 11.9184 0.777344 11.7642V6.53296Z" stroke="currentColor" strokeLinejoin="round" />
             </svg>
             <span className="text-sm" style={{ color: dueInfo.color }}>
               {dueInfo.text}
@@ -214,13 +222,13 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
 
           <div className="flex items-center gap-1">
             {/* Clock icon */}
-            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, color: "var(--text-muted)" }}>
-              <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.2" />
-              <path d="M7 4V7.5L9.5 9.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+            <svg width="14" height="14" viewBox="0 0 15 15" fill="none" style={{ flexShrink: 0, color: "var(--text-secondary)" }}>
+              <path d="M7.00712 13.1381C3.62623 13.1381 0.875977 10.3879 0.875977 7.007C0.875977 3.62611 3.62623 0.875854 7.00712 0.875854C10.388 0.875854 13.1383 3.62611 13.1383 7.007C13.1383 10.3879 10.388 13.1381 7.00712 13.1381ZM7.00712 1.75173C4.10796 1.75173 1.75185 4.10784 1.75185 7.007C1.75185 9.90615 4.10796 12.2623 7.00712 12.2623C9.90627 12.2623 12.2624 9.90615 12.2624 7.007C12.2624 4.10784 9.90627 1.75173 7.00712 1.75173Z" fill="currentColor" />
+              <path d="M8.75948 9.19674C8.68065 9.19674 8.60182 9.17923 8.53175 9.13543L6.34205 7.82162C6.27749 7.78231 6.2242 7.72697 6.18737 7.66097C6.15053 7.59498 6.1314 7.52057 6.13184 7.44499V3.94148C6.13184 3.69623 6.32454 3.50354 6.56978 3.50354C6.81503 3.50354 7.00772 3.69623 7.00772 3.94148V7.19974L8.9872 8.38218C9.06874 8.43215 9.13176 8.50734 9.16671 8.59635C9.20166 8.68536 9.20664 8.78334 9.18089 8.87544C9.15514 8.96754 9.10007 9.04873 9.02403 9.10671C8.94798 9.16469 8.8551 9.1963 8.75948 9.19674Z" fill="currentColor" />
             </svg>
             <span
               className="text-sm"
-              style={{ color: daysLeft !== null && daysLeft < 0 ? "var(--danger)" : "var(--text-muted)" }}
+              style={{ color: daysLeft === 0 ? "var(--sunset)" : daysLeft === 1 ? "var(--alert)" : daysLeft !== null && daysLeft < 0 ? "var(--danger)" : "var(--text-secondary)" }}
             >
               {daysLeft !== null ? `${daysLeft}d` : ""}
             </span>
@@ -245,14 +253,12 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
       {/* Row 4: Waiting on (hidden if empty) */}
       {task.waitingOn && task.waitingOn.trim() && (
         <div className="flex items-center gap-1.5">
-          {/* People icon */}
-          <svg width="12" height="12" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, color: "var(--text-muted)" }}>
-            <circle cx="5" cy="4.5" r="2" stroke="currentColor" strokeWidth="1.2" />
-            <path d="M1 12c0-2.5 1.8-4 4-4s4 1.5 4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-            <circle cx="10.5" cy="4.5" r="1.7" stroke="currentColor" strokeWidth="1.1" />
-            <path d="M12.5 12c0-1.8-0.8-3-2-3.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+          {/* Waiting on icon */}
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, color: "var(--text-secondary)" }}>
+            <path d="M13.3437 3.12326C13.3437 3.77756 13.0838 4.40505 12.6212 4.86771C12.1585 5.33036 11.531 5.59028 10.8767 5.59028C10.2224 5.59028 9.59495 5.33036 9.13229 4.86771C8.66964 4.40505 8.40972 3.77756 8.40972 3.12326C8.40972 2.46897 8.66964 1.84148 9.13229 1.37882C9.59495 0.916167 10.2224 0.65625 10.8767 0.65625C11.531 0.65625 12.1585 0.916167 12.6212 1.37882C13.0838 1.84148 13.3437 2.46897 13.3437 3.12326ZM0.65625 3.12326C0.65625 1.96024 0.65625 1.37873 1.01784 1.01784C1.37873 0.65625 1.96024 0.65625 3.12326 0.65625C4.28628 0.65625 4.8678 0.65625 5.22868 1.01784C5.59028 1.37873 5.59028 1.96024 5.59028 3.12326C5.59028 4.28628 5.59028 4.8678 5.22868 5.22868C4.8678 5.59028 4.28628 5.59028 3.12326 5.59028C1.96024 5.59028 1.37873 5.59028 1.01784 5.22868C0.65625 4.8678 0.65625 4.28628 0.65625 3.12326ZM0.65625 10.8767C0.65625 9.71372 0.65625 9.1322 1.01784 8.77132C1.37873 8.40972 1.96024 8.40972 3.12326 8.40972C4.28628 8.40972 4.8678 8.40972 5.22868 8.77132C5.59028 9.1322 5.59028 9.71372 5.59028 10.8767C5.59028 12.0398 5.59028 12.6213 5.22868 12.9822C4.8678 13.3437 4.28628 13.3437 3.12326 13.3437C1.96024 13.3437 1.37873 13.3437 1.01784 12.9822C0.65625 12.6213 0.65625 12.0398 0.65625 10.8767ZM8.40972 10.8767C8.40972 9.71372 8.40972 9.1322 8.77132 8.77132C9.1322 8.40972 9.71372 8.40972 10.8767 8.40972C12.0398 8.40972 12.6213 8.40972 12.9822 8.77132C13.3437 9.1322 13.3437 9.71372 13.3437 10.8767C13.3437 12.0398 13.3437 12.6213 12.9822 12.9822C12.6213 13.3437 12.0398 13.3437 10.8767 13.3437C9.71372 13.3437 9.1322 13.3437 8.77132 12.9822C8.40972 12.6213 8.40972 12.0398 8.40972 10.8767Z" stroke="currentColor" strokeWidth="0.875" />
+            <path d="M10.8763 5.5903V8.40975M8.40929 10.8768H5.58984M5.58984 3.12329H8.40929" stroke="currentColor" strokeWidth="0.875" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <span className="text-sm" style={{ color: "var(--text-muted)" }}>
+          <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
             {task.waitingOn}
           </span>
         </div>
@@ -264,21 +270,32 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
           {/* Notes indicator */}
           {task.notes && task.notes.trim() && (
             <div className="flex items-center gap-1">
-              <svg width="11" height="11" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-muted)" }}>
-                <rect x="1" y="1" width="12" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
-                <line x1="3.5" y1="4.5" x2="10.5" y2="4.5" stroke="currentColor" strokeWidth="1" />
-                <line x1="3.5" y1="7" x2="10.5" y2="7" stroke="currentColor" strokeWidth="1" />
-                <line x1="3.5" y1="9.5" x2="7.5" y2="9.5" stroke="currentColor" strokeWidth="1" />
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-secondary)" }}>
+                <g clipPath="url(#notes-clip)">
+                  <path d="M3.45675 3.89835H8.94754M3.45675 7.26357H10.6029M3.45675 10.494H7.72288M11.8948 2.83855L9.9266 0.85352C9.8046 0.731724 9.6598 0.635161 9.50047 0.56935C9.34114 0.503539 9.1704 0.46977 8.99801 0.469972H2.43732C2.26179 0.474361 2.09493 0.547188 1.97235 0.672907C1.84978 0.798626 1.7812 0.967278 1.78125 1.14286V12.9521C1.7812 13.1277 1.84978 13.2963 1.97235 13.4221C2.09493 13.5478 2.26179 13.6206 2.43732 13.625H11.6223C11.8007 13.625 11.9719 13.5541 12.0981 13.4279C12.2243 13.3017 12.2952 13.1306 12.2952 12.9521V3.76714C12.2932 3.59357 12.2568 3.42212 12.188 3.26273C12.1193 3.10333 12.0196 2.95915 11.8948 2.83855Z" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" />
+                </g>
+                <defs>
+                  <clipPath id="notes-clip">
+                    <rect width="14" height="14" fill="white" />
+                  </clipPath>
+                </defs>
               </svg>
             </div>
           )}
           {/* Comment count */}
           {task.commentCount > 0 && (
             <div className="flex items-center gap-1">
-              <svg width="11" height="11" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-muted)" }}>
-                <path d="M2 2h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H5l-3 2.5V3a1 1 0 0 1 1-1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-secondary)" }}>
+                <g clipPath="url(#comment-clip)">
+                  <path d="M1.83778 1.24799C1.88502 1.24523 1.93284 1.24385 1.98125 1.24385H10.5418C11.2073 1.24385 11.8455 1.50821 12.316 1.97876C12.7866 2.44931 13.0509 3.08752 13.0509 3.75298V9.36163C13.0509 9.41004 13.0496 9.45806 13.0468 9.50569C13.3195 9.3324 13.544 9.09307 13.6996 8.80986C13.8551 8.52666 13.9366 8.20877 13.9365 7.88567V3.75298C13.9365 3.30718 13.8487 2.86575 13.6781 2.45389C13.5075 2.04202 13.2575 1.66779 12.9422 1.35256C12.627 1.03734 12.2528 0.787283 11.8409 0.616683C11.429 0.446083 10.9876 0.358276 10.5418 0.358276H3.45721C3.13421 0.358284 2.81644 0.439831 2.53335 0.59536C2.25026 0.750889 2.01101 0.975366 1.83778 1.24799ZM2.8314 13.5652C2.93767 13.6183 3.04984 13.6419 3.16202 13.6419H3.16792C3.32142 13.6419 3.47492 13.5947 3.6048 13.4943L6.58034 11.2804H10.5418C11.5986 11.2804 12.4606 10.4184 12.4606 9.36163V3.75298C12.4606 2.6962 11.5986 1.83424 10.5418 1.83424H1.98125C0.924461 1.83424 0.0625 2.6962 0.0625 3.75298V9.36163C0.0625 10.4184 0.924461 11.2804 1.98125 11.2804H2.42404V12.9039C2.42404 13.1873 2.57754 13.4412 2.8314 13.5652ZM0.948076 3.75298C0.948076 3.18622 1.41448 2.71981 1.98125 2.71981H10.5418C11.1086 2.71981 11.575 3.18622 11.575 3.75298V9.36163C11.575 9.9284 11.1086 10.3948 10.5418 10.3948H6.28515L3.30961 12.6087V10.3948H1.98125C1.41448 10.3948 0.948076 9.9284 0.948076 9.36163V3.75298Z" fill="currentColor" />
+                </g>
+                <defs>
+                  <clipPath id="comment-clip">
+                    <rect width="14" height="14" fill="white" />
+                  </clipPath>
+                </defs>
               </svg>
-              <span className="text-sm" style={{ color: "var(--text-muted)" }}>
+              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
                 {task.commentCount}
               </span>
             </div>
@@ -288,17 +305,28 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
         <div className="flex items-center gap-1.5">
           <PriorityIcon priority={task.priority} />
           {ownerInitials && (
-            <div
-              className="flex items-center justify-center text-[9px] font-semibold rounded-full flex-shrink-0"
-              style={{
-                width: 18,
-                height: 18,
-                background: avatarColor(task.owner),
-                color: "var(--text-dark)",
-              }}
-            >
-              {ownerInitials}
-            </div>
+            AVATAR_IMAGES[task.owner] ? (
+              <img
+                src={AVATAR_IMAGES[task.owner]}
+                alt={task.owner}
+                title={task.owner}
+                className="rounded-full flex-shrink-0"
+                style={{ width: 18, height: 18, objectFit: "cover" }}
+              />
+            ) : (
+              <div
+                className="flex items-center justify-center text-[9px] font-semibold rounded-full flex-shrink-0"
+                style={{
+                  width: 18,
+                  height: 18,
+                  background: avatarColor(task.owner),
+                  color: "var(--text-dark)",
+                }}
+                title={task.owner}
+              >
+                {ownerInitials}
+              </div>
+            )
           )}
         </div>
       </div>

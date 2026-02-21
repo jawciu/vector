@@ -38,6 +38,42 @@ Defined in `app/globals.css` under `:root`. Not yet migrated to `@theme`.
 
 ### DS Components (in `app/ui/`)
 
+#### `IconButton` (`app/ui/IconButton.js`)
+Small square icon buttons used throughout the UI (meatball menus, plus icons, close buttons, etc.).
+
+**Props:**
+- `onClick` — click handler
+- `aria-label` — required for accessibility
+- `isActive` — boolean, adds `.icon-btn--active` when true (e.g. while a menu is open)
+- `disabled` — boolean, passed to the underlying button
+
+**Rules:**
+- Always `rounded` (not `rounded-full`) — rounded square shape, never a circle
+- Size is fixed at `w-5 h-5` (20×20px)
+- Icons inside should be 11–12px SVGs using `currentColor`
+- `rounded-full` is reserved for avatar/initials circles only
+
+**CSS (defined in `globals.css`):**
+```css
+.icon-btn               /* default: --text-muted color */
+.icon-btn:hover         /* bg: --bg-hover, color: --text */
+.icon-btn:active        /* bg: --surface-hover, color: --text */
+.icon-btn--active       /* bg: --surface-hover, color: --text (persists while open) */
+```
+
+**Usage:**
+```jsx
+import IconButton from "@/app/ui/IconButton";
+
+<IconButton onClick={() => setOpen(o => !o)} isActive={open} aria-label="Options">
+  <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+    <circle cx="8" cy="3" r="1.5" />
+    <circle cx="8" cy="8" r="1.5" />
+    <circle cx="8" cy="13" r="1.5" />
+  </svg>
+</IconButton>
+```
+
 #### `Button` (`app/ui/Button.js`)
 - **Variants:** `primary`, `secondary`
 - **Sizes:** `xs` (`py-0.5 px-2 text-xs`), `sm` default (`py-1 px-2 text-sm`)

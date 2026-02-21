@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { MenuList, MenuOption } from "./Menu";
+import IconButton from "@/app/ui/IconButton";
 
 export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onAddTask }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -70,21 +71,15 @@ export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onA
   }
 
   return (
-    <div className="flex items-center px-4 py-1" style={{ gap: 6 }}>
+    <div className="flex items-center pl-4 pr-2 py-1" style={{ gap: 6 }}>
       {/* 6-dot drag handle */}
-      <svg
-        width="8"
-        height="14"
-        viewBox="0 0 8 14"
-        fill="none"
-        style={{ color: "var(--text-muted)", flexShrink: 0, cursor: "grab", opacity: 0.5 }}
-      >
-        <circle cx="2" cy="2" r="1.2" fill="currentColor" />
-        <circle cx="6" cy="2" r="1.2" fill="currentColor" />
-        <circle cx="2" cy="7" r="1.2" fill="currentColor" />
-        <circle cx="6" cy="7" r="1.2" fill="currentColor" />
-        <circle cx="2" cy="12" r="1.2" fill="currentColor" />
-        <circle cx="6" cy="12" r="1.2" fill="currentColor" />
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0, cursor: "grab" }}>
+        <path d="M4.125 2.4375C4.43566 2.4375 4.6875 2.18566 4.6875 1.875C4.6875 1.56434 4.43566 1.3125 4.125 1.3125C3.81434 1.3125 3.5625 1.56434 3.5625 1.875C3.5625 2.18566 3.81434 2.4375 4.125 2.4375Z" stroke="var(--text-muted)" strokeWidth="1.10321" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M4.125 6.5625C4.43566 6.5625 4.6875 6.31066 4.6875 6C4.6875 5.68934 4.43566 5.4375 4.125 5.4375C3.81434 5.4375 3.5625 5.68934 3.5625 6C3.5625 6.31066 3.81434 6.5625 4.125 6.5625Z" stroke="var(--text-muted)" strokeWidth="1.10321" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M4.125 10.6875C4.43566 10.6875 4.6875 10.4357 4.6875 10.125C4.6875 9.81434 4.43566 9.5625 4.125 9.5625C3.81434 9.5625 3.5625 9.81434 3.5625 10.125C3.5625 10.4357 3.81434 10.6875 4.125 10.6875Z" stroke="var(--text-muted)" strokeWidth="1.10321" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M7.87207 2.4375C8.18273 2.4375 8.43457 2.18566 8.43457 1.875C8.43457 1.56434 8.18273 1.3125 7.87207 1.3125C7.56141 1.3125 7.30957 1.56434 7.30957 1.875C7.30957 2.18566 7.56141 2.4375 7.87207 2.4375Z" stroke="var(--text-muted)" strokeWidth="1.10321" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M7.87207 6.5625C8.18273 6.5625 8.43457 6.31066 8.43457 6C8.43457 5.68934 8.18273 5.4375 7.87207 5.4375C7.56141 5.4375 7.30957 5.68934 7.30957 6C7.30957 6.31066 7.56141 6.5625 7.87207 6.5625Z" stroke="var(--text-muted)" strokeWidth="1.10321" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M7.87207 10.6875C8.18273 10.6875 8.43457 10.4357 8.43457 10.125C8.43457 9.81434 8.18273 9.5625 7.87207 9.5625C7.56141 9.5625 7.30957 9.81434 7.30957 10.125C7.30957 10.4357 7.56141 10.6875 7.87207 10.6875Z" stroke="var(--text-muted)" strokeWidth="1.10321" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
 
       {/* Phase name (inline edit) + task count */}
@@ -95,7 +90,7 @@ export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onA
             value={name}
             onChange={(e) => setName(e.target.value)}
             autoFocus
-            className="text-sm font-semibold outline-none flex-1 min-w-0"
+            className="text-sm font-semibold outline-none"
             style={{
               background: "transparent",
               color: "var(--text)",
@@ -103,6 +98,8 @@ export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onA
               borderBottom: "1px solid var(--action)",
               paddingBottom: 1,
               lineHeight: 1,
+              fieldSizing: "content",
+              minWidth: "2ch",
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSave();
@@ -126,19 +123,18 @@ export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onA
 
       {/* Meatball menu */}
       <div ref={menuRef} className="relative">
-        <button
-          type="button"
+        <IconButton
           onClick={() => setMenuOpen((o) => !o)}
-          className={`icon-btn flex items-center justify-center w-5 h-5 rounded-full${menuOpen ? " icon-btn--active" : ""}`}
-          aria-label="Phase options"
+          isActive={menuOpen}
           disabled={loading}
+          aria-label="Phase options"
         >
           <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
             <circle cx="8" cy="3" r="1.5" />
             <circle cx="8" cy="8" r="1.5" />
             <circle cx="8" cy="13" r="1.5" />
           </svg>
-        </button>
+        </IconButton>
 
         {menuOpen && (
           <MenuList style={{ left: "auto", right: 0, width: 160 }}>
@@ -153,18 +149,15 @@ export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onA
       </div>
 
       {/* Plus icon */}
-      <button
-        type="button"
+      <IconButton
         onClick={() => onAddTask && onAddTask()}
-        className="flex items-center justify-center w-5 h-5 rounded icon-btn"
-        style={{ flexShrink: 0 }}
         aria-label="Add task"
       >
         <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
           <line x1="5.5" y1="1" x2="5.5" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           <line x1="1" y1="5.5" x2="10" y2="5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
-      </button>
+      </IconButton>
     </div>
   );
 }

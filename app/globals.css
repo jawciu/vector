@@ -11,6 +11,7 @@
   --border-subtle: #25232D;
   --text: #F1EAF1;
   --text-muted: #999599;
+  --text-secondary: #CAC7CA;
   --accent: #22d3ee;
   --accent-muted: #0891b2;
   --action: #C098FF;
@@ -20,10 +21,10 @@
   --action-text: #18181E;
   --danger: #FF899B;
   --success: #9CFFA6;
-  --alert: #FFEEB5;
+  --alert: #FFDA91;
   --mint: #9DFFF4;
   --rose: #D8A7FF;
-  --sunset: #FFB9A1;
+  --sunset: #FFA673;
   --lilac: #B3A5FF;
   --sky: #85C0FF;
   --candy: #FF9EE5;
@@ -79,9 +80,9 @@ a {
 
 /* Secondary button */
 .btn-secondary {
-  background-color: var(--surface);
+  background-color: var(--bg);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-subtle);
   transition: background-color 0.15s ease;
 }
 
@@ -94,7 +95,7 @@ a {
 }
 
 .btn-secondary:disabled {
-  color: var(--text-muted);
+  color: var(--text);
   cursor: not-allowed;
 }
 

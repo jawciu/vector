@@ -10,15 +10,14 @@ export function MenuTriggerButton({
   const baseClassName =
     "flex items-center gap-2 rounded-lg border text-sm font-medium transition-colors";
   const baseStyle = {
-    borderColor: "var(--border)",
-    background: "var(--surface)",
+    borderColor: "var(--border-subtle)",
+    background: "var(--bg)",
     color: "var(--text)",
-    width: "144px",
-    minWidth: "144px",
     paddingLeft: "8px",
-    paddingRight: "4px",
+    paddingRight: "8px",
     paddingTop: "4px",
     paddingBottom: "4px",
+    height: "fit-content",
   };
 
   return (
