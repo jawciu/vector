@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { MenuList, MenuOption } from "./Menu";
 import IconButton from "@/app/ui/IconButton";
 
-export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onAddTask }) {
+export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onAddTask, dragListeners }) {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(phase.name);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -73,7 +73,7 @@ export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onA
   return (
     <div className="flex items-center pl-4 pr-2 py-1" style={{ gap: 6 }}>
       {/* 6-dot drag handle */}
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0, cursor: "grab" }}>
+      <svg {...dragListeners} width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0, cursor: "grab", touchAction: "none" }}>
         <path d="M4.125 2.4375C4.43566 2.4375 4.6875 2.18566 4.6875 1.875C4.6875 1.56434 4.43566 1.3125 4.125 1.3125C3.81434 1.3125 3.5625 1.56434 3.5625 1.875C3.5625 2.18566 3.81434 2.4375 4.125 2.4375Z" stroke="var(--text-muted)" strokeWidth="1.10321" strokeLinecap="round" strokeLinejoin="round"/>
         <path d="M4.125 6.5625C4.43566 6.5625 4.6875 6.31066 4.6875 6C4.6875 5.68934 4.43566 5.4375 4.125 5.4375C3.81434 5.4375 3.5625 5.68934 3.5625 6C3.5625 6.31066 3.81434 6.5625 4.125 6.5625Z" stroke="var(--text-muted)" strokeWidth="1.10321" strokeLinecap="round" strokeLinejoin="round"/>
         <path d="M4.125 10.6875C4.43566 10.6875 4.6875 10.4357 4.6875 10.125C4.6875 9.81434 4.43566 9.5625 4.125 9.5625C3.81434 9.5625 3.5625 9.81434 3.5625 10.125C3.5625 10.4357 3.81434 10.6875 4.125 10.6875Z" stroke="var(--text-muted)" strokeWidth="1.10321" strokeLinecap="round" strokeLinejoin="round"/>

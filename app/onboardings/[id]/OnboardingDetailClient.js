@@ -14,8 +14,11 @@ import {
 import {
   SortableContext,
   verticalListSortingStrategy,
+  horizontalListSortingStrategy,
   arrayMove,
+  useSortable,
 } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { computeHealth } from "@/lib/health";
 import Button from "@/app/ui/Button";
 import TaskCard from "@/app/components/TaskCard";
@@ -57,6 +60,35 @@ const TASK_FILTERS = [
   { id: "all", label: "All" },
 ];
 
+function SortableColumn({ id, children }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform ? { ...transform, scaleX: 1, scaleY: 1 } : null),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+    minWidth: 240,
+    flexShrink: 0,
+    display: "flex",
+    flexDirection: "column",
+    gap: 0,
+    marginRight: 24,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      {typeof children === "function" ? children(listeners) : children}
+    </div>
+  );
+}
+
 export default function OnboardingDetailClient({
   onboarding,
   tasks: initialTasks,
@@ -75,10 +107,13 @@ export default function OnboardingDetailClient({
   const [newPhaseName, setNewPhaseName] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [activeTask, setActiveTask] = useState(null);
+  const [activePhase, setActivePhase] = useState(null);
   const [mounted, setMounted] = useState(false);
   const filterRef = useRef(null);
   const tasksRef = useRef(tasks);
   tasksRef.current = tasks;
+  const phasesRef = useRef(phases);
+  phasesRef.current = phases;
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -189,19 +224,31 @@ export default function OnboardingDetailClient({
     }
   }
 
+  // ── Drag & drop helpers ──────────────────────────────────────
+  const isColId = (id) => String(id).startsWith("col-");
+  const toPhaseId = (colId) => Number(String(colId).replace("col-", ""));
+
   // ── Drag & drop handlers ──────────────────────────────────────
   function handleDragStart(event) {
-    const task = tasksRef.current.find((t) => t.id === event.active.id);
-    setActiveTask(task || null);
+    const id = event.active.id;
+    if (isColId(id)) {
+      const phase = phasesRef.current.find((p) => p.id === toPhaseId(id));
+      setActivePhase(phase || null);
+    } else {
+      const task = tasksRef.current.find((t) => t.id === id);
+      setActiveTask(task || null);
+    }
   }
 
   function handleDragOver(event) {
     const { active, over } = event;
     if (!over) return;
+    // Column drags don't need onDragOver
+    if (isColId(active.id)) return;
 
     const activeId = active.id;
     const overId = over.id;
-    if (activeId === overId) return;
+    if (activeId === overId || isColId(overId)) return;
 
     const current = tasksRef.current;
     const activeTaskData = current.find((t) => t.id === activeId);
@@ -209,7 +256,6 @@ export default function OnboardingDetailClient({
 
     if (!activeTaskData) return;
 
-    // Target is another task in a different phase
     const targetPhaseId = overTask ? overTask.phaseId : null;
     if (!targetPhaseId || activeTaskData.phaseId === targetPhaseId) return;
 
@@ -221,19 +267,63 @@ export default function OnboardingDetailClient({
   async function handleDragEnd(event) {
     const { active, over } = event;
     setActiveTask(null);
+    setActivePhase(null);
 
     if (!over) return;
 
     const activeId = active.id;
     const overId = over.id;
 
+    // ── Column reorder ──
+    if (isColId(activeId)) {
+      // Resolve over target: could be a col-ID or a task inside a column
+      let resolvedOverColId;
+      if (isColId(overId)) {
+        resolvedOverColId = overId;
+      } else {
+        // Over target is a task — find which phase it belongs to
+        const overTask = tasksRef.current.find((t) => t.id === overId);
+        if (overTask) resolvedOverColId = `col-${overTask.phaseId}`;
+      }
+      if (!resolvedOverColId || activeId === resolvedOverColId) return;
+
+      const currentPhases = phasesRef.current;
+      const sorted = [...currentPhases].sort((a, b) => a.sortOrder - b.sortOrder);
+      const activeIdx = sorted.findIndex((p) => p.id === toPhaseId(activeId));
+      const overIdx = sorted.findIndex((p) => p.id === toPhaseId(resolvedOverColId));
+      if (activeIdx === -1 || overIdx === -1 || activeIdx === overIdx) return;
+
+      const reordered = arrayMove(sorted, activeIdx, overIdx);
+      const prevPhases = currentPhases;
+
+      // Optimistic update
+      setPhases(reordered.map((p, i) => ({ ...p, sortOrder: i })));
+
+      // Persist each changed sortOrder
+      try {
+        await Promise.all(
+          reordered.map((p, i) => {
+            if (p.sortOrder === i) return null;
+            return fetch(`/api/phases/${p.id}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ sortOrder: i }),
+            });
+          }).filter(Boolean)
+        );
+      } catch {
+        setPhases(prevPhases);
+      }
+      return;
+    }
+
+    // ── Task reorder ──
     const current = tasksRef.current;
     const activeTaskData = current.find((t) => t.id === activeId);
     if (!activeTaskData) return;
 
     const targetPhaseId = activeTaskData.phaseId;
 
-    // Get tasks in target phase in current order
     const colTasks = current
       .filter((t) => t.phaseId === targetPhaseId)
       .sort((a, b) => a.sortOrder - b.sortOrder);
@@ -242,11 +332,10 @@ export default function OnboardingDetailClient({
     const overIdx = colTasks.findIndex((t) => t.id === overId);
 
     if (activeIdx === -1) return;
-    if (activeIdx === overIdx) return; // no change
+    if (activeIdx === overIdx) return;
 
     const reordered = arrayMove(colTasks, activeIdx, overIdx < 0 ? colTasks.length - 1 : overIdx);
 
-    // Optimistic update with new sort orders
     const sortMap = new Map();
     reordered.forEach((t, i) => sortMap.set(t.id, i));
 
@@ -260,7 +349,6 @@ export default function OnboardingDetailClient({
       })
     );
 
-    // Persist
     const newSortOrder = sortMap.get(activeId) ?? 0;
     try {
       await fetch("/api/tasks/reorder", {
@@ -473,6 +561,8 @@ export default function OnboardingDetailClient({
 
           {/* Kanban board */}
           {(() => {
+            const columnIds = columns.map(({ phase }) => `col-${phase.id}`);
+
             const boardContent = (
               <div style={{ overflowX: "auto", flex: 1 }}>
                 <div
@@ -484,61 +574,58 @@ export default function OnboardingDetailClient({
                     alignItems: "flex-start",
                   }}
                 >
-                  {columns.map(({ phase, tasks: colTasks }) => (
-                    <div
-                      key={phase.id}
-                      style={{
-                        minWidth: 240,
-                        flexShrink: 0,
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 0,
-                        marginRight: 24,
-                      }}
-                    >
-                      {/* Column header */}
-                      <div style={{ marginBottom: 8 }}>
-                        <PhaseHeader
-                          phase={phase}
-                          onPhaseUpdated={handlePhaseUpdated}
-                          onPhaseDeleted={handlePhaseDeleted}
-                          onAddTask={() => setAddingInPhase(phase.id)}
-                        />
-                      </div>
+                  <SortableContext items={columnIds} strategy={horizontalListSortingStrategy}>
+                    {columns.map(({ phase, tasks: colTasks }) => (
+                      <SortableColumn key={phase.id} id={`col-${phase.id}`}>
+                        {(dragListeners) => (
+                          <>
+                            {/* Column header */}
+                            <div style={{ marginBottom: 8 }}>
+                              <PhaseHeader
+                                phase={phase}
+                                onPhaseUpdated={handlePhaseUpdated}
+                                onPhaseDeleted={handlePhaseDeleted}
+                                onAddTask={() => setAddingInPhase(phase.id)}
+                                dragListeners={dragListeners}
+                              />
+                            </div>
 
-                      {/* Task cards */}
-                      <SortableContext
-                        id={String(phase.id)}
-                        items={colTasks.map((t) => t.id)}
-                        strategy={verticalListSortingStrategy}
-                      >
-                        <div className="flex flex-col gap-2" style={{ minHeight: 40 }}>
-                          {colTasks.map((t) => (
-                            <TaskCard
-                              key={t.id}
-                              task={t}
-                              onTaskUpdated={handleTaskUpdated}
-                              onTaskDeleted={handleTaskDeleted}
-                              people={people}
-                            />
-                          ))}
-                        </div>
-                      </SortableContext>
+                            {/* Task cards */}
+                            <SortableContext
+                              id={String(phase.id)}
+                              items={colTasks.map((t) => t.id)}
+                              strategy={verticalListSortingStrategy}
+                            >
+                              <div className="flex flex-col gap-2" style={{ minHeight: 40 }}>
+                                {colTasks.map((t) => (
+                                  <TaskCard
+                                    key={t.id}
+                                    task={t}
+                                    onTaskUpdated={handleTaskUpdated}
+                                    onTaskDeleted={handleTaskDeleted}
+                                    people={people}
+                                  />
+                                ))}
+                              </div>
+                            </SortableContext>
 
-                      {/* Create task */}
-                      <div style={{ marginTop: colTasks.length > 0 ? 8 : 0 }}>
-                        <CreateTaskCard
-                          onboardingId={onboarding.id}
-                          phaseId={phase.id}
-                          onTaskCreated={handleTaskCreated}
-                          people={people}
-                          isExpanded={addingInPhase === phase.id}
-                          onExpand={() => setAddingInPhase(phase.id)}
-                          onCollapse={() => setAddingInPhase(null)}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                            {/* Create task */}
+                            <div style={{ marginTop: colTasks.length > 0 ? 8 : 0 }}>
+                              <CreateTaskCard
+                                onboardingId={onboarding.id}
+                                phaseId={phase.id}
+                                onTaskCreated={handleTaskCreated}
+                                people={people}
+                                isExpanded={addingInPhase === phase.id}
+                                onExpand={() => setAddingInPhase(phase.id)}
+                                onCollapse={() => setAddingInPhase(null)}
+                              />
+                            </div>
+                          </>
+                        )}
+                      </SortableColumn>
+                    ))}
+                  </SortableContext>
 
                   {/* Add phase column */}
                   <div style={{ minWidth: 200, flexShrink: 0 }}>
@@ -601,6 +688,19 @@ export default function OnboardingDetailClient({
                 {boardContent}
                 <DragOverlay>
                   {activeTask ? <TaskCard task={activeTask} isOverlay /> : null}
+                  {activePhase ? (
+                    <div
+                      style={{
+                        minWidth: 240,
+                        background: "var(--bg)",
+                        borderRadius: 8,
+                        padding: "8px 0",
+                        boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
+                      }}
+                    >
+                      <PhaseHeader phase={activePhase} />
+                    </div>
+                  ) : null}
                 </DragOverlay>
               </DndContext>
             );
