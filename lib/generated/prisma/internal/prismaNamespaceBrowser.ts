@@ -127,6 +127,7 @@ export const TaskScalarFieldEnum = {
   waitingOn: 'waitingOn',
   owner: 'owner',
   notes: 'notes',
+  sortOrder: 'sortOrder',
   priority: 'priority',
   commentCount: 'commentCount',
   previousStatus: 'previousStatus',

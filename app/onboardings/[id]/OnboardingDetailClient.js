@@ -3,6 +3,19 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import {
+  DndContext,
+  closestCorners,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
 import { computeHealth } from "@/lib/health";
 import Button from "@/app/ui/Button";
 import TaskCard from "@/app/components/TaskCard";
@@ -61,7 +74,17 @@ export default function OnboardingDetailClient({
   const [addingPhase, setAddingPhase] = useState(false);
   const [newPhaseName, setNewPhaseName] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
+  const [activeTask, setActiveTask] = useState(null);
+  const [mounted, setMounted] = useState(false);
   const filterRef = useRef(null);
+  const tasksRef = useRef(tasks);
+  tasksRef.current = tasks;
+
+  useEffect(() => { setMounted(true); }, []);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
 
   useEffect(() => {
     if (!filterOpen) return;
@@ -108,7 +131,9 @@ export default function OnboardingDetailClient({
 
   const columns = phasesWithCounts.map((phase) => ({
     phase,
-    tasks: filteredTasks.filter((t) => t.phaseId === phase.id),
+    tasks: filteredTasks
+      .filter((t) => t.phaseId === phase.id)
+      .sort((a, b) => a.sortOrder - b.sortOrder),
   }));
 
   const people = Array.from(
@@ -161,6 +186,90 @@ export default function OnboardingDetailClient({
       setAddingPhase(false);
     } catch {
       setError("Failed to add phase");
+    }
+  }
+
+  // ── Drag & drop handlers ──────────────────────────────────────
+  function handleDragStart(event) {
+    const task = tasksRef.current.find((t) => t.id === event.active.id);
+    setActiveTask(task || null);
+  }
+
+  function handleDragOver(event) {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = active.id;
+    const overId = over.id;
+    if (activeId === overId) return;
+
+    const current = tasksRef.current;
+    const activeTaskData = current.find((t) => t.id === activeId);
+    const overTask = current.find((t) => t.id === overId);
+
+    if (!activeTaskData) return;
+
+    // Target is another task in a different phase
+    const targetPhaseId = overTask ? overTask.phaseId : null;
+    if (!targetPhaseId || activeTaskData.phaseId === targetPhaseId) return;
+
+    setTasks((prev) =>
+      prev.map((t) => (t.id === activeId ? { ...t, phaseId: targetPhaseId } : t))
+    );
+  }
+
+  async function handleDragEnd(event) {
+    const { active, over } = event;
+    setActiveTask(null);
+
+    if (!over) return;
+
+    const activeId = active.id;
+    const overId = over.id;
+
+    const current = tasksRef.current;
+    const activeTaskData = current.find((t) => t.id === activeId);
+    if (!activeTaskData) return;
+
+    const targetPhaseId = activeTaskData.phaseId;
+
+    // Get tasks in target phase in current order
+    const colTasks = current
+      .filter((t) => t.phaseId === targetPhaseId)
+      .sort((a, b) => a.sortOrder - b.sortOrder);
+
+    const activeIdx = colTasks.findIndex((t) => t.id === activeId);
+    const overIdx = colTasks.findIndex((t) => t.id === overId);
+
+    if (activeIdx === -1) return;
+    if (activeIdx === overIdx) return; // no change
+
+    const reordered = arrayMove(colTasks, activeIdx, overIdx < 0 ? colTasks.length - 1 : overIdx);
+
+    // Optimistic update with new sort orders
+    const sortMap = new Map();
+    reordered.forEach((t, i) => sortMap.set(t.id, i));
+
+    const prevTasks = current;
+    setTasks((prev) =>
+      prev.map((t) => {
+        if (sortMap.has(t.id)) {
+          return { ...t, phaseId: targetPhaseId, sortOrder: sortMap.get(t.id) };
+        }
+        return t;
+      })
+    );
+
+    // Persist
+    const newSortOrder = sortMap.get(activeId) ?? 0;
+    try {
+      await fetch("/api/tasks/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskId: activeId, targetPhaseId, sortOrder: newSortOrder }),
+      });
+    } catch {
+      setTasks(prevTasks);
     }
   }
 
@@ -363,110 +472,139 @@ export default function OnboardingDetailClient({
           </div>
 
           {/* Kanban board */}
-          <div style={{ overflowX: "auto", flex: 1 }}>
-            <div
-              style={{
-                display: "flex",
-                gap: 0,
-                minWidth: phases.length * 264,
-                padding: "12px 16px",
-                alignItems: "flex-start",
-              }}
-            >
-              {columns.map(({ phase, tasks: colTasks }) => (
+          {(() => {
+            const boardContent = (
+              <div style={{ overflowX: "auto", flex: 1 }}>
                 <div
-                  key={phase.id}
                   style={{
-                    minWidth: 240,
-                    flexShrink: 0,
                     display: "flex",
-                    flexDirection: "column",
                     gap: 0,
-                    marginRight: 24,
+                    minWidth: phases.length * 264,
+                    padding: "12px 16px",
+                    alignItems: "flex-start",
                   }}
                 >
-                  {/* Column header */}
-                  <div style={{ marginBottom: 8 }}>
-                    <PhaseHeader
-                      phase={phase}
-                      onPhaseUpdated={handlePhaseUpdated}
-                      onPhaseDeleted={handlePhaseDeleted}
-                      onAddTask={() => setAddingInPhase(phase.id)}
-                    />
-                  </div>
+                  {columns.map(({ phase, tasks: colTasks }) => (
+                    <div
+                      key={phase.id}
+                      style={{
+                        minWidth: 240,
+                        flexShrink: 0,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0,
+                        marginRight: 24,
+                      }}
+                    >
+                      {/* Column header */}
+                      <div style={{ marginBottom: 8 }}>
+                        <PhaseHeader
+                          phase={phase}
+                          onPhaseUpdated={handlePhaseUpdated}
+                          onPhaseDeleted={handlePhaseDeleted}
+                          onAddTask={() => setAddingInPhase(phase.id)}
+                        />
+                      </div>
 
-                  {/* Task cards */}
-                  <div className="flex flex-col gap-2">
-                    {colTasks.map((t) => (
-                      <TaskCard
-                        key={t.id}
-                        task={t}
-                        onTaskUpdated={handleTaskUpdated}
-                        onTaskDeleted={handleTaskDeleted}
-                        people={people}
-                      />
-                    ))}
+                      {/* Task cards */}
+                      <SortableContext
+                        id={String(phase.id)}
+                        items={colTasks.map((t) => t.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <div className="flex flex-col gap-2" style={{ minHeight: 40 }}>
+                          {colTasks.map((t) => (
+                            <TaskCard
+                              key={t.id}
+                              task={t}
+                              onTaskUpdated={handleTaskUpdated}
+                              onTaskDeleted={handleTaskDeleted}
+                              people={people}
+                            />
+                          ))}
+                        </div>
+                      </SortableContext>
 
-                    {/* Create task */}
-                    <CreateTaskCard
-                      onboardingId={onboarding.id}
-                      phaseId={phase.id}
-                      onTaskCreated={handleTaskCreated}
-                      people={people}
-                      isExpanded={addingInPhase === phase.id}
-                      onExpand={() => setAddingInPhase(phase.id)}
-                      onCollapse={() => setAddingInPhase(null)}
-                    />
+                      {/* Create task */}
+                      <div style={{ marginTop: colTasks.length > 0 ? 8 : 0 }}>
+                        <CreateTaskCard
+                          onboardingId={onboarding.id}
+                          phaseId={phase.id}
+                          onTaskCreated={handleTaskCreated}
+                          people={people}
+                          isExpanded={addingInPhase === phase.id}
+                          onExpand={() => setAddingInPhase(phase.id)}
+                          onCollapse={() => setAddingInPhase(null)}
+                        />
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Add phase column */}
+                  <div style={{ minWidth: 200, flexShrink: 0 }}>
+                    {addingPhase ? (
+                      <div className="flex flex-col gap-2 px-4 py-1">
+                        <input
+                          type="text"
+                          placeholder="Phase name"
+                          value={newPhaseName}
+                          onChange={(e) => setNewPhaseName(e.target.value)}
+                          autoFocus
+                          className="text-sm font-semibold outline-none"
+                          style={{
+                            background: "transparent",
+                            color: "var(--text)",
+                            border: "none",
+                            borderBottom: "1px solid var(--action)",
+                            paddingBottom: 2,
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") handleAddPhase();
+                            if (e.key === "Escape") { setAddingPhase(false); setNewPhaseName(""); }
+                          }}
+                        />
+                        <div className="flex gap-2">
+                          <Button size="xs" onClick={handleAddPhase}>Add</Button>
+                          <button
+                            onClick={() => { setAddingPhase(false); setNewPhaseName(""); }}
+                            className="text-xs font-medium"
+                            style={{ color: "var(--text-muted)" }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setAddingPhase(true)}
+                        className="text-sm font-semibold px-4 py-1"
+                        style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}
+                      >
+                        + Add section
+                      </button>
+                    )}
                   </div>
                 </div>
-              ))}
-
-              {/* Add phase column */}
-              <div style={{ minWidth: 200, flexShrink: 0 }}>
-                {addingPhase ? (
-                  <div className="flex flex-col gap-2 px-4 py-1">
-                    <input
-                      type="text"
-                      placeholder="Phase name"
-                      value={newPhaseName}
-                      onChange={(e) => setNewPhaseName(e.target.value)}
-                      autoFocus
-                      className="text-sm font-semibold outline-none"
-                      style={{
-                        background: "transparent",
-                        color: "var(--text)",
-                        border: "none",
-                        borderBottom: "1px solid var(--action)",
-                        paddingBottom: 2,
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddPhase();
-                        if (e.key === "Escape") { setAddingPhase(false); setNewPhaseName(""); }
-                      }}
-                    />
-                    <div className="flex gap-2">
-                      <Button size="xs" onClick={handleAddPhase}>Add</Button>
-                      <button
-                        onClick={() => { setAddingPhase(false); setNewPhaseName(""); }}
-                        className="text-xs font-medium"
-                        style={{ color: "var(--text-muted)" }}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setAddingPhase(true)}
-                    className="text-sm font-semibold px-4 py-1"
-                    style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}
-                  >
-                    + Add section
-                  </button>
-                )}
               </div>
-            </div>
-          </div>
+            );
+
+            if (!mounted) return boardContent;
+
+            return (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCorners}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDragEnd={handleDragEnd}
+              >
+                {boardContent}
+                <DragOverlay>
+                  {activeTask ? <TaskCard task={activeTask} isOverlay /> : null}
+                </DragOverlay>
+              </DndContext>
+            );
+          })()}
         </div>
       )}
 

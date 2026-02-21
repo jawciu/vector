@@ -64,6 +64,7 @@ model Task {
   waitingOn       String
   owner           String  @default("")
   notes           String  @default("")
+  sortOrder       Int     @default(0)
   priority        String? // low | medium | high
   commentCount    Int     @default(0)
   previousStatus  String? // stores status before "Done" for toggle-back

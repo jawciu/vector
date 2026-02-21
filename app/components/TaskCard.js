@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const AVATAR_COLORS = [
   "var(--sunset)",
@@ -127,8 +129,23 @@ function CheckboxButton({ isDone, isCompleting, onClick }) {
   );
 }
 
-export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
+export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, isOverlay }) {
   const [completing, setCompleting] = useState(false);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: task.id, disabled: isOverlay });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
 
   const isDone = task.status === "Done" || completing;
   const statusColor = STATUS_STYLES[task.status] || "var(--text-secondary)";
@@ -176,6 +193,9 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
 
   return (
     <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
       className={`rounded-lg${completing ? " task-completing" : ""}`}
       style={{
         background: "var(--bg-elevated)",
@@ -183,6 +203,8 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
         display: "flex",
         flexDirection: "column",
         gap: 8,
+        cursor: "grab",
+        ...style,
       }}
     >
       {/* Row 1: Checkbox + Title */}
