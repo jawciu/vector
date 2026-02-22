@@ -179,6 +179,43 @@ a {
   animation: checkboxBounce 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
 }
 
+/* Pill dropdown triggers */
+.field-pill {
+  background: var(--bg-elevated);
+  transition: background 0.15s ease;
+}
+
+.field-pill:hover {
+  background: var(--bg-hover);
+}
+
+.field-pill[data-active="true"] {
+  background: var(--surface-hover);
+}
+
+.menu-trigger-pill {
+  background: var(--bg);
+  transition: background 0.15s ease;
+}
+
+.menu-trigger-pill:hover {
+  background: var(--bg-hover);
+}
+
+.menu-trigger-pill[data-active="true"] {
+  background: var(--surface-hover);
+}
+
+/* Add task button */
+.add-task-btn {
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+}
+
+.add-task-btn:hover {
+  color: var(--text);
+}
+
 /* Filter button styles */
 .task-filter-btn {
   transition: all 0.15s ease;

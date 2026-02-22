@@ -16,10 +16,10 @@
 export default function FieldPill({ icon, label, children, onClick, active }) {
   return (
     <div
-      className="flex flex-1 items-center gap-1 rounded-lg cursor-pointer transition-colors"
+      className="field-pill flex flex-1 items-center gap-1 rounded-lg cursor-pointer"
+      data-active={active ? "true" : undefined}
       style={{
         border: "1px solid var(--button-secondary-border)",
-        background: active ? "var(--surface-hover)" : "var(--bg-elevated)",
         padding: "4px 8px",
         minHeight: 26,
       }}

@@ -9,10 +9,9 @@ export function MenuTriggerButton({
   ...rest
 }) {
   const baseClassName =
-    "flex items-center gap-2 rounded-lg border text-sm font-medium transition-colors";
+    "menu-trigger-pill flex items-center gap-2 rounded-lg border text-sm font-medium";
   const baseStyle = {
     borderColor: "var(--button-secondary-border)",
-    background: active ? "var(--surface-hover)" : "var(--bg)",
     color: "var(--text)",
     paddingLeft: "8px",
     paddingRight: "8px",
@@ -25,6 +24,7 @@ export function MenuTriggerButton({
     <button
       type={type}
       className={`${baseClassName} ${className}`.trim()}
+      data-active={active ? "true" : undefined}
       style={{ ...baseStyle, ...style }}
       {...rest}
     >
