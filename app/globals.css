@@ -206,6 +206,29 @@ a {
   background: var(--surface-hover);
 }
 
+/* Health tooltip */
+.health-pill {
+  position: relative;
+}
+
+.health-pill[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+  z-index: 50;
+  pointer-events: none;
+}
+
 /* Add task button */
 .add-task-btn {
   color: var(--text-muted);

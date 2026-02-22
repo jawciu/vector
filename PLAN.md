@@ -112,12 +112,30 @@ The foundation. A vendor can create and manage onboardings, and a customer can s
 - Target dates per phase
 
 #### 1.5 Health scoring v2 ✅
-- ~~Current: blocked → "At risk", all blocked → "Blocked", else "On track"~~
-- ✅ 30%+ tasks blocked → "Blocked"; any blocked → "At risk"
-- ✅ Overdue tasks factor into health (1 task 7+ days overdue or 3+ tasks overdue → "At risk")
-- ✅ Velocity check: remaining tasks / completion rate > days to go-live → "At risk" (requires go-live date and 7+ days elapsed)
-- ✅ Health reasons shown as tooltip on health pill: "4 of 12 tasks blocked · 2 tasks overdue"
-- ✅ Added `createdAt` to Onboarding model for velocity calculation
+
+Health is computed per onboarding from its tasks + project dates. Returns `{ status, reasons }`.
+
+**Status hierarchy** (worst wins):
+| Status | Condition |
+|--------|-----------|
+| **Blocked** | ≥ 30% of tasks have status "Blocked" |
+| **At risk** | Any of: some tasks blocked (< 30%), overdue tasks, or behind velocity |
+| **On track** | None of the above |
+
+**Overdue rules:**
+- 1 task overdue by ≥ 7 days → At risk
+- 3+ tasks overdue by ≥ 1 day → At risk
+
+**Velocity check** (only when target go-live date exists and ≥ 7 days have elapsed):
+- Completion rate = tasks done / days since onboarding created
+- If `tasks remaining / completion rate > days until go-live` → At risk ("Behind pace — X tasks left, Yd to go-live")
+- Past go-live with open tasks → At risk
+- No tasks completed after 7+ days → At risk
+
+**Health reasons** — collected as string array, shown as tooltip on health pill (e.g. "4 of 12 tasks blocked · 2 tasks overdue"). Multiple reasons can fire simultaneously.
+
+**Schema** — Added `createdAt` (DateTime) to Onboarding model for velocity calculation.
+
 - Deferred: days since last customer activity (stale = risk) — needs clearer definition of what counts as "customer activity"
 
 #### 1.6 Vendor auth + roles

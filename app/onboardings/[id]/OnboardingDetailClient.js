@@ -503,13 +503,12 @@ export default function OnboardingDetailClient({
             <div className="flex items-center gap-2 flex-shrink-0">
               {health !== "On track" && (
                 <span
-                  className="text-sm rounded-md"
-                  title={healthTooltip || undefined}
+                  className={`text-sm rounded-md${healthTooltip ? " health-pill" : ""}`}
+                  data-tooltip={healthTooltip || undefined}
                   style={{
                     color: health === "Blocked" ? "var(--danger)" : "var(--alert)",
                     border: `0.5px solid ${health === "Blocked" ? "var(--danger)" : "var(--alert)"}`,
                     padding: "2px 4px",
-                    cursor: healthTooltip ? "help" : undefined,
                   }}
                 >
                   {health}

@@ -147,8 +147,8 @@ export default async function OnboardingsListPage({ searchParams }) {
                   const badge = statusBadge(ob);
                   return (
                     <span
-                      className="inline-flex h-fit rounded text-xs font-medium"
-                      title={badge.tooltip || undefined}
+                      className={`inline-flex h-fit rounded text-xs font-medium${badge.tooltip ? " health-pill" : ""}`}
+                      data-tooltip={badge.tooltip || undefined}
                       style={{
                         paddingTop: 2,
                         paddingBottom: 2,
@@ -159,7 +159,6 @@ export default async function OnboardingsListPage({ searchParams }) {
                         borderWidth: "0.5px",
                         borderStyle: "solid",
                         borderColor: badge.color,
-                        cursor: badge.tooltip ? "help" : undefined,
                       }}
                     >
                       {badge.label}
