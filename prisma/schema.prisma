@@ -25,6 +25,7 @@ model Onboarding {
   owner         String    @default("")
   status        String    @default("Active") // Active | Completed | Paused | Archived
   targetGoLive  DateTime?
+  createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now()) @updatedAt
   company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   tasks         Task[]

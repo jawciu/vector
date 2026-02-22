@@ -25,16 +25,16 @@ function companyLogoColor(name) {
   return AVATAR_COLORS[n % AVATAR_COLORS.length];
 }
 
-/** Returns { label, color } for the status badge.
+/** Returns { label, color, tooltip } for the status badge.
  *  Active onboardings show health (On track / At risk / Blocked).
  *  Completed and Paused show their own status. */
 function statusBadge(ob) {
-  if (ob.onboardingStatus === "Completed") return { label: "Completed", color: "var(--mint)" };
-  if (ob.onboardingStatus === "Paused") return { label: "Paused", color: "var(--rose)" };
-  // Active — derive from health
-  if (ob.health === "At risk") return { label: "At risk", color: "var(--alert)" };
-  if (ob.health === "Blocked") return { label: "Blocked", color: "var(--danger)" };
-  return { label: "On track", color: "var(--success)" };
+  if (ob.onboardingStatus === "Completed") return { label: "Completed", color: "var(--mint)", tooltip: null };
+  if (ob.onboardingStatus === "Paused") return { label: "Paused", color: "var(--rose)", tooltip: null };
+  const tooltip = ob.healthReasons?.length > 0 ? ob.healthReasons.join(" · ") : null;
+  if (ob.health === "At risk") return { label: "At risk", color: "var(--alert)", tooltip };
+  if (ob.health === "Blocked") return { label: "Blocked", color: "var(--danger)", tooltip };
+  return { label: "On track", color: "var(--success)", tooltip: null };
 }
 
 export default async function OnboardingsListPage({ searchParams }) {
@@ -148,6 +148,7 @@ export default async function OnboardingsListPage({ searchParams }) {
                   return (
                     <span
                       className="inline-flex h-fit rounded text-xs font-medium"
+                      title={badge.tooltip || undefined}
                       style={{
                         paddingTop: 2,
                         paddingBottom: 2,
@@ -158,6 +159,7 @@ export default async function OnboardingsListPage({ searchParams }) {
                         borderWidth: "0.5px",
                         borderStyle: "solid",
                         borderColor: badge.color,
+                        cursor: badge.tooltip ? "help" : undefined,
                       }}
                     >
                       {badge.label}

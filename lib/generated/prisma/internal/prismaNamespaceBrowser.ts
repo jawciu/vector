@@ -88,6 +88,7 @@ export const OnboardingScalarFieldEnum = {
   owner: 'owner',
   status: 'status',
   targetGoLive: 'targetGoLive',
+  createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 

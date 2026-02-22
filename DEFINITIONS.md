@@ -62,7 +62,7 @@ Quick reference for what you can do from each part of the Onboarding Orchestrato
 | File / folder | What it's for |
 |---------------|----------------|
 | **`lib/db.js`** | Database read layer: Prisma client + helpers. Use **`getOnboardings()`**, **`getOnboarding(id)`**, **`getTasksForOnboarding(id)`**, **`STATUSES`** from Server Components or API routes. |
-| **`lib/health.js`** | Pure helper: **`computeHealth(tasks)`** → `"At risk"` or `"On track"`. No DB; safe to use in client components. |
+| **`lib/health.js`** | Pure helper: **`computeHealth(tasks, { targetGoLive, createdAt })`** → `{ status, reasons }`. Status is `"Blocked"` / `"At risk"` / `"On track"`. Reasons is a string array for tooltips. No DB; safe to use in client components. |
 | **`lib/supabase/client.js`** | **`createClient()`** for browser: use in Client Components (login form, sign out). |
 | **`lib/supabase/server.js`** | **`createClient()`** for server: use in Server Components, Server Actions, Route Handlers; uses `cookies()` from `next/headers`. |
 | **`lib/supabase/proxy.js`** | **`updateSession(request)`**: creates Supabase server client from request cookies, calls `getClaims()` to refresh session, redirects to `/login` if no user. Used by root `proxy.js`. |

@@ -111,12 +111,14 @@ The foundation. A vendor can create and manage onboardings, and a customer can s
 - Phase completion triggers (all tasks done → phase auto-completes, or manual)
 - Target dates per phase
 
-#### 1.5 Health scoring v2
-- Current: blocked → "At risk", all blocked → "Blocked", else "On track"
-- Add: overdue tasks factor into health
-- Add: days since last customer activity (stale = risk)
-- Add: % of tasks completed vs. expected by this date (ahead / behind schedule)
-- Health reasons shown on dashboard: "2 tasks overdue", "No customer activity in 5 days", "Blocked on IT Admin for SSO setup"
+#### 1.5 Health scoring v2 ✅
+- ~~Current: blocked → "At risk", all blocked → "Blocked", else "On track"~~
+- ✅ 30%+ tasks blocked → "Blocked"; any blocked → "At risk"
+- ✅ Overdue tasks factor into health (1 task 7+ days overdue or 3+ tasks overdue → "At risk")
+- ✅ Velocity check: remaining tasks / completion rate > days to go-live → "At risk" (requires go-live date and 7+ days elapsed)
+- ✅ Health reasons shown as tooltip on health pill: "4 of 12 tasks blocked · 2 tasks overdue"
+- ✅ Added `createdAt` to Onboarding model for velocity calculation
+- Deferred: days since last customer activity (stale = risk) — needs clearer definition of what counts as "customer activity"
 
 #### 1.6 Vendor auth + roles
 - Vendor team members sign up / log in (Supabase Auth, email/password first, OAuth later)

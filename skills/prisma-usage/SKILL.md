@@ -20,7 +20,7 @@ description: Manage Prisma ORM for this project — schema changes, migrations, 
 Three models with relations:
 
 - **Company** → has many Onboardings
-- **Onboarding** → belongs to Company, has many Tasks. Fields: `owner` (String), `updatedAt` (DateTime)
+- **Onboarding** → belongs to Company, has many Tasks. Fields: `owner` (String), `createdAt` (DateTime), `updatedAt` (DateTime)
 - **Task** → belongs to Onboarding. Fields: `title`, `status` (Todo | In progress | Blocked | Done), `due`, `waitingOn`
 
 ## Connection URLs
@@ -124,6 +124,7 @@ Always run after schema changes. Updates `lib/generated/prisma/`.
 |-----------|-------------|
 | `20260201180000_init` | Baseline — Company, Onboarding, Task tables |
 | `20260209000000_add_owner_and_updated_at` | Added `owner` (String) and `updatedAt` (DateTime) to Onboarding |
+| `20260222190000_add_onboarding_created_at` | Added `createdAt` (DateTime, default now()) to Onboarding for health velocity |
 
 ## Adding queries
 

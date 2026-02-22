@@ -145,7 +145,11 @@ export default function OnboardingDetailClient({
     router.push(`?${params.toString()}`);
   }
 
-  const health = computeHealth(tasks);
+  const { status: health, reasons: healthReasons } = computeHealth(tasks, {
+    targetGoLive: onboarding.targetGoLive,
+    createdAt: onboarding.createdAt,
+  });
+  const healthTooltip = healthReasons.length > 0 ? healthReasons.join(" · ") : null;
   const blockedCount = tasks.filter((t) => t.status === "Blocked").length;
 
   const filteredTasks = tasks.filter((t) => {
@@ -500,10 +504,12 @@ export default function OnboardingDetailClient({
               {health !== "On track" && (
                 <span
                   className="text-sm rounded-md"
+                  title={healthTooltip || undefined}
                   style={{
                     color: health === "Blocked" ? "var(--danger)" : "var(--alert)",
                     border: `0.5px solid ${health === "Blocked" ? "var(--danger)" : "var(--alert)"}`,
                     padding: "2px 4px",
+                    cursor: healthTooltip ? "help" : undefined,
                   }}
                 >
                   {health}
