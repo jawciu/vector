@@ -3,6 +3,7 @@
 export function MenuTriggerButton({
   type = "button",
   className = "",
+  active = false,
   style,
   children,
   ...rest
@@ -10,8 +11,8 @@ export function MenuTriggerButton({
   const baseClassName =
     "flex items-center gap-2 rounded-lg border text-sm font-medium transition-colors";
   const baseStyle = {
-    borderColor: "var(--border-subtle)",
-    background: "var(--bg)",
+    borderColor: "var(--button-secondary-border)",
+    background: active ? "var(--surface-hover)" : "var(--bg)",
     color: "var(--text)",
     paddingLeft: "8px",
     paddingRight: "8px",

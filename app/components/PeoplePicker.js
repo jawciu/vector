@@ -42,7 +42,7 @@ export default function PeoplePicker({ value, onChange, placeholder, people }) {
           if (!isOpen) setIsOpen(true);
         }}
         onFocus={() => setIsOpen(true)}
-        className="py-2 px-0 text-xs w-full outline-none transition-colors"
+        className="py-0 px-0 text-sm w-full outline-none transition-colors"
         style={{
           border: "none",
           background: "transparent",
@@ -67,7 +67,7 @@ export default function PeoplePicker({ value, onChange, placeholder, people }) {
                 key={idx}
                 type="button"
                 onClick={() => handleSelect(person)}
-                className="w-full text-left px-3 py-2 text-xs transition-colors"
+                className="w-full text-left px-3 py-2 text-sm transition-colors"
                 style={{
                   color: "var(--text)",
                   background: "transparent",
@@ -80,7 +80,7 @@ export default function PeoplePicker({ value, onChange, placeholder, people }) {
               </button>
             ))
           ) : (
-            <div className="px-3 py-2 text-xs" style={{ color: "var(--text-muted)" }}>
+            <div className="px-3 py-2 text-sm" style={{ color: "var(--text-muted)" }}>
               {search ? `No matches. Press Enter to add "${search}"` : "Start typing..."}
             </div>
           )}

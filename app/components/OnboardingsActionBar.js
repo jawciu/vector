@@ -49,6 +49,7 @@ export default function OnboardingsActionBar() {
       <div className="flex flex-wrap items-center justify-between gap-2 py-3">
         <div ref={ref} className="relative">
           <MenuTriggerButton
+            active={open}
             onClick={() => setOpen((o) => !o)}
             aria-haspopup="listbox"
             aria-expanded={open}

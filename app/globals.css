@@ -31,6 +31,7 @@
   --text-dark: #18181E;
   --warning: #fbbf24;
   --icon-tertiary: #5D565D;
+  --button-secondary-border: #2E2C38;
 }
 
 html,
@@ -82,7 +83,7 @@ a {
 .btn-secondary {
   background-color: var(--bg);
   color: var(--text);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--button-secondary-border);
   transition: background-color 0.15s ease;
 }
 
@@ -185,4 +186,8 @@ a {
 
 .task-filter-btn:hover {
   background-color: var(--surface-hover);
+}
+
+.notes-textarea::placeholder {
+  color: var(--text-muted);
 }

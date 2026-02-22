@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { CalendarIcon, PriorityIcon, DependenciesIcon } from "../ui/Icons";
 
 const AVATAR_COLORS = [
   "var(--sunset)",
@@ -67,26 +68,6 @@ const STATUS_STYLES = {
   "Done": "var(--success)",
 };
 
-function PriorityIcon({ priority }) {
-  if (!priority) return null;
-  const active = "var(--action)";
-  const inactive = "var(--icon-tertiary)";
-  const colorMap = {
-    low: [active, inactive, inactive],
-    medium: [active, active, inactive],
-    high: [active, active, active],
-  };
-  const colors = colorMap[priority.toLowerCase()] || null;
-  if (!colors) return null;
-  // colors[0]=bottom chevron, colors[1]=middle, colors[2]=top
-  return (
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <path d="M2.0835 17.5001L10.0002 11.6667L17.9168 17.5001" stroke={colors[0]} strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M2.0835 12.5001L10.0002 6.66675L17.9168 12.5001" stroke={colors[1]} strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M2.0835 7.50008L10.0002 1.66675L17.9168 7.50008" stroke={colors[2]} strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 function CheckboxButton({ isDone, isCompleting, onClick }) {
   const [hovered, setHovered] = useState(false);
@@ -231,12 +212,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, isOverlay
       {task.due && dueInfo && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            {/* Calendar icon */}
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, color: "var(--text-secondary)" }}>
-              <path d="M0.777344 2.72046C0.777344 2.46767 0.859288 2.22524 1.00515 2.0465C1.15101 1.86775 1.34884 1.76733 1.55512 1.76733H12.444C12.6503 1.76733 12.8481 1.86775 12.994 2.0465C13.1398 2.22524 13.2218 2.46767 13.2218 2.72046V6.53296H0.777344V2.72046Z" stroke="currentColor" strokeLinejoin="round" />
-              <path d="M3.88867 2.83333V0.5M10.1109 2.83333V0.5" stroke="currentColor" strokeLinecap="round" />
-              <path d="M0.777344 6.53296H13.2218V11.7642C13.2218 11.9184 13.1398 12.0662 12.994 12.1752C12.8481 12.2842 12.6503 12.3455 12.444 12.3455H1.55512C1.34884 12.3455 1.15101 12.2842 1.00515 12.1752C0.859288 12.0662 0.777344 11.9184 0.777344 11.7642V6.53296Z" stroke="currentColor" strokeLinejoin="round" />
-            </svg>
+            <CalendarIcon style={{ flexShrink: 0 }} />
             <span className="text-sm" style={{ color: dueInfo.color }}>
               {dueInfo.text}
             </span>
@@ -272,16 +248,12 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, isOverlay
         </span>
       </div>
 
-      {/* Row 4: Waiting on (hidden if empty) */}
-      {task.waitingOn && task.waitingOn.trim() && (
+      {/* Row 4: Blocked by */}
+      {task.blockedByTask && (
         <div className="flex items-center gap-1.5">
-          {/* Waiting on icon */}
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, color: "var(--text-secondary)" }}>
-            <path d="M13.3437 3.12326C13.3437 3.77756 13.0838 4.40505 12.6212 4.86771C12.1585 5.33036 11.531 5.59028 10.8767 5.59028C10.2224 5.59028 9.59495 5.33036 9.13229 4.86771C8.66964 4.40505 8.40972 3.77756 8.40972 3.12326C8.40972 2.46897 8.66964 1.84148 9.13229 1.37882C9.59495 0.916167 10.2224 0.65625 10.8767 0.65625C11.531 0.65625 12.1585 0.916167 12.6212 1.37882C13.0838 1.84148 13.3437 2.46897 13.3437 3.12326ZM0.65625 3.12326C0.65625 1.96024 0.65625 1.37873 1.01784 1.01784C1.37873 0.65625 1.96024 0.65625 3.12326 0.65625C4.28628 0.65625 4.8678 0.65625 5.22868 1.01784C5.59028 1.37873 5.59028 1.96024 5.59028 3.12326C5.59028 4.28628 5.59028 4.8678 5.22868 5.22868C4.8678 5.59028 4.28628 5.59028 3.12326 5.59028C1.96024 5.59028 1.37873 5.59028 1.01784 5.22868C0.65625 4.8678 0.65625 4.28628 0.65625 3.12326ZM0.65625 10.8767C0.65625 9.71372 0.65625 9.1322 1.01784 8.77132C1.37873 8.40972 1.96024 8.40972 3.12326 8.40972C4.28628 8.40972 4.8678 8.40972 5.22868 8.77132C5.59028 9.1322 5.59028 9.71372 5.59028 10.8767C5.59028 12.0398 5.59028 12.6213 5.22868 12.9822C4.8678 13.3437 4.28628 13.3437 3.12326 13.3437C1.96024 13.3437 1.37873 13.3437 1.01784 12.9822C0.65625 12.6213 0.65625 12.0398 0.65625 10.8767ZM8.40972 10.8767C8.40972 9.71372 8.40972 9.1322 8.77132 8.77132C9.1322 8.40972 9.71372 8.40972 10.8767 8.40972C12.0398 8.40972 12.6213 8.40972 12.9822 8.77132C13.3437 9.1322 13.3437 9.71372 13.3437 10.8767C13.3437 12.0398 13.3437 12.6213 12.9822 12.9822C12.6213 13.3437 12.0398 13.3437 10.8767 13.3437C9.71372 13.3437 9.1322 13.3437 8.77132 12.9822C8.40972 12.6213 8.40972 12.0398 8.40972 10.8767Z" stroke="currentColor" strokeWidth="0.875" />
-            <path d="M10.8763 5.5903V8.40975M8.40929 10.8768H5.58984M5.58984 3.12329H8.40929" stroke="currentColor" strokeWidth="0.875" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-            {task.waitingOn}
+          <DependenciesIcon style={{ flexShrink: 0 }} />
+          <span className="text-sm truncate" style={{ color: "var(--text-secondary)" }}>
+            {task.blockedByTask.title}
           </span>
         </div>
       )}
@@ -325,7 +297,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, isOverlay
         </div>
 
         <div className="flex items-center gap-1.5">
-          <PriorityIcon priority={task.priority} />
+          <PriorityIcon priority={task.priority} size={18} />
           {ownerInitials && (
             AVATAR_IMAGES[task.owner] ? (
               <img

@@ -22,7 +22,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { computeHealth } from "@/lib/health";
 import Button from "@/app/ui/Button";
 import TaskCard from "@/app/components/TaskCard";
-import CreateTaskCard from "@/app/components/CreateTaskCard";
+import CreateTaskModal from "@/app/components/CreateTaskModal";
 import OnboardingActions from "@/app/components/OnboardingActions";
 import PhaseHeader from "@/app/components/PhaseHeader";
 import OnboardingTabs from "@/app/components/OnboardingTabs";
@@ -176,13 +176,13 @@ export default function OnboardingDetailClient({
       ...contacts.map((c) => c.name).filter(Boolean),
       onboarding.companyName,
       ...tasks.map((t) => t.owner).filter(Boolean),
-      ...tasks.map((t) => t.waitingOn).filter(Boolean),
+      ...tasks.flatMap((t) => t.members || []).filter(Boolean),
     ])
   ).filter((p) => p.trim().length > 0);
 
   function handleTaskCreated(newTask) {
     setTasks((prev) => [...prev, newTask]);
-    setAddingInPhase(null);
+    setAddingInPhase(null); // close modal
   }
 
   function handleTaskUpdated(updatedTask) {
@@ -431,6 +431,7 @@ export default function OnboardingDetailClient({
             <div className="flex items-center gap-1">
               <div ref={filterRef} className="relative">
                 <MenuTriggerButton
+                  active={filterOpen}
                   onClick={() => setFilterOpen((o) => !o)}
                   aria-haspopup="listbox"
                   aria-expanded={filterOpen}
@@ -609,17 +610,25 @@ export default function OnboardingDetailClient({
                               </div>
                             </SortableContext>
 
-                            {/* Create task */}
+                            {/* Add task button */}
                             <div style={{ marginTop: colTasks.length > 0 ? 8 : 0 }}>
-                              <CreateTaskCard
-                                onboardingId={onboarding.id}
-                                phaseId={phase.id}
-                                onTaskCreated={handleTaskCreated}
-                                people={people}
-                                isExpanded={addingInPhase === phase.id}
-                                onExpand={() => setAddingInPhase(phase.id)}
-                                onCollapse={() => setAddingInPhase(null)}
-                              />
+                              <button
+                                onClick={() => setAddingInPhase(phase.id)}
+                                className="flex items-center gap-1 w-full text-sm transition-colors hover:opacity-80"
+                                style={{
+                                  border: "1px solid var(--border-subtle)",
+                                  borderRadius: 8,
+                                  padding: "8px 16px",
+                                  background: "none",
+                                  cursor: "pointer",
+                                  color: "var(--text)",
+                                }}
+                              >
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden style={{ flexShrink: 0, color: "var(--text-muted)" }}>
+                                  <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                                </svg>
+                                Add task
+                              </button>
                             </div>
                           </>
                         )}
@@ -719,6 +728,19 @@ export default function OnboardingDetailClient({
       )}
 
       {activeTab === "communication" && <CommunicationTab />}
+
+      {/* Create task modal */}
+      <CreateTaskModal
+        open={addingInPhase !== null}
+        onClose={() => setAddingInPhase(null)}
+        onboardingId={onboarding.id}
+        phaseId={addingInPhase}
+        phaseName={phases.find((p) => p.id === addingInPhase)?.name || ""}
+        companyName={onboarding.companyName}
+        onTaskCreated={handleTaskCreated}
+        people={people}
+        allTasks={tasks}
+      />
     </main>
   );
 }
