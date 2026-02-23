@@ -330,7 +330,7 @@ export default function CreateTaskModal({
                 active={calendarOpen}
                 onClick={() => toggleDropdown("calendar", calendarOpen, setCalendarOpen)}
               >
-                <span className="text-sm flex-1" style={{ color: formData.due ? "var(--text)" : "var(--text-muted)" }}>
+                <span className="text-sm flex-1" style={{ color: formData.due || calendarOpen ? "var(--text)" : "var(--text-muted)" }}>
                   {formData.due
                     ? new Date(formData.due + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
                     : "Target"}
@@ -358,7 +358,7 @@ export default function CreateTaskModal({
                 active={priorityOpen}
                 onClick={() => toggleDropdown("priority", priorityOpen, setPriorityOpen)}
               >
-                <span className="text-sm capitalize flex-1" style={{ color: formData.priority ? "var(--text)" : "var(--text-muted)" }}>
+                <span className="text-sm capitalize flex-1" style={{ color: formData.priority || priorityOpen ? "var(--text)" : "var(--text-muted)" }}>
                   {formData.priority || "Priority"}
                 </span>
                 {formData.priority && (
@@ -388,7 +388,7 @@ export default function CreateTaskModal({
                 active={statusOpen}
                 onClick={() => toggleDropdown("status", statusOpen, setStatusOpen)}
               >
-                <span className="text-sm flex-1" style={{ color: formData.status === "Not started" ? "var(--text-muted)" : "var(--text)" }}>
+                <span className="text-sm flex-1" style={{ color: formData.status === "Not started" && !statusOpen ? "var(--text-muted)" : "var(--text)" }}>
                   {formData.status}
                 </span>
                 {formData.status !== "Not started" && (
@@ -426,7 +426,7 @@ export default function CreateTaskModal({
                   <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("owner", ""); }} />
                 </div>
               ) : (
-                <span className="text-sm" style={{ color: "var(--text-muted)" }}>Owner</span>
+                <span className="text-sm" style={{ color: ownerOpen ? "var(--text)" : "var(--text-muted)" }}>Owner</span>
               )}
             </FieldRow>
             {ownerOpen && (
@@ -466,7 +466,7 @@ export default function CreateTaskModal({
                   <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("blockedByTaskId", null); }} />
                 </div>
               ) : (
-                <span className="text-sm" style={{ color: "var(--text-muted)" }}>Dependencies</span>
+                <span className="text-sm" style={{ color: dependenciesOpen ? "var(--text)" : "var(--text-muted)" }}>Dependencies</span>
               )}
             </FieldRow>
             {dependenciesOpen && (
