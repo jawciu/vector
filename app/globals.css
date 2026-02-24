@@ -200,6 +200,22 @@ a {
   animation: checkboxBounce 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
 }
 
+/* Field row triggers (drawer detail view) — no border in default, appears on active */
+.field-row {
+  background: transparent;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.field-row:hover:not([data-active="true"]) {
+  background: var(--bg-hover);
+}
+
+.field-row[data-active="true"] {
+  background: var(--surface-hover);
+  border-color: var(--button-secondary-border);
+}
+
 /* Pill dropdown triggers */
 .field-pill {
   background: var(--bg-elevated);

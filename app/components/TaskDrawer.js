@@ -319,7 +319,7 @@ function NotesToolbar({ notesValue, setNotesValue, notesRef }) {
         gap: 2,
         padding: "4px 8px",
         borderBottom: "1px solid var(--border)",
-        background: "var(--bg-elevated)",
+        background: "var(--bg)",
         borderRadius: "8px 8px 0 0",
         flexWrap: "nowrap",
       }}
@@ -450,6 +450,16 @@ export default function TaskDrawer({
   const [submittingComment, setSubmittingComment] = useState(false);
   const [commentError, setCommentError] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [notesFocused, setNotesFocused] = useState(false);
+  const [commentFocused, setCommentFocused] = useState(false);
+
+  // Hover states for field rows (show X on hover)
+  const [dueDateHovered, setDueDateHovered] = useState(false);
+  const [statusHovered, setStatusHovered] = useState(false);
+  const [priorityHovered, setPriorityHovered] = useState(false);
+  const [ownerHovered, setOwnerHovered] = useState(false);
+  const [membersHovered, setMembersHovered] = useState(false);
+  const [depsHovered, setDepsHovered] = useState(false);
 
   // Inline editing state
   const [editingTitle, setEditingTitle] = useState(false);
@@ -766,22 +776,23 @@ export default function TaskDrawer({
         )}
 
         {/* Fields */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
 
           {/* Due date */}
-          <div ref={calendarRef} className="relative">
+          <div ref={calendarRef} className="relative" onMouseEnter={() => setDueDateHovered(true)} onMouseLeave={() => setDueDateHovered(false)}>
             <FieldRow
               icon={<CalendarIcon style={{ flexShrink: 0 }} />}
               active={calendarOpen}
               onClick={() => toggleDropdown(calendarOpen, setCalendarOpen)}
             >
-              <span className="text-sm flex-1" style={{ color: localTask.due || calendarOpen ? "var(--text)" : "var(--text-muted)" }}>
-                {localTask.due
-                  ? new Date(localTask.due + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
-                  : "Target"}
-              </span>
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Target</span>
               {localTask.due && (
-                <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ due: "" }); }} />
+                <span className="text-sm" style={{ color: "var(--text)" }}>
+                  {new Date(localTask.due + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+                </span>
+              )}
+              {localTask.due && (dueDateHovered || calendarOpen) && (
+                <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ due: "" }); setCalendarOpen(false); }} />
               )}
             </FieldRow>
             {calendarOpen && (
@@ -797,33 +808,46 @@ export default function TaskDrawer({
           </div>
 
           {/* Status */}
-          <div ref={statusRef} className="relative">
+          <div ref={statusRef} className="relative" onMouseEnter={() => setStatusHovered(true)} onMouseLeave={() => setStatusHovered(false)}>
             <FieldRow
               icon={<StatusIcon style={{ flexShrink: 0 }} />}
               active={statusOpen}
               onClick={() => toggleDropdown(statusOpen, setStatusOpen)}
             >
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Status</span>
               <span
-                className="text-sm flex-1 rounded"
+                className="text-sm rounded"
                 style={{
                   color: statusColor,
                   border: `0.5px solid ${statusColor}`,
                   padding: "1px 4px",
                   display: "inline-block",
+                  fontSize: 12,
                 }}
               >
                 {localTask.status}
               </span>
+              {(statusHovered || statusOpen) && (
+                <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ status: "Not started" }); setStatusOpen(false); }} />
+              )}
             </FieldRow>
             {statusOpen && (
-              <MenuList style={{ background: "var(--bg-elevated)", width: "100%" }}>
+              <MenuList style={{ minWidth: "100%" }}>
                 {TASK_STATUSES.map((s) => (
                   <MenuOption
                     key={s}
                     active={localTask.status === s}
                     onClick={() => { patchTask({ status: s, ...(s === "Done" && { previousStatus: localTask.status }) }); setStatusOpen(false); }}
                   >
-                    {s}
+                    <span style={{
+                      color: STATUS_COLORS[s],
+                      border: `0.5px solid ${STATUS_COLORS[s]}`,
+                      padding: "1px 4px",
+                      borderRadius: 6,
+                      fontSize: 12,
+                    }}>
+                      {s}
+                    </span>
                   </MenuOption>
                 ))}
               </MenuList>
@@ -831,21 +855,22 @@ export default function TaskDrawer({
           </div>
 
           {/* Priority */}
-          <div ref={priorityRef} className="relative">
+          <div ref={priorityRef} className="relative" onMouseEnter={() => setPriorityHovered(true)} onMouseLeave={() => setPriorityHovered(false)}>
             <FieldRow
               icon={<PriorityIcon priority={localTask.priority} style={{ flexShrink: 0 }} />}
               active={priorityOpen}
               onClick={() => toggleDropdown(priorityOpen, setPriorityOpen)}
             >
-              <span className="text-sm capitalize flex-1" style={{ color: localTask.priority || priorityOpen ? "var(--text)" : "var(--text-muted)" }}>
-                {localTask.priority || "Priority"}
-              </span>
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Priority</span>
               {localTask.priority && (
-                <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ priority: null }); }} />
+                <span className="text-sm capitalize" style={{ color: "var(--text)" }}>{localTask.priority}</span>
+              )}
+              {localTask.priority && (priorityHovered || priorityOpen) && (
+                <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ priority: null }); setPriorityOpen(false); }} />
               )}
             </FieldRow>
             {priorityOpen && (
-              <MenuList style={{ background: "var(--bg-elevated)", width: "100%" }}>
+              <MenuList style={{ minWidth: "100%" }}>
                 {PRIORITIES.map((p) => (
                   <MenuOption
                     key={p}
@@ -853,7 +878,10 @@ export default function TaskDrawer({
                     onClick={() => { patchTask({ priority: localTask.priority === p ? null : p }); setPriorityOpen(false); }}
                     className="capitalize"
                   >
-                    {p}
+                    <div className="flex items-center gap-2">
+                      <PriorityIcon priority={p} />
+                      <span>{p}</span>
+                    </div>
                   </MenuOption>
                 ))}
               </MenuList>
@@ -861,24 +889,23 @@ export default function TaskDrawer({
           </div>
 
           {/* Owner */}
-          <div ref={ownerRef} className="relative">
+          <div ref={ownerRef} className="relative" onMouseEnter={() => setOwnerHovered(true)} onMouseLeave={() => setOwnerHovered(false)}>
             <FieldRow
               icon={<OwnerIcon style={{ flexShrink: 0 }} />}
               active={ownerOpen}
               onClick={() => toggleDropdown(ownerOpen, setOwnerOpen)}
             >
-              {localTask.owner ? (
-                <div className="flex items-center gap-1.5 flex-1">
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Owner</span>
+              {localTask.owner && (
+                <div className="flex items-center gap-1.5">
                   <Avatar name={localTask.owner} size={16} />
-                  <span className="text-sm flex-1" style={{ color: "var(--text)" }}>{localTask.owner}</span>
-                  <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ owner: "" }); }} />
+                  <span className="text-sm" style={{ color: "var(--text)" }}>{localTask.owner}</span>
+                  {(ownerHovered || ownerOpen) && <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ owner: "" }); setOwnerOpen(false); }} />}
                 </div>
-              ) : (
-                <span className="text-sm flex-1" style={{ color: ownerOpen ? "var(--text)" : "var(--text-muted)" }}>Owner</span>
               )}
             </FieldRow>
             {ownerOpen && (
-              <MenuList style={{ background: "var(--bg-elevated)", width: "100%", maxHeight: 160, overflowY: "auto" }}>
+              <MenuList style={{ minWidth: "100%", maxHeight: 160, overflowY: "auto" }}>
                 {people.length === 0 ? (
                   <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No people available</div>
                 ) : (
@@ -900,15 +927,17 @@ export default function TaskDrawer({
           </div>
 
           {/* Members */}
-          <div ref={membersRef} className="relative">
+          <div ref={membersRef} className="relative" onMouseEnter={() => setMembersHovered(true)} onMouseLeave={() => setMembersHovered(false)}>
             <FieldRow
               icon={<MembersIcon style={{ flexShrink: 0 }} />}
               active={membersOpen}
               onClick={() => toggleDropdown(membersOpen, setMembersOpen)}
             >
-              {localTask.members && localTask.members.length > 0 ? (
-                <div className="flex items-center flex-1" style={{ gap: 4 }}>
-                  <div className="flex items-center" style={{ gap: -4 }}>
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Members</span>
+              {localTask.members && localTask.members.length > 0 && (
+                <>
+                  {/* Avatar stack — negative margins for overlap */}
+                  <div className="flex items-center">
                     {localTask.members.slice(0, 5).map((m, i) => (
                       <div key={m} style={{ marginLeft: i > 0 ? -6 : 0, zIndex: 5 - i, position: "relative" }}>
                         <Avatar name={m} size={16} />
@@ -923,13 +952,15 @@ export default function TaskDrawer({
                       </div>
                     )}
                   </div>
-                </div>
-              ) : (
-                <span className="text-sm flex-1" style={{ color: membersOpen ? "var(--text)" : "var(--text-muted)" }}>Members</span>
+                  {/* X sits outside the avatar stack so it's never hidden */}
+                  {(membersHovered || membersOpen) && (
+                    <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ members: [] }); setMembersOpen(false); }} />
+                  )}
+                </>
               )}
             </FieldRow>
             {membersOpen && (
-              <MenuList style={{ background: "var(--bg-elevated)", width: "100%", maxHeight: 180, overflowY: "auto" }}>
+              <MenuList style={{ minWidth: "100%", maxHeight: 180, overflowY: "auto" }}>
                 {people.length === 0 ? (
                   <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No people available</div>
                 ) : (
@@ -959,25 +990,24 @@ export default function TaskDrawer({
           </div>
 
           {/* Dependencies */}
-          <div ref={depsRef} className="relative">
+          <div ref={depsRef} className="relative" onMouseEnter={() => setDepsHovered(true)} onMouseLeave={() => setDepsHovered(false)}>
             <FieldRow
               icon={<DependenciesIcon style={{ flexShrink: 0 }} />}
               active={depsOpen}
               onClick={() => toggleDropdown(depsOpen, setDepsOpen)}
             >
-              {localTask.blockedByTaskId ? (
-                <div className="flex items-center justify-between flex-1">
-                  <span className="text-sm truncate" style={{ color: "var(--text)" }}>
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Dependencies</span>
+              {localTask.blockedByTaskId && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm" style={{ color: "var(--text)" }}>
                     {allTasks.find((t) => t.id === localTask.blockedByTaskId)?.title || "Task"}
                   </span>
-                  <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ blockedByTaskId: null }); }} />
+                  {(depsHovered || depsOpen) && <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ blockedByTaskId: null }); setDepsOpen(false); }} />}
                 </div>
-              ) : (
-                <span className="text-sm flex-1" style={{ color: depsOpen ? "var(--text)" : "var(--text-muted)" }}>Dependencies</span>
               )}
             </FieldRow>
             {depsOpen && (
-              <MenuList style={{ background: "var(--bg-elevated)", width: "100%", maxHeight: 160, overflowY: "auto" }}>
+              <MenuList style={{ width: "max-content", minWidth: "100%", maxWidth: 360, maxHeight: 160, overflowY: "auto" }}>
                 {allTasks.filter((t) => t.id !== localTask.id).length === 0 ? (
                   <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No other tasks</div>
                 ) : (
@@ -992,7 +1022,7 @@ export default function TaskDrawer({
                           setDepsOpen(false);
                         }}
                       >
-                        <span className="truncate">{t.title}</span>
+                        <span>{t.title}</span>
                       </MenuOption>
                     ))
                 )}
@@ -1010,10 +1040,11 @@ export default function TaskDrawer({
           {/* Toolbar + textarea grouped with shared border */}
           <div
             style={{
-              border: "1px solid var(--border)",
+              border: `1px solid ${notesFocused ? "var(--action)" : "var(--border)"}`,
               borderRadius: 8,
               overflow: "hidden",
-              background: "var(--bg-elevated)",
+              background: "var(--bg)",
+              transition: "border-color 0.15s ease",
             }}
           >
             <NotesToolbar
@@ -1025,12 +1056,13 @@ export default function TaskDrawer({
               ref={notesRef}
               value={notesValue}
               onChange={(e) => setNotesValue(e.target.value)}
-              onBlur={handleNotesBlur}
+              onFocus={() => setNotesFocused(true)}
+              onBlur={() => { setNotesFocused(false); handleNotesBlur(); }}
               placeholder="Write your notes here"
               rows={5}
               className="w-full text-sm resize-y outline-none"
               style={{
-                background: "var(--bg-elevated)",
+                background: "var(--bg)",
                 border: "none",
                 borderRadius: 0,
                 color: "var(--text)",
@@ -1057,7 +1089,7 @@ export default function TaskDrawer({
                   key={c.id}
                   className="rounded-lg text-sm"
                   style={{
-                    background: "var(--bg-elevated)",
+                    background: "var(--bg)",
                     border: "1px solid var(--border)",
                     padding: "8px 12px",
                     display: "flex",
@@ -1080,12 +1112,13 @@ export default function TaskDrawer({
           <div
             className="rounded-lg"
             style={{
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border)",
+              background: "var(--bg)",
+              border: `1px solid ${commentFocused ? "var(--action)" : "var(--border)"}`,
               padding: "8px 12px",
               display: "flex",
               flexDirection: "column",
               gap: 8,
+              transition: "border-color 0.15s ease",
             }}
           >
             <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
@@ -1096,6 +1129,8 @@ export default function TaskDrawer({
               <textarea
                 value={commentInput}
                 onChange={(e) => { setCommentInput(e.target.value); setCommentError(null); }}
+                onFocus={() => setCommentFocused(true)}
+                onBlur={() => setCommentFocused(false)}
                 onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmitComment(); }}
                 placeholder="Add a comment"
                 rows={2}
