@@ -55,7 +55,8 @@ export const ModelName = {
   Onboarding: 'Onboarding',
   Contact: 'Contact',
   Phase: 'Phase',
-  Task: 'Task'
+  Task: 'Task',
+  Comment: 'Comment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -137,6 +138,17 @@ export const TaskScalarFieldEnum = {
 } as const
 
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
+
+
+export const CommentScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  author: 'author',
+  body: 'body',
+  createdAt: 'createdAt'
+} as const
+
+export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -23,6 +23,7 @@ import { computeHealth } from "@/lib/health";
 import Button from "@/app/ui/Button";
 import TaskCard from "@/app/components/TaskCard";
 import CreateTaskModal from "@/app/components/CreateTaskModal";
+import TaskDrawer from "@/app/components/TaskDrawer";
 import OnboardingActions from "@/app/components/OnboardingActions";
 import PhaseHeader from "@/app/components/PhaseHeader";
 import OnboardingTabs from "@/app/components/OnboardingTabs";
@@ -109,6 +110,8 @@ export default function OnboardingDetailClient({
   const [activeTask, setActiveTask] = useState(null);
   const [activePhase, setActivePhase] = useState(null);
   const [mounted, setMounted] = useState(false);
+  const [drawerTask, setDrawerTask] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const filterRef = useRef(null);
   const tasksRef = useRef(tasks);
   tasksRef.current = tasks;
@@ -184,6 +187,11 @@ export default function OnboardingDetailClient({
     ])
   ).filter((p) => p.trim().length > 0);
 
+  function handleOpenDrawer(task) {
+    setDrawerTask(task);
+    setDrawerOpen(true);
+  }
+
   function handleTaskCreated(newTask) {
     setTasks((prev) => [...prev, newTask]);
     setAddingInPhase(null); // close modal
@@ -191,6 +199,9 @@ export default function OnboardingDetailClient({
 
   function handleTaskUpdated(updatedTask) {
     setTasks((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+    if (drawerTask && drawerTask.id === updatedTask.id) {
+      setDrawerTask(updatedTask);
+    }
   }
 
   function handleTaskDeleted(taskId) {
@@ -609,6 +620,7 @@ export default function OnboardingDetailClient({
                                     task={t}
                                     onTaskUpdated={handleTaskUpdated}
                                     onTaskDeleted={handleTaskDeleted}
+                                    onCardClick={handleOpenDrawer}
                                     people={people}
                                   />
                                 ))}
@@ -742,6 +754,16 @@ export default function OnboardingDetailClient({
         phaseName={phases.find((p) => p.id === addingInPhase)?.name || ""}
         companyName={onboarding.companyName}
         onTaskCreated={handleTaskCreated}
+        people={people}
+        allTasks={tasks}
+      />
+
+      {/* Task detail drawer */}
+      <TaskDrawer
+        task={drawerTask}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onTaskUpdated={handleTaskUpdated}
         people={people}
         allTasks={tasks}
       />

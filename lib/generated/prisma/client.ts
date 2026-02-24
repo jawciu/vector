@@ -64,3 +64,8 @@ export type Phase = Prisma.PhaseModel
  * 
  */
 export type Task = Prisma.TaskModel
+/**
+ * Model Comment
+ * 
+ */
+export type Comment = Prisma.CommentModel

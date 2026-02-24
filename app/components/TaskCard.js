@@ -110,7 +110,7 @@ function CheckboxButton({ isDone, isCompleting, onClick }) {
   );
 }
 
-export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, isOverlay }) {
+export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, onCardClick, isOverlay }) {
   const [completing, setCompleting] = useState(false);
 
   const {
@@ -177,6 +177,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, isOverlay
       ref={setNodeRef}
       {...attributes}
       {...listeners}
+      onClick={() => { if (onCardClick) onCardClick(task); }}
       className={`rounded-lg${completing ? " task-completing" : ""}`}
       style={{
         background: "var(--bg-elevated)",

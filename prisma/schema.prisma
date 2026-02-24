@@ -73,4 +73,14 @@ model Task {
   blockedByTaskId Int?
   blockedByTask   Task?   @relation("TaskBlocks", fields: [blockedByTaskId], references: [id], onDelete: SetNull)
   blockedTasks    Task[]  @relation("TaskBlocks")
+  comments        Comment[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  taskId    Int
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author    String
+  body      String
+  createdAt DateTime @default(now())
 }
