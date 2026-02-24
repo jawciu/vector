@@ -113,6 +113,7 @@ export default function OnboardingDetailClient({
   const [drawerTask, setDrawerTask] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const filterRef = useRef(null);
+  const drawerRef = useRef(null);
   const tasksRef = useRef(tasks);
   tasksRef.current = tasks;
   const phasesRef = useRef(phases);
@@ -132,6 +133,17 @@ export default function OnboardingDetailClient({
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [filterOpen]);
+
+  useEffect(() => {
+    if (!drawerOpen) return;
+    function handleClick(e) {
+      if (drawerRef.current && drawerRef.current.contains(e.target)) return;
+      if (e.target.closest("[data-task-card]")) return;
+      setDrawerOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [drawerOpen]);
 
   const activeTab = searchParams.get("tab") || "tasks";
   const taskFilter = searchParams.get("filter") || "active";
@@ -760,6 +772,7 @@ export default function OnboardingDetailClient({
 
       {/* Task detail drawer */}
       <TaskDrawer
+        ref={drawerRef}
         task={drawerTask}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}

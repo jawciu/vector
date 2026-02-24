@@ -79,7 +79,7 @@ function CheckboxButton({ isDone, isCompleting, onClick }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className={`flex-shrink-0${isCompleting ? " checkbox-bounce" : ""}`}
-      style={{ background: "none", border: "none", padding: 0, cursor: "pointer", marginTop: 2, display: "flex" }}
+      style={{ background: "none", border: "none", padding: "4px", margin: "-4px", marginTop: -2, cursor: "pointer", display: "flex" }}
       aria-label={isDone ? "Mark as incomplete" : "Mark as done"}
     >
       {isDone ? (
@@ -177,6 +177,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, onCardCli
       ref={setNodeRef}
       {...attributes}
       {...listeners}
+      data-task-card
       onClick={() => { if (onCardClick) onCardClick(task); }}
       className={`rounded-lg${completing ? " task-completing" : ""}`}
       style={{
@@ -306,14 +307,14 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, onCardCli
                 alt={task.owner}
                 title={task.owner}
                 className="rounded-full flex-shrink-0"
-                style={{ width: 18, height: 18, objectFit: "cover" }}
+                style={{ width: 20, height: 20, objectFit: "cover" }}
               />
             ) : (
               <div
                 className="flex items-center justify-center text-[9px] font-semibold rounded-full flex-shrink-0"
                 style={{
-                  width: 18,
-                  height: 18,
+                  width: 20,
+                  height: 20,
                   background: avatarColor(task.owner),
                   color: "var(--text-dark)",
                 }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, forwardRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/app/ui/Button";
 import FieldPill from "@/app/ui/FieldPill";
@@ -81,8 +81,9 @@ function Avatar({ name, size = 18 }) {
 
 function CloseIcon() {
   return (
-    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" style={{ color: "currentColor" }}>
-      <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+      <path d="M1.32129 10.1182L6.2296 5.40892L1.32129 0.600098" stroke="currentColor" strokeWidth="1.06126" strokeLinecap="round" />
+      <path d="M9.67871 0.583496L9.67871 10.4167" stroke="currentColor" strokeWidth="1.06126" strokeLinecap="round" />
     </svg>
   );
 }
@@ -436,14 +437,14 @@ function NotesToolbar({ notesValue, setNotesValue, notesRef }) {
   );
 }
 
-export default function TaskDrawer({
+const TaskDrawer = forwardRef(function TaskDrawer({
   task,
   open,
   onClose,
   onTaskUpdated,
   people = [],
   allTasks = [],
-}) {
+}, ref) {
   const [localTask, setLocalTask] = useState(task);
   const [comments, setComments] = useState([]);
   const [commentInput, setCommentInput] = useState("");
@@ -452,6 +453,7 @@ export default function TaskDrawer({
   const [currentUser, setCurrentUser] = useState(null);
   const [notesFocused, setNotesFocused] = useState(false);
   const [commentFocused, setCommentFocused] = useState(false);
+  const [doneBtnAnimating, setDoneBtnAnimating] = useState(false);
 
   // Hover states for field rows (show X on hover)
   const [dueDateHovered, setDueDateHovered] = useState(false);
@@ -572,6 +574,8 @@ export default function TaskDrawer({
   }
 
   async function handleMarkDone() {
+    setDoneBtnAnimating(true);
+    setTimeout(() => setDoneBtnAnimating(false), 450);
     const goingToDone = localTask.status !== "Done";
     const patch = goingToDone
       ? { status: "Done", previousStatus: localTask.status }
@@ -638,6 +642,7 @@ export default function TaskDrawer({
 
   return (
     <div
+      ref={ref}
       className={`task-drawer${open ? " task-drawer--open" : ""}`}
       style={{
         position: "fixed",
@@ -650,72 +655,61 @@ export default function TaskDrawer({
         display: "flex",
         flexDirection: "column",
         zIndex: 40,
-        overflowY: "auto",
+        overflow: "hidden",
       }}
     >
-      {/* Header */}
+      {/* Sticky header: actions + title + description */}
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "16px 20px 0",
           flexShrink: 0,
-        }}
-      >
-        {/* Mark as done button */}
-        <button
-          type="button"
-          onClick={handleMarkDone}
-          className="flex items-center gap-1.5 rounded-lg text-sm"
-          style={{
-            border: "1px solid var(--button-secondary-border)",
-            padding: "4px 8px",
-            background: "none",
-            cursor: "pointer",
-            color: isDone ? "var(--success)" : "var(--text-muted)",
-            transition: "color 0.15s ease, border-color 0.15s ease",
-          }}
-        >
-          {isDone ? (
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-              <path
-                d="M7 0C10.866 0 14 3.13401 14 7C14 10.866 10.866 14 7 14C3.13401 14 0 10.866 0 7C0 3.13401 3.13401 0 7 0ZM10.8125 4.10938C10.5969 3.93687 10.2819 3.97187 10.1094 4.1875L6.42773 8.78906L3.82031 6.61621C3.60827 6.43951 3.29304 6.46781 3.11621 6.67969C2.93951 6.89173 2.96781 7.20696 3.17969 7.38379L6.17969 9.88379L6.57129 10.2109L6.89062 9.8125L10.8906 4.8125C11.0631 4.59687 11.0281 4.28188 10.8125 4.10938Z"
-                fill="var(--success)"
-              />
-            </svg>
-          ) : (
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-              <circle cx="7" cy="7" r="6.5" stroke="currentColor" />
-              <path d="M3.5 7L6.5 9.5L10.5 4.5" stroke="currentColor" strokeLinecap="round" />
-            </svg>
-          )}
-          <span>{isDone ? "Done" : "Mark as done"}</span>
-        </button>
-
-        {/* Close button */}
-        <button
-          type="button"
-          onClick={onClose}
-          className="flex items-center justify-center w-5 h-5 rounded icon-btn"
-          aria-label="Close"
-          style={{ background: "none", border: "none", cursor: "pointer" }}
-        >
-          <CloseIcon />
-        </button>
-      </div>
-
-      {/* Scrollable body */}
-      <div
-        style={{
-          flex: 1,
-          padding: "20px 20px 32px",
+          padding: "16px 20px 0",
           display: "flex",
           flexDirection: "column",
-          gap: 24,
-          overflowY: "auto",
+          gap: 12,
+          background: "var(--bg)",
         }}
       >
+        {/* Row: Mark as done + Close */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          {/* Mark as done button */}
+          <button
+            type="button"
+            onClick={handleMarkDone}
+            className={`flex items-center gap-1 rounded-lg text-sm${isDone ? "" : " btn-secondary"}${doneBtnAnimating ? " done-btn-pop" : ""}`}
+            style={{
+              padding: "4px 8px",
+              cursor: "pointer",
+              color: isDone ? "var(--success)" : "var(--text)",
+              transition: "color 0.2s ease, border-color 0.2s ease",
+              ...(isDone && {
+                border: "1px solid var(--success)",
+              }),
+            }}
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              className={isDone && doneBtnAnimating ? "done-check-draw" : ""}
+            >
+              <path d="M2.5 6.5L5 9L9.5 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span>{isDone ? "Done" : "Mark as done"}</span>
+          </button>
+
+          {/* Close button */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex items-center justify-center w-5 h-5 rounded icon-btn"
+            aria-label="Close"
+            style={{ background: "none", border: "none", cursor: "pointer" }}
+          >
+            <CloseIcon />
+          </button>
+        </div>
+
         {/* Title */}
         {editingTitle ? (
           <input
@@ -742,6 +736,19 @@ export default function TaskDrawer({
           </h2>
         )}
 
+      </div>
+
+      {/* Scrollable body */}
+      <div
+        style={{
+          flex: 1,
+          padding: "20px 20px 32px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 24,
+          overflowY: "auto",
+        }}
+      >
         {/* Description */}
         {editingDesc ? (
           <textarea
@@ -758,7 +765,6 @@ export default function TaskDrawer({
               color: "var(--text)",
               padding: 0,
               lineHeight: 1.5,
-              marginTop: -8,
             }}
           />
         ) : (
@@ -768,7 +774,6 @@ export default function TaskDrawer({
             style={{
               color: localTask.description ? "var(--text-muted)" : "var(--icon-tertiary)",
               lineHeight: 1.5,
-              marginTop: -8,
             }}
           >
             {localTask.description || "Add a description…"}
@@ -898,7 +903,7 @@ export default function TaskDrawer({
               <span className="text-sm" style={{ color: "var(--text-muted)" }}>Owner</span>
               {localTask.owner && (
                 <div className="flex items-center gap-1.5">
-                  <Avatar name={localTask.owner} size={16} />
+                  <Avatar name={localTask.owner} size={20} />
                   <span className="text-sm" style={{ color: "var(--text)" }}>{localTask.owner}</span>
                   {(ownerHovered || ownerOpen) && <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ owner: "" }); setOwnerOpen(false); }} />}
                 </div>
@@ -916,7 +921,7 @@ export default function TaskDrawer({
                       onClick={() => { patchTask({ owner: localTask.owner === person ? "" : person }); setOwnerOpen(false); }}
                     >
                       <div className="flex items-center gap-1.5">
-                        <Avatar name={person} size={16} />
+                        <Avatar name={person} size={20} />
                         <span>{person}</span>
                       </div>
                     </MenuOption>
@@ -940,7 +945,7 @@ export default function TaskDrawer({
                   <div className="flex items-center">
                     {localTask.members.slice(0, 5).map((m, i) => (
                       <div key={m} style={{ marginLeft: i > 0 ? -6 : 0, zIndex: 5 - i, position: "relative" }}>
-                        <Avatar name={m} size={16} />
+                        <Avatar name={m} size={20} />
                       </div>
                     ))}
                     {localTask.members.length > 5 && (
@@ -977,7 +982,7 @@ export default function TaskDrawer({
                         }}
                       >
                         <div className="flex items-center gap-1.5">
-                          <Avatar name={person} size={16} />
+                          <Avatar name={person} size={20} />
                           <span>{person}</span>
                           {isMember && <span className="ml-auto text-xs" style={{ color: "var(--success)" }}>✓</span>}
                         </div>
@@ -1098,7 +1103,7 @@ export default function TaskDrawer({
                   }}
                 >
                   <div className="flex items-center gap-2">
-                    <Avatar name={c.author} size={16} />
+                    <Avatar name={c.author} size={20} />
                     <span style={{ color: "var(--text)" }}>{c.author}</span>
                     <span style={{ color: "var(--text-muted)", fontSize: 12 }}>{formatTimestamp(c.createdAt)}</span>
                   </div>
@@ -1124,7 +1129,7 @@ export default function TaskDrawer({
             <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
               <Avatar
                 name={currentUser?.user_metadata?.full_name || currentUser?.email || "You"}
-                size={18}
+                size={20}
               />
               <textarea
                 value={commentInput}
@@ -1164,4 +1169,6 @@ export default function TaskDrawer({
       </div>
     </div>
   );
-}
+});
+
+export default TaskDrawer;
