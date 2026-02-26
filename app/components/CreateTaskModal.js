@@ -521,7 +521,7 @@ export default function CreateTaskModal({
                           <button
                             key={person}
                             type="button"
-                            className="flex w-full items-center gap-2.5 rounded p-1 text-left text-sm transition-colors"
+                            className="group flex w-full items-center gap-2.5 rounded p-1 text-left text-sm transition-colors"
                             style={{
                               background: isSelected ? "var(--list-item-selected, var(--surface-hover))" : "transparent",
                               color: isSelected ? "var(--text)" : "var(--text-muted)",
@@ -535,7 +535,17 @@ export default function CreateTaskModal({
                               );
                             }}
                           >
-                            <CalendarIcon style={{ flexShrink: 0 }} />
+                            {/* Checkbox */}
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+                              {isSelected ? (
+                                <path d="M10 0C12.2091 0 14 1.79086 14 4V10C14 12.2091 12.2091 14 10 14H4C1.79086 14 9.66399e-08 12.2091 0 10V4C0 1.79086 1.79086 9.66384e-08 4 0H10ZM10.8125 4.10938C10.5969 3.93687 10.2819 3.97187 10.1094 4.1875L6.42773 8.78906L3.82031 6.61621C3.60827 6.43951 3.29304 6.46781 3.11621 6.67969C2.93951 6.89173 2.96781 7.20696 3.17969 7.38379L6.17969 9.88379L6.57129 10.2109L6.89062 9.8125L10.8906 4.8125C11.0631 4.59687 11.0281 4.28188 10.8125 4.10938Z" fill="#C098FF"/>
+                              ) : (
+                                <>
+                                  <rect x="0.5" y="0.5" width="13" height="13" rx="3.5" stroke="#5D565D" className="group-hover:hidden" />
+                                  <rect x="0.5" y="0.5" width="13" height="13" rx="3.5" stroke="#C098FF" className="hidden group-hover:block" />
+                                </>
+                              )}
+                            </svg>
                             {/* Avatar */}
                             <span
                               className="flex shrink-0 w-[18px] h-[18px] rounded-full items-center justify-center text-[8px] font-semibold"
