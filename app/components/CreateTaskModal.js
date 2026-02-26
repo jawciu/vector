@@ -98,6 +98,8 @@ export default function CreateTaskModal({
   const [statusOpen, setStatusOpen] = useState(false);
   const [priorityOpen, setPriorityOpen] = useState(false);
   const [ownerOpen, setOwnerOpen] = useState(false);
+  const [membersOpen, setMembersOpen] = useState(false);
+  const [membersSearch, setMembersSearch] = useState("");
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [dependenciesOpen, setDependenciesOpen] = useState(false);
   const [notesFocused, setNotesFocused] = useState(false);
@@ -108,6 +110,8 @@ export default function CreateTaskModal({
   const priorityRef = useRef(null);
   const statusRef = useRef(null);
   const ownerRef = useRef(null);
+  const membersRef = useRef(null);
+  const membersSearchRef = useRef(null);
   const dependenciesRef = useRef(null);
 
   useEffect(() => {
@@ -134,11 +138,12 @@ export default function CreateTaskModal({
       if (priorityOpen && priorityRef.current && !priorityRef.current.contains(e.target)) setPriorityOpen(false);
       if (statusOpen && statusRef.current && !statusRef.current.contains(e.target)) setStatusOpen(false);
       if (ownerOpen && ownerRef.current && !ownerRef.current.contains(e.target)) setOwnerOpen(false);
+      if (membersOpen && membersRef.current && !membersRef.current.contains(e.target)) { setMembersOpen(false); setMembersSearch(""); }
       if (dependenciesOpen && dependenciesRef.current && !dependenciesRef.current.contains(e.target)) setDependenciesOpen(false);
     }
     document.addEventListener("mousedown", handleMouseDown);
     return () => document.removeEventListener("mousedown", handleMouseDown);
-  }, [open, calendarOpen, priorityOpen, statusOpen, ownerOpen, dependenciesOpen]);
+  }, [open, calendarOpen, priorityOpen, statusOpen, ownerOpen, membersOpen, dependenciesOpen]);
 
   // Close all dropdowns (used before opening a new one)
   function closeAll() {
@@ -146,6 +151,8 @@ export default function CreateTaskModal({
     setPriorityOpen(false);
     setStatusOpen(false);
     setOwnerOpen(false);
+    setMembersOpen(false);
+    setMembersSearch("");
     setDependenciesOpen(false);
   }
 
@@ -448,8 +455,106 @@ export default function CreateTaskModal({
             )}
           </div>
 
-          {/* Members — placeholder for now */}
-          <FieldRow icon={<MembersIcon style={{ flexShrink: 0 }} />} label="Members" />
+          {/* Members */}
+          <div ref={membersRef} className="relative">
+            <FieldRow
+              icon={<MembersIcon style={{ flexShrink: 0 }} />}
+              active={membersOpen}
+              onClick={() => {
+                const wasOpen = membersOpen;
+                toggleDropdown("members", membersOpen, setMembersOpen);
+                if (!wasOpen) setTimeout(() => membersSearchRef.current?.focus(), 0);
+              }}
+            >
+              {formData.members.length > 0 ? (
+                <div className="flex items-center justify-between flex-1">
+                  <span className="text-sm" style={{ color: "var(--text)" }}>
+                    {formData.members.length === 1
+                      ? formData.members[0]
+                      : `${formData.members.length} members`}
+                  </span>
+                  <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("members", []); }} />
+                </div>
+              ) : (
+                <span className="text-sm" style={{ color: membersOpen ? "var(--text)" : "var(--text-muted)" }}>Members</span>
+              )}
+            </FieldRow>
+            {membersOpen && (
+              <div
+                className="absolute left-0 z-10 rounded border flex flex-col shadow-lg"
+                style={{
+                  top: "calc(100% + 4px)",
+                  background: "var(--bg-elevated)",
+                  borderColor: "var(--button-secondary-border)",
+                  width: "100%",
+                }}
+              >
+                {/* Search */}
+                <div
+                  className="flex items-center gap-2.5 px-1.5 py-1.5"
+                  style={{ borderBottom: "1px solid var(--button-secondary-border)" }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
+                    <circle cx="6" cy="6" r="4.5" stroke="var(--text-muted)" strokeWidth="1.2" />
+                    <line x1="9.5" y1="9.5" x2="12.5" y2="12.5" stroke="var(--text-muted)" strokeWidth="1.2" strokeLinecap="round" />
+                  </svg>
+                  <input
+                    ref={membersSearchRef}
+                    type="text"
+                    placeholder="Search"
+                    value={membersSearch}
+                    onChange={(e) => setMembersSearch(e.target.value)}
+                    className="text-sm w-full outline-none"
+                    style={{ background: "transparent", border: "none", color: "var(--text)", padding: 0 }}
+                  />
+                </div>
+                {/* People list */}
+                <div className="flex flex-col gap-0.5 px-0.5 pt-1 pb-0.5" style={{ maxHeight: 200, overflowY: "auto" }}>
+                  {people.length === 0 ? (
+                    <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No people available</div>
+                  ) : (
+                    people
+                      .filter((p) => p.toLowerCase().includes(membersSearch.toLowerCase()))
+                      .map((person) => {
+                        const isSelected = formData.members.includes(person);
+                        return (
+                          <button
+                            key={person}
+                            type="button"
+                            className="flex w-full items-center gap-2.5 rounded p-1 text-left text-sm transition-colors"
+                            style={{
+                              background: isSelected ? "var(--list-item-selected, var(--surface-hover))" : "transparent",
+                              color: isSelected ? "var(--text)" : "var(--text-muted)",
+                            }}
+                            onClick={() => {
+                              handleChange(
+                                "members",
+                                isSelected
+                                  ? formData.members.filter((m) => m !== person)
+                                  : [...formData.members, person]
+                              );
+                            }}
+                          >
+                            <CalendarIcon style={{ flexShrink: 0 }} />
+                            {/* Avatar */}
+                            <span
+                              className="flex shrink-0 w-[18px] h-[18px] rounded-full items-center justify-center text-[8px] font-semibold"
+                              style={{ background: companyLogoColor(person), color: "var(--text-dark)" }}
+                            >
+                              {companyInitials(person)}
+                            </span>
+                            {person}
+                          </button>
+                        );
+                      })
+                  )}
+                  {people.length > 0 && people.filter((p) => p.toLowerCase().includes(membersSearch.toLowerCase())).length === 0 && (
+                    <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No matches</div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Dependencies */}
           <div ref={dependenciesRef} className="relative">
