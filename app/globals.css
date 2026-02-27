@@ -312,3 +312,18 @@ a {
 .notes-textarea::placeholder {
   color: var(--text-muted);
 }
+
+/* Grabbing cursor during drag-and-drop */
+html.grabbing, html.grabbing * {
+  cursor: grabbing !important;
+}
+
+/* Thin muted scrollbars globally */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+*:hover {
+  scrollbar-color: var(--border) transparent;
+}

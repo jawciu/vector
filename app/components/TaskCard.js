@@ -186,7 +186,6 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, onCardCli
         display: "flex",
         flexDirection: "column",
         gap: 8,
-        cursor: "grab",
         ...style,
       }}
     >

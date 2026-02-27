@@ -43,7 +43,7 @@ export default async function OnboardingsListPage({ searchParams }) {
   const onboardings = await getOnboardings(statusFilter);
 
   return (
-    <div className="w-full pt-0 pb-0">
+    <div className="w-full pt-0 pb-0 h-full overflow-y-auto">
       <div
         className="w-full flex flex-col justify-center items-start border-b"
         style={{

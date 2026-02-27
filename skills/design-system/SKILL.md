@@ -89,6 +89,12 @@ Currently the reusable menu primitives live here. These should be migrated to `a
 - **MenuList** — Absolutely-positioned dropdown container with `padding: 4px`, `flex flex-col gap-1`, `rounded-lg`, `border`, uses `--bg` background and `--border` border
 - **MenuOption** — Menu item with `rounded`, `padding: 4px 8px`, hover via `.menu-option` CSS class (`background-color: var(--bg-hover)`), active state via `.menu-option-active` (`background-color: var(--surface-hover)`)
 
+### Scrollbars (global, in `globals.css`)
+Applied globally via `*` selector — no classes needed.
+- **Default:** `scrollbar-width: thin`, track and thumb both transparent (invisible)
+- **On hover:** thumb becomes `var(--border)`, track stays transparent
+- This keeps all scrollable areas clean by default, with a subtle muted scrollbar appearing only on hover
+
 ### Hover/Interactive CSS Classes (in `globals.css`)
 - `.menu-option:hover` → `background-color: var(--bg-hover)`
 - `.menu-option-active` → `background-color: var(--surface-hover)`

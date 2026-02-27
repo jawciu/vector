@@ -76,10 +76,9 @@ export default function Sidebar() {
 
   return (
     <aside
-      className="flex flex-col h-full border-r transition-colors"
+      className="flex flex-col h-full border-r transition-colors shrink-0"
       style={{
         width: 240,
-        minHeight: "100vh",
         background: "var(--bg-elevated)",
         borderColor: "var(--border)",
       }}

@@ -81,6 +81,7 @@ function SortableColumn({ id, children }) {
     flexDirection: "column",
     gap: 0,
     marginRight: 24,
+    minHeight: 0,
   };
 
   return (
@@ -257,6 +258,7 @@ export default function OnboardingDetailClient({
 
   // ── Drag & drop handlers ──────────────────────────────────────
   function handleDragStart(event) {
+    document.documentElement.classList.add("grabbing");
     const id = event.active.id;
     if (isColId(id)) {
       const phase = phasesRef.current.find((p) => p.id === toPhaseId(id));
@@ -270,20 +272,24 @@ export default function OnboardingDetailClient({
   function handleDragOver(event) {
     const { active, over } = event;
     if (!over) return;
-    // Column drags don't need onDragOver
     if (isColId(active.id)) return;
 
     const activeId = active.id;
     const overId = over.id;
-    if (activeId === overId || isColId(overId)) return;
+    if (activeId === overId) return;
 
     const current = tasksRef.current;
     const activeTaskData = current.find((t) => t.id === activeId);
-    const overTask = current.find((t) => t.id === overId);
-
     if (!activeTaskData) return;
 
-    const targetPhaseId = overTask ? overTask.phaseId : null;
+    let targetPhaseId;
+    if (isColId(overId)) {
+      targetPhaseId = toPhaseId(overId);
+    } else {
+      const overTask = current.find((t) => t.id === overId);
+      targetPhaseId = overTask ? overTask.phaseId : null;
+    }
+
     if (!targetPhaseId || activeTaskData.phaseId === targetPhaseId) return;
 
     setTasks((prev) =>
@@ -292,6 +298,7 @@ export default function OnboardingDetailClient({
   }
 
   async function handleDragEnd(event) {
+    document.documentElement.classList.remove("grabbing");
     const { active, over } = event;
     setActiveTask(null);
     setActivePhase(null);
@@ -358,10 +365,11 @@ export default function OnboardingDetailClient({
     const activeIdx = colTasks.findIndex((t) => t.id === activeId);
     const overIdx = colTasks.findIndex((t) => t.id === overId);
 
-    if (activeIdx === -1) return;
-    if (activeIdx === overIdx) return;
+    if (activeIdx !== -1 && activeIdx === overIdx) return;
 
-    const reordered = arrayMove(colTasks, activeIdx, overIdx < 0 ? colTasks.length - 1 : overIdx);
+    const reordered = activeIdx === -1
+      ? [...colTasks, activeTaskData]
+      : arrayMove(colTasks, activeIdx, overIdx < 0 ? colTasks.length - 1 : overIdx);
 
     const sortMap = new Map();
     reordered.forEach((t, i) => sortMap.set(t.id, i));
@@ -393,7 +401,7 @@ export default function OnboardingDetailClient({
   const memberOverflow = contacts.length > 4 ? contacts.length - 4 : 0;
 
   return (
-    <main className="w-full flex flex-col" style={{ minHeight: "100vh" }}>
+    <main className="w-full flex flex-col h-full overflow-hidden">
       {/* Breadcrumb nav */}
       <nav
         className="w-full flex items-center justify-between text-sm border-b"
@@ -442,7 +450,7 @@ export default function OnboardingDetailClient({
 
       {/* Tab content */}
       {activeTab === "tasks" && (
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 overflow-hidden">
           {/* Action bar */}
           <div
             className="flex items-center justify-between gap-3"
@@ -593,14 +601,15 @@ export default function OnboardingDetailClient({
             const columnIds = columns.map(({ phase }) => `col-${phase.id}`);
 
             const boardContent = (
-              <div style={{ overflowX: "auto", flex: 1 }}>
+              <div style={{ overflowX: "auto", flex: 1, minHeight: 0 }}>
                 <div
                   style={{
                     display: "flex",
                     gap: 0,
                     minWidth: phases.length * 264,
                     padding: "12px 16px",
-                    alignItems: "flex-start",
+                    alignItems: "stretch",
+                    height: "100%",
                   }}
                 >
                   <SortableContext items={columnIds} strategy={horizontalListSortingStrategy}>
@@ -609,7 +618,7 @@ export default function OnboardingDetailClient({
                         {(dragListeners) => (
                           <>
                             {/* Column header */}
-                            <div style={{ marginBottom: 8 }}>
+                            <div style={{ marginBottom: 8, flexShrink: 0 }}>
                               <PhaseHeader
                                 phase={phase}
                                 onPhaseUpdated={handlePhaseUpdated}
@@ -619,44 +628,46 @@ export default function OnboardingDetailClient({
                               />
                             </div>
 
-                            {/* Task cards */}
-                            <SortableContext
-                              id={String(phase.id)}
-                              items={colTasks.map((t) => t.id)}
-                              strategy={verticalListSortingStrategy}
-                            >
-                              <div className="flex flex-col gap-2" style={{ minHeight: 40 }}>
-                                {colTasks.map((t) => (
-                                  <TaskCard
-                                    key={t.id}
-                                    task={t}
-                                    onTaskUpdated={handleTaskUpdated}
-                                    onTaskDeleted={handleTaskDeleted}
-                                    onCardClick={handleOpenDrawer}
-                                    people={people}
-                                  />
-                                ))}
-                              </div>
-                            </SortableContext>
-
-                            {/* Add task button */}
-                            <div style={{ marginTop: colTasks.length > 0 ? 8 : 0 }}>
-                              <button
-                                onClick={() => setAddingInPhase(phase.id)}
-                                className="add-task-btn flex items-center gap-1 w-full text-sm"
-                                style={{
-                                  border: "1px solid var(--border-subtle)",
-                                  borderRadius: 8,
-                                  padding: "8px 16px",
-                                  background: "none",
-                                  cursor: "pointer",
-                                }}
+                            {/* Scrollable task list + add button */}
+                            <div style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+                              <SortableContext
+                                id={String(phase.id)}
+                                items={colTasks.map((t) => t.id)}
+                                strategy={verticalListSortingStrategy}
                               >
-                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden style={{ flexShrink: 0 }}>
-                                  <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                                </svg>
-                                Add task
-                              </button>
+                                <div className="flex flex-col gap-2" style={{ minHeight: 40 }}>
+                                  {colTasks.map((t) => (
+                                    <TaskCard
+                                      key={t.id}
+                                      task={t}
+                                      onTaskUpdated={handleTaskUpdated}
+                                      onTaskDeleted={handleTaskDeleted}
+                                      onCardClick={handleOpenDrawer}
+                                      people={people}
+                                    />
+                                  ))}
+                                </div>
+                              </SortableContext>
+
+                              {/* Add task button */}
+                              <div style={{ marginTop: colTasks.length > 0 ? 8 : 0 }}>
+                                <button
+                                  onClick={() => setAddingInPhase(phase.id)}
+                                  className="add-task-btn flex items-center gap-1 w-full text-sm"
+                                  style={{
+                                    border: "1px solid var(--border-subtle)",
+                                    borderRadius: 8,
+                                    padding: "8px 16px",
+                                    background: "none",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden style={{ flexShrink: 0 }}>
+                                    <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                                  </svg>
+                                  Add task
+                                </button>
+                              </div>
                             </div>
                           </>
                         )}
@@ -721,6 +732,7 @@ export default function OnboardingDetailClient({
                 onDragStart={handleDragStart}
                 onDragOver={handleDragOver}
                 onDragEnd={handleDragEnd}
+                onDragCancel={() => { document.documentElement.classList.remove("grabbing"); setActiveTask(null); setActivePhase(null); }}
               >
                 {boardContent}
                 <DragOverlay>
@@ -745,17 +757,27 @@ export default function OnboardingDetailClient({
         </div>
       )}
 
-      {activeTab === "details" && <DetailsTab onboarding={onboarding} />}
-
-      {activeTab === "members" && (
-        <MembersTab
-          onboardingId={onboarding.id}
-          contacts={contacts}
-          onContactsChange={setContacts}
-        />
+      {activeTab === "details" && (
+        <div className="flex-1 overflow-y-auto">
+          <DetailsTab onboarding={onboarding} />
+        </div>
       )}
 
-      {activeTab === "communication" && <CommunicationTab />}
+      {activeTab === "members" && (
+        <div className="flex-1 overflow-y-auto">
+          <MembersTab
+            onboardingId={onboarding.id}
+            contacts={contacts}
+            onContactsChange={setContacts}
+          />
+        </div>
+      )}
+
+      {activeTab === "communication" && (
+        <div className="flex-1 overflow-y-auto">
+          <CommunicationTab />
+        </div>
+      )}
 
       {/* Create task modal */}
       <CreateTaskModal
