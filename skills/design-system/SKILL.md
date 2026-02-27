@@ -95,6 +95,13 @@ Currently the reusable menu primitives live here. These should be migrated to `a
 - `.company-cell-link:hover` → `background-color: var(--bg-hover)`
 - `.task-filter-btn:hover` → `background-color: var(--surface-hover)`
 
+## Creating a New DS Component
+
+1. Check existing DS components in `app/ui/`
+2. Follow existing patterns (variants, size props, color tokens)
+3. Export from the DS index file
+4. Migrate any existing inline usages to the new component
+
 ## Rules & Patterns
 
 ### Dropdown/Popover Pattern

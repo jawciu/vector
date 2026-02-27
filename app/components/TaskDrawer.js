@@ -476,6 +476,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
   const [priorityOpen, setPriorityOpen] = useState(false);
   const [ownerOpen, setOwnerOpen] = useState(false);
   const [membersOpen, setMembersOpen] = useState(false);
+  const [membersSearch, setMembersSearch] = useState("");
   const [depsOpen, setDepsOpen] = useState(false);
   const [viewDate, setViewDate] = useState(new Date());
 
@@ -484,6 +485,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
   const priorityRef = useRef(null);
   const ownerRef = useRef(null);
   const membersRef = useRef(null);
+  const membersSearchRef = useRef(null);
   const depsRef = useRef(null);
   const notesRef = useRef(null);
 
@@ -538,7 +540,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
       if (statusOpen && statusRef.current && !statusRef.current.contains(e.target)) setStatusOpen(false);
       if (priorityOpen && priorityRef.current && !priorityRef.current.contains(e.target)) setPriorityOpen(false);
       if (ownerOpen && ownerRef.current && !ownerRef.current.contains(e.target)) setOwnerOpen(false);
-      if (membersOpen && membersRef.current && !membersRef.current.contains(e.target)) setMembersOpen(false);
+      if (membersOpen && membersRef.current && !membersRef.current.contains(e.target)) { setMembersOpen(false); setMembersSearch(""); }
       if (depsOpen && depsRef.current && !depsRef.current.contains(e.target)) setDepsOpen(false);
     }
     document.addEventListener("mousedown", handler);
@@ -551,6 +553,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
     setPriorityOpen(false);
     setOwnerOpen(false);
     setMembersOpen(false);
+    setMembersSearch("");
     setDepsOpen(false);
   }
 
@@ -936,7 +939,11 @@ const TaskDrawer = forwardRef(function TaskDrawer({
             <FieldRow
               icon={<MembersIcon style={{ flexShrink: 0 }} />}
               active={membersOpen}
-              onClick={() => toggleDropdown(membersOpen, setMembersOpen)}
+              onClick={() => {
+                const wasOpen = membersOpen;
+                toggleDropdown(membersOpen, setMembersOpen);
+                if (!wasOpen) setTimeout(() => membersSearchRef.current?.focus(), 0);
+              }}
             >
               <span className="text-sm" style={{ color: "var(--text-muted)" }}>Members</span>
               {localTask.members && localTask.members.length > 0 && (
@@ -959,38 +966,86 @@ const TaskDrawer = forwardRef(function TaskDrawer({
                   </div>
                   {/* X sits outside the avatar stack so it's never hidden */}
                   {(membersHovered || membersOpen) && (
-                    <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ members: [] }); setMembersOpen(false); }} />
+                    <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ members: [] }); setMembersOpen(false); setMembersSearch(""); }} />
                   )}
                 </>
               )}
             </FieldRow>
             {membersOpen && (
-              <MenuList style={{ minWidth: "100%", maxHeight: 180, overflowY: "auto" }}>
-                {people.length === 0 ? (
-                  <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No people available</div>
-                ) : (
-                  people.map((person) => {
-                    const isMember = (localTask.members || []).includes(person);
-                    return (
-                      <MenuOption
-                        key={person}
-                        active={isMember}
-                        onClick={() => {
-                          const current = localTask.members || [];
-                          const updated = isMember ? current.filter((m) => m !== person) : [...current, person];
-                          patchTask({ members: updated });
-                        }}
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <Avatar name={person} size={20} />
-                          <span>{person}</span>
-                          {isMember && <span className="ml-auto text-xs" style={{ color: "var(--success)" }}>✓</span>}
-                        </div>
-                      </MenuOption>
-                    );
-                  })
-                )}
-              </MenuList>
+              <div
+                className="absolute left-0 z-10 rounded border flex flex-col shadow-lg"
+                style={{
+                  top: "calc(100% + 4px)",
+                  background: "var(--bg-elevated)",
+                  borderColor: "var(--border)",
+                  minWidth: 220,
+                }}
+              >
+                {/* Search */}
+                <div
+                  className="flex items-center gap-2.5 px-1.5 py-1.5"
+                  style={{ borderBottom: "1px solid var(--border)" }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
+                    <circle cx="6" cy="6" r="4.5" stroke="var(--text-muted)" strokeWidth="1.2" />
+                    <line x1="9.5" y1="9.5" x2="12.5" y2="12.5" stroke="var(--text-muted)" strokeWidth="1.2" strokeLinecap="round" />
+                  </svg>
+                  <input
+                    ref={membersSearchRef}
+                    type="text"
+                    placeholder="Search"
+                    value={membersSearch}
+                    onChange={(e) => setMembersSearch(e.target.value)}
+                    className="text-sm w-full outline-none"
+                    style={{ background: "transparent", border: "none", color: "var(--text)", padding: 0 }}
+                  />
+                </div>
+                {/* People list */}
+                <div className="flex flex-col gap-0.5 px-0.5 pt-1 pb-0.5" style={{ maxHeight: 200, overflowY: "auto" }}>
+                  {people.length === 0 ? (
+                    <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No people available</div>
+                  ) : (
+                    people
+                      .filter((p) => p.toLowerCase().includes(membersSearch.toLowerCase()))
+                      .map((person) => {
+                        const isMember = (localTask.members || []).includes(person);
+                        return (
+                          <button
+                            key={person}
+                            type="button"
+                            className="group menu-option flex w-full items-center gap-2.5 rounded p-1 text-left text-sm whitespace-nowrap transition-colors"
+                            style={{
+                              background: isMember ? "var(--surface-hover)" : undefined,
+                              color: isMember ? "var(--text)" : "var(--text-muted)",
+                            }}
+                            onClick={() => {
+                              const current = localTask.members || [];
+                              const updated = isMember ? current.filter((m) => m !== person) : [...current, person];
+                              patchTask({ members: updated });
+                            }}
+                          >
+                            {/* Checkbox */}
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+                              {isMember ? (
+                                <path d="M10 0C12.2091 0 14 1.79086 14 4V10C14 12.2091 12.2091 14 10 14H4C1.79086 14 9.66399e-08 12.2091 0 10V4C0 1.79086 1.79086 9.66384e-08 4 0H10ZM10.8125 4.10938C10.5969 3.93687 10.2819 3.97187 10.1094 4.1875L6.42773 8.78906L3.82031 6.61621C3.60827 6.43951 3.29304 6.46781 3.11621 6.67969C2.93951 6.89173 2.96781 7.20696 3.17969 7.38379L6.17969 9.88379L6.57129 10.2109L6.89062 9.8125L10.8906 4.8125C11.0631 4.59687 11.0281 4.28188 10.8125 4.10938Z" fill="#C098FF"/>
+                              ) : (
+                                <>
+                                  <rect x="0.5" y="0.5" width="13" height="13" rx="3.5" stroke="#5D565D" className="group-hover:hidden" />
+                                  <rect x="0.5" y="0.5" width="13" height="13" rx="3.5" stroke="#C098FF" className="hidden group-hover:block" />
+                                </>
+                              )}
+                            </svg>
+                            <Avatar name={person} size={18} />
+                            {person}
+                          </button>
+                        );
+                      })
+                  )}
+                  {people.length > 0 && people.filter((p) => p.toLowerCase().includes(membersSearch.toLowerCase())).length === 0 && (
+                    <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No matches</div>
+                  )}
+                </div>
+              </div>
             )}
           </div>
 

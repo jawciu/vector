@@ -11,6 +11,14 @@ import { MenuList, MenuOption } from "./Menu";
 const TASK_STATUSES = ["Not started", "In progress", "Under investigation", "Blocked", "Done"];
 const PRIORITIES = ["low", "medium", "high"];
 
+const STATUS_COLORS = {
+  "Not started": "var(--text-muted)",
+  "In progress": "var(--mint)",
+  "Under investigation": "var(--sky)",
+  "Blocked": "var(--danger)",
+  "Done": "var(--success)",
+};
+
 const AVATAR_COLORS = [
   "var(--sunset)", "var(--lilac)", "var(--sky)", "var(--candy)",
   "var(--mint)", "var(--rose)", "var(--alert)", "var(--success)",
@@ -48,7 +56,7 @@ function PillClearButton({ onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center justify-center flex-shrink-0"
+      className="flex items-center justify-center flex-shrink-0 ml-2"
       style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
     >
       <CloseIcon size={9} />
@@ -410,7 +418,15 @@ export default function CreateTaskModal({
                       active={formData.status === s}
                       onClick={() => { handleChange("status", s); setStatusOpen(false); }}
                     >
-                      {s}
+                      <span style={{
+                        color: STATUS_COLORS[s],
+                        border: `0.5px solid ${STATUS_COLORS[s]}`,
+                        padding: "1px 4px",
+                        borderRadius: 6,
+                        fontSize: 12,
+                      }}>
+                        {s}
+                      </span>
                     </MenuOption>
                   ))}
                 </MenuList>
@@ -521,9 +537,9 @@ export default function CreateTaskModal({
                           <button
                             key={person}
                             type="button"
-                            className="group flex w-full items-center gap-2.5 rounded p-1 text-left text-sm transition-colors"
+                            className="group menu-option flex w-full items-center gap-2.5 rounded p-1 text-left text-sm transition-colors"
                             style={{
-                              background: isSelected ? "var(--list-item-selected, var(--surface-hover))" : "transparent",
+                              background: isSelected ? "var(--surface-hover)" : undefined,
                               color: isSelected ? "var(--text)" : "var(--text-muted)",
                             }}
                             onClick={() => {
