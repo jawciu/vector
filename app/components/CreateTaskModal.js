@@ -56,8 +56,7 @@ function PillClearButton({ onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center justify-center flex-shrink-0 ml-2"
-      style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+      className="flex items-center justify-center shrink-0 ml-2! cursor-pointer border-none bg-transparent p-0"
     >
       <CloseIcon size={9} />
     </button>
@@ -436,22 +435,25 @@ export default function CreateTaskModal({
 
           {/* Owner */}
           <div ref={ownerRef} className="relative">
-            <FieldRow
+            <FieldPill
               icon={<OwnerIcon style={{ flexShrink: 0 }} />}
               active={ownerOpen}
               onClick={() => toggleDropdown("owner", ownerOpen, setOwnerOpen)}
             >
-              {formData.owner ? (
-                <div className="flex items-center justify-between flex-1">
-                  <span className="text-sm" style={{ color: "var(--text)" }}>
-                    {formData.owner}
+              <span className="text-sm" style={{ color: ownerOpen ? "var(--text)" : "var(--text-muted)" }}>Owner</span>
+              {formData.owner && (
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className="flex shrink-0 w-5 h-5 rounded-full items-center justify-center text-[8px] font-semibold"
+                    style={{ background: companyLogoColor(formData.owner), color: "var(--text-dark)" }}
+                  >
+                    {companyInitials(formData.owner)}
                   </span>
+                  <span className="text-sm" style={{ color: "var(--text)" }}>{formData.owner}</span>
                   <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("owner", ""); }} />
                 </div>
-              ) : (
-                <span className="text-sm" style={{ color: ownerOpen ? "var(--text)" : "var(--text-muted)" }}>Owner</span>
               )}
-            </FieldRow>
+            </FieldPill>
             {ownerOpen && (
               <MenuList style={{ background: "var(--bg-elevated)", width: "100%", maxHeight: 160, overflowY: "auto" }}>
                 {people.length === 0 ? (
@@ -463,7 +465,15 @@ export default function CreateTaskModal({
                       active={formData.owner === person}
                       onClick={() => { handleChange("owner", formData.owner === person ? "" : person); setOwnerOpen(false); }}
                     >
-                      {person}
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className="flex shrink-0 w-[18px] h-[18px] rounded-full items-center justify-center text-[8px] font-semibold"
+                          style={{ background: companyLogoColor(person), color: "var(--text-dark)" }}
+                        >
+                          {companyInitials(person)}
+                        </span>
+                        {person}
+                      </div>
                     </MenuOption>
                   ))
                 )}
@@ -473,7 +483,7 @@ export default function CreateTaskModal({
 
           {/* Members */}
           <div ref={membersRef} className="relative">
-            <FieldRow
+            <FieldPill
               icon={<MembersIcon style={{ flexShrink: 0 }} />}
               active={membersOpen}
               onClick={() => {
@@ -482,19 +492,32 @@ export default function CreateTaskModal({
                 if (!wasOpen) setTimeout(() => membersSearchRef.current?.focus(), 0);
               }}
             >
-              {formData.members.length > 0 ? (
-                <div className="flex items-center justify-between flex-1">
-                  <span className="text-sm" style={{ color: "var(--text)" }}>
-                    {formData.members.length === 1
-                      ? formData.members[0]
-                      : `${formData.members.length} members`}
-                  </span>
+              <span className="text-sm" style={{ color: membersOpen ? "var(--text)" : "var(--text-muted)" }}>Members</span>
+              {formData.members.length > 0 && (
+                <>
+                  <div className="flex items-center">
+                    {formData.members.slice(0, 5).map((m, i) => (
+                      <span
+                        key={m}
+                        className="flex shrink-0 w-5 h-5 rounded-full items-center justify-center text-[8px] font-semibold"
+                        style={{ background: companyLogoColor(m), color: "var(--text-dark)", marginLeft: i > 0 ? -6 : 0, zIndex: 5 - i, position: "relative" }}
+                      >
+                        {companyInitials(m)}
+                      </span>
+                    ))}
+                    {formData.members.length > 5 && (
+                      <div
+                        className="flex items-center justify-center text-[8px] font-semibold rounded-full"
+                        style={{ width: 20, height: 20, background: "var(--surface-hover)", color: "var(--text-muted)", marginLeft: -6, position: "relative" }}
+                      >
+                        +{formData.members.length - 5}
+                      </div>
+                    )}
+                  </div>
                   <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("members", []); }} />
-                </div>
-              ) : (
-                <span className="text-sm" style={{ color: membersOpen ? "var(--text)" : "var(--text-muted)" }}>Members</span>
+                </>
               )}
-            </FieldRow>
+            </FieldPill>
             {membersOpen && (
               <div
                 className="absolute left-0 z-10 rounded border flex flex-col shadow-lg"
@@ -584,7 +607,7 @@ export default function CreateTaskModal({
 
           {/* Dependencies */}
           <div ref={dependenciesRef} className="relative">
-            <FieldRow
+            <FieldPill
               icon={<DependenciesIcon style={{ flexShrink: 0 }} />}
               active={dependenciesOpen}
               onClick={() => toggleDropdown("dependencies", dependenciesOpen, setDependenciesOpen)}
@@ -599,7 +622,7 @@ export default function CreateTaskModal({
               ) : (
                 <span className="text-sm" style={{ color: dependenciesOpen ? "var(--text)" : "var(--text-muted)" }}>Dependencies</span>
               )}
-            </FieldRow>
+            </FieldPill>
             {dependenciesOpen && (
               <MenuList style={{ background: "var(--bg-elevated)", width: "100%", maxHeight: 160, overflowY: "auto" }}>
                 {allTasks.length === 0 ? (
