@@ -1,12 +1,15 @@
 "use client";
 
+const DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
 export default function DetailsTab({ onboarding }) {
   const goLiveFormatted = onboarding.targetGoLive
-    ? new Date(onboarding.targetGoLive).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      })
+    ? DATE_FORMATTER.format(new Date(onboarding.targetGoLive))
     : null;
 
   const fields = [

@@ -59,45 +59,20 @@ export async function GET(request) {
   if (!debug) {
     return NextResponse.json({ url, key });
   }
-  const cwd = process.cwd();
-  const root = getProjectRoot();
-  const envPath = path.join(root, ".env");
-  let envExists = false;
-  let lineCount = 0;
-  try {
-    envExists = fs.existsSync(envPath);
-    if (envExists) {
-      lineCount = fs.readFileSync(envPath, "utf8").split(/\r?\n/).length;
-    }
-  } catch {
-    // ignore
-  }
-  let rawPreview = "";
-  let contentLength = 0;
-  let hasUrlInFile = false;
-  let hasKeyInFile = false;
-  try {
-    const raw = fs.readFileSync(envPath, "utf8");
-    contentLength = raw.length;
-    rawPreview = raw.replace(/\s/g, " ").slice(0, 300);
-    hasUrlInFile = /NEXT_PUBLIC_SUPABASE_URL\s*=\s*[^\s\r\n]+/.test(raw);
-    hasKeyInFile = /NEXT_PUBLIC_SUPABASE_(?:ANON_KEY|PUBLISHABLE_KEY)\s*=\s*[^\s\r\n]+/.test(raw);
-  } catch {
-    // ignore
-  }
+
   return NextResponse.json({
     url: url ? "(set)" : "",
     key: key ? "(set)" : "",
     debug: {
-      cwd,
-      root,
-      envPath,
-      envExists,
-      lineCount,
-      contentLength,
-      hasUrlInFile,
-      hasKeyInFile,
-      rawPreview,
+      source: {
+        fileUrl: !!file.url,
+        fileKey: !!file.key,
+        processEnvUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+        processEnvKey: !!(
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+          process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+        ),
+      },
       processEnvHasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
       processEnvHasKey: !!(
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
