@@ -2,7 +2,7 @@
 
 All significant decisions for the Onboarding Orchestrator project. Add new entries here as we make more.
 
-**When to update:** Whenever we make a major choice (tech, workflow, config, or "why we did it this way"), add a row (or section) here with the decision and rationale. Keep **DEFINITIONS.md** in sync when we add or change files/folders.
+**When to update:** Whenever we make a major choice (tech, workflow, config, or "why we did it this way"), add a row (or section) here with the decision and rationale.
 
 ---
 

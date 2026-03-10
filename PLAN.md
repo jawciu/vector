@@ -326,6 +326,33 @@ Dashboard shows reasons:
 - **AI** — OpenAI API or Anthropic API for follow-up drafts (when needed)
 - ESLint enabled
 
+### Possible future migration: Supabase → SurrealDB
+
+**Why consider it:**
+- Supabase free tier pauses projects after 7 days of inactivity (annoying)
+- SurrealDB Cloud free tier (1 GB storage, 0.25 vCPU) does not appear to pause for inactivity
+- SurrealDB is a multi-model DB (document + graph + vector + relational in one) — ideal for Phase 3 AI features:
+  - Native vector search for finding similar onboardings (no separate pgvector setup)
+  - Native graph traversal for walking Company → Onboarding → Phase → Task → blocker chains
+  - Combined vector + graph + relational queries in single SurrealQL statements
+  - Built-in agent memory patterns for AI follow-up / insights features
+- Supabase can do vector search (pgvector) but has no graph support — would need a separate DB for knowledge graphs
+
+**Migration scope (assessed March 2026):**
+- ~25-30 files to modify, moderate effort overall
+- `lib/db.js` rewrite is the big one (~600 lines, 25 functions) — but since all DB access is centralized there, API routes and UI stay untouched
+- Auth replacement (Supabase Auth → NextAuth.js or SurrealDB built-in auth) touches ~20 files
+- Integer IDs → SurrealDB record IDs requires reworking validation logic
+- No Prisma adapter for SurrealDB — use `surrealdb.js` SDK with raw SurrealQL
+- Can be done incrementally: DB layer first, auth second
+
+**Caveats:**
+- SurrealDB Cloud is still in beta (DB engine is v3.0 GA, cloud is not)
+- Younger ecosystem — fewer tutorials, community answers
+- Alternative: self-host SurrealDB via Docker to avoid cloud limitations entirely
+
+**Decision:** Park for now. Build app features on Supabase, migrate when AI agent work begins (Phase 3). The centralized `lib/db.js` pattern means migration is always contained.
+
 ---
 
 ## Key decisions (log)
