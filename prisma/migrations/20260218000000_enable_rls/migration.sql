@@ -7,4 +7,5 @@ ALTER TABLE "Task" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Onboarding" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Contact" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Phase" ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "_prisma_migrations" ENABLE ROW LEVEL SECURITY;
+-- Note: _prisma_migrations RLS is managed directly in Supabase, not here
+-- (shadow database doesn't have this table during migration replay)

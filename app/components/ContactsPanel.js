@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import Button from "../ui/Button";
+import MagicLinkActions from "./MagicLinkActions";
 
 const CONTACT_ROLES = ["Champion", "Technical Lead", "IT Admin", "Exec Sponsor"];
 
-export default function ContactsPanel({ onboardingId, contacts, onContactsChange }) {
+export default function ContactsPanel({ onboardingId, contacts, onContactsChange, magicLinks = [] }) {
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -271,6 +272,11 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
                   {contact.email}
                 </div>
               )}
+              <MagicLinkActions
+                contactId={contact.id}
+                onboardingId={onboardingId}
+                magicLinks={magicLinks.filter((l) => l.contactId === contact.id)}
+              />
             </div>
           </div>
         )

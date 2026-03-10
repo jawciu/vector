@@ -1,15 +1,16 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { getOnboarding, getTasksForOnboarding, getContactsForOnboarding, getPhasesForOnboarding } from "@/lib/db";
+import { getOnboarding, getTasksForOnboarding, getContactsForOnboarding, getPhasesForOnboarding, getMagicLinksForOnboarding } from "@/lib/db";
 import OnboardingDetailClient from "./OnboardingDetailClient";
 
 export default async function OnboardingDetailPage({ params }) {
   const { id } = await params;
-  const [onboarding, tasks, contacts, phases] = await Promise.all([
+  const [onboarding, tasks, contacts, phases, magicLinks] = await Promise.all([
     getOnboarding(id),
     getTasksForOnboarding(id),
     getContactsForOnboarding(id),
     getPhasesForOnboarding(id),
+    getMagicLinksForOnboarding(id),
   ]);
 
   if (!onboarding) {
@@ -25,7 +26,7 @@ export default async function OnboardingDetailPage({ params }) {
 
   return (
     <Suspense>
-      <OnboardingDetailClient onboarding={onboarding} tasks={tasks} contacts={contacts} phases={phases} />
+      <OnboardingDetailClient onboarding={onboarding} tasks={tasks} contacts={contacts} phases={phases} magicLinks={magicLinks} />
     </Suspense>
   );
 }

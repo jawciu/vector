@@ -69,3 +69,13 @@ export type Task = Prisma.TaskModel
  * 
  */
 export type Comment = Prisma.CommentModel
+/**
+ * Model MagicLink
+ * 
+ */
+export type MagicLink = Prisma.MagicLinkModel
+/**
+ * Model File
+ * 
+ */
+export type File = Prisma.FileModel

@@ -56,7 +56,9 @@ export const ModelName = {
   Contact: 'Contact',
   Phase: 'Phase',
   Task: 'Task',
-  Comment: 'Comment'
+  Comment: 'Comment',
+  MagicLink: 'MagicLink',
+  File: 'File'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -134,7 +136,8 @@ export const TaskScalarFieldEnum = {
   priority: 'priority',
   commentCount: 'commentCount',
   previousStatus: 'previousStatus',
-  blockedByTaskId: 'blockedByTaskId'
+  blockedByTaskId: 'blockedByTaskId',
+  assigneeContactId: 'assigneeContactId'
 } as const
 
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
@@ -149,6 +152,36 @@ export const CommentScalarFieldEnum = {
 } as const
 
 export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]
+
+
+export const MagicLinkScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  contactId: 'contactId',
+  onboardingId: 'onboardingId',
+  expiresAt: 'expiresAt',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt',
+  lastUsedAt: 'lastUsedAt'
+} as const
+
+export type MagicLinkScalarFieldEnum = (typeof MagicLinkScalarFieldEnum)[keyof typeof MagicLinkScalarFieldEnum]
+
+
+export const FileScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  onboardingId: 'onboardingId',
+  contactId: 'contactId',
+  uploadedBy: 'uploadedBy',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  mimeType: 'mimeType',
+  storagePath: 'storagePath',
+  createdAt: 'createdAt'
+} as const
+
+export type FileScalarFieldEnum = (typeof FileScalarFieldEnum)[keyof typeof FileScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -20,26 +20,31 @@ model Company {
 }
 
 model Onboarding {
-  id            Int       @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
   companyId     Int
-  owner         String    @default("")
-  status        String    @default("Active") // Active | Completed | Paused | Archived
+  owner         String       @default("")
+  status        String       @default("Active") // Active | Completed | Paused | Archived
   targetGoLive  DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
-  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now()) @updatedAt
+  company       Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
   tasks         Task[]
   contacts      Contact[]
   phases        Phase[]
+  magicLinks    MagicLink[]
+  files         File[]
 }
 
 model Contact {
-  id            Int        @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
   onboardingId  Int
-  onboarding    Onboarding @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
+  onboarding    Onboarding   @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
   name          String
-  email         String     @default("")
-  role          String     @default("")
+  email         String       @default("")
+  role          String       @default("")
+  magicLinks    MagicLink[]
+  assignedTasks Task[]
+  files         File[]
 }
 
 model Phase {
@@ -71,9 +76,12 @@ model Task {
   commentCount    Int     @default(0)
   previousStatus  String? // stores status before "Done" for toggle-back
   blockedByTaskId Int?
-  blockedByTask   Task?   @relation("TaskBlocks", fields: [blockedByTaskId], references: [id], onDelete: SetNull)
-  blockedTasks    Task[]  @relation("TaskBlocks")
-  comments        Comment[]
+  blockedByTask      Task?    @relation("TaskBlocks", fields: [blockedByTaskId], references: [id], onDelete: SetNull)
+  blockedTasks       Task[]   @relation("TaskBlocks")
+  assigneeContactId  Int?
+  assigneeContact    Contact? @relation(fields: [assigneeContactId], references: [id], onDelete: SetNull)
+  comments           Comment[]
+  files              File[]
 }
 
 model Comment {
@@ -83,4 +91,35 @@ model Comment {
   author    String
   body      String
   createdAt DateTime @default(now())
+}
+
+model MagicLink {
+  id            Int        @id @default(autoincrement())
+  token         String     @unique @default(uuid())
+  contactId     Int
+  contact       Contact    @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  onboardingId  Int
+  onboarding    Onboarding @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
+  expiresAt     DateTime
+  revokedAt     DateTime?
+  createdAt     DateTime   @default(now())
+  lastUsedAt    DateTime?
+
+  @@index([contactId])
+}
+
+model File {
+  id            Int        @id @default(autoincrement())
+  taskId        Int
+  task          Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  onboardingId  Int
+  onboarding    Onboarding @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
+  contactId     Int?
+  contact       Contact?   @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  uploadedBy    String
+  fileName      String
+  fileSize      Int
+  mimeType      String
+  storagePath   String
+  createdAt     DateTime   @default(now())
 }

@@ -149,36 +149,73 @@ Health is computed per onboarding from its tasks + project dates. Returns `{ sta
 
 The customer-facing experience. This is the differentiator — if customers actually use the portal, the whole product works. If they ignore it, it's just another internal PM tool.
 
+#### Architecture decisions (decided March 2026)
+
+**Auth strategy — custom UUID tokens, NOT Supabase magic links:**
+- Supabase `signInWithOtp` creates `auth.users` rows — wrong model. Customers aren't users, they're scoped visitors.
+- Custom tokens: UUID per contact per onboarding, stored in `MagicLink` table. Vendor generates, copies link, sends via their own email/Slack.
+- Token on first visit sets an httpOnly cookie, then redirects to clean URL (`/portal/[onboardingId]`). Cookie proves identity on subsequent visits.
+- Default expiry: 30 days (configurable). Vendor can revoke instantly. Resend = revoke old + generate new.
+- Portal routes (`/portal/*`, `/api/portal/*`) bypass Supabase auth middleware entirely.
+
+**Schema additions:**
+- `MagicLink` model: token (UUID, unique), contactId, onboardingId, expiresAt, revokedAt, createdAt, lastUsedAt
+- `assigneeContactId` FK on Task → proper link to Contact (not string matching — prevents name collision bugs)
+- `File` model: taskId, fileName, storagePath, uploadedBy, contactId, fileSize, mimeType, createdAt
+- Future: `owner` string on Task/Onboarding will become FK to VendorUser when team features are built (Phase 1.6)
+
+**Portal route structure:**
+- Entry: `/portal/[token]` → validate, set cookie, redirect to `/portal/[onboardingId]`
+- Browsing: `/portal/[onboardingId]`, `/portal/[onboardingId]/tasks`, `/portal/[onboardingId]/all`
+- Separate layout (no sidebar, no vendor nav). Mobile-first. Top bar + bottom tabs on mobile.
+- Separate API routes under `/api/portal/` with token auth.
+- Portal does NOT reuse vendor components. New lightweight portal-specific components.
+
+**Progress display — NO percentages:**
+- Tasks get added throughout an onboarding, so "34% complete" is misleading.
+- Show: task summary counts (to do / in progress / done / blocked), segmented status bar per phase, health scoring, go-live countdown.
+- Frame as "current status" not "progress toward completion."
+
 #### 2.1 Magic-link access
-- Vendor sends a magic link to each customer contact
+- Vendor generates a magic link for each customer contact from the Members tab
 - Link opens the customer portal for that specific onboarding — no login, no account
-- Token per contact: unique, expirable, revocable
-- Vendor can resend / revoke links from the onboarding detail page
+- Token per contact per onboarding: UUID, expirable (default 30 days), revocable
+- Vendor can generate / copy / revoke / resend links from the onboarding detail page
+- No email sending for MVP — copy-to-clipboard only.
 
-#### 2.2 Customer portal pages
-- **Progress overview**: phases, progress bars, overall health, upcoming deadlines
-- **My tasks**: tasks assigned to this contact, with ability to mark done, upload files, add comments
-- **All tasks**: full task list (read-only for tasks not assigned to them)
-- **Timeline**: activity feed — what happened, what changed, messages from vendor
-- **Files**: all uploaded files in one place
+#### 2.2 Customer portal pages (MVP — 3 pages)
+- **Progress overview** (landing): health banner with reasons, task summary counts (to do / in progress / done / blocked), segmented status bar per phase, go-live countdown, upcoming deadlines
+- **My tasks**: tasks assigned to this contact, grouped by phase. Can: mark done, add comments, upload files.
+- **All tasks**: every task across all phases (read-only for non-assigned). Filter: All / My tasks / Completed.
+- **Deferred**: Timeline/activity feed (needs ActivityLog model), dedicated Files page
 
-#### 2.3 File uploads
-- Customers can upload files against specific tasks (e.g., "Upload your SSO metadata XML")
-- File types: documents, images, CSVs, configuration files
-- Files stored in Supabase Storage (or S3)
-- Vendor can download / review files from the onboarding detail
+#### 2.3 File uploads (included in MVP)
+- Customers upload files against specific tasks (e.g., "Upload your SSO metadata XML")
+- File types: documents, images, CSVs, configuration files (max 50 MB per file)
+- Files stored in Supabase Storage (free tier: 1 GB)
+- Vendor can download / review files from the task drawer
 
-#### 2.4 Comments & messages
+#### 2.4 Comments (included in MVP)
 - Per-task comments: vendor and customer can discuss specific tasks
-- General messages: free-form communication on the onboarding timeline
-- @mention contacts to notify them
-- All communication in one place — no more digging through email threads
+- Portal auto-sets comment author to contact name
+- Comment model already exists in schema
+- Deferred: general messages, @mentions, onboarding-level communication
 
-#### 2.5 Customer notifications
+#### 2.5 Customer notifications (deferred)
 - Email notifications when: new tasks assigned, due date approaching, vendor sends a message
 - Digest option: daily summary email instead of per-event
 - Each notification includes a magic link back to the relevant task/page
 - Unsubscribe option per contact
+
+#### Implementation steps (7 shippable increments)
+
+1. **Schema + DB functions** — MagicLink table, File model, assigneeContactId on Task, new `lib/db.js` functions
+2. **Middleware + auth helper** — exempt `/portal` from Supabase auth, create `validatePortalToken()` helper
+3. **Vendor magic link UI** — Generate/Copy/Revoke buttons on ContactsPanel, new API routes
+4. **Portal layout + Progress Overview** — landing page with health, task summary, go-live countdown. Mobile-first PortalLayout.
+5. **My Tasks + done toggle + file upload** — filtered task list, mark done, upload files. Portal API routes.
+6. **Task detail + comments** — expandable task view, comment thread, add comment as portal contact.
+7. **Polish + edge cases** — expired/revoked token UX, empty states, mobile responsiveness.
 
 ---
 

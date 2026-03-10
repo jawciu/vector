@@ -6,8 +6,9 @@ import Sidebar from "./Sidebar";
 export default function AppShell({ children }) {
   const pathname = usePathname();
   const isLogin = pathname === "/login";
+  const isPortal = pathname.startsWith("/portal");
 
-  if (isLogin) {
+  if (isLogin || isPortal) {
     return <>{children}</>;
   }
 

@@ -96,6 +96,7 @@ export default function OnboardingDetailClient({
   tasks: initialTasks,
   contacts: initialContacts,
   phases: initialPhases,
+  magicLinks: initialMagicLinks,
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -769,6 +770,7 @@ export default function OnboardingDetailClient({
             onboardingId={onboarding.id}
             contacts={contacts}
             onContactsChange={setContacts}
+            magicLinks={initialMagicLinks || []}
           />
         </div>
       )}
