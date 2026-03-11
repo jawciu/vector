@@ -33,8 +33,8 @@ export default function PortalShell({ data, tasks, contactName }) {
       {/* Tab content */}
       <div style={{ padding: 16, paddingBottom: 72 }}>
         {activeTab === "overview" && <PortalOverview data={data} />}
-        {activeTab === "my-tasks" && <PortalTasks tasks={tasks} myOnly />}
-        {activeTab === "all-tasks" && <PortalTasks tasks={tasks} myOnly={false} />}
+        {activeTab === "my-tasks" && <PortalTasks tasks={tasks} myOnly contactName={contactName} />}
+        {activeTab === "all-tasks" && <PortalTasks tasks={tasks} myOnly={false} contactName={contactName} />}
       </div>
 
       {/* Bottom nav */}

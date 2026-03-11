@@ -21,10 +21,26 @@ function isOverdue(task) {
   return new Date(task.due + "T23:59:59") < new Date();
 }
 
-function TaskRow({ task, onStatusChange, onFileUploaded }) {
+function formatCommentTime(dateStr) {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now - d;
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contactName }) {
   const [toggling, setToggling] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef(null);
 
   const isDone = task.status === "Done";
@@ -78,6 +94,31 @@ function TaskRow({ task, onStatusChange, onFileUploaded }) {
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  async function handleAddComment(e) {
+    e.preventDefault();
+    if (!commentText.trim() || submitting) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/portal/tasks/${task.id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: commentText.trim() }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to add comment");
+      }
+      const newComment = await res.json();
+      onCommentAdded(task.id, newComment);
+      setCommentText("");
+    } catch (err) {
+      console.error("Comment error:", err.message);
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -243,13 +284,74 @@ function TaskRow({ task, onStatusChange, onFileUploaded }) {
             </svg>
             {uploading ? "Uploading…" : "Upload file"}
           </button>
+
+          {/* Comments */}
+          <div style={{ marginTop: 12 }}>
+            <div className="text-[11px] font-medium mb-2" style={{ color: "var(--text-muted)" }}>
+              Comments{task.comments.length > 0 ? ` (${task.comments.length})` : ""}
+            </div>
+
+            {task.comments.length > 0 && (
+              <div className="flex flex-col gap-2 mb-3">
+                {task.comments.map((c) => (
+                  <div key={c.id}>
+                    <div className="flex items-baseline gap-1.5">
+                      <span
+                        className="text-xs font-medium"
+                        style={{ color: c.author === contactName ? "var(--action)" : "var(--text)" }}
+                      >
+                        {c.author}
+                      </span>
+                      <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+                        {formatCommentTime(c.createdAt)}
+                      </span>
+                    </div>
+                    <p className="text-xs mt-0.5" style={{ color: "var(--text-secondary)", lineHeight: 1.5 }}>
+                      {c.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add comment form */}
+            <form onSubmit={handleAddComment} className="flex gap-2">
+              <input
+                type="text"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Add a comment…"
+                className="flex-1 text-xs rounded outline-none"
+                style={{
+                  padding: "6px 8px",
+                  background: "var(--bg)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text)",
+                }}
+              />
+              <button
+                type="submit"
+                disabled={!commentText.trim() || submitting}
+                className="text-xs font-medium rounded shrink-0"
+                style={{
+                  padding: "6px 12px",
+                  background: commentText.trim() ? "var(--action)" : "var(--surface-hover)",
+                  color: commentText.trim() ? "var(--action-text)" : "var(--text-muted)",
+                  border: "none",
+                  cursor: commentText.trim() ? "pointer" : "default",
+                }}
+              >
+                {submitting ? "…" : "Send"}
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-function PhaseGroup({ phaseName, tasks, onStatusChange, onFileUploaded }) {
+function PhaseGroup({ phaseName, tasks, onStatusChange, onFileUploaded, onCommentAdded, contactName }) {
   if (tasks.length === 0) return null;
 
   return (
@@ -267,6 +369,8 @@ function PhaseGroup({ phaseName, tasks, onStatusChange, onFileUploaded }) {
             task={task}
             onStatusChange={onStatusChange}
             onFileUploaded={onFileUploaded}
+            onCommentAdded={onCommentAdded}
+            contactName={contactName}
           />
         ))}
       </div>
@@ -274,7 +378,7 @@ function PhaseGroup({ phaseName, tasks, onStatusChange, onFileUploaded }) {
   );
 }
 
-export default function PortalTasks({ tasks: initialTasks, myOnly }) {
+export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }) {
   const [tasks, setTasks] = useState(initialTasks);
   const [filter, setFilter] = useState("active"); // active | done | all
 
@@ -292,6 +396,16 @@ export default function PortalTasks({ tasks: initialTasks, myOnly }) {
     setTasks((prev) =>
       prev.map((t) =>
         t.id === taskId ? { ...t, files: [newFile, ...t.files] } : t
+      )
+    );
+  }
+
+  function handleCommentAdded(taskId, newComment) {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === taskId
+          ? { ...t, comments: [...t.comments, newComment], commentCount: t.commentCount + 1 }
+          : t
       )
     );
   }
@@ -362,6 +476,8 @@ export default function PortalTasks({ tasks: initialTasks, myOnly }) {
               tasks={group.tasks}
               onStatusChange={handleStatusChange}
               onFileUploaded={handleFileUploaded}
+              onCommentAdded={handleCommentAdded}
+              contactName={contactName}
             />
           ))}
         </div>

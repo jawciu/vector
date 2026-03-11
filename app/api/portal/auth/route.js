@@ -28,7 +28,7 @@ export async function GET(request) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    path: "/portal",
+    path: "/",
     maxAge: Math.max(maxAge, 0),
   });
 
