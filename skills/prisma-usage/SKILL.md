@@ -17,11 +17,16 @@ description: Manage Prisma ORM for this project — schema changes, migrations, 
 
 ## Current schema
 
-Three models with relations:
+Eight models with relations:
 
 - **Company** → has many Onboardings
-- **Onboarding** → belongs to Company, has many Tasks. Fields: `owner` (String), `createdAt` (DateTime), `updatedAt` (DateTime)
-- **Task** → belongs to Onboarding. Fields: `title`, `status` (Todo | In progress | Blocked | Done), `due`, `waitingOn`
+- **Onboarding** → belongs to Company, has many Tasks, Contacts, Phases, MagicLinks, Files. Fields: `owner`, `status` (Active | Completed | Paused | Archived), `targetGoLive` (DateTime?), `createdAt`, `updatedAt`
+- **Contact** → belongs to Onboarding, has many MagicLinks, assigned Tasks, Files. Fields: `name`, `email`, `role`
+- **Phase** → belongs to Onboarding, has many Tasks. Fields: `name`, `sortOrder`, `targetDate` (DateTime?), `isComplete` (Boolean)
+- **Task** → belongs to Onboarding + Phase, optional assigneeContact, self-referential blockedByTask, has many Comments, Files. Fields: `title`, `description`, `status` (Not started | In progress | Under investigation | Blocked | Done), `due`, `owner`, `members` (String[]), `notes`, `sortOrder`, `priority` (low | medium | high), `commentCount`, `previousStatus`
+- **Comment** → belongs to Task. Fields: `author`, `body`, `createdAt`
+- **MagicLink** → belongs to Contact + Onboarding. Fields: `token` (unique UUID), `expiresAt`, `revokedAt`, `lastUsedAt`, `createdAt`
+- **File** → belongs to Task + Onboarding, optional Contact. Fields: `uploadedBy`, `fileName`, `fileSize`, `mimeType`, `storagePath`, `createdAt`
 
 ## Connection URLs
 
@@ -123,8 +128,17 @@ Always run after schema changes. Updates `lib/generated/prisma/`.
 | Migration | What it did |
 |-----------|-------------|
 | `20260201180000_init` | Baseline — Company, Onboarding, Task tables |
-| `20260209000000_add_owner_and_updated_at` | Added `owner` (String) and `updatedAt` (DateTime) to Onboarding |
-| `20260222190000_add_onboarding_created_at` | Added `createdAt` (DateTime, default now()) to Onboarding for health velocity |
+| `20260209000000_add_owner_and_updated_at` | Added `owner` and `updatedAt` to Onboarding |
+| `20260209190000_add_onboarding_status` | Added `status` field to Onboarding |
+| `20260215000000_add_target_go_live` | Added `targetGoLive` (DateTime?) to Onboarding |
+| `20260215100000_add_contact_model` | Added Contact model |
+| `20260215200000_add_phases` | Added Phase model + `phaseId` on Task |
+| `20260218000000_enable_rls` | Enabled RLS on all public tables |
+| `20260221000000_add_task_new_fields` | Added priority, commentCount, previousStatus, blockedByTaskId, assigneeContactId to Task |
+| `20260221050000_add_task_description_owner_members_notes` | Added description, owner, members, notes to Task |
+| `20260221100000_add_task_sort_order` | Added sortOrder to Task |
+| `20260222190000_add_onboarding_created_at` | Added `createdAt` to Onboarding |
+| `20260310000000_add_portal_models` | Added MagicLink and File models for customer portal |
 
 ## Adding queries
 
@@ -152,6 +166,15 @@ Key patterns:
 - Return plain objects (not Prisma models) — stringify IDs
 - Use `include` for relations
 
+## Dynamic schema check
+
+To verify the schema is valid before making changes, the skill can preprocess:
+
+<!-- When loading this skill, validate schema state -->
+<!-- Run: npx prisma validate 2>&1 | head -3 -->
+
+If validation fails, fix the schema before proceeding with migrations.
+
 ## Seeding
 
 ```bash
@@ -159,10 +182,10 @@ npm run seed
 ```
 
 The seed script (`prisma/seed.js`):
-1. Deletes all data (Task → Onboarding → Company, in order)
-2. Creates companies (Acme Co, TechCorp)
-3. Creates onboardings with owners
-4. Creates tasks with statuses
+1. Deletes all data (cascading from Company down)
+2. Creates 10 companies with onboardings
+3. Creates phases, tasks (28 total), contacts
+4. Creates sample comments
 
 To add new seed data, edit `prisma/seed.js` and re-run `npm run seed`.
 
@@ -185,4 +208,4 @@ To add new seed data, edit `prisma/seed.js` and re-run `npm run seed`.
 - **`prisma db push` doesn't work** reliably in this Prisma 7 + Supabase setup — use migrations instead
 - **Singleton pattern in `lib/db.js`**: `globalForPrisma` prevents creating multiple clients during Next.js hot reload in dev
 - **Cascade deletes**: all relations use `onDelete: Cascade` — deleting a Company deletes its Onboardings and Tasks
-- **No CRUD from UI yet** — `lib/db.js` only has read functions. When adding writes, add them here too
+- **All DB access in `lib/db.js`** — ~25 functions covering reads and writes. Always add new queries here, never call Prisma directly from routes or components

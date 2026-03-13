@@ -8,8 +8,8 @@ description: Manage GitHub operations for this project using the gh CLI and git.
 ## Project context
 
 - **GitHub account**: `jawciu`
-- **Repository**: `jawciu/valign` (public)
-- **Remote**: `origin` via HTTPS
+- **Repository**: `jawciu/vector` (public)
+- **Remote**: `origin` via HTTPS (`https://github.com/jawciu/vector.git`)
 - **Default branch**: `main`
 - **CLI tool**: `gh` (GitHub CLI), authenticated via `gh auth login`
 
@@ -39,7 +39,7 @@ git push origin main
 ```
 
 - Always require `full_network` or `all` sandbox permissions for push/fetch.
-- If `origin` remote is missing, add it: `git remote add origin https://github.com/jawciu/valign.git`
+- If `origin` remote is missing, add it: `git remote add origin https://github.com/jawciu/vector.git`
 
 ## Amending commits
 
@@ -70,11 +70,11 @@ gh repo create jawciu/<name> --public --source=. --remote=origin --push --descri
 
 ```bash
 # Visibility
-gh repo edit jawciu/valign --visibility public --accept-visibility-change-consequences
+gh repo edit jawciu/vector --visibility public --accept-visibility-change-consequences
 
 # Description, homepage, topics
-gh repo edit jawciu/valign --description "New description"
-gh repo edit jawciu/valign --add-topic nextjs --add-topic onboarding
+gh repo edit jawciu/vector --description "New description"
+gh repo edit jawciu/vector --add-topic nextjs --add-topic onboarding
 ```
 
 ## Pull requests

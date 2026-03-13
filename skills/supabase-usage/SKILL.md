@@ -121,5 +121,5 @@ No extra work — the proxy in `proxy.js` already redirects unauthenticated user
 - `getClaims()` (not `getUser()`) is used in the proxy — it validates the JWT without a network call
 - The anon key is safe to expose client-side (it's rate-limited by RLS policies)
 - Supabase key naming is changing: `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` is the new format; this project accepts both via fallback
-- RLS is not configured yet — tables are accessible with the anon key. Add policies before going to production
+- RLS is enabled on all tables but only restricts PostgREST access (Prisma bypasses as postgres role). Add row-level policies before going to production
 - **Direct connections (non-pooler, port 5432) don't work** on this Supabase project — always use the pooler hostname

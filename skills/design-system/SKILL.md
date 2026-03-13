@@ -1,3 +1,9 @@
+---
+name: design-system
+description: Design System Skill — tokens, DS components (Button, IconButton), shared Menu primitives, color usage, and architecture. Use when creating or modifying UI components, checking design tokens, or ensuring visual consistency.
+allowed-tools: Read, Grep, Glob
+---
+
 # Design System Skill
 
 ## Overview
