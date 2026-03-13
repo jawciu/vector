@@ -31,28 +31,7 @@ import DetailsTab from "@/app/components/DetailsTab";
 import MembersTab from "@/app/components/MembersTab";
 import CommunicationTab from "@/app/components/CommunicationTab";
 import { MenuTriggerButton, MenuList, MenuOption } from "@/app/components/Menu";
-
-const AVATAR_COLORS = [
-  "var(--sunset)",
-  "var(--lilac)",
-  "var(--sky)",
-  "var(--candy)",
-  "var(--mint)",
-  "var(--rose)",
-  "var(--alert)",
-  "var(--success)",
-];
-
-function companyInitials(name) {
-  const words = name.trim().split(/\s+/);
-  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase().slice(0, 2);
-  return name.slice(0, 2).toUpperCase();
-}
-
-function companyLogoColor(name) {
-  const n = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  return AVATAR_COLORS[n % AVATAR_COLORS.length];
-}
+import { avatarColor, avatarInitials } from "@/lib/avatar";
 
 const TASK_FILTERS = [
   { id: "active", label: "Active" },
@@ -420,10 +399,10 @@ export default function OnboardingDetailClient({
           <div className="flex items-center gap-2">
             <span
               className="flex shrink-0 w-5 h-5 rounded items-center justify-center text-[10px] font-semibold"
-              style={{ background: companyLogoColor(onboarding.companyName), color: "var(--text-dark)" }}
+              style={{ background: avatarColor(onboarding.companyName), color: "var(--text-dark)" }}
               aria-hidden
             >
-              {companyInitials(onboarding.companyName)}
+              {avatarInitials(onboarding.companyName)}
             </span>
             <span className="font-medium" style={{ color: "var(--text)" }}>
               {onboarding.companyName}
@@ -565,7 +544,7 @@ export default function OnboardingDetailClient({
                       style={{
                         width: 22,
                         height: 22,
-                        background: companyLogoColor(contact.name),
+                        background: avatarColor(contact.name),
                         color: "var(--text-dark)",
                         border: "1.5px solid var(--bg)",
                         marginLeft: i > 0 ? -6 : 0,

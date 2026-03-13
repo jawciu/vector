@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import Button from "../ui/Button";
 import IconButton from "../ui/IconButton";
 import { useRouter } from "next/navigation";
 import { MenuList, MenuOption } from "./Menu";
+import { useClickOutside, useEscapeKey } from "@/lib/hooks/useClickOutside";
 
 export default function OnboardingActions({ onboarding, onUpdated }) {
   const router = useRouter();
@@ -23,35 +24,11 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
       : "",
   });
 
-  // Close menu on click outside
-  useEffect(() => {
-    if (!menuOpen) return;
-    function handleClick(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [menuOpen]);
-
-  // Close modal on click outside
-  useEffect(() => {
-    if (!editOpen) return;
-    function handleClick(e) {
-      if (modalRef.current && !modalRef.current.contains(e.target)) setEditOpen(false);
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [editOpen]);
-
-  // Close modal on Escape
-  useEffect(() => {
-    if (!editOpen) return;
-    function handleKey(e) {
-      if (e.key === "Escape") setEditOpen(false);
-    }
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [editOpen]);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const closeEdit = useCallback(() => setEditOpen(false), []);
+  useClickOutside(menuRef, closeMenu, menuOpen);
+  useClickOutside(modalRef, closeEdit, editOpen);
+  useEscapeKey(closeEdit, editOpen);
 
   async function handleEdit(e) {
     e.preventDefault();

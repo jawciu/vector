@@ -3,9 +3,7 @@
 import { useState } from "react";
 import PeoplePicker from "./PeoplePicker";
 import Button from "../ui/Button";
-
-const TASK_STATUSES = ["Not started", "In progress", "Under investigation", "Blocked", "Done"];
-const PRIORITIES = ["low", "medium", "high"];
+import { TASK_STATUSES, PRIORITIES } from "@/lib/constants";
 
 export default function CreateTaskCard({
   onboardingId,

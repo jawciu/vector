@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import { MenuList, MenuOption } from "./Menu";
 import IconButton from "@/app/ui/IconButton";
+import { useClickOutside } from "@/lib/hooks/useClickOutside";
 
 export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onAddTask, dragListeners }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -11,15 +12,7 @@ export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onA
   const [loading, setLoading] = useState(false);
   const menuRef = useRef(null);
 
-  // Close menu on outside click
-  useEffect(() => {
-    if (!menuOpen) return;
-    function handleClick(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [menuOpen]);
+  useClickOutside(menuRef, useCallback(() => setMenuOpen(false), []), menuOpen);
 
   async function handleSave() {
     const trimmed = name.trim();

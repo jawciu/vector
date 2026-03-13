@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-
-const STATUS_COLORS = {
-  Done: "var(--success)",
-  "In progress": "var(--action)",
-  "Under investigation": "var(--action)",
-  Blocked: "var(--danger)",
-  "Not started": "var(--text-muted)",
-};
+import { STATUS_COLORS } from "@/lib/constants";
 
 function formatDate(dateStr) {
   if (!dateStr) return null;

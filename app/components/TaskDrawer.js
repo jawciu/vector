@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, forwardRef } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/app/ui/Button";
 import FieldPill from "@/app/ui/FieldPill";
@@ -15,51 +16,19 @@ import {
   DependenciesIcon,
 } from "@/app/ui/Icons";
 import { MenuList, MenuOption } from "./Menu";
-
-const TASK_STATUSES = ["Not started", "In progress", "Under investigation", "Blocked", "Done"];
-const PRIORITIES = ["low", "medium", "high"];
-
-const STATUS_COLORS = {
-  "Not started": "var(--text-muted)",
-  "In progress": "var(--mint)",
-  "Under investigation": "var(--sky)",
-  "Blocked": "var(--danger)",
-  "Done": "var(--success)",
-};
-
-const AVATAR_COLORS = [
-  "var(--sunset)", "var(--lilac)", "var(--sky)", "var(--candy)",
-  "var(--mint)", "var(--rose)", "var(--alert)", "var(--success)",
-];
-
-const AVATAR_IMAGES = {
-  "Lena Marsh":  "/avatar-lena.png",
-  "Jordan Cole": "/avatar-jordan.png",
-  "Priya Nair":  "/avatar-priya.png",
-  "Tom Okafor":  "/avatar-tom.png",
-  "Dana Fox":    "/avatar-dana.png",
-};
-
-function avatarColor(name) {
-  if (!name) return AVATAR_COLORS[0];
-  const n = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  return AVATAR_COLORS[n % AVATAR_COLORS.length];
-}
-
-function avatarInitials(name) {
-  if (!name) return "?";
-  return name.trim().split(/\s+/).map((w) => w[0]).join("").toUpperCase().slice(0, 2);
-}
+import { TASK_STATUSES, PRIORITIES, STATUS_COLORS } from "@/lib/constants";
+import { AVATAR_IMAGES, avatarColor, avatarInitials } from "@/lib/avatar";
 
 function Avatar({ name, size = 18 }) {
   if (AVATAR_IMAGES[name]) {
     return (
-      <img
+      <Image
         src={AVATAR_IMAGES[name]}
         alt={name}
         title={name}
-        className="rounded-full flex-shrink-0"
-        style={{ width: size, height: size, objectFit: "cover" }}
+        width={size}
+        height={size}
+        className="rounded-full flex-shrink-0 object-cover"
       />
     );
   }
@@ -500,7 +469,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
       setEditingTitle(false);
       setEditingDesc(false);
     }
-  }, [task?.id]);
+  }, [task]);
 
   // Load comments when drawer opens
   useEffect(() => {
@@ -510,7 +479,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
         .then((data) => setComments(Array.isArray(data) ? data : []))
         .catch(() => setComments([]));
     }
-  }, [open, task?.id]);
+  }, [open, task]);
 
   // Load current user for comment avatar
   useEffect(() => {

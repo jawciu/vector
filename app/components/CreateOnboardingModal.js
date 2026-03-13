@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Button from "../ui/Button";
+import { useClickOutside, useEscapeKey } from "@/lib/hooks/useClickOutside";
 
 export default function CreateOnboardingModal({ open, onClose, onCreated }) {
   const [companies, setCompanies] = useState([]);
@@ -17,6 +18,9 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
 
   const modalRef = useRef(null);
 
+  useClickOutside(modalRef, onClose, open);
+  useEscapeKey(onClose, open);
+
   // Fetch companies when modal opens
   useEffect(() => {
     if (!open) return;
@@ -31,28 +35,6 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
       .catch(() => {})
       .finally(() => setFetchingCompanies(false));
   }, [open]);
-
-  // Close on click outside
-  useEffect(() => {
-    if (!open) return;
-    function handleClick(e) {
-      if (modalRef.current && !modalRef.current.contains(e.target)) {
-        onClose();
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [open, onClose]);
-
-  // Close on Escape
-  useEffect(() => {
-    if (!open) return;
-    function handleKey(e) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [open, onClose]);
 
   function resetForm() {
     setCompanyMode("existing");

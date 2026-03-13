@@ -1,32 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { CalendarIcon, PriorityIcon, DependenciesIcon } from "../ui/Icons";
-
-const AVATAR_COLORS = [
-  "var(--sunset)",
-  "var(--lilac)",
-  "var(--sky)",
-  "var(--candy)",
-  "var(--mint)",
-  "var(--rose)",
-];
-
-const AVATAR_IMAGES = {
-  "Lena Marsh":   "/avatar-lena.png",
-  "Jordan Cole":  "/avatar-jordan.png",
-  "Priya Nair":   "/avatar-priya.png",
-  "Tom Okafor":   "/avatar-tom.png",
-  "Dana Fox":     "/avatar-dana.png",
-};
-
-function avatarColor(name) {
-  if (!name) return AVATAR_COLORS[0];
-  const n = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  return AVATAR_COLORS[n % AVATAR_COLORS.length];
-}
+import { AVATAR_IMAGES, avatarColor, avatarInitials } from "@/lib/avatar";
+import { STATUS_COLORS } from "@/lib/constants";
 
 function parseLocalDate(dateStr) {
   if (!dateStr) return null;
@@ -60,13 +40,7 @@ function getDaysLeft(dateStr) {
   return Math.round((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-const STATUS_STYLES = {
-  "Not started": "var(--text-secondary)",
-  "In progress": "var(--mint)",
-  "Under investigation": "var(--sky)",
-  "Blocked": "var(--danger)",
-  "Done": "var(--success)",
-};
+const STATUS_STYLES = STATUS_COLORS;
 
 
 function CheckboxButton({ isDone, isCompleting, onClick }) {
@@ -132,9 +106,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, onCardCli
   const statusColor = STATUS_STYLES[task.status] || "var(--text-secondary)";
   const dueInfo = task.due ? formatDueDate(task.due) : null;
   const daysLeft = task.due ? getDaysLeft(task.due) : null;
-  const ownerInitials = task.owner
-    ? task.owner.trim().split(/\s+/).map((w) => w[0]).join("").toUpperCase().slice(0, 2)
-    : null;
+  const ownerInitials = task.owner ? avatarInitials(task.owner) : null;
 
   async function handleToggleDone(e) {
     e.stopPropagation();
@@ -301,12 +273,13 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, onCardCli
           <PriorityIcon priority={task.priority} size={18} />
           {ownerInitials && (
             AVATAR_IMAGES[task.owner] ? (
-              <img
+              <Image
                 src={AVATAR_IMAGES[task.owner]}
                 alt={task.owner}
                 title={task.owner}
-                className="rounded-full flex-shrink-0"
-                style={{ width: 20, height: 20, objectFit: "cover" }}
+                width={20}
+                height={20}
+                className="rounded-full flex-shrink-0 object-cover"
               />
             ) : (
               <div

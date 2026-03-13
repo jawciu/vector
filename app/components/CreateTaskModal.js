@@ -7,33 +7,8 @@ import FieldRow from "../ui/FieldRow";
 import CalendarDropdown from "../ui/CalendarDropdown";
 import { CalendarIcon, PriorityIcon, StatusIcon, OwnerIcon, MembersIcon, DependenciesIcon } from "../ui/Icons";
 import { MenuList, MenuOption } from "./Menu";
-
-const TASK_STATUSES = ["Not started", "In progress", "Under investigation", "Blocked", "Done"];
-const PRIORITIES = ["low", "medium", "high"];
-
-const STATUS_COLORS = {
-  "Not started": "var(--text-muted)",
-  "In progress": "var(--mint)",
-  "Under investigation": "var(--sky)",
-  "Blocked": "var(--danger)",
-  "Done": "var(--success)",
-};
-
-const AVATAR_COLORS = [
-  "var(--sunset)", "var(--lilac)", "var(--sky)", "var(--candy)",
-  "var(--mint)", "var(--rose)", "var(--alert)", "var(--success)",
-];
-
-function companyInitials(name) {
-  const words = name.trim().split(/\s+/);
-  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase().slice(0, 2);
-  return name.slice(0, 2).toUpperCase();
-}
-
-function companyLogoColor(name) {
-  const n = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  return AVATAR_COLORS[n % AVATAR_COLORS.length];
-}
+import { TASK_STATUSES, PRIORITIES, STATUS_COLORS } from "@/lib/constants";
+import { avatarColor, avatarInitials } from "@/lib/avatar";
 
 function ChevronIcon() {
   return (
@@ -65,11 +40,11 @@ function PillClearButton({ onClick }) {
 
 function NotesIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
-      <rect x="1.5" y="1.5" width="11" height="11" rx="1.5" stroke="#999599" strokeWidth="1.1" fill="none" />
-      <line x1="4" y1="5" x2="10" y2="5" stroke="#999599" strokeWidth="1.1" strokeLinecap="round" />
-      <line x1="4" y1="7.5" x2="10" y2="7.5" stroke="#999599" strokeWidth="1.1" strokeLinecap="round" />
-      <line x1="4" y1="10" x2="7.5" y2="10" stroke="#999599" strokeWidth="1.1" strokeLinecap="round" />
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, color: "var(--text-muted)" }}>
+      <rect x="1.5" y="1.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.1" fill="none" />
+      <line x1="4" y1="5" x2="10" y2="5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+      <line x1="4" y1="7.5" x2="10" y2="7.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+      <line x1="4" y1="10" x2="7.5" y2="10" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
     </svg>
   );
 }
@@ -265,10 +240,10 @@ export default function CreateTaskModal({
             <div className="flex items-center gap-1">
               <span
                 className="flex shrink-0 w-3.5 h-3.5 rounded-[3px] items-center justify-center text-[8px] font-semibold"
-                style={{ background: companyLogoColor(companyName), color: "var(--text-dark)" }}
+                style={{ background: avatarColor(companyName), color: "var(--text-dark)" }}
                 aria-hidden
               >
-                {companyInitials(companyName)}
+                {avatarInitials(companyName)}
               </span>
               <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
                 {companyName}
@@ -445,9 +420,9 @@ export default function CreateTaskModal({
                 <div className="flex items-center gap-1.5">
                   <span
                     className="flex shrink-0 w-5 h-5 rounded-full items-center justify-center text-[8px] font-semibold"
-                    style={{ background: companyLogoColor(formData.owner), color: "var(--text-dark)" }}
+                    style={{ background: avatarColor(formData.owner), color: "var(--text-dark)" }}
                   >
-                    {companyInitials(formData.owner)}
+                    {avatarInitials(formData.owner)}
                   </span>
                   <span className="text-sm" style={{ color: "var(--text)" }}>{formData.owner}</span>
                   <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("owner", ""); }} />
@@ -468,9 +443,9 @@ export default function CreateTaskModal({
                       <div className="flex items-center gap-1.5">
                         <span
                           className="flex shrink-0 w-[18px] h-[18px] rounded-full items-center justify-center text-[8px] font-semibold"
-                          style={{ background: companyLogoColor(person), color: "var(--text-dark)" }}
+                          style={{ background: avatarColor(person), color: "var(--text-dark)" }}
                         >
-                          {companyInitials(person)}
+                          {avatarInitials(person)}
                         </span>
                         {person}
                       </div>
@@ -500,9 +475,9 @@ export default function CreateTaskModal({
                       <span
                         key={m}
                         className="flex shrink-0 w-5 h-5 rounded-full items-center justify-center text-[8px] font-semibold"
-                        style={{ background: companyLogoColor(m), color: "var(--text-dark)", marginLeft: i > 0 ? -6 : 0, zIndex: 5 - i, position: "relative" }}
+                        style={{ background: avatarColor(m), color: "var(--text-dark)", marginLeft: i > 0 ? -6 : 0, zIndex: 5 - i, position: "relative" }}
                       >
-                        {companyInitials(m)}
+                        {avatarInitials(m)}
                       </span>
                     ))}
                     {formData.members.length > 5 && (
@@ -588,9 +563,9 @@ export default function CreateTaskModal({
                             {/* Avatar */}
                             <span
                               className="flex shrink-0 w-[18px] h-[18px] rounded-full items-center justify-center text-[8px] font-semibold"
-                              style={{ background: companyLogoColor(person), color: "var(--text-dark)" }}
+                              style={{ background: avatarColor(person), color: "var(--text-dark)" }}
                             >
-                              {companyInitials(person)}
+                              {avatarInitials(person)}
                             </span>
                             {person}
                           </button>

@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Button from "../ui/Button";
 import MagicLinkActions from "./MagicLinkActions";
-
-const CONTACT_ROLES = ["Champion", "Technical Lead", "IT Admin", "Exec Sponsor"];
+import { CONTACT_ROLES } from "@/lib/constants";
 
 export default function ContactsPanel({ onboardingId, contacts, onContactsChange, magicLinks = [] }) {
   const [adding, setAdding] = useState(false);

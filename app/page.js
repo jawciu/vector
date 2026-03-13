@@ -2,28 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { getOnboardings } from "@/lib/db";
 import OnboardingsActionBar from "./components/OnboardingsActionBar";
-
-const AVATAR_COLORS = [
-  "var(--sunset)",
-  "var(--lilac)",
-  "var(--sky)",
-  "var(--candy)",
-  "var(--mint)",
-  "var(--rose)",
-  "var(--alert)",
-  "var(--success)",
-];
-
-function companyInitials(name) {
-  const words = name.trim().split(/\s+/);
-  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase().slice(0, 2);
-  return name.slice(0, 2).toUpperCase();
-}
-
-function companyLogoColor(name) {
-  const n = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  return AVATAR_COLORS[n % AVATAR_COLORS.length];
-}
+import { avatarColor, avatarInitials } from "@/lib/avatar";
 
 /** Returns { label, color, tooltip } for the status badge.
  *  Active onboardings show health (On track / At risk / Blocked).
@@ -127,12 +106,12 @@ export default async function OnboardingsListPage({ searchParams }) {
                 <span
                   className="flex shrink-0 w-4 h-4 rounded items-center justify-center text-[10px] font-semibold"
                   style={{
-                    background: companyLogoColor(ob.companyName),
+                    background: avatarColor(ob.companyName),
                     color: "var(--text-dark)",
                   }}
                   aria-hidden
                 >
-                  {companyInitials(ob.companyName)}
+                  {avatarInitials(ob.companyName)}
                 </span>
                 <span
                   className="font-medium company-name"
@@ -197,12 +176,12 @@ export default async function OnboardingsListPage({ searchParams }) {
                     <span
                       className="flex shrink-0 w-5 h-5 rounded-full items-center justify-center text-[10px] font-semibold"
                       style={{
-                        background: companyLogoColor(ob.owner),
+                        background: avatarColor(ob.owner),
                         color: "var(--text-dark)",
                       }}
                       aria-hidden
                     >
-                      {companyInitials(ob.owner)}
+                      {avatarInitials(ob.owner)}
                     </span>
                     <span style={{ color: "var(--text)" }}>{ob.owner}</span>
                   </>
