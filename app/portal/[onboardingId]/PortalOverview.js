@@ -121,7 +121,7 @@ function TaskSummary({ summary }) {
       <div className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>
         Task summary
       </div>
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {items.map(({ label, count, color }) => (
           <div key={label} className="text-center">
             <div className="text-xl font-semibold" style={{ color }}>

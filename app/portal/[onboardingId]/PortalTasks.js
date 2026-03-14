@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { STATUS_COLORS } from "@/lib/constants";
+import { useRouter } from "next/navigation";
+import StatusBadge from "@/app/components/StatusBadge";
 
 function formatDate(dateStr) {
   if (!dateStr) return null;
@@ -28,35 +29,74 @@ function formatCommentTime(dateStr) {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contactName }) {
+function InlineError({ message, onDismiss }) {
+  if (!message) return null;
+  return (
+    <div
+      className="flex items-center gap-2 text-xs rounded-md mt-2"
+      style={{
+        padding: "6px 10px",
+        background: "rgba(255, 137, 155, 0.08)",
+        color: "var(--danger)",
+        border: "1px solid var(--danger)",
+      }}
+    >
+      <span className="flex-1">{message}</span>
+      <button
+        onClick={onDismiss}
+        style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", padding: 0 }}
+      >
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contactName, onSessionExpired }) {
   const [toggling, setToggling] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
   const isDone = task.status === "Done";
   const overdue = isOverdue(task);
 
+  async function handleApiCall(url, options) {
+    const res = await fetch(url, options);
+    if (res.status === 401) {
+      onSessionExpired();
+      throw new Error("Session expired");
+    }
+    return res;
+  }
+
   async function handleToggleDone() {
     setToggling(true);
+    setError(null);
     try {
       const newStatus = isDone ? (task.previousStatus || "Not started") : "Done";
       const body = isDone
         ? { status: newStatus }
         : { status: "Done", previousStatus: task.status };
 
-      const res = await fetch(`/api/portal/tasks/${task.id}`, {
+      const res = await handleApiCall(`/api/portal/tasks/${task.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error("Failed to update task");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to update task");
+      }
       const updated = await res.json();
       onStatusChange(task.id, updated);
     } catch (err) {
-      console.error(err);
+      if (err.message !== "Session expired") setError(err.message);
     } finally {
       setToggling(false);
     }
@@ -67,23 +107,23 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
     if (!file) return;
 
     setUploading(true);
+    setError(null);
     try {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch(`/api/portal/tasks/${task.id}/files`, {
+      const res = await handleApiCall(`/api/portal/tasks/${task.id}/files`, {
         method: "POST",
         body: formData,
       });
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Upload failed");
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Upload failed");
       }
       const newFile = await res.json();
       onFileUploaded(task.id, newFile);
     } catch (err) {
-      console.error(err);
-      alert(err.message);
+      if (err.message !== "Session expired") setError(err.message);
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -95,8 +135,9 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
     if (!commentText.trim() || submitting) return;
 
     setSubmitting(true);
+    setError(null);
     try {
-      const res = await fetch(`/api/portal/tasks/${task.id}/comments`, {
+      const res = await handleApiCall(`/api/portal/tasks/${task.id}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ body: commentText.trim() }),
@@ -109,7 +150,7 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
       onCommentAdded(task.id, newComment);
       setCommentText("");
     } catch (err) {
-      console.error("Comment error:", err.message);
+      if (err.message !== "Session expired") setError(err.message);
     } finally {
       setSubmitting(false);
     }
@@ -124,27 +165,27 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
         overflow: "hidden",
       }}
     >
-      {/* Main row */}
+      {/* Main row — larger touch target */}
       <div
         className="flex items-center gap-3 cursor-pointer"
-        style={{ padding: "10px 12px" }}
+        style={{ padding: "12px 14px", minHeight: 48 }}
         onClick={() => setExpanded(!expanded)}
       >
-        {/* Checkbox */}
+        {/* Checkbox — 24x24 touch target */}
         <button
           onClick={(e) => { e.stopPropagation(); handleToggleDone(); }}
           disabled={toggling}
           className="flex-shrink-0 flex items-center justify-center rounded"
           style={{
-            width: 18,
-            height: 18,
+            width: 22,
+            height: 22,
             border: `1.5px solid ${isDone ? "var(--success)" : "var(--border)"}`,
             background: isDone ? "var(--success)" : "transparent",
             cursor: "pointer",
           }}
         >
           {isDone && (
-            <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M2 6l3 3 5-5" stroke="var(--bg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           )}
@@ -161,7 +202,7 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
           >
             {task.title}
           </div>
-          <div className="flex items-center gap-2 mt-0.5">
+          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
             {task.due && (
               <span
                 className="text-[11px]"
@@ -183,17 +224,10 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
           </div>
         </div>
 
-        {/* Status pill */}
-        <span
-          className="text-[10px] font-medium rounded-full shrink-0"
-          style={{
-            padding: "2px 8px",
-            color: STATUS_COLORS[task.status] || "var(--text-muted)",
-            border: `1px solid ${STATUS_COLORS[task.status] || "var(--border)"}`,
-          }}
-        >
-          {task.status}
-        </span>
+        {/* Status badge — same component as main platform */}
+        <div className="shrink-0">
+          <StatusBadge status={task.status} />
+        </div>
 
         {/* Chevron */}
         <svg
@@ -212,13 +246,20 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
         </svg>
       </div>
 
+      {/* Inline error */}
+      {error && !expanded && (
+        <div style={{ padding: "0 14px 8px" }}>
+          <InlineError message={error} onDismiss={() => setError(null)} />
+        </div>
+      )}
+
       {/* Expanded detail */}
       {expanded && (
         <div
           style={{
-            padding: "0 12px 12px",
+            padding: "0 14px 14px",
             borderTop: "1px solid var(--border)",
-            paddingTop: 10,
+            paddingTop: 12,
           }}
         >
           {task.description && (
@@ -227,6 +268,9 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
             </p>
           )}
 
+          {/* Inline error in expanded view */}
+          {error && <InlineError message={error} onDismiss={() => setError(null)} />}
+
           {/* Files list */}
           {task.files.length > 0 && (
             <div className="mb-3">
@@ -234,26 +278,28 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
                 Files
               </div>
               {task.files.map((f) => (
-                <div
+                <a
                   key={f.id}
-                  className="flex items-center gap-2 py-1"
+                  href={`/api/portal/tasks/${task.id}/files/${f.id}`}
+                  className="flex items-center gap-2 rounded-md"
+                  style={{ padding: "6px 4px", textDecoration: "none", minHeight: 36 }}
                 >
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ color: "var(--text-muted)", flexShrink: 0 }}>
                     <path d="M7 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L7 1z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
                     <path d="M7 1v3h3" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
                   </svg>
-                  <span className="text-xs truncate" style={{ color: "var(--text)" }}>
+                  <span className="text-xs truncate" style={{ color: "var(--action)" }}>
                     {f.fileName}
                   </span>
                   <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
                     {(f.fileSize / 1024).toFixed(0)} KB
                   </span>
-                </div>
+                </a>
               ))}
             </div>
           )}
 
-          {/* Upload button */}
+          {/* Upload button — larger touch target */}
           <input
             ref={fileInputRef}
             type="file"
@@ -269,6 +315,8 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
               background: "none",
               border: "none",
               cursor: "pointer",
+              padding: "6px 0",
+              minHeight: 36,
             }}
           >
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -316,10 +364,11 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
                 placeholder="Add a comment…"
                 className="flex-1 text-xs rounded outline-none"
                 style={{
-                  padding: "6px 8px",
+                  padding: "8px 10px",
                   background: "var(--bg)",
                   border: "1px solid var(--border)",
                   color: "var(--text)",
+                  minHeight: 36,
                 }}
               />
               <button
@@ -327,11 +376,12 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
                 disabled={!commentText.trim() || submitting}
                 className="text-xs font-medium rounded shrink-0"
                 style={{
-                  padding: "6px 12px",
+                  padding: "8px 14px",
                   background: commentText.trim() ? "var(--action)" : "var(--surface-hover)",
                   color: commentText.trim() ? "var(--action-text)" : "var(--text-muted)",
                   border: "none",
                   cursor: commentText.trim() ? "pointer" : "default",
+                  minHeight: 36,
                 }}
               >
                 {submitting ? "…" : "Send"}
@@ -344,7 +394,7 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
   );
 }
 
-function PhaseGroup({ phaseName, tasks, onStatusChange, onFileUploaded, onCommentAdded, contactName }) {
+function PhaseGroup({ phaseName, tasks, onStatusChange, onFileUploaded, onCommentAdded, contactName, onSessionExpired }) {
   if (tasks.length === 0) return null;
 
   return (
@@ -364,6 +414,7 @@ function PhaseGroup({ phaseName, tasks, onStatusChange, onFileUploaded, onCommen
             onFileUploaded={onFileUploaded}
             onCommentAdded={onCommentAdded}
             contactName={contactName}
+            onSessionExpired={onSessionExpired}
           />
         ))}
       </div>
@@ -371,9 +422,59 @@ function PhaseGroup({ phaseName, tasks, onStatusChange, onFileUploaded, onCommen
   );
 }
 
+function EmptyState({ filter, myOnly }) {
+  const messages = {
+    active: {
+      title: myOnly ? "No active tasks assigned to you" : "No active tasks",
+      body: myOnly
+        ? "When tasks are assigned to you, they\u2019ll appear here."
+        : "All tasks are either done or haven\u2019t been created yet.",
+    },
+    done: {
+      title: myOnly ? "No completed tasks yet" : "No completed tasks",
+      body: "Mark tasks as done by checking the checkbox next to them.",
+    },
+    all: {
+      title: myOnly ? "No tasks assigned to you" : "No tasks yet",
+      body: myOnly
+        ? "Your vendor hasn\u2019t assigned any tasks to you yet."
+        : "Tasks will appear here once your vendor sets up the onboarding.",
+    },
+  };
+
+  const msg = messages[filter] || messages.all;
+
+  return (
+    <div className="text-center" style={{ padding: "40px 16px" }}>
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        style={{ color: "var(--text-muted)", margin: "0 auto 12px" }}
+      >
+        <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M3 10h18" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M8 14h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+      <p className="text-sm font-medium" style={{ color: "var(--text)", marginBottom: 4 }}>
+        {msg.title}
+      </p>
+      <p className="text-xs" style={{ color: "var(--text-muted)", lineHeight: 1.5 }}>
+        {msg.body}
+      </p>
+    </div>
+  );
+}
+
 export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }) {
   const [tasks, setTasks] = useState(initialTasks);
   const [filter, setFilter] = useState("active"); // active | done | all
+  const router = useRouter();
+
+  function handleSessionExpired() {
+    router.push("/portal/auth?error=expired");
+  }
 
   function handleStatusChange(taskId, updatedTask) {
     setTasks((prev) =>
@@ -432,7 +533,7 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
 
   return (
     <div>
-      {/* Filter pills */}
+      {/* Filter pills — larger touch targets */}
       <div className="flex gap-1.5 mb-4">
         {FILTERS.map(({ id, label }) => (
           <button
@@ -440,7 +541,8 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
             onClick={() => setFilter(id)}
             className="text-xs font-medium rounded-full"
             style={{
-              padding: "4px 12px",
+              padding: "6px 14px",
+              minHeight: 32,
               background: filter === id ? "var(--action)" : "transparent",
               color: filter === id ? "var(--action-text)" : "var(--text-muted)",
               border: filter === id ? "none" : "1px solid var(--border)",
@@ -454,12 +556,7 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
 
       {/* Task list */}
       {filtered.length === 0 ? (
-        <div
-          className="text-sm text-center py-8"
-          style={{ color: "var(--text-muted)" }}
-        >
-          {myOnly ? "No tasks assigned to you." : "No tasks found."}
-        </div>
+        <EmptyState filter={filter} myOnly={myOnly} />
       ) : (
         <div className="flex flex-col gap-4">
           {phases.map((group) => (
@@ -471,6 +568,7 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
               onFileUploaded={handleFileUploaded}
               onCommentAdded={handleCommentAdded}
               contactName={contactName}
+              onSessionExpired={handleSessionExpired}
             />
           ))}
         </div>

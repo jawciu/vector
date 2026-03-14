@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation";
-import { validatePortalAccess } from "@/lib/portal-auth";
+import { validatePortalWithReason } from "@/lib/portal-auth";
 import { getPortalOnboarding, getPortalTasks } from "@/lib/db";
 import PortalShell from "./PortalShell";
 
 export default async function PortalPage({ params }) {
   const { onboardingId } = await params;
-  const session = await validatePortalAccess(onboardingId);
+  const { session, error } = await validatePortalWithReason(onboardingId);
 
   if (!session) {
-    redirect("/portal/auth");
+    redirect(`/portal/auth?error=${error}`);
   }
 
   const [data, tasks] = await Promise.all([

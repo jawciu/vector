@@ -191,7 +191,7 @@ The customer-facing experience. This is the differentiator — if customers actu
 **Portal route structure:**
 - Entry: `/portal/[token]` → validate, set cookie, redirect to `/portal/[onboardingId]`
 - Browsing: `/portal/[onboardingId]`, `/portal/[onboardingId]/tasks`, `/portal/[onboardingId]/all`
-- Separate layout (no sidebar, no vendor nav). Mobile-first. Top bar + bottom tabs on mobile.
+- Separate layout (no sidebar, no vendor nav). Desktop-first, fully responsive. Clean top bar, adapts well to mobile.
 - Separate API routes under `/api/portal/` with token auth.
 - Portal does NOT reuse vendor components. New lightweight portal-specific components.
 
@@ -236,7 +236,7 @@ The customer-facing experience. This is the differentiator — if customers actu
 1. **Schema + DB functions** — MagicLink table, File model, assigneeContactId on Task, new `lib/db.js` functions
 2. **Middleware + auth helper** — exempt `/portal` from Supabase auth, create `validatePortalToken()` helper
 3. **Vendor magic link UI** — Generate/Copy/Revoke buttons on ContactsPanel, new API routes
-4. **Portal layout + Progress Overview** — landing page with health, task summary, go-live countdown. Mobile-first PortalLayout.
+4. **Portal layout + Progress Overview** — landing page with health, task summary, go-live countdown. Responsive PortalLayout.
 5. **My Tasks + done toggle + file upload** — filtered task list, mark done, upload files. Portal API routes.
 6. **Task detail + comments** — expandable task view, comment thread, add comment as portal contact.
 7. **Polish + edge cases** — expired/revoked token UX, empty states, mobile responsiveness.
@@ -368,7 +368,7 @@ Dashboard shows reasons:
 ## Customer portal design principles
 
 1. **No login** — magic link only. Every extra step loses customers.
-2. **Mobile-first** — customers check status on their phone between meetings.
+2. **Desktop-first, fully responsive** — customers do onboarding work at their desk, but checking progress on mobile should feel great too. Designed for laptop, polished for phone.
 3. **Clarity over features** — show what's next, what's done, what's blocked. Nothing else.
 4. **Respect their time** — executive sponsors see a 3-line summary. Technical leads see task details. Don't show everyone everything.
 5. **One-tap actions** — mark task done, upload a file, reply to a message. Minimal friction.

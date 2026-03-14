@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { validatePortalAccess } from "@/lib/portal-auth";
 import { updateTaskAsPortalUser } from "@/lib/db";
+import { TASK_STATUSES } from "@/lib/constants";
 
 export async function PATCH(request, { params }) {
   try {
@@ -11,6 +12,13 @@ export async function PATCH(request, { params }) {
 
     const { taskId } = await params;
     const body = await request.json();
+
+    if (body.status && !TASK_STATUSES.includes(body.status)) {
+      return NextResponse.json(
+        { error: `Invalid status. Must be one of: ${TASK_STATUSES.join(", ")}` },
+        { status: 400 }
+      );
+    }
 
     const updated = await updateTaskAsPortalUser(
       taskId,
