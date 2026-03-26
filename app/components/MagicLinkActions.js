@@ -128,7 +128,7 @@ export default function MagicLinkActions({ contactId, onboardingId, magicLinks }
       <button
         onClick={handleGenerate}
         disabled={loading}
-        className="text-[10px] font-medium"
+        className="text-sm font-medium"
         style={{ color: "var(--action)", background: "none", border: "none", cursor: "pointer" }}
       >
         {loading ? "Generating…" : "Generate portal link"}

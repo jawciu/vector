@@ -246,12 +246,12 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
           >
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium truncate" style={{ color: "var(--text)" }}>
+                <span className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>
                   {contact.name}
                 </span>
                 {contact.role && (
                   <span
-                    className="text-[10px] font-medium rounded-full shrink-0"
+                    className="text-xs font-medium rounded-full shrink-0"
                     style={{
                       paddingLeft: 6,
                       paddingRight: 6,
@@ -267,7 +267,7 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
                 )}
               </div>
               {contact.email && (
-                <div className="text-[11px] truncate" style={{ color: "var(--text-muted)" }}>
+                <div className="text-sm truncate" style={{ color: "var(--text-muted)" }}>
                   {contact.email}
                 </div>
               )}

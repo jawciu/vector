@@ -48,7 +48,7 @@ export default async function PortalAuthPage({ searchParams }) {
     >
       {msg ? (
         <>
-          <div style={{ marginBottom: 16 }}>{msg.icon}</div>
+          <div style={{ marginBottom: 16, display: "flex", justifyContent: "center" }}>{msg.icon}</div>
           <h1
             className="text-lg font-semibold"
             style={{ color: "var(--text)", marginBottom: 8 }}
