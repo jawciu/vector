@@ -1,0 +1,27 @@
+name: Keep Supabase Alive (Backup)
+
+on:
+  schedule:
+    - cron: "0 20 * * 2,5"  # Tuesday & Friday at 8 PM UTC
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase via REST API
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          # Read from a table to register real database activity
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "$SUPABASE_URL/rest/v1/company?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 300 ]; then
+            echo "REST API ping successful (HTTP $STATUS)"
+          else
+            echo "REST API ping failed (HTTP $STATUS)"
+            exit 1
+          fi
