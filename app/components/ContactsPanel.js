@@ -121,178 +121,201 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
     }
   }
 
-  function renderForm(onSubmit, submitLabel) {
+  const inputStyle = {
+    border: "1px solid var(--border)",
+    background: "var(--bg)",
+    color: "var(--text)",
+  };
+
+  function renderInlineForm(onSubmit, submitLabel) {
     return (
-      <form onSubmit={onSubmit} className="flex flex-col gap-2">
-        {error && (
-          <div
-            className="text-xs px-2 py-1.5 rounded"
-            style={{
-              color: "var(--danger)",
-              background: "rgba(255, 137, 155, 0.1)",
-              border: "1px solid var(--danger)",
-            }}
-          >
-            {error}
-          </div>
-        )}
-        <input
-          type="text"
-          placeholder="Name"
-          value={formData.name}
-          onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
-          required
-          autoFocus
-          className="py-1.5 px-2 text-xs w-full rounded outline-none"
-          style={{
-            border: "1px solid var(--border)",
-            background: "var(--bg)",
-            color: "var(--text)",
-          }}
-        />
-        <input
-          type="email"
-          placeholder="Email (optional)"
-          value={formData.email}
-          onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
-          className="py-1.5 px-2 text-xs w-full rounded outline-none"
-          style={{
-            border: "1px solid var(--border)",
-            background: "var(--bg)",
-            color: "var(--text)",
-          }}
-        />
-        <select
-          value={formData.role}
-          onChange={(e) => setFormData((p) => ({ ...p, role: e.target.value }))}
-          className="py-1.5 px-2 text-xs w-full rounded outline-none"
-          style={{
-            border: "1px solid var(--border)",
-            background: "var(--bg)",
-            color: formData.role ? "var(--text)" : "var(--text-muted)",
-          }}
-        >
-          <option value="">Role (optional)</option>
-          {CONTACT_ROLES.map((r) => (
-            <option key={r} value={r}>{r}</option>
-          ))}
-        </select>
-        <div className="flex gap-2">
-          <Button type="submit" size="xs" disabled={loading}>
-            {loading ? "Saving…" : submitLabel}
-          </Button>
-          <Button variant="secondary" size="xs" onClick={handleCancel} disabled={loading}>
-            Cancel
-          </Button>
-        </div>
-      </form>
+      <tr>
+        <td colSpan={5} style={{ padding: "8px 12px", borderBottom: "1px solid var(--border)" }}>
+          <form onSubmit={onSubmit} className="flex items-center gap-2 flex-wrap">
+            {error && (
+              <span className="text-xs w-full" style={{ color: "var(--danger)" }}>
+                {error}
+              </span>
+            )}
+            <input
+              type="text"
+              placeholder="Name"
+              value={formData.name}
+              onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
+              required
+              autoFocus
+              className="py-1.5 px-2 text-xs rounded outline-none"
+              style={{ ...inputStyle, flex: "1 1 120px", minWidth: 100 }}
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
+              className="py-1.5 px-2 text-xs rounded outline-none"
+              style={{ ...inputStyle, flex: "1 1 160px", minWidth: 120 }}
+            />
+            <select
+              value={formData.role}
+              onChange={(e) => setFormData((p) => ({ ...p, role: e.target.value }))}
+              className="py-1.5 px-2 text-xs rounded outline-none"
+              style={{
+                ...inputStyle,
+                flex: "0 1 120px",
+                color: formData.role ? "var(--text)" : "var(--text-muted)",
+              }}
+            >
+              <option value="">Role</option>
+              {CONTACT_ROLES.map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+            <div className="flex gap-2">
+              <Button type="submit" size="xs" disabled={loading}>
+                {loading ? "Saving…" : submitLabel}
+              </Button>
+              <Button variant="secondary" size="xs" onClick={handleCancel} disabled={loading}>
+                Cancel
+              </Button>
+              {editingId && (
+                <button
+                  type="button"
+                  onClick={() => handleDelete(editingId)}
+                  className="text-xs"
+                  style={{ color: "var(--danger)", background: "none", border: "none", cursor: "pointer" }}
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          </form>
+        </td>
+      </tr>
     );
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-semibold" style={{ color: "var(--text-muted)" }}>
-          Contacts
+          Members
         </h3>
         {!adding && editingId === null && (
-          <button
-            onClick={startAdd}
-            className="text-xs transition-opacity hover:opacity-80"
-            style={{ color: "var(--action)", background: "none", border: "none" }}
-          >
+          <Button variant="primary" size="sm" onClick={startAdd}>
             + Add
-          </button>
+          </Button>
         )}
       </div>
 
-      {contacts.length === 0 && !adding && (
-        <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-          No contacts yet.
-        </p>
-      )}
-
-      {contacts.map((contact) =>
-        editingId === contact.id ? (
-          <div
-            key={contact.id}
-            className="rounded-lg"
-            style={{
-              border: "1px solid var(--action)",
-              background: "var(--surface)",
-              padding: "8px 12px",
-            }}
-          >
-            {renderForm(handleUpdate, "Save")}
-            <button
-              type="button"
-              onClick={() => handleDelete(contact.id)}
-              className="mt-2 text-xs transition-opacity hover:opacity-80"
-              style={{ color: "var(--danger)", background: "none", border: "none" }}
-            >
-              Delete contact
-            </button>
-          </div>
-        ) : (
-          <div
-            key={contact.id}
-            className="flex items-center gap-2 rounded-lg cursor-pointer hover:opacity-80"
-            style={{
-              border: "1px solid var(--border)",
-              background: "var(--surface)",
-              padding: "8px 12px",
-            }}
-            onClick={() => startEdit(contact)}
-          >
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>
-                  {contact.name}
-                </span>
-                {contact.role && (
-                  <span
-                    className="text-xs font-medium rounded-full shrink-0"
-                    style={{
-                      paddingLeft: 6,
-                      paddingRight: 6,
-                      paddingTop: 1,
-                      paddingBottom: 1,
-                      background: "var(--surface-hover)",
-                      color: "var(--text-muted)",
-                      border: "1px solid var(--border)",
-                    }}
-                  >
-                    {contact.role}
-                  </span>
-                )}
-              </div>
-              {contact.email && (
-                <div className="text-sm truncate" style={{ color: "var(--text-muted)" }}>
-                  {contact.email}
-                </div>
-              )}
-              <MagicLinkActions
-                contactId={contact.id}
-                onboardingId={onboardingId}
-                magicLinks={magicLinks.filter((l) => l.contactId === contact.id)}
+      <div
+        className="rounded-lg overflow-hidden"
+        style={{ border: "1px solid var(--border)", margin: "0 auto", width: "100%" }}
+      >
+        <table className="w-full text-sm" style={{ borderCollapse: "collapse" }}>
+          <thead>
+            <tr style={{ borderBottom: "1px solid var(--border)" }}>
+              {["Name", "Email", "Role", "Portal"].map((col) => (
+                <th
+                  key={col}
+                  className="text-xs font-medium text-left"
+                  style={{
+                    padding: "8px 12px",
+                    color: "var(--text-muted)",
+                  }}
+                >
+                  {col}
+                </th>
+              ))}
+              <th
+                className="text-xs font-medium text-left"
+                style={{
+                  padding: "8px 12px",
+                  color: "var(--text-muted)",
+                  width: 1,
+                }}
               />
-            </div>
-          </div>
-        )
-      )}
+            </tr>
+          </thead>
+          <tbody>
+            {contacts.length === 0 && !adding && (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="text-xs text-center"
+                  style={{ padding: "20px 12px", color: "var(--text-muted)" }}
+                >
+                  No members yet. Click + Add to get started.
+                </td>
+              </tr>
+            )}
 
-      {adding && (
-        <div
-          className="rounded-lg"
-          style={{
-            border: "1px solid var(--border)",
-            background: "var(--surface)",
-            padding: "8px 12px",
-          }}
-        >
-          {renderForm(handleCreate, "Add")}
-        </div>
-      )}
+            {contacts.map((contact) =>
+              editingId === contact.id ? (
+                renderInlineForm(handleUpdate, "Save")
+              ) : (
+                <tr
+                  key={contact.id}
+                  className="cursor-pointer"
+                  style={{ borderBottom: "1px solid var(--border)" }}
+                  onClick={() => startEdit(contact)}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-hover)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "")}
+                >
+                  <td style={{ padding: "8px 12px", color: "var(--text)" }}>
+                    {contact.name}
+                  </td>
+                  <td style={{ padding: "8px 12px", color: "var(--text-muted)" }}>
+                    {contact.email || "—"}
+                  </td>
+                  <td style={{ padding: "8px 12px" }}>
+                    {contact.role ? (
+                      <span
+                        className="inline-flex h-fit rounded text-xs font-medium"
+                        style={{
+                          paddingTop: 2,
+                          paddingBottom: 2,
+                          paddingLeft: 4,
+                          paddingRight: 4,
+                          borderRadius: 6,
+                          borderWidth: "0.5px",
+                          borderStyle: "solid",
+                          borderColor: "var(--text-muted)",
+                          color: "var(--text-muted)",
+                        }}
+                      >
+                        {contact.role}
+                      </span>
+                    ) : (
+                      <span style={{ color: "var(--text-muted)" }}>—</span>
+                    )}
+                  </td>
+                  <td style={{ padding: "8px 12px" }} onClick={(e) => e.stopPropagation()}>
+                    <MagicLinkActions
+                      contactId={contact.id}
+                      onboardingId={onboardingId}
+                      magicLinks={magicLinks.filter((l) => l.contactId === contact.id)}
+                    />
+                  </td>
+                  <td style={{ padding: "8px 12px", width: 1 }}>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startEdit(contact);
+                      }}
+                      className="text-xs"
+                      style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}
+                    >
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              )
+            )}
+
+            {adding && renderInlineForm(handleCreate, "Add")}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
