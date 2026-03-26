@@ -3,17 +3,18 @@ import Link from "next/link";
 import { getOnboardings } from "@/lib/db";
 import OnboardingsActionBar from "./components/OnboardingsActionBar";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
+import Tooltip from "@/app/ui/Tooltip";
 
 /** Returns { label, color, tooltip } for the status badge.
  *  Active onboardings show health (On track / At risk / Blocked).
  *  Completed and Paused show their own status. */
 function statusBadge(ob) {
-  if (ob.onboardingStatus === "Completed") return { label: "Completed", color: "var(--mint)", tooltip: null };
-  if (ob.onboardingStatus === "Paused") return { label: "Paused", color: "var(--rose)", tooltip: null };
-  const tooltip = ob.healthReasons?.length > 0 ? ob.healthReasons.join(" · ") : null;
-  if (ob.health === "At risk") return { label: "At risk", color: "var(--alert)", tooltip };
-  if (ob.health === "Blocked") return { label: "Blocked", color: "var(--danger)", tooltip };
-  return { label: "On track", color: "var(--success)", tooltip: null };
+  if (ob.onboardingStatus === "Completed") return { label: "Completed", color: "var(--mint)", lines: null };
+  if (ob.onboardingStatus === "Paused") return { label: "Paused", color: "var(--rose)", lines: null };
+  const lines = ob.healthReasons?.length > 0 ? ob.healthReasons : null;
+  if (ob.health === "At risk") return { label: "At risk", color: "var(--alert)", lines };
+  if (ob.health === "Blocked") return { label: "Blocked", color: "var(--danger)", lines };
+  return { label: "On track", color: "var(--success)", lines: null };
 }
 
 export default async function OnboardingsListPage({ searchParams }) {
@@ -125,23 +126,24 @@ export default async function OnboardingsListPage({ searchParams }) {
                 {(() => {
                   const badge = statusBadge(ob);
                   return (
-                    <span
-                      className={`inline-flex h-fit rounded text-xs font-medium${badge.tooltip ? " health-pill" : ""}`}
-                      data-tooltip={badge.tooltip || undefined}
-                      style={{
-                        paddingTop: 2,
-                        paddingBottom: 2,
-                        paddingLeft: 4,
-                        paddingRight: 4,
-                        borderRadius: 6,
-                        color: badge.color,
-                        borderWidth: "0.5px",
-                        borderStyle: "solid",
-                        borderColor: badge.color,
-                      }}
-                    >
-                      {badge.label}
-                    </span>
+                    <Tooltip lines={badge.lines}>
+                      <span
+                        className="inline-flex h-fit rounded text-xs font-medium health-pill"
+                        style={{
+                          paddingTop: 2,
+                          paddingBottom: 2,
+                          paddingLeft: 4,
+                          paddingRight: 4,
+                          borderRadius: 6,
+                          color: badge.color,
+                          borderWidth: "0.5px",
+                          borderStyle: "solid",
+                          borderColor: badge.color,
+                        }}
+                      >
+                        {badge.label}
+                      </span>
+                    </Tooltip>
                   );
                 })()}
               </span>

@@ -32,6 +32,7 @@ import MembersTab from "@/app/components/MembersTab";
 import CommunicationTab from "@/app/components/CommunicationTab";
 import { MenuTriggerButton, MenuList, MenuOption } from "@/app/components/Menu";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
+import Tooltip from "@/app/ui/Tooltip";
 
 const TASK_FILTERS = [
   { id: "active", label: "Active" },
@@ -145,7 +146,7 @@ export default function OnboardingDetailClient({
     targetGoLive: onboarding.targetGoLive,
     createdAt: onboarding.createdAt,
   });
-  const healthTooltip = healthReasons.length > 0 ? healthReasons.join(" · ") : null;
+  const healthTooltipLines = healthReasons.length > 0 ? healthReasons : null;
   const blockedCount = tasks.filter((t) => t.status === "Blocked").length;
 
   const filteredTasks = tasks.filter((t) => {
@@ -513,17 +514,18 @@ export default function OnboardingDetailClient({
             {/* Right: health tags + member avatars */}
             <div className="flex items-center gap-2 flex-shrink-0">
               {health !== "On track" && (
-                <span
-                  className={`text-sm rounded-md${healthTooltip ? " health-pill" : ""}`}
-                  data-tooltip={healthTooltip || undefined}
-                  style={{
-                    color: health === "Blocked" ? "var(--danger)" : "var(--alert)",
-                    border: `0.5px solid ${health === "Blocked" ? "var(--danger)" : "var(--alert)"}`,
-                    padding: "2px 4px",
-                  }}
-                >
-                  {health}
-                </span>
+                <Tooltip lines={healthTooltipLines}>
+                  <span
+                    className="text-sm rounded-md health-pill"
+                    style={{
+                      color: health === "Blocked" ? "var(--danger)" : "var(--alert)",
+                      border: `0.5px solid ${health === "Blocked" ? "var(--danger)" : "var(--alert)"}`,
+                      padding: "2px 4px",
+                    }}
+                  >
+                    {health}
+                  </span>
+                </Tooltip>
               )}
               {blockedCount > 0 && (
                 <span
