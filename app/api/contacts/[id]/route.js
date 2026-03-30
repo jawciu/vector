@@ -14,6 +14,9 @@ export async function PATCH(request, { params }) {
     const body = await request.json();
 
     const contact = await updateContact(id, body);
+    if (!contact) {
+      return NextResponse.json({ error: "Contact not found" }, { status: 404 });
+    }
     return NextResponse.json(contact);
   } catch (error) {
     console.error("Error updating contact:", error);
@@ -33,7 +36,10 @@ export async function DELETE(request, { params }) {
     }
 
     const { id } = await params;
-    await deleteContact(id);
+    const result = await deleteContact(id);
+    if (!result) {
+      return NextResponse.json({ error: "Contact not found" }, { status: 404 });
+    }
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting contact:", error);

@@ -14,6 +14,9 @@ export async function PATCH(request, { params }) {
     const body = await request.json();
 
     const phase = await updatePhase(id, body);
+    if (!phase) {
+      return NextResponse.json({ error: "Phase not found" }, { status: 404 });
+    }
     return NextResponse.json(phase);
   } catch (error) {
     console.error("Error updating phase:", error);
@@ -33,7 +36,10 @@ export async function DELETE(request, { params }) {
     }
 
     const { id } = await params;
-    await deletePhase(id);
+    const result = await deletePhase(id);
+    if (!result) {
+      return NextResponse.json({ error: "Phase not found" }, { status: 404 });
+    }
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting phase:", error);

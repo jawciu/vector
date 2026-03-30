@@ -12,6 +12,9 @@ export async function PATCH(request, { params }) {
 
     const { linkId } = await params;
     const link = await revokeMagicLink(linkId);
+    if (!link) {
+      return NextResponse.json({ error: "Magic link not found" }, { status: 404 });
+    }
     return NextResponse.json(link);
   } catch (error) {
     console.error("Error revoking magic link:", error);

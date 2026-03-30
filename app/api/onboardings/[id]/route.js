@@ -14,6 +14,9 @@ export async function PATCH(request, { params }) {
     const body = await request.json();
 
     const onboarding = await updateOnboarding(id, body);
+    if (!onboarding) {
+      return NextResponse.json({ error: "Onboarding not found" }, { status: 404 });
+    }
     return NextResponse.json(onboarding);
   } catch (error) {
     console.error("Error updating onboarding:", error);
@@ -33,7 +36,10 @@ export async function DELETE(request, { params }) {
     }
 
     const { id } = await params;
-    await deleteOnboarding(id);
+    const result = await deleteOnboarding(id);
+    if (!result) {
+      return NextResponse.json({ error: "Onboarding not found" }, { status: 404 });
+    }
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting onboarding:", error);
