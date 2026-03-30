@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { validatePortalAccess } from "@/lib/portal-auth";
 import { createFile } from "@/lib/db";
-import { createClient } from "@/lib/supabase/server";
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 const BUCKET_NAME = "portal-files";
+
+/** Admin Supabase client for storage (bypasses RLS — portal users have no Supabase session). */
+function getStorageClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error("Missing env: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY");
+  }
+  return createSupabaseClient(url, key);
+}
 
 export async function POST(request, { params }) {
   try {
@@ -32,8 +42,8 @@ export async function POST(request, { params }) {
     const contactId = session.contact.id;
     const contactName = session.contact.name;
 
-    // Upload to Supabase Storage
-    const supabase = await createClient();
+    // Upload to Supabase Storage via service role (portal users don't have Supabase sessions)
+    const supabase = getStorageClient();
     const storagePath = `${onboardingId}/${taskId}/${Date.now()}-${file.name}`;
 
     const { error: uploadError } = await supabase.storage

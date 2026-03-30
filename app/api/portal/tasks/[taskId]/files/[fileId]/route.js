@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { validatePortalAccess } from "@/lib/portal-auth";
 import { getFileForPortal } from "@/lib/db";
-import { createClient } from "@/lib/supabase/server";
 
 const BUCKET_NAME = "portal-files";
+
+/** Admin Supabase client for storage (bypasses RLS — portal users have no Supabase session). */
+function getStorageClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error("Missing env: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY");
+  }
+  return createSupabaseClient(url, key);
+}
 
 export async function GET(request, { params }) {
   try {
@@ -20,7 +30,7 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: "File not found" }, { status: 404 });
     }
 
-    const supabase = await createClient();
+    const supabase = getStorageClient();
     const { data, error } = await supabase.storage
       .from(BUCKET_NAME)
       .download(file.storagePath);

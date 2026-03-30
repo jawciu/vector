@@ -16,7 +16,7 @@ export async function POST(request) {
     // Validation
     if (!body.onboardingId || !body.title || !body.phaseId) {
       return NextResponse.json(
-        { error: "onboardingId, phaseId, and title are required" },
+        { error: "onboardingId, phaseId, and title are all required" },
         { status: 400 }
       );
     }

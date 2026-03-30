@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import StatusBadge from "@/app/components/StatusBadge";
 
@@ -62,6 +62,14 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+
+  // Reset draft comment and error when task is collapsed
+  useEffect(() => {
+    if (!expanded) {
+      setCommentText("");
+      setError(null);
+    }
+  }, [expanded]);
 
   const isDone = task.status === "Done";
   const overdue = isOverdue(task);
@@ -246,8 +254,8 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
         </svg>
       </div>
 
-      {/* Inline error */}
-      {error && !expanded && (
+      {/* Inline error — always visible when present */}
+      {error && (
         <div style={{ padding: "0 14px 8px" }}>
           <InlineError message={error} onDismiss={() => setError(null)} />
         </div>
@@ -267,9 +275,6 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
               {task.description}
             </p>
           )}
-
-          {/* Inline error in expanded view */}
-          {error && <InlineError message={error} onDismiss={() => setError(null)} />}
 
           {/* Files list */}
           {task.files.length > 0 && (
