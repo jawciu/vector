@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getMagicLinkByToken } from "@/lib/db";
+import { getMagicLinkByToken, getMagicLinkRaw } from "@/lib/db";
 
 const COOKIE_NAME = "portal_token";
 
@@ -11,9 +11,30 @@ export async function GET(request) {
     return NextResponse.redirect(new URL("/portal/auth", request.url));
   }
 
-  const link = await getMagicLinkByToken(token);
+  // Check raw link first to log the specific failure reason
+  const rawLink = await getMagicLinkRaw(token);
+  if (!rawLink) {
+    console.warn("[GET /api/portal/auth] Auth failed: invalid token");
+    return NextResponse.redirect(
+      new URL("/portal/auth?error=invalid", request.url)
+    );
+  }
+  if (rawLink.revokedAt) {
+    console.warn("[GET /api/portal/auth] Auth failed: token revoked", { onboardingId: rawLink.onboardingId });
+    return NextResponse.redirect(
+      new URL("/portal/auth?error=revoked", request.url)
+    );
+  }
+  if (rawLink.expiresAt < new Date()) {
+    console.warn("[GET /api/portal/auth] Auth failed: token expired", { onboardingId: rawLink.onboardingId });
+    return NextResponse.redirect(
+      new URL("/portal/auth?error=expired", request.url)
+    );
+  }
 
+  const link = await getMagicLinkByToken(token);
   if (!link) {
+    console.warn("[GET /api/portal/auth] Auth failed: valid raw link but getMagicLinkByToken returned null");
     return NextResponse.redirect(
       new URL("/portal/auth?error=invalid", request.url)
     );

@@ -12,6 +12,7 @@ export async function GET(request, { params }) {
     const comments = await getCommentsForTask(id);
     return NextResponse.json(comments);
   } catch (error) {
+    console.error("[GET /api/tasks/:id/comments]", error);
     return NextResponse.json({ error: error.message || "Failed to fetch comments" }, { status: 500 });
   }
 }
@@ -32,6 +33,7 @@ export async function POST(request, { params }) {
     const comment = await createComment(id, author, body.trim());
     return NextResponse.json(comment);
   } catch (error) {
+    console.error("[POST /api/tasks/:id/comments]", error);
     return NextResponse.json({ error: error.message || "Failed to create comment" }, { status: 500 });
   }
 }
