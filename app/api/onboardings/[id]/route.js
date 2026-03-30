@@ -19,7 +19,7 @@ export async function PATCH(request, { params }) {
     }
     return NextResponse.json(onboarding);
   } catch (error) {
-    console.error("Error updating onboarding:", error);
+    console.error("[PATCH /api/onboardings/:id]", error);
     return NextResponse.json(
       { error: error.message || "Failed to update onboarding" },
       { status: 500 }
@@ -42,7 +42,7 @@ export async function DELETE(request, { params }) {
     }
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting onboarding:", error);
+    console.error("[DELETE /api/onboardings/:id]", error);
     return NextResponse.json(
       { error: error.message || "Failed to delete onboarding" },
       { status: 500 }

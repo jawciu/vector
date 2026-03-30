@@ -32,7 +32,7 @@ export async function PATCH(request, { params }) {
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error("Portal task update error:", error);
+    console.error("[PATCH /api/portal/tasks/:taskId]", error);
     return NextResponse.json(
       { error: error.message || "Failed to update task" },
       { status: 500 }

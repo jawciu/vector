@@ -36,7 +36,7 @@ export async function GET(request, { params }) {
       .download(file.storagePath);
 
     if (error) {
-      console.error("Storage download error:", error);
+      console.error("[GET /api/portal/tasks/:taskId/files/:fileId] Storage error:", error);
       return NextResponse.json({ error: "Failed to download file" }, { status: 500 });
     }
 
@@ -48,7 +48,7 @@ export async function GET(request, { params }) {
       },
     });
   } catch (error) {
-    console.error("Portal file download error:", error);
+    console.error("[GET /api/portal/tasks/:taskId/files/:fileId]", error);
     return NextResponse.json(
       { error: error.message || "Failed to download file" },
       { status: 500 }

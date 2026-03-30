@@ -11,7 +11,8 @@ function getProjectRoot() {
   let dir;
   try {
     dir = path.dirname(fileURLToPath(import.meta.url));
-  } catch {
+  } catch (error) {
+    console.warn("[GET /api/env] Failed to resolve project root:", error.message);
     return cwd;
   }
   for (let i = 0; i < 15; i++) {
@@ -34,8 +35,8 @@ function readEnvFromFile() {
     const keyMatch = content.match(/NEXT_PUBLIC_SUPABASE_(?:ANON_KEY|PUBLISHABLE_KEY)\s*=\s*([^\s\r\n]+)/);
     if (urlMatch) out.url = urlMatch[1].replace(/^["']|["']$/g, "").trim();
     if (keyMatch) out.key = keyMatch[1].replace(/^["']|["']$/g, "").trim();
-  } catch {
-    // ignore
+  } catch (error) {
+    console.warn("[GET /api/env] Failed to read .env file:", error.message);
   }
   return out;
 }

@@ -19,7 +19,7 @@ export async function PATCH(request, { params }) {
     }
     return NextResponse.json(phase);
   } catch (error) {
-    console.error("Error updating phase:", error);
+    console.error("[PATCH /api/phases/:id]", error);
     return NextResponse.json(
       { error: error.message || "Failed to update phase" },
       { status: 500 }
@@ -42,7 +42,7 @@ export async function DELETE(request, { params }) {
     }
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting phase:", error);
+    console.error("[DELETE /api/phases/:id]", error);
     return NextResponse.json(
       { error: error.message || "Failed to delete phase" },
       { status: 500 }

@@ -14,7 +14,7 @@ export async function GET(request, { params }) {
     const contacts = await getContactsForOnboarding(id);
     return NextResponse.json(contacts);
   } catch (error) {
-    console.error("Error fetching contacts:", error);
+    console.error("[GET /api/onboardings/:id/contacts]", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch contacts" },
       { status: 500 }
@@ -43,7 +43,7 @@ export async function POST(request, { params }) {
     const contact = await createContact({ ...body, onboardingId: id });
     return NextResponse.json(contact, { status: 201 });
   } catch (error) {
-    console.error("Error creating contact:", error);
+    console.error("[POST /api/onboardings/:id/contacts]", error);
     return NextResponse.json(
       { error: error.message || "Failed to create contact" },
       { status: 500 }

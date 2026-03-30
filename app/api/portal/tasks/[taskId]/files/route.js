@@ -54,7 +54,7 @@ export async function POST(request, { params }) {
       });
 
     if (uploadError) {
-      console.error("Storage upload error:", uploadError);
+      console.error("[POST /api/portal/tasks/:taskId/files] Storage upload error:", uploadError);
       return NextResponse.json(
         { error: "Failed to upload file" },
         { status: 500 }
@@ -75,7 +75,7 @@ export async function POST(request, { params }) {
 
     return NextResponse.json(fileRecord, { status: 201 });
   } catch (error) {
-    console.error("Portal file upload error:", error);
+    console.error("[POST /api/portal/tasks/:taskId/files]", error);
     return NextResponse.json(
       { error: error.message || "Failed to upload file" },
       { status: 500 }

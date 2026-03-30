@@ -19,7 +19,7 @@ export async function PATCH(request, { params }) {
     }
     return NextResponse.json(contact);
   } catch (error) {
-    console.error("Error updating contact:", error);
+    console.error("[PATCH /api/contacts/:id]", error);
     return NextResponse.json(
       { error: error.message || "Failed to update contact" },
       { status: 500 }
@@ -42,7 +42,7 @@ export async function DELETE(request, { params }) {
     }
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting contact:", error);
+    console.error("[DELETE /api/contacts/:id]", error);
     return NextResponse.json(
       { error: error.message || "Failed to delete contact" },
       { status: 500 }

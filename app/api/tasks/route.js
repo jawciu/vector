@@ -24,7 +24,7 @@ export async function POST(request) {
     const task = await createTask(body);
     return NextResponse.json(task, { status: 201 });
   } catch (error) {
-    console.error("Error creating task:", error);
+    console.error("[POST /api/tasks]", error);
     return NextResponse.json(
       { error: error.message || "Failed to create task" },
       { status: 500 }

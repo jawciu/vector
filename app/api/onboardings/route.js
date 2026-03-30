@@ -22,7 +22,7 @@ export async function POST(request) {
     const onboarding = await createOnboarding(body);
     return NextResponse.json(onboarding, { status: 201 });
   } catch (error) {
-    console.error("Error creating onboarding:", error);
+    console.error("[POST /api/onboardings]", error);
     return NextResponse.json(
       { error: error.message || "Failed to create onboarding" },
       { status: 500 }

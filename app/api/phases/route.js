@@ -22,7 +22,7 @@ export async function POST(request) {
     const phase = await createPhase(body);
     return NextResponse.json(phase, { status: 201 });
   } catch (error) {
-    console.error("Error creating phase:", error);
+    console.error("[POST /api/phases]", error);
     return NextResponse.json(
       { error: error.message || "Failed to create phase" },
       { status: 500 }

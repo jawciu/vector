@@ -14,7 +14,7 @@ export async function POST(request, { params }) {
     const onboarding = await duplicateOnboarding(id);
     return NextResponse.json(onboarding, { status: 201 });
   } catch (error) {
-    console.error("Error duplicating onboarding:", error);
+    console.error("[POST /api/onboardings/:id/duplicate]", error);
     return NextResponse.json(
       { error: error.message || "Failed to duplicate onboarding" },
       { status: 500 }

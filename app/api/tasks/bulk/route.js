@@ -22,7 +22,7 @@ export async function PATCH(request) {
     const result = await bulkUpdateTasks(taskIds, data);
     return NextResponse.json({ count: result.count });
   } catch (error) {
-    console.error("Error bulk updating tasks:", error);
+    console.error("[PATCH /api/tasks/bulk]", error);
     return NextResponse.json(
       { error: error.message || "Failed to bulk update tasks" },
       { status: 500 }

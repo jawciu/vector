@@ -32,7 +32,7 @@ export async function POST(request, { params }) {
 
     return NextResponse.json(comment, { status: 201 });
   } catch (error) {
-    console.error("Portal comment error:", error);
+    console.error("[POST /api/portal/tasks/:taskId/comments]", error);
     return NextResponse.json(
       { error: error.message || "Failed to add comment" },
       { status: 500 }

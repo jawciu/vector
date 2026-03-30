@@ -19,7 +19,7 @@ export async function PATCH(request, { params }) {
     }
     return NextResponse.json(task);
   } catch (error) {
-    console.error("Error updating task:", error);
+    console.error("[PATCH /api/tasks/:id]", error);
     return NextResponse.json(
       { error: error.message || "Failed to update task" },
       { status: 500 }
@@ -42,7 +42,7 @@ export async function DELETE(request, { params }) {
     }
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting task:", error);
+    console.error("[DELETE /api/tasks/:id]", error);
     return NextResponse.json(
       { error: error.message || "Failed to delete task" },
       { status: 500 }

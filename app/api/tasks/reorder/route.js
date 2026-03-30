@@ -22,7 +22,7 @@ export async function POST(request) {
     const task = await reorderTask(taskId, targetPhaseId, sortOrder);
     return NextResponse.json(task);
   } catch (error) {
-    console.error("Error reordering task:", error);
+    console.error("[POST /api/tasks/reorder]", error);
     return NextResponse.json(
       { error: error.message || "Failed to reorder task" },
       { status: 500 }

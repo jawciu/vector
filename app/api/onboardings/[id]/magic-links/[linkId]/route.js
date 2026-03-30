@@ -17,7 +17,7 @@ export async function PATCH(request, { params }) {
     }
     return NextResponse.json(link);
   } catch (error) {
-    console.error("Error revoking magic link:", error);
+    console.error("[PATCH /api/onboardings/:id/magic-links/:linkId]", error);
     return NextResponse.json(
       { error: error.message || "Failed to revoke magic link" },
       { status: 500 }

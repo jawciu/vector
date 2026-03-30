@@ -13,7 +13,7 @@ export async function GET() {
     const companies = await getCompanies();
     return NextResponse.json(companies);
   } catch (error) {
-    console.error("Error fetching companies:", error);
+    console.error("[GET /api/companies]", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch companies" },
       { status: 500 }
@@ -41,7 +41,7 @@ export async function POST(request) {
     const company = await createCompany(body.name);
     return NextResponse.json(company, { status: 201 });
   } catch (error) {
-    console.error("Error creating company:", error);
+    console.error("[POST /api/companies]", error);
     return NextResponse.json(
       { error: error.message || "Failed to create company" },
       { status: 500 }

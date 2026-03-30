@@ -14,7 +14,7 @@ export async function GET(request, { params }) {
     const links = await getMagicLinksForOnboarding(id);
     return NextResponse.json(links);
   } catch (error) {
-    console.error("Error fetching magic links:", error);
+    console.error("[GET /api/onboardings/:id/magic-links]", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch magic links" },
       { status: 500 }
@@ -43,7 +43,7 @@ export async function POST(request, { params }) {
     const link = await createMagicLink(body.contactId, id, body.expiresInDays || 30);
     return NextResponse.json(link, { status: 201 });
   } catch (error) {
-    console.error("Error creating magic link:", error);
+    console.error("[POST /api/onboardings/:id/magic-links]", error);
     return NextResponse.json(
       { error: error.message || "Failed to create magic link" },
       { status: 500 }
