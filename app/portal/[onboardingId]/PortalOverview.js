@@ -18,7 +18,7 @@ function GoLiveCountdown({ targetGoLive }) {
   if (days < 0) {
     return (
       <div
-        className="rounded-lg"
+        className="rounded-lg h-full"
         style={{
           padding: "12px 16px",
           background: "rgba(255, 137, 155, 0.08)",
@@ -34,7 +34,7 @@ function GoLiveCountdown({ targetGoLive }) {
 
   return (
     <div
-      className="rounded-lg"
+      className="rounded-lg h-full"
       style={{
         padding: "12px 16px",
         background: "var(--surface)",
@@ -63,7 +63,7 @@ function HealthBanner({ health }) {
   if (health.status === "On track") {
     return (
       <div
-        className="rounded-lg"
+        className="rounded-lg h-full"
         style={{
           padding: "12px 16px",
           background: "rgba(156, 255, 166, 0.08)",
@@ -82,7 +82,7 @@ function HealthBanner({ health }) {
 
   return (
     <div
-      className="rounded-lg"
+      className="rounded-lg h-full"
       style={{
         padding: "12px 16px",
         background: bgAlpha,
@@ -121,7 +121,7 @@ function TaskSummary({ summary }) {
       <div className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>
         Task summary
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {items.map(({ label, count, color }) => (
           <div key={label} className="text-center">
             <div className="text-xl font-semibold" style={{ color }}>
@@ -192,16 +192,26 @@ function PhaseCard({ phase }) {
 export default function PortalOverview({ data }) {
   return (
     <div className="flex flex-col gap-3">
-      <HealthBanner health={data.health} />
-      <GoLiveCountdown targetGoLive={data.targetGoLive} />
+      {/* Health + Go-live: side by side on desktop */}
+      <div className="flex flex-col md:flex-row gap-3">
+        <div className="md:flex-1">
+          <HealthBanner health={data.health} />
+        </div>
+        {data.targetGoLive && (
+          <div className="md:flex-1">
+            <GoLiveCountdown targetGoLive={data.targetGoLive} />
+          </div>
+        )}
+      </div>
+
       <TaskSummary summary={data.taskSummary} />
 
-      {/* Phases */}
+      {/* Phases — 2-col grid on desktop */}
       <div>
         <div className="text-xs mb-2" style={{ color: "var(--text-muted)" }}>
           Phases
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col md:grid md:grid-cols-2 gap-2">
           {data.phases.map((phase) => (
             <PhaseCard key={phase.id} phase={phase} />
           ))}

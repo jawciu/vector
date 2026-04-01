@@ -30,32 +30,57 @@ export default function PortalShell({ data, tasks, contactName }) {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto" }}>
+    <div className="max-w-[640px] md:max-w-[960px]" style={{ margin: "0 auto" }}>
       {/* Header */}
       <header
+        className="md:flex md:items-end md:justify-between"
         style={{
           padding: "20px 16px 16px",
           borderBottom: "1px solid var(--border)",
         }}
       >
-        <div className="text-xs" style={{ color: "var(--text-muted)", marginBottom: 2 }}>
-          Welcome, {contactName}
+        <div>
+          <div className="text-xs" style={{ color: "var(--text-muted)", marginBottom: 2 }}>
+            Welcome, {contactName}
+          </div>
+          <h1 className="text-lg font-semibold" style={{ color: "var(--text)" }}>
+            {data.companyName}
+          </h1>
         </div>
-        <h1 className="text-lg font-semibold" style={{ color: "var(--text)" }}>
-          {data.companyName}
-        </h1>
+
+        {/* Desktop top tabs — hidden on mobile */}
+        <nav className="hidden md:flex gap-1" style={{ marginBottom: -1 }}>
+          {TABS.map(({ id, label, icon }) => (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className="flex items-center gap-1.5 text-sm font-medium"
+              style={{
+                padding: "8px 16px",
+                background: "none",
+                border: "none",
+                borderBottom: activeTab === id ? "2px solid var(--action)" : "2px solid transparent",
+                color: activeTab === id ? "var(--action)" : "var(--text-muted)",
+                cursor: activeTab === id ? "default" : "pointer",
+              }}
+            >
+              {icon}
+              {label}
+            </button>
+          ))}
+        </nav>
       </header>
 
-      {/* Tab content */}
-      <div style={{ padding: 16, paddingBottom: 80 }}>
+      {/* Tab content — extra bottom padding on mobile for bottom nav */}
+      <div className="p-4 pb-20 md:pb-4 md:p-6">
         {activeTab === "overview" && <PortalOverview data={data} />}
         {activeTab === "my-tasks" && <PortalTasks tasks={tasks} myOnly contactName={contactName} />}
         {activeTab === "all-tasks" && <PortalTasks tasks={tasks} myOnly={false} contactName={contactName} />}
       </div>
 
-      {/* Bottom nav — larger touch targets with icons */}
+      {/* Bottom nav — mobile only */}
       <nav
-        className="fixed bottom-0 left-0 right-0 flex justify-around items-center"
+        className="fixed bottom-0 left-0 right-0 flex justify-around items-center md:hidden"
         style={{
           padding: "8px 0 calc(8px + env(safe-area-inset-bottom, 0px))",
           background: "var(--bg-elevated)",

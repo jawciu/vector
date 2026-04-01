@@ -175,7 +175,7 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
     >
       {/* Main row — larger touch target */}
       <div
-        className="flex items-center gap-3 cursor-pointer"
+        className="flex items-center gap-3 cursor-pointer md:gap-4"
         style={{ padding: "12px 14px", minHeight: 48 }}
         onClick={() => setExpanded(!expanded)}
       >
@@ -270,128 +270,133 @@ function TaskRow({ task, onStatusChange, onFileUploaded, onCommentAdded, contact
             paddingTop: 12,
           }}
         >
-          {task.description && (
-            <p className="text-xs mb-3" style={{ color: "var(--text-muted)", lineHeight: 1.5 }}>
-              {task.description}
-            </p>
-          )}
+          <div className="md:flex md:gap-6">
+            {/* Left column: description + files */}
+            <div className="md:flex-1 md:min-w-0">
+              {task.description && (
+                <p className="text-xs mb-3" style={{ color: "var(--text-muted)", lineHeight: 1.5 }}>
+                  {task.description}
+                </p>
+              )}
 
-          {/* Files list */}
-          {task.files.length > 0 && (
-            <div className="mb-3">
-              <div className="text-[11px] font-medium mb-1" style={{ color: "var(--text-muted)" }}>
-                Files
-              </div>
-              {task.files.map((f) => (
-                <a
-                  key={f.id}
-                  href={`/api/portal/tasks/${task.id}/files/${f.id}`}
-                  className="flex items-center gap-2 rounded-md"
-                  style={{ padding: "6px 4px", textDecoration: "none", minHeight: 36 }}
-                >
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ color: "var(--text-muted)", flexShrink: 0 }}>
-                    <path d="M7 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L7 1z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
-                    <path d="M7 1v3h3" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
-                  </svg>
-                  <span className="text-xs truncate" style={{ color: "var(--action)" }}>
-                    {f.fileName}
-                  </span>
-                  <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-                    {(f.fileSize / 1024).toFixed(0)} KB
-                  </span>
-                </a>
-              ))}
-            </div>
-          )}
-
-          {/* Upload button — larger touch target */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            onChange={handleFileUpload}
-            style={{ display: "none" }}
-          />
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="flex items-center gap-1.5 text-xs font-medium"
-            style={{
-              color: "var(--action)",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: "6px 0",
-              minHeight: 36,
-            }}
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M6 9V3M3.5 5.5L6 3l2.5 2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M2 9.5h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-            </svg>
-            {uploading ? "Uploading…" : "Upload file"}
-          </button>
-
-          {/* Comments */}
-          <div style={{ marginTop: 12 }}>
-            <div className="text-[11px] font-medium mb-2" style={{ color: "var(--text-muted)" }}>
-              Comments{task.comments.length > 0 ? ` (${task.comments.length})` : ""}
-            </div>
-
-            {task.comments.length > 0 && (
-              <div className="flex flex-col gap-2 mb-3">
-                {task.comments.map((c) => (
-                  <div key={c.id}>
-                    <div className="flex items-baseline gap-1.5">
-                      <span
-                        className="text-xs font-medium"
-                        style={{ color: c.author === contactName ? "var(--action)" : "var(--text)" }}
-                      >
-                        {c.author}
+              {/* Files list */}
+              {task.files.length > 0 && (
+                <div className="mb-3">
+                  <div className="text-[11px] font-medium mb-1" style={{ color: "var(--text-muted)" }}>
+                    Files
+                  </div>
+                  {task.files.map((f) => (
+                    <a
+                      key={f.id}
+                      href={`/api/portal/tasks/${task.id}/files/${f.id}`}
+                      className="flex items-center gap-2 rounded-md"
+                      style={{ padding: "6px 4px", textDecoration: "none", minHeight: 36 }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ color: "var(--text-muted)", flexShrink: 0 }}>
+                        <path d="M7 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L7 1z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
+                        <path d="M7 1v3h3" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
+                      </svg>
+                      <span className="text-xs truncate" style={{ color: "var(--action)" }}>
+                        {f.fileName}
                       </span>
                       <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-                        {formatCommentTime(c.createdAt)}
+                        {(f.fileSize / 1024).toFixed(0)} KB
                       </span>
-                    </div>
-                    <p className="text-xs mt-0.5" style={{ color: "var(--text-secondary)", lineHeight: 1.5 }}>
-                      {c.body}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
+                    </a>
+                  ))}
+                </div>
+              )}
 
-            {/* Add comment form */}
-            <form onSubmit={handleAddComment} className="flex gap-2">
+              {/* Upload button — larger touch target */}
               <input
-                type="text"
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Add a comment…"
-                className="flex-1 text-xs rounded outline-none"
-                style={{
-                  padding: "8px 10px",
-                  background: "var(--bg)",
-                  border: "1px solid var(--border)",
-                  color: "var(--text)",
-                  minHeight: 36,
-                }}
+                ref={fileInputRef}
+                type="file"
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
               />
               <button
-                type="submit"
-                disabled={!commentText.trim() || submitting}
-                className="text-xs font-medium rounded shrink-0"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="flex items-center gap-1.5 text-xs font-medium"
                 style={{
-                  padding: "8px 14px",
-                  background: commentText.trim() ? "var(--action)" : "var(--surface-hover)",
-                  color: commentText.trim() ? "var(--action-text)" : "var(--text-muted)",
+                  color: "var(--action)",
+                  background: "none",
                   border: "none",
-                  cursor: commentText.trim() ? "pointer" : "default",
+                  cursor: "pointer",
+                  padding: "6px 0",
                   minHeight: 36,
                 }}
               >
-                {submitting ? "…" : "Send"}
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M6 9V3M3.5 5.5L6 3l2.5 2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M2 9.5h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
+                {uploading ? "Uploading…" : "Upload file"}
               </button>
-            </form>
+            </div>
+
+            {/* Right column (desktop) / below (mobile): Comments */}
+            <div className="mt-3 md:mt-0 md:flex-1 md:min-w-0">
+              <div className="text-[11px] font-medium mb-2" style={{ color: "var(--text-muted)" }}>
+                Comments{task.comments.length > 0 ? ` (${task.comments.length})` : ""}
+              </div>
+
+              {task.comments.length > 0 && (
+                <div className="flex flex-col gap-2 mb-3">
+                  {task.comments.map((c) => (
+                    <div key={c.id}>
+                      <div className="flex items-baseline gap-1.5">
+                        <span
+                          className="text-xs font-medium"
+                          style={{ color: c.author === contactName ? "var(--action)" : "var(--text)" }}
+                        >
+                          {c.author}
+                        </span>
+                        <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+                          {formatCommentTime(c.createdAt)}
+                        </span>
+                      </div>
+                      <p className="text-xs mt-0.5" style={{ color: "var(--text-secondary)", lineHeight: 1.5 }}>
+                        {c.body}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add comment form */}
+              <form onSubmit={handleAddComment} className="flex gap-2">
+                <input
+                  type="text"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Add a comment…"
+                  className="flex-1 text-xs rounded outline-none"
+                  style={{
+                    padding: "8px 10px",
+                    background: "var(--bg)",
+                    border: "1px solid var(--border)",
+                    color: "var(--text)",
+                    minHeight: 36,
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={!commentText.trim() || submitting}
+                  className="text-xs font-medium rounded shrink-0"
+                  style={{
+                    padding: "8px 14px",
+                    background: commentText.trim() ? "var(--action)" : "var(--surface-hover)",
+                    color: commentText.trim() ? "var(--action-text)" : "var(--text-muted)",
+                    border: "none",
+                    cursor: commentText.trim() ? "pointer" : "default",
+                    minHeight: 36,
+                  }}
+                >
+                  {submitting ? "…" : "Send"}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       )}
