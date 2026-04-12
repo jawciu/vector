@@ -15,11 +15,12 @@
   --accent: #22d3ee;
   --accent-muted: #0891b2;
   --action: #C098FF;
-  --action-hover: #CAA8FF;
+  --action-hover: #D3B5FF;
   --action-active: #9E6CEE;
   --action-disabled: #604C80;
   --action-text: #18181E;
   --danger: #FF899B;
+  --danger-hover: #FFB0BC;
   --success: #9CFFA6;
   --alert: #FFDA91;
   --mint: #9DFFF4;
@@ -164,6 +165,32 @@ a {
 
 .company-cell-link:hover .company-name {
   color: var(--action);
+}
+
+/* Inline text buttons (e.g. Copy / Revoke / Generate) */
+.text-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.text-btn-action {
+  color: var(--action);
+}
+
+.text-btn-action:hover {
+  color: var(--action-hover);
+}
+
+.text-btn-danger {
+  color: var(--danger);
+}
+
+.text-btn-danger:hover {
+  color: var(--danger-hover);
 }
 
 /* Task completion animation */
