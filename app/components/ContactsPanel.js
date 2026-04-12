@@ -5,7 +5,7 @@ import Button from "../ui/Button";
 import IconButton from "../ui/IconButton";
 import { MenuList, MenuOption } from "./Menu";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
-import { CONTACT_ROLES } from "@/lib/constants";
+import MemberModal from "./MemberModal";
 
 const GRID_COLUMNS = "1fr 1.3fr 140px 200px 140px 48px";
 const HEADERS = ["Name", "Email", "Role", "Portal", "Link", ""];
@@ -28,94 +28,28 @@ function activeLinkFor(contactId, magicLinks) {
 
 export default function ContactsPanel({ onboardingId, contacts, onContactsChange, magicLinks = [] }) {
   const [links, setLinks] = useState(magicLinks);
-  const [adding, setAdding] = useState(false);
-  const [editingId, setEditingId] = useState(null);
+  const [modalState, setModalState] = useState({ open: false, mode: "add", contact: null });
   const [openMenuId, setOpenMenuId] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [copiedId, setCopiedId] = useState(null);
 
-  const [formData, setFormData] = useState({ name: "", email: "", role: "" });
-
-  function resetForm() {
-    setFormData({ name: "", email: "", role: "" });
-    setError("");
+  function openAddModal() {
+    setModalState({ open: true, mode: "add", contact: null });
   }
 
-  function startAdd() {
-    setEditingId(null);
-    resetForm();
-    setAdding(true);
-  }
-
-  function startEdit(contact) {
-    setAdding(false);
+  function openEditModal(contact) {
     setOpenMenuId(null);
-    setFormData({ name: contact.name, email: contact.email, role: contact.role });
-    setEditingId(contact.id);
+    setModalState({ open: true, mode: "edit", contact });
   }
 
-  function handleCancel() {
-    setAdding(false);
-    setEditingId(null);
-    resetForm();
+  function closeModal() {
+    setModalState((s) => ({ ...s, open: false }));
   }
 
-  async function handleCreate(e) {
-    e.preventDefault();
-    if (!formData.name.trim()) {
-      setError("Name is required");
-      return;
-    }
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch(`/api/onboardings/${onboardingId}/contacts`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Failed to create contact");
-      }
-      const newContact = await res.json();
-      onContactsChange([...contacts, newContact]);
-      setAdding(false);
-      resetForm();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleUpdate(e) {
-    e.preventDefault();
-    if (!formData.name.trim()) {
-      setError("Name is required");
-      return;
-    }
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch(`/api/contacts/${editingId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Failed to update contact");
-      }
-      const updated = await res.json();
-      onContactsChange(contacts.map((c) => (c.id === updated.id ? updated : c)));
-      setEditingId(null);
-      resetForm();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  function handleSaved(saved) {
+    if (modalState.mode === "edit") {
+      onContactsChange(contacts.map((c) => (c.id === saved.id ? saved : c)));
+    } else {
+      onContactsChange([...contacts, saved]);
     }
   }
 
@@ -129,12 +63,8 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
         throw new Error(err.error || "Failed to delete contact");
       }
       onContactsChange(contacts.filter((c) => c.id !== contactId));
-      if (editingId === contactId) {
-        setEditingId(null);
-        resetForm();
-      }
     } catch (err) {
-      setError(err.message);
+      alert(err.message);
     }
   }
 
@@ -194,12 +124,6 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
     }
   }
 
-  const inputStyle = {
-    border: "1px solid var(--border)",
-    background: "var(--bg)",
-    color: "var(--text)",
-  };
-
   function cellStyle(colIdx, isLast) {
     return {
       paddingTop: 10,
@@ -214,69 +138,6 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
     };
   }
 
-  function renderInlineForm(onSubmit, submitLabel) {
-    return (
-      <div
-        style={{
-          gridColumn: "1 / -1",
-          padding: "10px 20px",
-          borderBottom: "1px solid var(--border-subtle)",
-        }}
-      >
-        <form onSubmit={onSubmit} className="flex items-center gap-2 flex-wrap">
-          {error && (
-            <span className="text-xs w-full" style={{ color: "var(--danger)" }}>
-              {error}
-            </span>
-          )}
-          <input
-            type="text"
-            placeholder="Name"
-            value={formData.name}
-            onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
-            required
-            autoFocus
-            className="py-1.5 px-2 text-sm rounded outline-none"
-            style={{ ...inputStyle, flex: "1 1 120px", minWidth: 100 }}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
-            className="py-1.5 px-2 text-sm rounded outline-none"
-            style={{ ...inputStyle, flex: "1 1 160px", minWidth: 120 }}
-          />
-          <select
-            value={formData.role}
-            onChange={(e) => setFormData((p) => ({ ...p, role: e.target.value }))}
-            className="py-1.5 px-2 text-sm rounded outline-none"
-            style={{
-              ...inputStyle,
-              flex: "0 1 140px",
-              color: formData.role ? "var(--text)" : "var(--text-muted)",
-            }}
-          >
-            <option value="">Role</option>
-            {CONTACT_ROLES.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
-          <div className="flex gap-2">
-            <Button type="submit" size="sm" disabled={loading}>
-              {loading ? "Saving…" : submitLabel}
-            </Button>
-            <Button variant="secondary" size="sm" onClick={handleCancel} disabled={loading}>
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full flex flex-col">
       <div
@@ -286,11 +147,9 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
         <h3 className="text-sm font-semibold" style={{ color: "var(--text-muted)" }}>
           Members
         </h3>
-        {!adding && editingId === null && (
-          <Button variant="primary" size="sm" onClick={startAdd}>
-            + Add
-          </Button>
-        )}
+        <Button variant="primary" size="sm" onClick={openAddModal}>
+          + Add
+        </Button>
       </div>
 
       <div
@@ -321,7 +180,7 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
         ))}
 
         {/* Empty state */}
-        {contacts.length === 0 && !adding && (
+        {contacts.length === 0 && (
           <span
             className="text-sm text-center"
             style={{
@@ -336,14 +195,7 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
 
         {/* Data rows */}
         {contacts.map((contact, rowIdx) => {
-          const isLast = rowIdx === contacts.length - 1 && !adding;
-          if (editingId === contact.id) {
-            return (
-              <React.Fragment key={contact.id}>
-                {renderInlineForm(handleUpdate, "Save")}
-              </React.Fragment>
-            );
-          }
+          const isLast = rowIdx === contacts.length - 1;
           const link = activeLinkFor(contact.id, links);
           return (
             <ContactRow
@@ -357,7 +209,7 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
                 setOpenMenuId((id) => (id === contact.id ? null : contact.id))
               }
               onCloseMenu={() => setOpenMenuId(null)}
-              onEdit={() => startEdit(contact)}
+              onEdit={() => openEditModal(contact)}
               onDelete={() => handleDelete(contact.id)}
               onGenerate={() => handleGenerate(contact.id)}
               onCopy={() => link && handleCopy(link)}
@@ -366,10 +218,16 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
             />
           );
         })}
-
-        {/* Inline add form at the bottom */}
-        {adding && renderInlineForm(handleCreate, "Add")}
       </div>
+
+      <MemberModal
+        open={modalState.open}
+        mode={modalState.mode}
+        contact={modalState.contact}
+        onboardingId={onboardingId}
+        onClose={closeModal}
+        onSaved={handleSaved}
+      />
     </div>
   );
 }
