@@ -35,7 +35,7 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
   const [fetchingCompanies, setFetchingCompanies] = useState(false);
   const [error, setError] = useState("");
 
-  const [companyMode, setCompanyMode] = useState("existing"); // "existing" | "new"
+  const [companyMode, setCompanyMode] = useState("new"); // "new" | "existing"
   const [selectedCompanyId, setSelectedCompanyId] = useState("");
   const [newCompanyName, setNewCompanyName] = useState("");
   const [owner, setOwner] = useState("");
@@ -73,7 +73,7 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
   }, [open]);
 
   function resetForm() {
-    setCompanyMode("existing");
+    setCompanyMode("new");
     setSelectedCompanyId("");
     setNewCompanyName("");
     setOwner("");
@@ -201,14 +201,14 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
           {/* Company mode toggle */}
           <div className="flex items-center gap-1">
             <ModeToggle
-              label="Existing"
-              active={companyMode === "existing"}
-              onClick={() => setCompanyMode("existing")}
-            />
-            <ModeToggle
               label="New"
               active={companyMode === "new"}
               onClick={() => setCompanyMode("new")}
+            />
+            <ModeToggle
+              label="Existing"
+              active={companyMode === "existing"}
+              onClick={() => setCompanyMode("existing")}
             />
           </div>
 

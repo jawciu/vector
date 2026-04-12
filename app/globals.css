@@ -3,6 +3,7 @@
 :root {
   --bg: #18181E;
   --bg-elevated: #1D1C24;
+  --bg-elevated-hover: #232028;
   --bg-hover: #211F29;
   --surface: #1f1e26;
   --surface-hover: #26242F;
@@ -197,6 +198,21 @@ a {
 .mode-toggle:not([data-active]):hover {
   color: var(--text);
   background: var(--bg-hover);
+}
+
+/* Kanban task card */
+.task-card {
+  background: var(--bg-elevated);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.task-card:hover {
+  background: var(--bg-elevated-hover);
 }
 
 /* Task completion animation */

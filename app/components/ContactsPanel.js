@@ -148,7 +148,7 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
           Members
         </h3>
         <Button variant="primary" size="sm" onClick={openAddModal}>
-          + Add
+          + Add member
         </Button>
       </div>
 

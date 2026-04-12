@@ -151,15 +151,8 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, onCardCli
       {...listeners}
       data-task-card
       onClick={() => { if (onCardClick) onCardClick(task); }}
-      className={`rounded-lg${completing ? " task-completing" : ""}`}
-      style={{
-        background: "var(--bg-elevated)",
-        padding: "12px 16px",
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-        ...style,
-      }}
+      className={`task-card rounded-lg${completing ? " task-completing" : ""}`}
+      style={style}
     >
       {/* Row 1: Checkbox + Title */}
       <div className="flex items-start gap-2.5">
