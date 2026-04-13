@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useMemo } from "react";
 import Button from "../ui/Button";
 import IconButton from "../ui/IconButton";
 import { MenuList, MenuOption } from "./Menu";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import MemberModal from "./MemberModal";
+import BulkActionBar from "./BulkActionBar";
 
-const GRID_COLUMNS = "1fr 1.3fr 140px 200px 140px 48px";
-const HEADERS = ["Name", "Email", "Role", "Portal", "Link", ""];
+const GRID_COLUMNS = "40px 1fr 1.3fr 140px 220px 140px 48px";
+const HEADERS = ["", "Name", "Email", "Role", "Portal", "Link", ""];
 
 function formatExpiry(dateStr) {
   const date = new Date(dateStr);
@@ -20,9 +21,64 @@ function formatExpiry(dateStr) {
   return `Expires in ${days} days`;
 }
 
+function formatRelative(dateStr) {
+  if (!dateStr) return null;
+  const then = new Date(dateStr);
+  const diffMs = Date.now() - then.getTime();
+  if (diffMs < 60_000) return "just now";
+  const mins = Math.floor(diffMs / 60_000);
+  if (mins < 60) return `${mins} min ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} hr ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days} ${days === 1 ? "day" : "days"} ago`;
+}
+
 function activeLinkFor(contactId, magicLinks) {
   return magicLinks.find(
     (l) => l.contactId === contactId && !l.revokedAt && new Date(l.expiresAt) > new Date()
+  );
+}
+
+function Checkbox({ checked, indeterminate, disabled, onClick, ariaLabel, title }) {
+  return (
+    <button
+      type="button"
+      className="member-checkbox"
+      disabled={disabled}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!disabled) onClick();
+      }}
+      aria-label={ariaLabel}
+      title={title}
+    >
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {checked ? (
+          <path
+            d="M10 0C12.2091 0 14 1.79086 14 4V10C14 12.2091 12.2091 14 10 14H4C1.79086 14 9.66399e-08 12.2091 0 10V4C0 1.79086 1.79086 9.66384e-08 4 0H10ZM10.8125 4.10938C10.5969 3.93687 10.2819 3.97187 10.1094 4.1875L6.42773 8.78906L3.82031 6.61621C3.60827 6.43951 3.29304 6.46781 3.11621 6.67969C2.93951 6.89173 2.96781 7.20696 3.17969 7.38379L6.17969 9.88379L6.57129 10.2109L6.89062 9.8125L10.8906 4.8125C11.0631 4.59687 11.0281 4.28188 10.8125 4.10938Z"
+            fill="var(--action)"
+          />
+        ) : indeterminate ? (
+          <>
+            <rect x="0.5" y="0.5" width="13" height="13" rx="3.5" stroke="var(--action)" />
+            <rect x="3" y="6.5" width="8" height="1" rx="0.5" fill="var(--action)" />
+          </>
+        ) : (
+          <rect x="0.5" y="0.5" width="13" height="13" rx="3.5" stroke="#5D565D" />
+        )}
+      </svg>
+    </button>
+  );
+}
+
+function WarningIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+      <circle cx="6" cy="6" r="5.5" stroke="var(--danger)" />
+      <path d="M6 3.5V6.5" stroke="var(--danger)" strokeWidth="1.2" strokeLinecap="round" />
+      <circle cx="6" cy="8.5" r="0.6" fill="var(--danger)" />
+    </svg>
   );
 }
 
@@ -31,6 +87,45 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
   const [modalState, setModalState] = useState({ open: false, mode: "add", contact: null });
   const [openMenuId, setOpenMenuId] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
+  const [selected, setSelected] = useState(() => new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const [bulkStatus, setBulkStatus] = useState(null); // null | "success" | "partial"
+  const [lastResult, setLastResult] = useState({ succeeded: 0, failed: [] }); // failed: [{contactId, reason}]
+  const [failedIds, setFailedIds] = useState(() => new Set());
+
+  // Eligible = contacts without an active link (checkbox enabled)
+  const eligibleIds = useMemo(
+    () => contacts.filter((c) => !activeLinkFor(c.id, links)).map((c) => c.id),
+    [contacts, links]
+  );
+
+  const allEligibleSelected =
+    eligibleIds.length > 0 && eligibleIds.every((id) => selected.has(id));
+  const someEligibleSelected =
+    !allEligibleSelected && eligibleIds.some((id) => selected.has(id));
+
+  function toggleSelect(id) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    setSelected((prev) => {
+      if (allEligibleSelected) return new Set();
+      const next = new Set(prev);
+      eligibleIds.forEach((id) => next.add(id));
+      return next;
+    });
+  }
+
+  function clearSelection() {
+    setSelected(new Set());
+    setBulkStatus(null);
+  }
 
   function openAddModal() {
     setModalState({ open: true, mode: "add", contact: null });
@@ -86,6 +181,9 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
           )
           .concat(newLink)
       );
+      if (newLink.emailStatus && newLink.emailStatus !== "skipped_no_email") {
+        setFailedIds((prev) => new Set(prev).add(contactId));
+      }
     } catch (err) {
       console.error(err);
     }
@@ -119,16 +217,93 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
           l.id === link.id ? { ...l, revokedAt: new Date().toISOString() } : l
         )
       );
+      setFailedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(link.contactId);
+        return next;
+      });
     } catch (err) {
       console.error(err);
     }
+  }
+
+  async function runBulkGenerate(contactIds) {
+    setBulkLoading(true);
+    try {
+      const res = await fetch(`/api/onboardings/${onboardingId}/magic-links/bulk`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contactIds }),
+      });
+      if (!res.ok) throw new Error("Bulk generate failed");
+      const { created, failed } = await res.json();
+
+      // Merge created links into state. Revoke any existing active links for
+      // contacts we just created new ones for (server already did this in DB).
+      setLinks((prev) => {
+        const newContactIds = new Set(created.map((l) => l.contactId));
+        const revoked = prev.map((l) =>
+          newContactIds.has(l.contactId) && !l.revokedAt
+            ? { ...l, revokedAt: new Date().toISOString() }
+            : l
+        );
+        return [...revoked, ...created];
+      });
+
+      // Update failed warnings: remove from failed for successful contacts,
+      // add for the new failures.
+      setFailedIds((prev) => {
+        const next = new Set(prev);
+        created.forEach((l) => next.delete(l.contactId));
+        failed.forEach((f) => next.add(f.contactId));
+        return next;
+      });
+
+      // Clear selection for successful contacts only — keep failed ones selected
+      // so user can see what needs retrying.
+      const successContactIds = new Set(created.map((l) => l.contactId));
+      setSelected((prev) => {
+        const next = new Set(prev);
+        successContactIds.forEach((id) => next.delete(id));
+        return next;
+      });
+
+      if (failed.length === 0) {
+        setBulkStatus("success");
+        setLastResult({ succeeded: created.length, failed: [] });
+        setTimeout(() => {
+          setBulkStatus(null);
+          setSelected(new Set());
+        }, 3000);
+      } else {
+        setBulkStatus("partial");
+        setLastResult({ succeeded: created.length, failed });
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Bulk generate failed");
+    } finally {
+      setBulkLoading(false);
+    }
+  }
+
+  function handleBulkGenerate() {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    runBulkGenerate(ids);
+  }
+
+  function handleRetry() {
+    const ids = lastResult.failed.map((f) => f.contactId);
+    if (ids.length === 0) return;
+    runBulkGenerate(ids);
   }
 
   function cellStyle(colIdx, isLast) {
     return {
       paddingTop: 10,
       paddingBottom: 10,
-      paddingLeft: colIdx === 0 ? 20 : 12,
+      paddingLeft: colIdx === 0 ? 12 : 12,
       paddingRight: colIdx === HEADERS.length - 1 ? 20 : 12,
       borderBottom: isLast ? undefined : "1px solid var(--border-subtle)",
       borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
@@ -137,6 +312,8 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
       minWidth: 0,
     };
   }
+
+  const showBulkBar = selected.size > 0 || bulkStatus !== null;
 
   return (
     <div className="w-full flex flex-col">
@@ -151,6 +328,19 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
           + Add member
         </Button>
       </div>
+
+      {showBulkBar && (
+        <BulkActionBar
+          selectedCount={selected.size}
+          loading={bulkLoading}
+          status={bulkStatus}
+          successCount={lastResult.succeeded}
+          failedCount={lastResult.failed.length}
+          onClear={clearSelection}
+          onGenerate={handleBulkGenerate}
+          onRetry={handleRetry}
+        />
+      )}
 
       <div
         className="w-full grid text-sm"
@@ -169,13 +359,25 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
               color: "var(--text-muted)",
               paddingTop: 12,
               paddingBottom: 12,
-              paddingLeft: i === 0 ? 20 : 12,
+              paddingLeft: i === 0 ? 12 : 12,
               paddingRight: i === HEADERS.length - 1 ? 20 : 12,
               borderBottom: "1px solid var(--border)",
               borderLeft: i > 0 ? "1px solid var(--border)" : undefined,
+              display: "flex",
+              alignItems: "center",
             }}
           >
-            {label}
+            {i === 0 ? (
+              <Checkbox
+                checked={allEligibleSelected}
+                indeterminate={someEligibleSelected}
+                disabled={eligibleIds.length === 0}
+                onClick={toggleSelectAll}
+                ariaLabel="Select all members"
+              />
+            ) : (
+              label
+            )}
           </span>
         ))}
 
@@ -204,6 +406,9 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
               link={link}
               isLast={isLast}
               cellStyle={cellStyle}
+              checked={selected.has(contact.id)}
+              onToggleSelect={() => toggleSelect(contact.id)}
+              failed={failedIds.has(contact.id)}
               menuOpen={openMenuId === contact.id}
               onToggleMenu={() =>
                 setOpenMenuId((id) => (id === contact.id ? null : contact.id))
@@ -237,6 +442,9 @@ function ContactRow({
   link,
   isLast,
   cellStyle,
+  checked,
+  onToggleSelect,
+  failed,
   menuOpen,
   onToggleMenu,
   onCloseMenu,
@@ -251,21 +459,35 @@ function ContactRow({
   const closeMenu = useCallback(() => onCloseMenu(), [onCloseMenu]);
   useClickOutside(menuRef, closeMenu, menuOpen);
 
+  const hasActiveLink = Boolean(link);
+  const checkboxDisabled = hasActiveLink;
+  const noEmail = !contact.email;
+
   return (
     <React.Fragment>
+      {/* Checkbox */}
+      <span style={cellStyle(0, isLast)}>
+        <Checkbox
+          checked={checked}
+          disabled={checkboxDisabled}
+          onClick={onToggleSelect}
+          ariaLabel={`Select ${contact.name}`}
+          title={checkboxDisabled ? "Portal already active — revoke to regenerate" : undefined}
+        />
+      </span>
       {/* Name */}
-      <span style={{ ...cellStyle(0, isLast), color: "var(--text)" }}>
+      <span style={{ ...cellStyle(1, isLast), color: "var(--text)" }}>
         {contact.name}
       </span>
       {/* Email */}
       <span
-        style={{ ...cellStyle(1, isLast), color: "var(--text)" }}
+        style={{ ...cellStyle(2, isLast), color: "var(--text)" }}
         className="truncate"
       >
         {contact.email || "—"}
       </span>
       {/* Role */}
-      <span style={cellStyle(2, isLast)}>
+      <span style={cellStyle(3, isLast)}>
         {contact.role ? (
           <span
             className="inline-flex h-fit rounded text-xs font-medium"
@@ -290,7 +512,7 @@ function ContactRow({
       {/* Portal */}
       <span
         style={{
-          ...cellStyle(3, isLast),
+          ...cellStyle(4, isLast),
           flexDirection: "column",
           alignItems: "flex-start",
           gap: 2,
@@ -298,11 +520,19 @@ function ContactRow({
       >
         {link ? (
           <>
-            <span className="text-sm" style={{ color: "var(--success)" }}>
-              Portal active
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm" style={{ color: "var(--success)" }}>
+                Portal active
+              </span>
+              {failed && (
+                <span title="Email failed to send — copy link manually or retry">
+                  <WarningIcon />
+                </span>
+              )}
+            </div>
             <span className="text-xs" style={{ color: "var(--text-muted)" }}>
               {formatExpiry(link.expiresAt)}
+              {link.sentAt && ` · Sent ${formatRelative(link.sentAt)}`}
             </span>
           </>
         ) : (
@@ -312,7 +542,7 @@ function ContactRow({
         )}
       </span>
       {/* Link */}
-      <span style={cellStyle(4, isLast)}>
+      <span style={cellStyle(5, isLast)}>
         {link ? (
           <div className="flex items-center gap-3">
             <button onClick={onCopy} className="text-btn text-btn-action text-sm">
@@ -323,13 +553,19 @@ function ContactRow({
             </button>
           </div>
         ) : (
-          <button onClick={onGenerate} className="text-btn text-btn-action text-sm">
-            Generate
+          <button
+            onClick={onGenerate}
+            className="text-btn text-btn-action text-sm"
+            disabled={noEmail}
+            title={noEmail ? "Add an email to send invite" : undefined}
+            style={noEmail ? { opacity: 0.4, cursor: "not-allowed" } : undefined}
+          >
+            Generate + email
           </button>
         )}
       </span>
       {/* Actions */}
-      <span style={cellStyle(5, isLast)}>
+      <span style={cellStyle(6, isLast)}>
         <div ref={menuRef} className="relative">
           <IconButton
             onClick={onToggleMenu}

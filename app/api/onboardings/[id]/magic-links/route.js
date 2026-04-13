@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getMagicLinksForOnboarding, createMagicLink } from "@/lib/db";
+import { getMagicLinksForOnboarding, createMagicLink, markMagicLinkSent, getOnboarding } from "@/lib/db";
+import { sendPortalInvite } from "@/lib/email";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request, { params }) {
@@ -41,7 +42,28 @@ export async function POST(request, { params }) {
     }
 
     const link = await createMagicLink(body.contactId, id, body.expiresInDays || 30);
-    return NextResponse.json(link, { status: 201 });
+    if (!link) {
+      return NextResponse.json({ error: "Failed to create magic link" }, { status: 500 });
+    }
+
+    let sendStatus = "skipped_no_email";
+    if (link.contact?.email) {
+      const onboarding = await getOnboarding(id);
+      const result = await sendPortalInvite({
+        to: link.contact.email,
+        contactName: link.contact.name,
+        companyName: onboarding?.companyName || "",
+        token: link.token,
+        expiresAt: link.expiresAt,
+      });
+      if (result.ok) {
+        const updated = await markMagicLinkSent(link.id, link.contact.email);
+        return NextResponse.json({ ...link, sentAt: updated.sentAt, sentTo: updated.sentTo }, { status: 201 });
+      }
+      sendStatus = result.error || "email_failed";
+    }
+
+    return NextResponse.json({ ...link, emailStatus: sendStatus }, { status: 201 });
   } catch (error) {
     console.error("[POST /api/onboardings/:id/magic-links]", error);
     return NextResponse.json(

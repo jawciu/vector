@@ -200,6 +200,35 @@ a {
   background: var(--bg-hover);
 }
 
+/* Members tab — bulk action bar */
+.bulk-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Members tab — checkbox (table row + select-all) */
+.member-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.member-checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
 /* Kanban task card */
 .task-card {
   background: var(--bg-elevated);

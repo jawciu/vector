@@ -47,6 +47,8 @@ export type MagicLinkMinAggregateOutputType = {
   revokedAt: Date | null
   createdAt: Date | null
   lastUsedAt: Date | null
+  sentAt: Date | null
+  sentTo: string | null
 }
 
 export type MagicLinkMaxAggregateOutputType = {
@@ -58,6 +60,8 @@ export type MagicLinkMaxAggregateOutputType = {
   revokedAt: Date | null
   createdAt: Date | null
   lastUsedAt: Date | null
+  sentAt: Date | null
+  sentTo: string | null
 }
 
 export type MagicLinkCountAggregateOutputType = {
@@ -69,6 +73,8 @@ export type MagicLinkCountAggregateOutputType = {
   revokedAt: number
   createdAt: number
   lastUsedAt: number
+  sentAt: number
+  sentTo: number
   _all: number
 }
 
@@ -94,6 +100,8 @@ export type MagicLinkMinAggregateInputType = {
   revokedAt?: true
   createdAt?: true
   lastUsedAt?: true
+  sentAt?: true
+  sentTo?: true
 }
 
 export type MagicLinkMaxAggregateInputType = {
@@ -105,6 +113,8 @@ export type MagicLinkMaxAggregateInputType = {
   revokedAt?: true
   createdAt?: true
   lastUsedAt?: true
+  sentAt?: true
+  sentTo?: true
 }
 
 export type MagicLinkCountAggregateInputType = {
@@ -116,6 +126,8 @@ export type MagicLinkCountAggregateInputType = {
   revokedAt?: true
   createdAt?: true
   lastUsedAt?: true
+  sentAt?: true
+  sentTo?: true
   _all?: true
 }
 
@@ -214,6 +226,8 @@ export type MagicLinkGroupByOutputType = {
   revokedAt: Date | null
   createdAt: Date
   lastUsedAt: Date | null
+  sentAt: Date | null
+  sentTo: string | null
   _count: MagicLinkCountAggregateOutputType | null
   _avg: MagicLinkAvgAggregateOutputType | null
   _sum: MagicLinkSumAggregateOutputType | null
@@ -248,6 +262,8 @@ export type MagicLinkWhereInput = {
   revokedAt?: Prisma.DateTimeNullableFilter<"MagicLink"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"MagicLink"> | Date | string
   lastUsedAt?: Prisma.DateTimeNullableFilter<"MagicLink"> | Date | string | null
+  sentAt?: Prisma.DateTimeNullableFilter<"MagicLink"> | Date | string | null
+  sentTo?: Prisma.StringNullableFilter<"MagicLink"> | string | null
   contact?: Prisma.XOR<Prisma.ContactScalarRelationFilter, Prisma.ContactWhereInput>
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
 }
@@ -261,6 +277,8 @@ export type MagicLinkOrderByWithRelationInput = {
   revokedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastUsedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sentAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sentTo?: Prisma.SortOrderInput | Prisma.SortOrder
   contact?: Prisma.ContactOrderByWithRelationInput
   onboarding?: Prisma.OnboardingOrderByWithRelationInput
 }
@@ -277,6 +295,8 @@ export type MagicLinkWhereUniqueInput = Prisma.AtLeast<{
   revokedAt?: Prisma.DateTimeNullableFilter<"MagicLink"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"MagicLink"> | Date | string
   lastUsedAt?: Prisma.DateTimeNullableFilter<"MagicLink"> | Date | string | null
+  sentAt?: Prisma.DateTimeNullableFilter<"MagicLink"> | Date | string | null
+  sentTo?: Prisma.StringNullableFilter<"MagicLink"> | string | null
   contact?: Prisma.XOR<Prisma.ContactScalarRelationFilter, Prisma.ContactWhereInput>
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
 }, "id" | "token">
@@ -290,6 +310,8 @@ export type MagicLinkOrderByWithAggregationInput = {
   revokedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastUsedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sentAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sentTo?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.MagicLinkCountOrderByAggregateInput
   _avg?: Prisma.MagicLinkAvgOrderByAggregateInput
   _max?: Prisma.MagicLinkMaxOrderByAggregateInput
@@ -309,6 +331,8 @@ export type MagicLinkScalarWhereWithAggregatesInput = {
   revokedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"MagicLink"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"MagicLink"> | Date | string
   lastUsedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"MagicLink"> | Date | string | null
+  sentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"MagicLink"> | Date | string | null
+  sentTo?: Prisma.StringNullableWithAggregatesFilter<"MagicLink"> | string | null
 }
 
 export type MagicLinkCreateInput = {
@@ -317,6 +341,8 @@ export type MagicLinkCreateInput = {
   revokedAt?: Date | string | null
   createdAt?: Date | string
   lastUsedAt?: Date | string | null
+  sentAt?: Date | string | null
+  sentTo?: string | null
   contact: Prisma.ContactCreateNestedOneWithoutMagicLinksInput
   onboarding: Prisma.OnboardingCreateNestedOneWithoutMagicLinksInput
 }
@@ -330,6 +356,8 @@ export type MagicLinkUncheckedCreateInput = {
   revokedAt?: Date | string | null
   createdAt?: Date | string
   lastUsedAt?: Date | string | null
+  sentAt?: Date | string | null
+  sentTo?: string | null
 }
 
 export type MagicLinkUpdateInput = {
@@ -338,6 +366,8 @@ export type MagicLinkUpdateInput = {
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contact?: Prisma.ContactUpdateOneRequiredWithoutMagicLinksNestedInput
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutMagicLinksNestedInput
 }
@@ -351,6 +381,8 @@ export type MagicLinkUncheckedUpdateInput = {
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MagicLinkCreateManyInput = {
@@ -362,6 +394,8 @@ export type MagicLinkCreateManyInput = {
   revokedAt?: Date | string | null
   createdAt?: Date | string
   lastUsedAt?: Date | string | null
+  sentAt?: Date | string | null
+  sentTo?: string | null
 }
 
 export type MagicLinkUpdateManyMutationInput = {
@@ -370,6 +404,8 @@ export type MagicLinkUpdateManyMutationInput = {
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MagicLinkUncheckedUpdateManyInput = {
@@ -381,6 +417,8 @@ export type MagicLinkUncheckedUpdateManyInput = {
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MagicLinkListRelationFilter = {
@@ -402,6 +440,8 @@ export type MagicLinkCountOrderByAggregateInput = {
   revokedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastUsedAt?: Prisma.SortOrder
+  sentAt?: Prisma.SortOrder
+  sentTo?: Prisma.SortOrder
 }
 
 export type MagicLinkAvgOrderByAggregateInput = {
@@ -419,6 +459,8 @@ export type MagicLinkMaxOrderByAggregateInput = {
   revokedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastUsedAt?: Prisma.SortOrder
+  sentAt?: Prisma.SortOrder
+  sentTo?: Prisma.SortOrder
 }
 
 export type MagicLinkMinOrderByAggregateInput = {
@@ -430,6 +472,8 @@ export type MagicLinkMinOrderByAggregateInput = {
   revokedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastUsedAt?: Prisma.SortOrder
+  sentAt?: Prisma.SortOrder
+  sentTo?: Prisma.SortOrder
 }
 
 export type MagicLinkSumOrderByAggregateInput = {
@@ -528,6 +572,8 @@ export type MagicLinkCreateWithoutOnboardingInput = {
   revokedAt?: Date | string | null
   createdAt?: Date | string
   lastUsedAt?: Date | string | null
+  sentAt?: Date | string | null
+  sentTo?: string | null
   contact: Prisma.ContactCreateNestedOneWithoutMagicLinksInput
 }
 
@@ -539,6 +585,8 @@ export type MagicLinkUncheckedCreateWithoutOnboardingInput = {
   revokedAt?: Date | string | null
   createdAt?: Date | string
   lastUsedAt?: Date | string | null
+  sentAt?: Date | string | null
+  sentTo?: string | null
 }
 
 export type MagicLinkCreateOrConnectWithoutOnboardingInput = {
@@ -579,6 +627,8 @@ export type MagicLinkScalarWhereInput = {
   revokedAt?: Prisma.DateTimeNullableFilter<"MagicLink"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"MagicLink"> | Date | string
   lastUsedAt?: Prisma.DateTimeNullableFilter<"MagicLink"> | Date | string | null
+  sentAt?: Prisma.DateTimeNullableFilter<"MagicLink"> | Date | string | null
+  sentTo?: Prisma.StringNullableFilter<"MagicLink"> | string | null
 }
 
 export type MagicLinkCreateWithoutContactInput = {
@@ -587,6 +637,8 @@ export type MagicLinkCreateWithoutContactInput = {
   revokedAt?: Date | string | null
   createdAt?: Date | string
   lastUsedAt?: Date | string | null
+  sentAt?: Date | string | null
+  sentTo?: string | null
   onboarding: Prisma.OnboardingCreateNestedOneWithoutMagicLinksInput
 }
 
@@ -598,6 +650,8 @@ export type MagicLinkUncheckedCreateWithoutContactInput = {
   revokedAt?: Date | string | null
   createdAt?: Date | string
   lastUsedAt?: Date | string | null
+  sentAt?: Date | string | null
+  sentTo?: string | null
 }
 
 export type MagicLinkCreateOrConnectWithoutContactInput = {
@@ -634,6 +688,8 @@ export type MagicLinkCreateManyOnboardingInput = {
   revokedAt?: Date | string | null
   createdAt?: Date | string
   lastUsedAt?: Date | string | null
+  sentAt?: Date | string | null
+  sentTo?: string | null
 }
 
 export type MagicLinkUpdateWithoutOnboardingInput = {
@@ -642,6 +698,8 @@ export type MagicLinkUpdateWithoutOnboardingInput = {
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contact?: Prisma.ContactUpdateOneRequiredWithoutMagicLinksNestedInput
 }
 
@@ -653,6 +711,8 @@ export type MagicLinkUncheckedUpdateWithoutOnboardingInput = {
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MagicLinkUncheckedUpdateManyWithoutOnboardingInput = {
@@ -663,6 +723,8 @@ export type MagicLinkUncheckedUpdateManyWithoutOnboardingInput = {
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MagicLinkCreateManyContactInput = {
@@ -673,6 +735,8 @@ export type MagicLinkCreateManyContactInput = {
   revokedAt?: Date | string | null
   createdAt?: Date | string
   lastUsedAt?: Date | string | null
+  sentAt?: Date | string | null
+  sentTo?: string | null
 }
 
 export type MagicLinkUpdateWithoutContactInput = {
@@ -681,6 +745,8 @@ export type MagicLinkUpdateWithoutContactInput = {
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutMagicLinksNestedInput
 }
 
@@ -692,6 +758,8 @@ export type MagicLinkUncheckedUpdateWithoutContactInput = {
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MagicLinkUncheckedUpdateManyWithoutContactInput = {
@@ -702,6 +770,8 @@ export type MagicLinkUncheckedUpdateManyWithoutContactInput = {
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sentTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -715,6 +785,8 @@ export type MagicLinkSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   revokedAt?: boolean
   createdAt?: boolean
   lastUsedAt?: boolean
+  sentAt?: boolean
+  sentTo?: boolean
   contact?: boolean | Prisma.ContactDefaultArgs<ExtArgs>
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["magicLink"]>
@@ -728,6 +800,8 @@ export type MagicLinkSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   revokedAt?: boolean
   createdAt?: boolean
   lastUsedAt?: boolean
+  sentAt?: boolean
+  sentTo?: boolean
   contact?: boolean | Prisma.ContactDefaultArgs<ExtArgs>
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["magicLink"]>
@@ -741,6 +815,8 @@ export type MagicLinkSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   revokedAt?: boolean
   createdAt?: boolean
   lastUsedAt?: boolean
+  sentAt?: boolean
+  sentTo?: boolean
   contact?: boolean | Prisma.ContactDefaultArgs<ExtArgs>
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["magicLink"]>
@@ -754,9 +830,11 @@ export type MagicLinkSelectScalar = {
   revokedAt?: boolean
   createdAt?: boolean
   lastUsedAt?: boolean
+  sentAt?: boolean
+  sentTo?: boolean
 }
 
-export type MagicLinkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "token" | "contactId" | "onboardingId" | "expiresAt" | "revokedAt" | "createdAt" | "lastUsedAt", ExtArgs["result"]["magicLink"]>
+export type MagicLinkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "token" | "contactId" | "onboardingId" | "expiresAt" | "revokedAt" | "createdAt" | "lastUsedAt" | "sentAt" | "sentTo", ExtArgs["result"]["magicLink"]>
 export type MagicLinkInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   contact?: boolean | Prisma.ContactDefaultArgs<ExtArgs>
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
@@ -785,6 +863,8 @@ export type $MagicLinkPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     revokedAt: Date | null
     createdAt: Date
     lastUsedAt: Date | null
+    sentAt: Date | null
+    sentTo: string | null
   }, ExtArgs["result"]["magicLink"]>
   composites: {}
 }
@@ -1218,6 +1298,8 @@ export interface MagicLinkFieldRefs {
   readonly revokedAt: Prisma.FieldRef<"MagicLink", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"MagicLink", 'DateTime'>
   readonly lastUsedAt: Prisma.FieldRef<"MagicLink", 'DateTime'>
+  readonly sentAt: Prisma.FieldRef<"MagicLink", 'DateTime'>
+  readonly sentTo: Prisma.FieldRef<"MagicLink", 'String'>
 }
     
 

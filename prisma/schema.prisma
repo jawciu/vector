@@ -104,6 +104,8 @@ model MagicLink {
   revokedAt     DateTime?
   createdAt     DateTime   @default(now())
   lastUsedAt    DateTime?
+  sentAt        DateTime?
+  sentTo        String?
 
   @@index([contactId])
 }
