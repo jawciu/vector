@@ -205,7 +205,7 @@ The customer-facing experience. This is the differentiator — if customers actu
 - Link opens the customer portal for that specific onboarding — no login, no account
 - Token per contact per onboarding: UUID, expirable (default 30 days), revocable
 - Vendor can generate / copy / revoke / resend links from the onboarding detail page
-- No email sending for MVP — copy-to-clipboard only.
+- MVP shipped with copy-to-clipboard only; bulk invite + email delivery covered in 2.6.
 
 #### 2.2 Customer portal pages (MVP — 3 pages)
 - **Progress overview** (landing): health banner with reasons, task summary counts (to do / in progress / done / blocked), segmented status bar per phase, go-live countdown, upcoming deadlines
@@ -230,6 +230,57 @@ The customer-facing experience. This is the differentiator — if customers actu
 - Digest option: daily summary email instead of per-event
 - Each notification includes a magic link back to the relevant task/page
 - Unsubscribe option per contact
+
+#### 2.6 Bulk member invite + email delivery (planned)
+
+**Goal:** A CSM ticks members who need portal access → clicks one button → each person gets a personalized email with their own unique link. Single-row Generate also sends email. Copy/Revoke stay per-row.
+
+**Decisions (resolved 2026-04-13 with Caroline):**
+- Each magic link is per-contact; "bulk" means N links in one action, not one shared link.
+- Rows with an active link have a disabled checkbox (tooltip: "Portal already active — revoke to regenerate"). "Select all" only selects eligible rows.
+- Partial failure → bar stays open with `Sent to N — M failed. [Retry]`. Retry re-POSTs with only the failed contactIds; server-side "skip already-active" guard prevents duplicates.
+- Single-row Generate becomes "Generate + email" (no dropdown / no "generate link only" option — Copy/Revoke remain after generation as the manual-paste escape hatch). Disabled when contact has no email.
+- Expiry hardcoded to 30 days for now; picker deferred.
+- CSM identity hardcoded as "Caroline Jaworsky" / sender company "Vector" for now; swap to Supabase user metadata when auth metadata is set up.
+- **Out of scope this phase:** bulk revoke, expiry picker, HTML/branded email template, per-CSM identity.
+
+**UX — table changes:**
+- New leftmost checkbox column (~32px). Header cell holds "select all" checkbox.
+- Checkbox disabled on rows with active link.
+- Sticky bulk action bar appears when ≥1 row selected: `N members selected    [Clear]    [Generate + email]`.
+- Success → "Sent to N members" toast in the bar, auto-dismiss after 3s; selected rows update to active + "Sent just now."
+- Partial failure → bar stays with Retry button; failed rows show inline warning icon next to Portal status (tooltip: "Email failed to send — retry from bulk bar or copy link manually").
+- Portal column gains a "Sent X ago" line under the expiry.
+
+**API:**
+- New: `POST /api/onboardings/:id/magic-links/bulk` — body `{ contactIds: number[] }`. Response `{ created: [...], skipped: [{contactId, reason: "already_active"}], failed: [{contactId, reason: "no_email" | "email_failed"}] }`. Link rows are kept even when email delivery fails so CSM can recover via per-row Copy.
+- Updated: `POST /api/onboardings/:id/magic-links` (single) — after creating the link, send the email if contact has one; update `sentAt` / `sentTo`. Link is still returned on email failure.
+
+**Data model:**
+- Add `sentAt: DateTime?` and `sentTo: String?` to `MagicLink`. Nullable so pre-existing links have no send history. Migration name: `magic_link_sent_tracking`.
+
+**Email:**
+- Provider: **Resend** (simple API, generous free tier, React Email support if we want HTML later).
+- Env vars: `RESEND_API_KEY`, `EMAIL_FROM` (e.g. `Vector <onboarding@vector.com>`).
+- New `lib/email.js` with `sendPortalInvite({ to, contactName, companyName, portalUrl, expiresAt })`. If `RESEND_API_KEY` is set → calls Resend; if not → logs the payload and returns `{ ok: true, stub: true }`. End-to-end flow works during development with no external dependency — flip the env var to go live.
+- Template v1 (plain text):
+  ```
+  Subject: Your {{companyName}} onboarding portal is ready
+  Body:
+    Hi {{contactName}},
+    Caroline Jaworsky from Vector invited you to the {{companyName}} onboarding portal.
+    Open your portal: {{portalUrl}}
+    This link is personal to you and expires on {{expiryDate}}.
+  ```
+
+**Build order:**
+1. DB migration + `lib/db.js` helpers (`createMagicLinksBulk`, `markMagicLinkSent`)
+2. `lib/email.js` with logging stub fallback
+3. Bulk API endpoint + update single endpoint to send email
+4. UI: checkbox column + selection state (no bulk bar yet)
+5. UI: bulk action bar + success / partial-failure states
+6. UI: per-row "Sent X ago" + failed warning
+7. Plug in Resend (env vars, domain verification) — flip the switch
 
 #### Implementation steps (7 shippable increments)
 
