@@ -29,7 +29,8 @@ export async function POST(request, { params }) {
     const { created, skipped } = await createMagicLinksBulk(
       body.contactIds,
       id,
-      body.expiresInDays || 30
+      body.expiresInDays || 30,
+      { force: body.force === true }
     );
 
     const results = await Promise.allSettled(

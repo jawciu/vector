@@ -8,7 +8,7 @@ import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import MemberModal from "./MemberModal";
 import BulkActionBar from "./BulkActionBar";
 
-const GRID_COLUMNS = "40px 1fr 1.5fr 140px 280px 120px 48px";
+const GRID_COLUMNS = "40px 1fr 1.5fr 140px 280px 120px 88px";
 const HEADERS = ["", "Name", "Email", "Role", "Portal", "Link", "Actions"];
 
 function formatExpiry(dateStr) {
@@ -234,13 +234,13 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
     }
   }
 
-  async function runBulkGenerate(contactIds) {
+  async function runBulkGenerate(contactIds, { force = false } = {}) {
     setBulkLoading(true);
     try {
       const res = await fetch(`/api/onboardings/${onboardingId}/magic-links/bulk`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contactIds }),
+        body: JSON.stringify({ contactIds, force }),
       });
       if (!res.ok) throw new Error("Bulk generate failed");
       const { created, failed } = await res.json();
@@ -307,7 +307,7 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
   function handleRetry() {
     const ids = lastResult.failed.map((f) => f.contactId);
     if (ids.length === 0) return;
-    runBulkGenerate(ids);
+    runBulkGenerate(ids, { force: true });
   }
 
   function cellStyle(colIdx, isLast) {
@@ -315,12 +315,13 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
       paddingTop: 10,
       paddingBottom: 10,
       paddingLeft: 12,
-      paddingRight: 12,
+      paddingRight: colIdx === HEADERS.length - 1 ? 20 : 12,
       borderBottom: isLast ? undefined : "1px solid var(--border-subtle)",
       borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
       display: "flex",
       alignItems: "center",
       minWidth: 0,
+      ...(colIdx === 0 ? { position: "sticky", left: 0, zIndex: 1, background: "var(--bg)" } : {}),
     };
   }
 
@@ -371,11 +372,12 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
               paddingTop: 12,
               paddingBottom: 12,
               paddingLeft: 12,
-              paddingRight: 12,
+              paddingRight: i === HEADERS.length - 1 ? 20 : 12,
               borderBottom: "1px solid var(--border)",
               borderLeft: i > 0 ? "1px solid var(--border)" : undefined,
               display: "flex",
               alignItems: "center",
+              ...(i === 0 ? { position: "sticky", left: 0, zIndex: 2, background: "var(--bg)" } : {}),
             }}
           >
             {i === 0 ? (
@@ -472,8 +474,12 @@ function ContactRow({
   useClickOutside(menuRef, closeMenu, menuOpen);
 
   const hasActiveLink = Boolean(link);
-  const checkboxDisabled = hasActiveLink;
   const noEmail = !contact.email;
+  // Email not delivered: link exists but sentAt is null and contact has email,
+  // OR explicitly marked as failed in this session
+  const emailNotSent = hasActiveLink && !link.sentAt && !noEmail;
+  const showFailed = failed || emailNotSent;
+  const checkboxDisabled = hasActiveLink && !showFailed;
 
   return (
     <React.Fragment>
@@ -530,7 +536,7 @@ function ContactRow({
           gap: 2,
         }}
       >
-        {link && !failed ? (
+        {link && !showFailed ? (
           <>
             <div className="flex items-center gap-1.5">
               <span className="text-sm" style={{ color: "var(--success)" }}>
@@ -547,7 +553,7 @@ function ContactRow({
             <span className="text-sm" style={{ color: "var(--text-muted)" }}>
               Portal inactive
             </span>
-            {failed && (
+            {showFailed && (
               <span title="Email failed to send">
                 <WarningIcon />
               </span>
@@ -557,7 +563,7 @@ function ContactRow({
       </span>
       {/* Link */}
       <span style={cellStyle(5, isLast)}>
-        {link && !failed ? (
+        {link && !showFailed ? (
           <div className="flex items-center gap-3">
             <button onClick={onCopy} className="text-btn text-btn-action text-sm">
               {copied ? "Copied!" : "Copy"}
@@ -574,7 +580,7 @@ function ContactRow({
             title={noEmail ? "Add an email to send invite" : undefined}
             style={noEmail ? { opacity: 0.4, cursor: "not-allowed" } : undefined}
           >
-            {failed ? "Resend" : "Send"}
+            {showFailed ? "Resend" : "Send"}
           </button>
         )}
       </span>
