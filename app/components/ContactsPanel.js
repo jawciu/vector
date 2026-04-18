@@ -8,8 +8,8 @@ import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import MemberModal from "./MemberModal";
 import BulkActionBar from "./BulkActionBar";
 
-const GRID_COLUMNS = "40px 1fr 1.3fr 140px 220px 140px 48px";
-const HEADERS = ["", "Name", "Email", "Role", "Portal", "Link", ""];
+const GRID_COLUMNS = "40px 1fr 1.5fr 140px 280px 120px 48px";
+const HEADERS = ["", "Name", "Email", "Role", "Portal", "Link", "Actions"];
 
 function formatExpiry(dateStr) {
   const date = new Date(dateStr);
@@ -44,7 +44,7 @@ function Checkbox({ checked, indeterminate, disabled, onClick, ariaLabel, title 
   return (
     <button
       type="button"
-      className="member-checkbox"
+      className="group member-checkbox"
       disabled={disabled}
       onClick={(e) => {
         e.stopPropagation();
@@ -64,8 +64,13 @@ function Checkbox({ checked, indeterminate, disabled, onClick, ariaLabel, title 
             <rect x="0.5" y="0.5" width="13" height="13" rx="3.5" stroke="var(--action)" />
             <rect x="3" y="6.5" width="8" height="1" rx="0.5" fill="var(--action)" />
           </>
-        ) : (
+        ) : disabled ? (
           <rect x="0.5" y="0.5" width="13" height="13" rx="3.5" stroke="#5D565D" />
+        ) : (
+          <>
+            <rect x="0.5" y="0.5" width="13" height="13" rx="3.5" stroke="#5D565D" className="group-hover:hidden" />
+            <rect x="0.5" y="0.5" width="13" height="13" rx="3.5" stroke="var(--action)" className="hidden group-hover:block" />
+          </>
         )}
       </svg>
     </button>
@@ -183,6 +188,8 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
       );
       if (newLink.emailStatus && newLink.emailStatus !== "skipped_no_email") {
         setFailedIds((prev) => new Set(prev).add(contactId));
+      } else {
+        setFailedIds((prev) => { const next = new Set(prev); next.delete(contactId); return next; });
       }
     } catch (err) {
       console.error(err);
@@ -268,16 +275,20 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
         return next;
       });
 
-      if (failed.length === 0) {
+      if (failed.length === 0 && created.length > 0) {
         setBulkStatus("success");
         setLastResult({ succeeded: created.length, failed: [] });
         setTimeout(() => {
           setBulkStatus(null);
           setSelected(new Set());
         }, 3000);
-      } else {
+      } else if (failed.length > 0) {
         setBulkStatus("partial");
         setLastResult({ succeeded: created.length, failed });
+      } else {
+        // All skipped (already active) — just dismiss
+        setBulkStatus(null);
+        setSelected(new Set());
       }
     } catch (err) {
       console.error(err);
@@ -303,8 +314,8 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
     return {
       paddingTop: 10,
       paddingBottom: 10,
-      paddingLeft: colIdx === 0 ? 12 : 12,
-      paddingRight: colIdx === HEADERS.length - 1 ? 20 : 12,
+      paddingLeft: 12,
+      paddingRight: 12,
       borderBottom: isLast ? undefined : "1px solid var(--border-subtle)",
       borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
       display: "flex",
@@ -342,12 +353,12 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
         />
       )}
 
+      <div className="w-full overflow-x-auto" style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
       <div
-        className="w-full grid text-sm"
+        className="grid text-sm"
         style={{
           gridTemplateColumns: GRID_COLUMNS,
-          borderTop: "1px solid var(--border)",
-          borderBottom: "1px solid var(--border)",
+          minWidth: "max-content",
         }}
       >
         {/* Header row */}
@@ -359,8 +370,8 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
               color: "var(--text-muted)",
               paddingTop: 12,
               paddingBottom: 12,
-              paddingLeft: i === 0 ? 12 : 12,
-              paddingRight: i === HEADERS.length - 1 ? 20 : 12,
+              paddingLeft: 12,
+              paddingRight: 12,
               borderBottom: "1px solid var(--border)",
               borderLeft: i > 0 ? "1px solid var(--border)" : undefined,
               display: "flex",
@@ -423,6 +434,7 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
             />
           );
         })}
+      </div>
       </div>
 
       <MemberModal
@@ -518,17 +530,12 @@ function ContactRow({
           gap: 2,
         }}
       >
-        {link ? (
+        {link && !failed ? (
           <>
             <div className="flex items-center gap-1.5">
               <span className="text-sm" style={{ color: "var(--success)" }}>
                 Portal active
               </span>
-              {failed && (
-                <span title="Email failed to send — copy link manually or retry">
-                  <WarningIcon />
-                </span>
-              )}
             </div>
             <span className="text-xs" style={{ color: "var(--text-muted)" }}>
               {formatExpiry(link.expiresAt)}
@@ -536,14 +543,21 @@ function ContactRow({
             </span>
           </>
         ) : (
-          <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-            Portal inactive
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm" style={{ color: "var(--text-muted)" }}>
+              Portal inactive
+            </span>
+            {failed && (
+              <span title="Email failed to send">
+                <WarningIcon />
+              </span>
+            )}
+          </div>
         )}
       </span>
       {/* Link */}
       <span style={cellStyle(5, isLast)}>
-        {link ? (
+        {link && !failed ? (
           <div className="flex items-center gap-3">
             <button onClick={onCopy} className="text-btn text-btn-action text-sm">
               {copied ? "Copied!" : "Copy"}
@@ -560,7 +574,7 @@ function ContactRow({
             title={noEmail ? "Add an email to send invite" : undefined}
             style={noEmail ? { opacity: 0.4, cursor: "not-allowed" } : undefined}
           >
-            Generate + email
+            {failed ? "Resend" : "Send"}
           </button>
         )}
       </span>

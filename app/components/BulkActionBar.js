@@ -2,6 +2,8 @@
 
 import Button from "../ui/Button";
 
+const rightGroupStyle = { minWidth: 148 };
+
 export default function BulkActionBar({
   selectedCount,
   loading,
@@ -26,15 +28,19 @@ export default function BulkActionBar({
     return (
       <div className="bulk-action-bar">
         <span className="text-sm" style={{ color: "var(--text)" }}>
-          Sent to {successCount} — {failedCount} failed
+          {successCount} sent, {failedCount} failed
         </span>
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-3">
           <Button variant="secondary" size="sm" onClick={onClear} disabled={loading}>
             Dismiss
           </Button>
-          <Button variant="primary" size="sm" onClick={onRetry} disabled={loading}>
-            {loading ? "Retrying…" : "Retry failed"}
-          </Button>
+          <div style={{ width: 1, height: 16, background: "var(--border)", marginLeft: 4, marginRight: 4 }} />
+          <div className="flex items-center gap-3" style={rightGroupStyle}>
+            <span className="text-sm" style={{ color: "var(--text-muted)" }}>Link</span>
+            <Button variant="primary" size="sm" onClick={onRetry} disabled={loading}>
+              {loading ? "Sending…" : "Resend"}
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -45,13 +51,17 @@ export default function BulkActionBar({
       <span className="text-sm" style={{ color: "var(--text)" }}>
         {selectedCount} {selectedCount === 1 ? "member" : "members"} selected
       </span>
-      <div className="flex items-center gap-2 ml-auto">
+      <div className="flex items-center gap-3">
         <Button variant="secondary" size="sm" onClick={onClear} disabled={loading}>
           Clear
         </Button>
-        <Button variant="primary" size="sm" onClick={onGenerate} disabled={loading}>
-          {loading ? "Sending…" : "Generate + email"}
-        </Button>
+        <div style={{ width: 1, height: 16, background: "var(--border)", marginLeft: 4, marginRight: 4 }} />
+        <div className="flex items-center gap-3" style={rightGroupStyle}>
+          <span className="text-sm" style={{ color: "var(--text-muted)" }}>Link</span>
+          <Button variant="primary" size="sm" onClick={onGenerate} disabled={loading}>
+            {loading ? "Sending…" : "Send"}
+          </Button>
+        </div>
       </div>
     </div>
   );
