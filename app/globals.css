@@ -219,6 +219,17 @@ a {
   justify-content: center;
 }
 
+/* Members tab — portal cell flash on re-failure */
+@keyframes portalFlash {
+  0%   { color: var(--text-muted); }
+  30%  { color: var(--text); }
+  100% { color: var(--text-muted); }
+}
+
+.portal-flash {
+  animation: portalFlash 0.6s ease;
+}
+
 /* Members tab — checkbox (table row + select-all) */
 .member-checkbox {
   display: inline-flex;

@@ -97,6 +97,15 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
   const [bulkStatus, setBulkStatus] = useState(null); // null | "success" | "partial"
   const [lastResult, setLastResult] = useState({ succeeded: 0, failed: [] }); // failed: [{contactId, reason}]
   const [failedIds, setFailedIds] = useState(() => new Set());
+  const [flashMap, setFlashMap] = useState(() => new Map()); // contactId → counter for flash animation
+
+  function flashContacts(contactIds) {
+    setFlashMap((prev) => {
+      const next = new Map(prev);
+      contactIds.forEach((id) => next.set(id, (next.get(id) || 0) + 1));
+      return next;
+    });
+  }
 
   // Eligible = contacts without an active link (checkbox enabled)
   const eligibleIds = useMemo(
@@ -188,6 +197,7 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
       );
       if (newLink.emailStatus && newLink.emailStatus !== "skipped_no_email") {
         setFailedIds((prev) => new Set(prev).add(contactId));
+        flashContacts([contactId]);
       } else {
         setFailedIds((prev) => { const next = new Set(prev); next.delete(contactId); return next; });
       }
@@ -285,6 +295,7 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
       } else if (failed.length > 0) {
         setBulkStatus("partial");
         setLastResult({ succeeded: created.length, failed });
+        flashContacts(failed.map((f) => f.contactId));
       } else {
         // All skipped (already active) — just dismiss
         setBulkStatus(null);
@@ -430,9 +441,11 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
               onEdit={() => openEditModal(contact)}
               onDelete={() => handleDelete(contact.id)}
               onGenerate={() => handleGenerate(contact.id)}
+              menuFlipUp={rowIdx >= contacts.length - 2}
               onCopy={() => link && handleCopy(link)}
               onRevoke={() => link && handleRevoke(link)}
               copied={link && copiedId === link.id}
+              flashKey={flashMap.get(contact.id) || 0}
             />
           );
         })}
@@ -468,6 +481,8 @@ function ContactRow({
   onCopy,
   onRevoke,
   copied,
+  flashKey,
+  menuFlipUp,
 }) {
   const menuRef = useRef(null);
   const closeMenu = useCallback(() => onCloseMenu(), [onCloseMenu]);
@@ -549,15 +564,15 @@ function ContactRow({
             </span>
           </>
         ) : (
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-              Portal inactive
-            </span>
+          <div className="flex items-center gap-1.5" key={showFailed ? flashKey : undefined}>
             {showFailed && (
               <span title="Email failed to send">
                 <WarningIcon />
               </span>
             )}
+            <span className={`text-sm${showFailed ? " portal-flash" : ""}`} style={{ color: "var(--text-muted)" }}>
+              Portal inactive
+            </span>
           </div>
         )}
       </span>
@@ -601,7 +616,12 @@ function ContactRow({
           {menuOpen && (
             <MenuList
               role="menu"
-              style={{ left: "auto", right: 0, width: "160px" }}
+              style={{
+                left: "auto",
+                right: 0,
+                width: "160px",
+                ...(menuFlipUp ? { bottom: "100%", top: "auto", marginBottom: 4 } : {}),
+              }}
             >
               <MenuOption
                 role="menuitem"
