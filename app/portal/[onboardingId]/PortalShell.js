@@ -54,7 +54,7 @@ export default function PortalShell({ data, tasks, contactName }) {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
-    <div className="max-w-[640px] md:max-w-[960px]" style={{ margin: "0 auto" }}>
+    <div className="w-full flex flex-col h-full">
       {/* Header */}
       <header
         style={{
@@ -75,9 +75,13 @@ export default function PortalShell({ data, tasks, contactName }) {
         <TabBar tabs={PORTAL_TABS} activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
-      {/* Tab content — extra bottom padding on mobile for bottom nav */}
-      <div className="p-4 pb-20 md:pb-4 md:p-6">
-        {activeTab === "overview" && <PortalOverview data={data} />}
+      {/* Tab content */}
+      <div style={{ paddingBottom: 80 }}>
+        {activeTab === "overview" && (
+          <div style={{ padding: "12px 16px" }}>
+            <PortalOverview data={data} />
+          </div>
+        )}
         {activeTab === "my-tasks" && <PortalTasks tasks={tasks} myOnly contactName={contactName} />}
         {activeTab === "all-tasks" && <PortalTasks tasks={tasks} myOnly={false} contactName={contactName} />}
       </div>
@@ -89,8 +93,6 @@ export default function PortalShell({ data, tasks, contactName }) {
           padding: "8px 0 calc(8px + env(safe-area-inset-bottom, 0px))",
           background: "var(--bg-elevated)",
           borderTop: "1px solid var(--border)",
-          maxWidth: 640,
-          margin: "0 auto",
         }}
       >
         {PORTAL_TABS.map(({ id, label, icon }) => (

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PortalTaskCard from "./PortalTaskCard";
 import PortalDrawer from "./PortalDrawer";
+import TaskFilterMenu from "@/app/components/TaskFilterMenu";
 
 function EmptyState({ filter, myOnly }) {
   const messages = {
@@ -150,33 +151,11 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
       .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
   }));
 
-  const FILTERS = [
-    { id: "active", label: "Active" },
-    { id: "done", label: "Done" },
-    { id: "all", label: "All" },
-  ];
-
   return (
     <div>
-      {/* Filter pills */}
-      <div className="flex gap-1.5 mb-4">
-        {FILTERS.map(({ id, label }) => (
-          <button
-            key={id}
-            onClick={() => setFilter(id)}
-            className="text-xs font-medium rounded-full"
-            style={{
-              padding: "6px 14px",
-              minHeight: 32,
-              background: filter === id ? "var(--action)" : "transparent",
-              color: filter === id ? "var(--action-text)" : "var(--text-muted)",
-              border: filter === id ? "none" : "1px solid var(--border)",
-              cursor: "pointer",
-            }}
-          >
-            {label}
-          </button>
-        ))}
+      {/* Filter dropdown — shared with main product */}
+      <div style={{ padding: "12px 16px", paddingBottom: 0 }}>
+        <TaskFilterMenu value={filter} onChange={setFilter} />
       </div>
 
       {filtered.length === 0 ? (
@@ -184,7 +163,7 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
       ) : (
         <>
           {/* ─── MOBILE: stacked list by phase ─── */}
-          <div className="flex flex-col gap-4 md:hidden">
+          <div className="flex flex-col gap-4 md:hidden" style={{ padding: "12px 16px" }}>
             {phaseOrder.map((group) => (
               <div key={group.id}>
                 <div
@@ -209,12 +188,13 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
           </div>
 
           {/* ─── DESKTOP: Kanban columns ─── */}
-          <div className="hidden md:block" style={{ overflowX: "auto", marginLeft: -24, marginRight: -24, paddingLeft: 24, paddingRight: 24 }}>
+          <div className="hidden md:block" style={{ overflowX: "auto" }}>
             <div
               style={{
                 display: "flex",
                 gap: 0,
                 minWidth: columns.length * 264,
+                padding: "12px 16px",
                 alignItems: "stretch",
               }}
             >
