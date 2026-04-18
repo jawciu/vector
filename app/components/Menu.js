@@ -44,7 +44,7 @@ export function MenuList({
     "absolute left-0 z-10 rounded-lg border px-1 py-1 shadow-lg flex flex-col gap-1";
   const baseStyle = {
     top: "calc(100% + 4px)",
-    background: "var(--bg)",
+    background: "var(--bg-elevated)",
     borderColor: "var(--border)",
     width: "144px",
     padding: "4px",
