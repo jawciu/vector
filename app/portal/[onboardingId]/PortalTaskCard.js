@@ -202,8 +202,8 @@ export default function PortalTaskCard({ task, onTaskUpdated, onCardClick, onSes
           {task.files && task.files.length > 0 && (
             <div className="flex items-center gap-1">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-secondary)" }}>
-                <path d="M8 1.5H4a1.5 1.5 0 00-1.5 1.5v8A1.5 1.5 0 004 12.5h6a1.5 1.5 0 001.5-1.5V5L8 1.5z" stroke="currentColor" strokeWidth="0.9" strokeLinejoin="round" />
-                <path d="M8 1.5V5h3.5" stroke="currentColor" strokeWidth="0.9" strokeLinejoin="round" />
+                <path d="M9.5 0.5H2.5a1.5 1.5 0 00-1.5 1.5v10a1.5 1.5 0 001.5 1.5h9a1.5 1.5 0 001.5-1.5V4.5L9.5 0.5z" stroke="currentColor" strokeWidth="0.9" strokeLinejoin="round" />
+                <path d="M9.5 0.5V4.5h3.5" stroke="currentColor" strokeWidth="0.9" strokeLinejoin="round" />
               </svg>
               <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
                 {task.files.length}

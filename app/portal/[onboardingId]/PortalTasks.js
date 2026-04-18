@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import PortalTaskCard from "./PortalTaskCard";
 import PortalDrawer from "./PortalDrawer";
 import TaskFilterMenu from "@/app/components/TaskFilterMenu";
+import { taskMatchesFilter, TASK_FILTER_OPTIONS } from "@/lib/taskFilters";
 
 function EmptyState({ filter, myOnly }) {
   const messages = {
@@ -26,7 +27,15 @@ function EmptyState({ filter, myOnly }) {
     },
   };
 
-  const msg = messages[filter] || messages.all;
+  let msg = messages[filter];
+  if (!msg) {
+    const opt = TASK_FILTER_OPTIONS.find((o) => o.id === filter);
+    const label = opt?.label?.toLowerCase() || "matching";
+    msg = {
+      title: myOnly ? `No ${label} tasks assigned to you` : `No ${label} tasks`,
+      body: "Try a different filter to see other tasks.",
+    };
+  }
 
   return (
     <div className="text-center" style={{ padding: "40px 16px" }}>
@@ -94,9 +103,7 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
 
   const filtered = tasks.filter((t) => {
     if (myOnly && !t.isAssignedToMe) return false;
-    if (filter === "active") return t.status !== "Done";
-    if (filter === "done") return t.status === "Done";
-    return true;
+    return taskMatchesFilter(t, filter);
   });
 
   // Build columns from phases
@@ -154,7 +161,12 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
   return (
     <div>
       {/* Filter dropdown — shared with main product */}
-      <div style={{ padding: "12px 16px", paddingBottom: 0 }}>
+      <div
+        style={{
+          padding: "12px 16px",
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
         <TaskFilterMenu value={filter} onChange={setFilter} />
       </div>
 

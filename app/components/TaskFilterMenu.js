@@ -2,14 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { MenuTriggerButton, MenuList, MenuOption } from "./Menu";
+import { TASK_FILTER_OPTIONS } from "@/lib/taskFilters";
 
-const DEFAULT_OPTIONS = [
-  { id: "active", label: "Active" },
-  { id: "done", label: "Done" },
-  { id: "all", label: "All" },
-];
-
-export default function TaskFilterMenu({ value, onChange, options = DEFAULT_OPTIONS }) {
+export default function TaskFilterMenu({ value, onChange, options = TASK_FILTER_OPTIONS }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -61,7 +56,7 @@ export default function TaskFilterMenu({ value, onChange, options = DEFAULT_OPTI
         </span>
       </MenuTriggerButton>
       {open && (
-        <MenuList>
+        <MenuList style={{ width: "auto", minWidth: 180 }}>
           {options.map(({ id, label }) => (
             <MenuOption
               key={id}

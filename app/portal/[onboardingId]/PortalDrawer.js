@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, forwardRef } from "react";
 import Button from "@/app/ui/Button";
+import IconButton from "@/app/ui/IconButton";
 import { CalendarIcon, StatusIcon, OwnerIcon, PriorityIcon } from "@/app/ui/Icons";
 import FieldRow from "@/app/ui/FieldRow";
 import { STATUS_COLORS, TASK_STATUSES } from "@/lib/constants";
@@ -33,6 +34,24 @@ function FileIcon() {
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
       <path d="M8 1.5H4a1.5 1.5 0 00-1.5 1.5v8A1.5 1.5 0 004 12.5h6a1.5 1.5 0 001.5-1.5V5L8 1.5z" stroke="var(--text-muted)" strokeWidth="0.9" strokeLinejoin="round" />
       <path d="M8 1.5V5h3.5" stroke="var(--text-muted)" strokeWidth="0.9" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M7 2v7M4 6l3 3 3-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M2.5 11.5h9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M2.5 3.75h9M5.25 3.75V2.75a1 1 0 011-1h1.5a1 1 0 011 1v1M4 3.75v7.5a1 1 0 001 1h4a1 1 0 001-1v-7.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6 6v4M8 6v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -190,6 +209,27 @@ const PortalDrawer = forwardRef(function PortalDrawer({
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  async function handleDeleteFile(file) {
+    if (!localTask) return;
+    if (!window.confirm(`Delete "${file.fileName}"?`)) return;
+
+    try {
+      const res = await handleApiCall(
+        `/api/portal/tasks/${localTask.id}/files/${file.id}`,
+        { method: "DELETE" }
+      );
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to delete file");
+      }
+      const updatedFiles = (localTask.files || []).filter((f) => f.id !== file.id);
+      setLocalTask((prev) => ({ ...prev, files: updatedFiles }));
+      onTaskUpdated(localTask.id, { ...localTask, files: updatedFiles });
+    } catch (err) {
+      if (err.message !== "Session expired") setUploadError(err.message);
     }
   }
 
@@ -414,28 +454,42 @@ const PortalDrawer = forwardRef(function PortalDrawer({
           {localTask.files && localTask.files.length > 0 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               {localTask.files.map((f) => (
-                <a
+                <div
                   key={f.id}
-                  href={`/api/portal/tasks/${localTask.id}/files/${f.id}`}
-                  className="flex items-center gap-2 rounded-lg text-sm"
-                  style={{
-                    background: "var(--bg)",
-                    border: "1px solid var(--border)",
-                    padding: "8px 12px",
-                    textDecoration: "none",
-                  }}
+                  className="flex items-center gap-2 text-sm"
+                  style={{ paddingLeft: 8 }}
                 >
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ color: "var(--text-muted)", flexShrink: 0 }}>
-                    <path d="M7 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V4L7 1z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
-                    <path d="M7 1v3h3" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text)", flexShrink: 0 }}>
+                    <path d="M8 1.5H4a1.5 1.5 0 00-1.5 1.5v8A1.5 1.5 0 004 12.5h6a1.5 1.5 0 001.5-1.5V5L8 1.5z" stroke="currentColor" strokeWidth="0.9" strokeLinejoin="round" />
+                    <path d="M8 1.5V5h3.5" stroke="currentColor" strokeWidth="0.9" strokeLinejoin="round" />
                   </svg>
-                  <span className="flex-1 truncate" style={{ color: "var(--action)" }}>
+                  <a
+                    href={`/api/portal/tasks/${localTask.id}/files/${f.id}`}
+                    className="flex-1 truncate"
+                    style={{ color: "var(--text)", textDecoration: "none" }}
+                  >
                     {f.fileName}
-                  </span>
+                  </a>
                   <span className="text-xs" style={{ color: "var(--text-muted)" }}>
                     {(f.fileSize / 1024).toFixed(0)} KB
                   </span>
-                </a>
+                  <a
+                    href={`/api/portal/tasks/${localTask.id}/files/${f.id}`}
+                    className="icon-btn flex items-center justify-center w-5 h-5 rounded"
+                    aria-label={`Download ${f.fileName}`}
+                    style={{ color: "var(--text-muted)", textDecoration: "none" }}
+                  >
+                    <DownloadIcon />
+                  </a>
+                  <IconButton
+                    onClick={() => handleDeleteFile(f)}
+                    aria-label={`Delete ${f.fileName}`}
+                  >
+                    <span style={{ color: "var(--text-muted)", display: "flex" }}>
+                      <TrashIcon />
+                    </span>
+                  </IconButton>
+                </div>
               ))}
             </div>
           )}
@@ -450,18 +504,18 @@ const PortalDrawer = forwardRef(function PortalDrawer({
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="flex items-center gap-1.5 text-sm font-medium rounded-lg"
+            className="text-btn-action flex items-center gap-1.5 text-sm font-medium rounded"
             style={{
-              color: "var(--action)",
               background: "none",
-              border: "1px dashed var(--border)",
-              cursor: "pointer",
-              padding: "8px 12px",
+              border: "none",
+              cursor: uploading ? "default" : "pointer",
+              padding: "4px 8px",
+              alignSelf: "flex-start",
             }}
           >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M6 9V3M3.5 5.5L6 3l2.5 2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M2 9.5h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M7 10.5V3.5M4 6L7 3l3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M2.5 11.5h9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
             {uploading ? "Uploading…" : "Upload file"}
           </button>

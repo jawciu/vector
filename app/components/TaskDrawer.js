@@ -96,6 +96,24 @@ function CommentIcon() {
   );
 }
 
+function FileIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
+      <path d="M8 1.5H4a1.5 1.5 0 00-1.5 1.5v8A1.5 1.5 0 004 12.5h6a1.5 1.5 0 001.5-1.5V5L8 1.5z" stroke="var(--text-muted)" strokeWidth="0.9" strokeLinejoin="round" />
+      <path d="M8 1.5V5h3.5" stroke="var(--text-muted)" strokeWidth="0.9" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M7 2v7M4 6l3 3 3-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M2.5 11.5h9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function PillClearButton({ onClick }) {
   return (
     <button
@@ -1102,6 +1120,49 @@ const TaskDrawer = forwardRef(function TaskDrawer({
             />
           </div>
         </div>
+
+        {/* Files */}
+        {localTask.files && localTask.files.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div className="flex items-center gap-1.5" style={{ paddingLeft: 8 }}>
+              <FileIcon />
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Files</span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {localTask.files.map((f) => (
+                <div
+                  key={f.id}
+                  className="flex items-center gap-2 text-sm"
+                  style={{ paddingLeft: 8 }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text)", flexShrink: 0 }}>
+                    <path d="M8 1.5H4a1.5 1.5 0 00-1.5 1.5v8A1.5 1.5 0 004 12.5h6a1.5 1.5 0 001.5-1.5V5L8 1.5z" stroke="currentColor" strokeWidth="0.9" strokeLinejoin="round" />
+                    <path d="M8 1.5V5h3.5" stroke="currentColor" strokeWidth="0.9" strokeLinejoin="round" />
+                  </svg>
+                  <a
+                    href={`/api/tasks/${localTask.id}/files/${f.id}`}
+                    className="flex-1 truncate"
+                    style={{ color: "var(--text)", textDecoration: "none" }}
+                  >
+                    {f.fileName}
+                  </a>
+                  <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    {(f.fileSize / 1024).toFixed(0)} KB
+                  </span>
+                  <a
+                    href={`/api/tasks/${localTask.id}/files/${f.id}`}
+                    className="icon-btn flex items-center justify-center w-5 h-5 rounded"
+                    aria-label={`Download ${f.fileName}`}
+                    style={{ color: "var(--text-muted)", textDecoration: "none" }}
+                  >
+                    <DownloadIcon />
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Comments */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>

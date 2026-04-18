@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { validatePortalAccess } from "@/lib/portal-auth";
-import { getFileForPortal } from "@/lib/db";
+import { getFileForPortal, deleteFile } from "@/lib/db";
 
 const BUCKET_NAME = "portal-files";
 
@@ -51,6 +51,42 @@ export async function GET(request, { params }) {
     console.error("[GET /api/portal/tasks/:taskId/files/:fileId]", error);
     return NextResponse.json(
       { error: error.message || "Failed to download file" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request, { params }) {
+  try {
+    const session = await validatePortalAccess();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { fileId } = await params;
+    const onboardingId = session.magicLink.onboardingId;
+
+    const file = await getFileForPortal(fileId, onboardingId);
+    if (!file) {
+      return NextResponse.json({ error: "File not found" }, { status: 404 });
+    }
+
+    const supabase = getStorageClient();
+    const { error: storageError } = await supabase.storage
+      .from(BUCKET_NAME)
+      .remove([file.storagePath]);
+
+    if (storageError) {
+      console.error("[DELETE /api/portal/tasks/:taskId/files/:fileId] Storage error:", storageError);
+    }
+
+    await deleteFile(file.id);
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("[DELETE /api/portal/tasks/:taskId/files/:fileId]", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to delete file" },
       { status: 500 }
     );
   }

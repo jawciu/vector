@@ -31,15 +31,9 @@ import DetailsTab from "@/app/components/DetailsTab";
 import MembersTab from "@/app/components/MembersTab";
 import CommunicationTab from "@/app/components/CommunicationTab";
 import TaskFilterMenu from "@/app/components/TaskFilterMenu";
+import { taskMatchesFilter } from "@/lib/taskFilters";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
 import Tooltip from "@/app/ui/Tooltip";
-
-const TASK_FILTERS = [
-  { id: "active", label: "Active" },
-  { id: "blocked", label: "Blocked" },
-  { id: "done", label: "Done" },
-  { id: "all", label: "All" },
-];
 
 function SortableColumn({ id, children }) {
   const {
@@ -138,12 +132,7 @@ export default function OnboardingDetailClient({
   const healthTooltipLines = healthReasons.length > 0 ? healthReasons : null;
   const blockedCount = tasks.filter((t) => t.status === "Blocked").length;
 
-  const filteredTasks = tasks.filter((t) => {
-    if (taskFilter === "active") return t.status !== "Done";
-    if (taskFilter === "done") return t.status === "Done";
-    if (taskFilter === "blocked") return t.status === "Blocked";
-    return true; // "all"
-  });
+  const filteredTasks = tasks.filter((t) => taskMatchesFilter(t, taskFilter));
 
   const phasesWithCounts = phases.map((phase) => {
     const phaseTasks = tasks.filter((t) => t.phaseId === phase.id);
@@ -434,11 +423,7 @@ export default function OnboardingDetailClient({
           >
             {/* Left: filter dropdown + sort */}
             <div className="flex items-center gap-1">
-              <TaskFilterMenu
-                value={taskFilter}
-                onChange={setFilter}
-                options={TASK_FILTERS}
-              />
+              <TaskFilterMenu value={taskFilter} onChange={setFilter} />
 
               {/* Sort button */}
               <button

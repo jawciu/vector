@@ -242,6 +242,18 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, onCardCli
               </svg>
             </div>
           )}
+          {/* File count */}
+          {task.files && task.files.length > 0 && (
+            <div className="flex items-center gap-1">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-secondary)" }}>
+                <path d="M9.5 0.5H2.5a1.5 1.5 0 00-1.5 1.5v10a1.5 1.5 0 001.5 1.5h9a1.5 1.5 0 001.5-1.5V4.5L9.5 0.5z" stroke="currentColor" strokeWidth="0.9" strokeLinejoin="round" />
+                <path d="M9.5 0.5V4.5h3.5" stroke="currentColor" strokeWidth="0.9" strokeLinejoin="round" />
+              </svg>
+              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                {task.files.length}
+              </span>
+            </div>
+          )}
           {/* Comment count */}
           {task.commentCount > 0 && (
             <div className="flex items-center gap-1">
