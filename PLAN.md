@@ -162,10 +162,46 @@ Health is computed per onboarding from its tasks + project dates. Returns `{ sta
 
 - Deferred: days since last customer activity (stale = risk) — needs clearer definition of what counts as "customer activity"
 
-#### 1.6 Vendor auth + roles
-- Vendor team members sign up / log in (Supabase Auth, email/password first, OAuth later)
-- Roles: Admin (full access), Member (manage assigned onboardings), Viewer (read-only)
-- Onboarding ownership — each onboarding has a primary owner on the vendor side
+#### 1.6a Vendor identity — FK refactor (prereq for notifications + AI)
+
+Prep work to move from string-based `owner` fields to a proper `VendorUser` table *before* notification / activity / AI features land. Splits the original Phase 1.6 into "model cleanup (do now)" and "team features (defer until 2nd seat)."
+
+**Scope:**
+- New `VendorUser` model: `id`, `authUserId` (FK to Supabase `auth.users`), `name`, `email`, `role` (string, default `"admin"`).
+- Migrate `Onboarding.owner` string → `Onboarding.ownerId` FK (nullable).
+- Migrate `Task.owner` string → `Task.ownerId` FK (nullable).
+- Seed one `VendorUser` row for Caroline Jaworsky.
+- One-time data backfill: existing owner strings → lookup/create → write `ownerId`.
+
+**What this unlocks:**
+- `ActivityLog.actorVendorId` and `Notification.recipientVendorId` become real FKs (not string lookups).
+- Phase 3 AI chatbox / summary prompts scope cleanly by `VendorUser.id`.
+- Zero user-visible change today — everything still belongs to Caroline.
+
+**Deferred (see 1.6b):** team management, roles enforcement, invitations, RLS policies.
+
+#### 1.6b Vendor auth + roles (deferred)
+
+Unblocks multi-seat. Build when a 2nd vendor user is about to join — not before.
+
+- Signup / login flows (Supabase Auth, email/password + OAuth later)
+- Roles enforcement: Admin (full), Member (assigned onboardings only), Viewer (read-only)
+- Invitation flow: admin emails invite → signup → auto-join team
+- RLS policies restricting onboarding access by `ownerId` + role
+- Team switcher UI if multiple teams become a concept
+
+#### 1.7 Collapsible sidebar (UI polish)
+
+Standalone UX task, independent of notifications. Left nav can collapse from ~240px (icon + label + user row) to ~56px (icons only + avatar circle). Toggle at the bottom.
+
+**Scope:**
+- Collapse / expand toggle (icon button at bottom of sidebar).
+- Icons-only mode for `Onboardings` and `Settings` nav items.
+- Avatar circle only in collapsed user row (no name / email visible).
+- Hover tooltip shows the hidden label in collapsed mode.
+- `localStorage.sidebarCollapsed` persistence across sessions.
+
+**Out of scope:** resizable drag handle, nested menu items, keyboard shortcut to toggle.
 
 ---
 
@@ -225,11 +261,9 @@ The customer-facing experience. This is the differentiator — if customers actu
 - Comment model already exists in schema
 - Deferred: general messages, @mentions, onboarding-level communication
 
-#### 2.5 Customer notifications (deferred)
-- Email notifications when: new tasks assigned, due date approaching, vendor sends a message
-- Digest option: daily summary email instead of per-event
-- Each notification includes a magic link back to the relevant task/page
-- Unsubscribe option per contact
+#### 2.5 Customer notifications (superseded by 2.7)
+
+Original intent folded into the broader notifications + activity spec in **2.7**. Left here for history — the "customer-side only, email-driven" framing was replaced by a two-sided inbox + banner + email model.
 
 #### 2.6 Bulk member invite + email delivery (planned)
 
@@ -281,6 +315,155 @@ The customer-facing experience. This is the differentiator — if customers actu
 5. UI: bulk action bar + success / partial-failure states
 6. UI: per-row "Sent X ago" + failed warning
 7. Plug in Resend (env vars, domain verification) — flip the switch
+
+#### 2.7 Notifications & activity (both sides)
+
+**Goal:** Close the feedback loop — when either side (vendor, customer) does something, the other side finds out without having to check. Vendor gets a Linear-style inbox (bell, badge, grouped events, read / unread). Portal gets a lightweight "Updates since you were last here" banner. Both sides get emails for high-signal events.
+
+This also establishes the `ActivityLog` foundation — a structured, AI-consumable feed of everything that happens inside an onboarding. Phase 3's AI overview pages + chatbox will read from the same log without a duplicate data layer.
+
+**Decisions (resolved 2026-04-19 with Caroline):**
+
+- **Strategy:** Plan B (vendor inbox + portal banner, in-app first) with Plan D's email digest folded in as a phase-2 follow-up. Skip preferences UI + Slack in v1.
+- **Track all events, email only high-signal ones.** Not every `ActivityLog` row becomes an email.
+- **Grouping:** per-actor + per-onboarding + 10-min bucket. `groupKey = {onboardingId}:{actorId}:{floor10min}`. "Caroline made 3 changes on Acme in the last 10 min" → one collapsible row.
+- **Vendor surface:** bell icon top-right of AppShell, unread badge (99+ cap), dropdown panel built from `MenuList` + `MenuOption` primitives.
+- **Portal surface:** banner on Overview only (not per-task). Dismiss writes `Contact.lastSeenPortalAt`. One banner, binary state — no per-row read tracking.
+- **Single-seat today** → every vendor notification goes to Caroline. Because 1.6a put a real FK in place, this is future-proof without another refactor when multi-seat lands.
+- **Realtime via Supabase.** Client subscribes to `Notification` table filtered by `recipientVendorId = me`. Initial build can poll-on-focus; Realtime is a mechanical upgrade.
+- **Compliance parked.** No `/unsubscribe/[token]` flow in v1. Portfolio-scope decision.
+- **Bounce handling kept.** Resend webhook → set `Contact.bouncedAt` on hard bounce / complaint → stop sending → warning icon in ContactsPanel.
+- **AI-ready ActivityLog.** `verb` is a structured enum, `metadata` is JSON with old / new values. Phase 3 prompts consume directly without parsing human strings.
+
+**Event taxonomy:**
+
+| Event | Vendor inbox | Vendor email | Portal banner | Contact email |
+|---|---|---|---|---|
+| Customer completes a task | ✅ | ✅ | — | — |
+| Customer uploads a file | ✅ | ✅ | — | — |
+| Customer comments on task | ✅ | ✅ | — | — |
+| Customer activates magic link (first ever visit) | ✅ | ✅ one-shot | — | — |
+| Health flips to At Risk / Blocked | ✅ | ✅ | — | — |
+| Vendor assigns task to contact | — | — | ✅ | ✅ |
+| Vendor comments on contact's task | — | — | ✅ | ✅ |
+| Vendor changes task status / field | ✅ (other vendors) | — | ✅ | — |
+| Task created (either side) | ✅ | — | ✅ | — |
+| Drag / reorder | skip | skip | skip | skip |
+| Own actions (actor == recipient) | never | never | never | never |
+
+**Data model additions:**
+
+```prisma
+model ActivityLog {
+  id             Int          @id @default(autoincrement())
+  onboardingId   Int
+  onboarding     Onboarding   @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
+  actorType      String       // "vendor" | "contact" | "system"
+  actorVendorId  Int?
+  actorVendor    VendorUser?  @relation("ActivityActor", fields: [actorVendorId], references: [id])
+  actorContactId Int?
+  actorContact   Contact?     @relation("ActivityActor", fields: [actorContactId], references: [id])
+  verb           String       // created | completed | status_changed | commented | uploaded | assigned | link_activated | health_flipped
+  entityType     String       // task | file | comment | onboarding | magic_link
+  entityId       Int
+  metadata       Json         // { from: "Todo", to: "Done" } | { fileName: "x.pdf" } | { excerpt: "..." }
+  createdAt      DateTime     @default(now())
+  notifications  Notification[]
+  @@index([onboardingId, createdAt])
+}
+
+model Notification {
+  id                 Int         @id @default(autoincrement())
+  activityLogId      Int
+  activityLog        ActivityLog @relation(fields: [activityLogId], references: [id], onDelete: Cascade)
+  recipientType      String      // "vendor" | "contact"
+  recipientVendorId  Int?
+  recipientVendor    VendorUser? @relation("NotificationRecipient", fields: [recipientVendorId], references: [id])
+  recipientContactId Int?
+  recipientContact   Contact?    @relation("NotificationRecipient", fields: [recipientContactId], references: [id])
+  groupKey           String
+  emailed            Boolean     @default(false)
+  readAt             DateTime?
+  archivedAt         DateTime?
+  createdAt          DateTime    @default(now())
+  @@index([recipientVendorId, readAt])
+  @@index([recipientContactId, readAt])
+  @@index([groupKey])
+}
+
+// Additions to existing Contact model
+model Contact {
+  // ... existing fields
+  bouncedAt        DateTime?  // set by Resend webhook on hard bounce / complaint
+  lastSeenPortalAt DateTime?  // powers the portal "Updates since you were last here" banner
+}
+```
+
+**Vendor inbox UX:**
+- Bell icon in top-right of `AppShell`. Unread count badge, caps at `99+`.
+- Click → dropdown panel (~400px wide, max ~480px tall, scrollable). Built with `MenuList` + `MenuOption`.
+- Row: actor avatar / initial · grouped message ("Caroline made 3 changes on Acme") · time ago (15m) · blue dot for unread.
+- Click row → navigate to the relevant entity (opens task drawer where appropriate) + mark the whole group read.
+- Header actions: "Mark all read" (secondary link). "View all" (dedicated page) deferred.
+- Empty state: "You're all caught up."
+- Archive deferred to v2 — v1 relies on "Mark all read" to push old rows down.
+
+**Portal banner UX:**
+- Overview page only, above the health banner.
+- `N updates since you were last here` + chevron to expand.
+- Expanded: list of grouped events (actor + verb + entity + time).
+- Dismiss button sets `Contact.lastSeenPortalAt = now()`. Banner stays hidden until new activity arrives.
+- No per-row read state — one banner, binary state.
+
+**API:**
+- `GET /api/notifications` — list for current vendor user, grouped by `groupKey`, last 50.
+- `POST /api/notifications/[id]/read` — mark one read.
+- `POST /api/notifications/group/[groupKey]/read` — mark all in a group read.
+- `POST /api/notifications/read-all` — mark everything read.
+- `GET /api/portal/activity` — activity since `Contact.lastSeenPortalAt`, grouped.
+- `POST /api/portal/activity/seen` — update `lastSeenPortalAt` to now.
+- `POST /api/webhooks/resend` — public endpoint, verifies Resend signature, updates `Contact.bouncedAt` on hard bounce or complaint.
+
+**Realtime:**
+- Client call: `supabase.channel('notifications').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Notification', filter: 'recipientVendorId=eq.${me.id}' }, handler)`.
+- Handler: refetch group count, toast on high-signal verbs (completed, uploaded, health_flipped), update bell badge.
+- Needs a minimal RLS policy on `Notification` restricting SELECT to `auth.uid() = recipient_vendor.auth_user_id` — this is the one surface where RLS actually earns its keep (Prisma bypasses it, Realtime client uses it).
+
+**`lib/notify.js` (new):**
+- `emitActivity({ onboardingId, actor, verb, entityType, entityId, metadata })` — writes `ActivityLog`, derives recipients per event-channel config, writes `Notification` rows, queues emails.
+- Called from inside `lib/db.js` mutation functions (createTask, updateTaskStatus, addComment, uploadFile, markMagicLinkUsed, recomputeHealth).
+- Single file owns the event → recipient → channel mapping.
+
+**Email:**
+- Reuse `lib/email.js` from 2.6. Add `sendNotificationEmail({ to, subject, preheader, bodyText, linkUrl })`.
+- Per-event delivery fires from inside `emitActivity` when the channel config includes email.
+- Digest (phase-2 follow-up): daily cron at 8am UTC for v1, aggregates unread inbox notifications from the last 24h.
+- Bounce webhook verifies signature, `event.type === 'email.bounced' && event.data.bounce.bounce_type === 'Permanent'` → set `Contact.bouncedAt`. `email.complained` → same + flag.
+- UI: ContactsPanel shows a warning icon next to bounced contacts (tooltip: "Email bounced — ask for a new address.").
+
+**Build order (7 shippable increments):**
+
+1. **Phase 1.6a refactor** — `VendorUser` model, owner FK migration, seed Caroline. Zero user-visible change, unblocks everything else.
+2. **`ActivityLog` + `emitActivity` helper** — wire into 5-6 lib/db.js mutation functions. Activity appears in DB, nothing in UI yet.
+3. **`Notification` model + derivation** — emitter writes recipient rows + `groupKey`. Still no UI.
+4. **Vendor inbox UI (poll-on-focus)** — bell, dropdown, read state, navigation. No Realtime yet.
+5. **Portal banner** — Overview "Updates since you were last here" + `lastSeenPortalAt` tracking.
+6. **Supabase Realtime** — upgrade vendor inbox poll → push. Toast on high-signal verbs. Add minimal RLS policy.
+7. **Email per-event + bounce webhook** — hook `lib/email.js` into the emitter, verify Resend webhook signature, add warning UI in ContactsPanel.
+
+**Deferred to 2.7.1 (later):**
+- Daily digest cron + timezone-aware send times
+- Notification preferences UI (per-event toggles)
+- Dedicated "All notifications" page with filters
+- `/unsubscribe/[token]` flow (compliance)
+- Snooze / archive gestures
+
+**Phase 3 handoff:**
+- `ActivityLog` rows are the primary grounding data for AI overview summaries.
+- AI chatbox prompts read `ActivityLog` + current task state + health signals — no duplicate feed.
+- "Highlight who to chase" = re-ranked Notification inbox with an LLM priority layer on top of the same data.
+
+---
 
 #### Implementation steps (7 shippable increments)
 
