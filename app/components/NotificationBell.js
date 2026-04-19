@@ -131,15 +131,29 @@ export default function NotificationBell() {
     }
   }
 
-  function navigateToOnboarding(onboardingId) {
+  function resolveTaskId(event) {
+    if (!event) return null;
+    if (event.entityType === "task") return event.entityId;
+    if (event.entityType === "file") return event.metadata?.taskId ?? null;
+    return null;
+  }
+
+  function buildHref(group, event) {
+    const target = event ?? group.events[0];
+    const taskId = resolveTaskId(target);
+    const base = `/onboardings/${group.onboardingId}`;
+    return taskId ? `${base}?task=${taskId}` : base;
+  }
+
+  function navigateTo(href) {
     setOpen(false);
-    router.push(`/onboardings/${onboardingId}`);
+    router.push(href);
   }
 
   function handleGroupClick(group) {
     if (group.events.length === 1) {
       if (group.unreadCount > 0) markGroupRead(group.groupKey);
-      navigateToOnboarding(group.onboardingId);
+      navigateTo(buildHref(group));
       return;
     }
     // Multi-event: toggle expansion, mark read on first expand
@@ -153,8 +167,8 @@ export default function NotificationBell() {
     if (!isOpen && group.unreadCount > 0) markGroupRead(group.groupKey);
   }
 
-  function handleSubEventClick(group) {
-    navigateToOnboarding(group.onboardingId);
+  function handleSubEventClick(group, event) {
+    navigateTo(buildHref(group, event));
   }
 
   const badge = data.unreadCount > 99 ? "99+" : String(data.unreadCount);
@@ -326,7 +340,7 @@ export default function NotificationBell() {
                             <li key={e.notificationId}>
                               <button
                                 type="button"
-                                onClick={() => handleSubEventClick(g)}
+                                onClick={() => handleSubEventClick(g, e)}
                                 className="w-full flex items-start gap-2 text-left transition-colors"
                                 style={{ padding: "6px 12px 6px 40px" }}
                               >

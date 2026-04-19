@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -99,16 +99,39 @@ export default function OnboardingDetailClient({
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
 
+  const closeDrawer = useCallback(() => {
+    setDrawerOpen(false);
+    if (searchParams.get("task")) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("task");
+      const query = params.toString();
+      router.replace(query ? `?${query}` : "?", { scroll: false });
+    }
+  }, [router, searchParams]);
+
   useEffect(() => {
     if (!drawerOpen) return;
     function handleClick(e) {
       if (drawerRef.current && drawerRef.current.contains(e.target)) return;
       if (e.target.closest("[data-task-card]")) return;
-      setDrawerOpen(false);
+      closeDrawer();
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [drawerOpen]);
+  }, [drawerOpen, closeDrawer]);
+
+  // Deep-link: ?task=<id> opens the task drawer (used by notification inbox).
+  useEffect(() => {
+    const raw = searchParams.get("task");
+    if (!raw) return;
+    const id = Number(raw);
+    if (Number.isNaN(id)) return;
+    const target = tasksRef.current.find((t) => t.id === id);
+    if (!target) return;
+    if (drawerTask?.id === id && drawerOpen) return;
+    setDrawerTask(target);
+    setDrawerOpen(true);
+  }, [searchParams, drawerTask, drawerOpen]);
 
   const activeTab = searchParams.get("tab") || "tasks";
   const taskFilter = searchParams.get("filter") || "active";
@@ -721,7 +744,7 @@ export default function OnboardingDetailClient({
         ref={drawerRef}
         task={drawerTask}
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={closeDrawer}
         onTaskUpdated={handleTaskUpdated}
         people={people}
         allTasks={tasks}
