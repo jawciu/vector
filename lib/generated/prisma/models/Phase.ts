@@ -446,10 +446,6 @@ export type PhaseUncheckedUpdateManyWithoutOnboardingNestedInput = {
   deleteMany?: Prisma.PhaseScalarWhereInput | Prisma.PhaseScalarWhereInput[]
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type PhaseCreateNestedOneWithoutTasksInput = {
   create?: Prisma.XOR<Prisma.PhaseCreateWithoutTasksInput, Prisma.PhaseUncheckedCreateWithoutTasksInput>
   connectOrCreate?: Prisma.PhaseCreateOrConnectWithoutTasksInput

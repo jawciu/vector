@@ -30,26 +30,48 @@ model VendorUser {
   ownedOnboardings Onboarding[]
   ownedTasks       Task[]
   activities       ActivityLog[]
+  notifications    Notification[] @relation("NotificationRecipientVendor")
 }
 
 model ActivityLog {
-  id             Int         @id @default(autoincrement())
+  id             Int            @id @default(autoincrement())
   onboardingId   Int
-  onboarding     Onboarding  @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
-  actorType      String      // "vendor" | "contact" | "system"
+  onboarding     Onboarding     @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
+  actorType      String         // "vendor" | "contact" | "system"
   actorVendorId  Int?
-  actorVendor    VendorUser? @relation(fields: [actorVendorId], references: [id], onDelete: SetNull)
+  actorVendor    VendorUser?    @relation(fields: [actorVendorId], references: [id], onDelete: SetNull)
   actorContactId Int?
-  actorContact   Contact?    @relation(fields: [actorContactId], references: [id], onDelete: SetNull)
-  verb           String      // created | completed | status_changed | assigned | commented | uploaded | link_activated | health_flipped
-  entityType     String      // task | file | comment | onboarding | magic_link
+  actorContact   Contact?       @relation(fields: [actorContactId], references: [id], onDelete: SetNull)
+  verb           String         // created | completed | status_changed | assigned | commented | uploaded | link_activated | health_flipped
+  entityType     String         // task | file | comment | onboarding | magic_link
   entityId       Int
-  metadata       Json        @default("{}")
-  createdAt      DateTime    @default(now())
+  metadata       Json           @default("{}")
+  createdAt      DateTime       @default(now())
+  notifications  Notification[]
 
   @@index([onboardingId, createdAt])
   @@index([actorVendorId])
   @@index([actorContactId])
+}
+
+model Notification {
+  id                 Int         @id @default(autoincrement())
+  activityLogId      Int
+  activityLog        ActivityLog @relation(fields: [activityLogId], references: [id], onDelete: Cascade)
+  recipientType      String      // "vendor" | "contact"
+  recipientVendorId  Int?
+  recipientVendor    VendorUser? @relation("NotificationRecipientVendor", fields: [recipientVendorId], references: [id], onDelete: Cascade)
+  recipientContactId Int?
+  recipientContact   Contact?    @relation("NotificationRecipientContact", fields: [recipientContactId], references: [id], onDelete: Cascade)
+  groupKey           String
+  emailed            Boolean     @default(false)
+  readAt             DateTime?
+  archivedAt         DateTime?
+  createdAt          DateTime    @default(now())
+
+  @@index([recipientVendorId, readAt])
+  @@index([recipientContactId, readAt])
+  @@index([groupKey])
 }
 
 model Onboarding {
@@ -82,6 +104,7 @@ model Contact {
   assignedTasks Task[]
   files         File[]
   activities    ActivityLog[]
+  notifications Notification[] @relation("NotificationRecipientContact")
 }
 
 model Phase {

@@ -11,6 +11,7 @@
 export type * from './models/Company.ts'
 export type * from './models/VendorUser.ts'
 export type * from './models/ActivityLog.ts'
+export type * from './models/Notification.ts'
 export type * from './models/Onboarding.ts'
 export type * from './models/Contact.ts'
 export type * from './models/Phase.ts'

@@ -55,6 +55,11 @@ export type VendorUser = Prisma.VendorUserModel
  */
 export type ActivityLog = Prisma.ActivityLogModel
 /**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
  * Model Onboarding
  * 
  */

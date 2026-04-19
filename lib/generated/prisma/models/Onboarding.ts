@@ -583,10 +583,6 @@ export type OnboardingUpdateOneRequiredWithoutActivitiesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OnboardingUpdateToOneWithWhereWithoutActivitiesInput, Prisma.OnboardingUpdateWithoutActivitiesInput>, Prisma.OnboardingUncheckedUpdateWithoutActivitiesInput>
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type OnboardingCreateNestedOneWithoutContactsInput = {
   create?: Prisma.XOR<Prisma.OnboardingCreateWithoutContactsInput, Prisma.OnboardingUncheckedCreateWithoutContactsInput>
   connectOrCreate?: Prisma.OnboardingCreateOrConnectWithoutContactsInput

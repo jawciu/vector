@@ -271,6 +271,7 @@ export type ActivityLogWhereInput = {
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
   actorVendor?: Prisma.XOR<Prisma.VendorUserNullableScalarRelationFilter, Prisma.VendorUserWhereInput> | null
   actorContact?: Prisma.XOR<Prisma.ContactNullableScalarRelationFilter, Prisma.ContactWhereInput> | null
+  notifications?: Prisma.NotificationListRelationFilter
 }
 
 export type ActivityLogOrderByWithRelationInput = {
@@ -287,6 +288,7 @@ export type ActivityLogOrderByWithRelationInput = {
   onboarding?: Prisma.OnboardingOrderByWithRelationInput
   actorVendor?: Prisma.VendorUserOrderByWithRelationInput
   actorContact?: Prisma.ContactOrderByWithRelationInput
+  notifications?: Prisma.NotificationOrderByRelationAggregateInput
 }
 
 export type ActivityLogWhereUniqueInput = Prisma.AtLeast<{
@@ -306,6 +308,7 @@ export type ActivityLogWhereUniqueInput = Prisma.AtLeast<{
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
   actorVendor?: Prisma.XOR<Prisma.VendorUserNullableScalarRelationFilter, Prisma.VendorUserWhereInput> | null
   actorContact?: Prisma.XOR<Prisma.ContactNullableScalarRelationFilter, Prisma.ContactWhereInput> | null
+  notifications?: Prisma.NotificationListRelationFilter
 }, "id">
 
 export type ActivityLogOrderByWithAggregationInput = {
@@ -352,6 +355,7 @@ export type ActivityLogCreateInput = {
   onboarding: Prisma.OnboardingCreateNestedOneWithoutActivitiesInput
   actorVendor?: Prisma.VendorUserCreateNestedOneWithoutActivitiesInput
   actorContact?: Prisma.ContactCreateNestedOneWithoutActivitiesInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutActivityLogInput
 }
 
 export type ActivityLogUncheckedCreateInput = {
@@ -365,6 +369,7 @@ export type ActivityLogUncheckedCreateInput = {
   entityId: number
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActivityLogInput
 }
 
 export type ActivityLogUpdateInput = {
@@ -377,6 +382,7 @@ export type ActivityLogUpdateInput = {
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutActivitiesNestedInput
   actorVendor?: Prisma.VendorUserUpdateOneWithoutActivitiesNestedInput
   actorContact?: Prisma.ContactUpdateOneWithoutActivitiesNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutActivityLogNestedInput
 }
 
 export type ActivityLogUncheckedUpdateInput = {
@@ -390,6 +396,7 @@ export type ActivityLogUncheckedUpdateInput = {
   entityId?: Prisma.IntFieldUpdateOperationsInput | number
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActivityLogNestedInput
 }
 
 export type ActivityLogCreateManyInput = {
@@ -490,6 +497,11 @@ export type ActivityLogSumOrderByAggregateInput = {
   entityId?: Prisma.SortOrder
 }
 
+export type ActivityLogScalarRelationFilter = {
+  is?: Prisma.ActivityLogWhereInput
+  isNot?: Prisma.ActivityLogWhereInput
+}
+
 export type ActivityLogCreateNestedManyWithoutActorVendorInput = {
   create?: Prisma.XOR<Prisma.ActivityLogCreateWithoutActorVendorInput, Prisma.ActivityLogUncheckedCreateWithoutActorVendorInput> | Prisma.ActivityLogCreateWithoutActorVendorInput[] | Prisma.ActivityLogUncheckedCreateWithoutActorVendorInput[]
   connectOrCreate?: Prisma.ActivityLogCreateOrConnectWithoutActorVendorInput | Prisma.ActivityLogCreateOrConnectWithoutActorVendorInput[]
@@ -538,6 +550,20 @@ export type NullableIntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type ActivityLogCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.ActivityLogCreateWithoutNotificationsInput, Prisma.ActivityLogUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.ActivityLogCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.ActivityLogWhereUniqueInput
+}
+
+export type ActivityLogUpdateOneRequiredWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.ActivityLogCreateWithoutNotificationsInput, Prisma.ActivityLogUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.ActivityLogCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.ActivityLogUpsertWithoutNotificationsInput
+  connect?: Prisma.ActivityLogWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ActivityLogUpdateToOneWithWhereWithoutNotificationsInput, Prisma.ActivityLogUpdateWithoutNotificationsInput>, Prisma.ActivityLogUncheckedUpdateWithoutNotificationsInput>
 }
 
 export type ActivityLogCreateNestedManyWithoutOnboardingInput = {
@@ -633,6 +659,7 @@ export type ActivityLogCreateWithoutActorVendorInput = {
   createdAt?: Date | string
   onboarding: Prisma.OnboardingCreateNestedOneWithoutActivitiesInput
   actorContact?: Prisma.ContactCreateNestedOneWithoutActivitiesInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutActivityLogInput
 }
 
 export type ActivityLogUncheckedCreateWithoutActorVendorInput = {
@@ -645,6 +672,7 @@ export type ActivityLogUncheckedCreateWithoutActorVendorInput = {
   entityId: number
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActivityLogInput
 }
 
 export type ActivityLogCreateOrConnectWithoutActorVendorInput = {
@@ -689,6 +717,72 @@ export type ActivityLogScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"ActivityLog"> | Date | string
 }
 
+export type ActivityLogCreateWithoutNotificationsInput = {
+  actorType: string
+  verb: string
+  entityType: string
+  entityId: number
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  onboarding: Prisma.OnboardingCreateNestedOneWithoutActivitiesInput
+  actorVendor?: Prisma.VendorUserCreateNestedOneWithoutActivitiesInput
+  actorContact?: Prisma.ContactCreateNestedOneWithoutActivitiesInput
+}
+
+export type ActivityLogUncheckedCreateWithoutNotificationsInput = {
+  id?: number
+  onboardingId: number
+  actorType: string
+  actorVendorId?: number | null
+  actorContactId?: number | null
+  verb: string
+  entityType: string
+  entityId: number
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+}
+
+export type ActivityLogCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.ActivityLogWhereUniqueInput
+  create: Prisma.XOR<Prisma.ActivityLogCreateWithoutNotificationsInput, Prisma.ActivityLogUncheckedCreateWithoutNotificationsInput>
+}
+
+export type ActivityLogUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.ActivityLogUpdateWithoutNotificationsInput, Prisma.ActivityLogUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.ActivityLogCreateWithoutNotificationsInput, Prisma.ActivityLogUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.ActivityLogWhereInput
+}
+
+export type ActivityLogUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.ActivityLogWhereInput
+  data: Prisma.XOR<Prisma.ActivityLogUpdateWithoutNotificationsInput, Prisma.ActivityLogUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type ActivityLogUpdateWithoutNotificationsInput = {
+  actorType?: Prisma.StringFieldUpdateOperationsInput | string
+  verb?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.StringFieldUpdateOperationsInput | string
+  entityId?: Prisma.IntFieldUpdateOperationsInput | number
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutActivitiesNestedInput
+  actorVendor?: Prisma.VendorUserUpdateOneWithoutActivitiesNestedInput
+  actorContact?: Prisma.ContactUpdateOneWithoutActivitiesNestedInput
+}
+
+export type ActivityLogUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
+  actorType?: Prisma.StringFieldUpdateOperationsInput | string
+  actorVendorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  actorContactId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verb?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.StringFieldUpdateOperationsInput | string
+  entityId?: Prisma.IntFieldUpdateOperationsInput | number
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type ActivityLogCreateWithoutOnboardingInput = {
   actorType: string
   verb: string
@@ -698,6 +792,7 @@ export type ActivityLogCreateWithoutOnboardingInput = {
   createdAt?: Date | string
   actorVendor?: Prisma.VendorUserCreateNestedOneWithoutActivitiesInput
   actorContact?: Prisma.ContactCreateNestedOneWithoutActivitiesInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutActivityLogInput
 }
 
 export type ActivityLogUncheckedCreateWithoutOnboardingInput = {
@@ -710,6 +805,7 @@ export type ActivityLogUncheckedCreateWithoutOnboardingInput = {
   entityId: number
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActivityLogInput
 }
 
 export type ActivityLogCreateOrConnectWithoutOnboardingInput = {
@@ -747,6 +843,7 @@ export type ActivityLogCreateWithoutActorContactInput = {
   createdAt?: Date | string
   onboarding: Prisma.OnboardingCreateNestedOneWithoutActivitiesInput
   actorVendor?: Prisma.VendorUserCreateNestedOneWithoutActivitiesInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutActivityLogInput
 }
 
 export type ActivityLogUncheckedCreateWithoutActorContactInput = {
@@ -759,6 +856,7 @@ export type ActivityLogUncheckedCreateWithoutActorContactInput = {
   entityId: number
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActivityLogInput
 }
 
 export type ActivityLogCreateOrConnectWithoutActorContactInput = {
@@ -808,6 +906,7 @@ export type ActivityLogUpdateWithoutActorVendorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutActivitiesNestedInput
   actorContact?: Prisma.ContactUpdateOneWithoutActivitiesNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutActivityLogNestedInput
 }
 
 export type ActivityLogUncheckedUpdateWithoutActorVendorInput = {
@@ -820,6 +919,7 @@ export type ActivityLogUncheckedUpdateWithoutActorVendorInput = {
   entityId?: Prisma.IntFieldUpdateOperationsInput | number
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActivityLogNestedInput
 }
 
 export type ActivityLogUncheckedUpdateManyWithoutActorVendorInput = {
@@ -855,6 +955,7 @@ export type ActivityLogUpdateWithoutOnboardingInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   actorVendor?: Prisma.VendorUserUpdateOneWithoutActivitiesNestedInput
   actorContact?: Prisma.ContactUpdateOneWithoutActivitiesNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutActivityLogNestedInput
 }
 
 export type ActivityLogUncheckedUpdateWithoutOnboardingInput = {
@@ -867,6 +968,7 @@ export type ActivityLogUncheckedUpdateWithoutOnboardingInput = {
   entityId?: Prisma.IntFieldUpdateOperationsInput | number
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActivityLogNestedInput
 }
 
 export type ActivityLogUncheckedUpdateManyWithoutOnboardingInput = {
@@ -902,6 +1004,7 @@ export type ActivityLogUpdateWithoutActorContactInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutActivitiesNestedInput
   actorVendor?: Prisma.VendorUserUpdateOneWithoutActivitiesNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutActivityLogNestedInput
 }
 
 export type ActivityLogUncheckedUpdateWithoutActorContactInput = {
@@ -914,6 +1017,7 @@ export type ActivityLogUncheckedUpdateWithoutActorContactInput = {
   entityId?: Prisma.IntFieldUpdateOperationsInput | number
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActivityLogNestedInput
 }
 
 export type ActivityLogUncheckedUpdateManyWithoutActorContactInput = {
@@ -928,6 +1032,35 @@ export type ActivityLogUncheckedUpdateManyWithoutActorContactInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type ActivityLogCountOutputType
+ */
+
+export type ActivityLogCountOutputType = {
+  notifications: number
+}
+
+export type ActivityLogCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  notifications?: boolean | ActivityLogCountOutputTypeCountNotificationsArgs
+}
+
+/**
+ * ActivityLogCountOutputType without action
+ */
+export type ActivityLogCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ActivityLogCountOutputType
+   */
+  select?: Prisma.ActivityLogCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ActivityLogCountOutputType without action
+ */
+export type ActivityLogCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
 
 
 export type ActivityLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -944,6 +1077,8 @@ export type ActivityLogSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
   actorVendor?: boolean | Prisma.ActivityLog$actorVendorArgs<ExtArgs>
   actorContact?: boolean | Prisma.ActivityLog$actorContactArgs<ExtArgs>
+  notifications?: boolean | Prisma.ActivityLog$notificationsArgs<ExtArgs>
+  _count?: boolean | Prisma.ActivityLogCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["activityLog"]>
 
 export type ActivityLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -996,6 +1131,8 @@ export type ActivityLogInclude<ExtArgs extends runtime.Types.Extensions.Internal
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
   actorVendor?: boolean | Prisma.ActivityLog$actorVendorArgs<ExtArgs>
   actorContact?: boolean | Prisma.ActivityLog$actorContactArgs<ExtArgs>
+  notifications?: boolean | Prisma.ActivityLog$notificationsArgs<ExtArgs>
+  _count?: boolean | Prisma.ActivityLogCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ActivityLogIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
@@ -1014,6 +1151,7 @@ export type $ActivityLogPayload<ExtArgs extends runtime.Types.Extensions.Interna
     onboarding: Prisma.$OnboardingPayload<ExtArgs>
     actorVendor: Prisma.$VendorUserPayload<ExtArgs> | null
     actorContact: Prisma.$ContactPayload<ExtArgs> | null
+    notifications: Prisma.$NotificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1423,6 +1561,7 @@ export interface Prisma__ActivityLogClient<T, Null = never, ExtArgs extends runt
   onboarding<T extends Prisma.OnboardingDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OnboardingDefaultArgs<ExtArgs>>): Prisma.Prisma__OnboardingClient<runtime.Types.Result.GetResult<Prisma.$OnboardingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   actorVendor<T extends Prisma.ActivityLog$actorVendorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ActivityLog$actorVendorArgs<ExtArgs>>): Prisma.Prisma__VendorUserClient<runtime.Types.Result.GetResult<Prisma.$VendorUserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   actorContact<T extends Prisma.ActivityLog$actorContactArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ActivityLog$actorContactArgs<ExtArgs>>): Prisma.Prisma__ContactClient<runtime.Types.Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  notifications<T extends Prisma.ActivityLog$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ActivityLog$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1893,6 +2032,30 @@ export type ActivityLog$actorContactArgs<ExtArgs extends runtime.Types.Extension
    */
   include?: Prisma.ContactInclude<ExtArgs> | null
   where?: Prisma.ContactWhereInput
+}
+
+/**
+ * ActivityLog.notifications
+ */
+export type ActivityLog$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
 }
 
 /**

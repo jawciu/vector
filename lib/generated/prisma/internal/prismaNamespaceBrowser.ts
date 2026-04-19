@@ -54,6 +54,7 @@ export const ModelName = {
   Company: 'Company',
   VendorUser: 'VendorUser',
   ActivityLog: 'ActivityLog',
+  Notification: 'Notification',
   Onboarding: 'Onboarding',
   Contact: 'Contact',
   Phase: 'Phase',
@@ -114,6 +115,22 @@ export const ActivityLogScalarFieldEnum = {
 } as const
 
 export type ActivityLogScalarFieldEnum = (typeof ActivityLogScalarFieldEnum)[keyof typeof ActivityLogScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  activityLogId: 'activityLogId',
+  recipientType: 'recipientType',
+  recipientVendorId: 'recipientVendorId',
+  recipientContactId: 'recipientContactId',
+  groupKey: 'groupKey',
+  emailed: 'emailed',
+  readAt: 'readAt',
+  archivedAt: 'archivedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const OnboardingScalarFieldEnum = {
