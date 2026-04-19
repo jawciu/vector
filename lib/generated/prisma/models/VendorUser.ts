@@ -234,6 +234,7 @@ export type VendorUserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"VendorUser"> | Date | string
   ownedOnboardings?: Prisma.OnboardingListRelationFilter
   ownedTasks?: Prisma.TaskListRelationFilter
+  activities?: Prisma.ActivityLogListRelationFilter
 }
 
 export type VendorUserOrderByWithRelationInput = {
@@ -246,6 +247,7 @@ export type VendorUserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   ownedOnboardings?: Prisma.OnboardingOrderByRelationAggregateInput
   ownedTasks?: Prisma.TaskOrderByRelationAggregateInput
+  activities?: Prisma.ActivityLogOrderByRelationAggregateInput
 }
 
 export type VendorUserWhereUniqueInput = Prisma.AtLeast<{
@@ -261,6 +263,7 @@ export type VendorUserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"VendorUser"> | Date | string
   ownedOnboardings?: Prisma.OnboardingListRelationFilter
   ownedTasks?: Prisma.TaskListRelationFilter
+  activities?: Prisma.ActivityLogListRelationFilter
 }, "id" | "authUserId" | "email">
 
 export type VendorUserOrderByWithAggregationInput = {
@@ -300,6 +303,7 @@ export type VendorUserCreateInput = {
   updatedAt?: Date | string
   ownedOnboardings?: Prisma.OnboardingCreateNestedManyWithoutOwnerUserInput
   ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerUserInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutActorVendorInput
 }
 
 export type VendorUserUncheckedCreateInput = {
@@ -312,6 +316,7 @@ export type VendorUserUncheckedCreateInput = {
   updatedAt?: Date | string
   ownedOnboardings?: Prisma.OnboardingUncheckedCreateNestedManyWithoutOwnerUserInput
   ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerUserInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorVendorInput
 }
 
 export type VendorUserUpdateInput = {
@@ -323,6 +328,7 @@ export type VendorUserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOnboardings?: Prisma.OnboardingUpdateManyWithoutOwnerUserNestedInput
   ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerUserNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutActorVendorNestedInput
 }
 
 export type VendorUserUncheckedUpdateInput = {
@@ -335,6 +341,7 @@ export type VendorUserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOnboardings?: Prisma.OnboardingUncheckedUpdateManyWithoutOwnerUserNestedInput
   ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerUserNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorVendorNestedInput
 }
 
 export type VendorUserCreateManyInput = {
@@ -417,6 +424,22 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type VendorUserCreateNestedOneWithoutActivitiesInput = {
+  create?: Prisma.XOR<Prisma.VendorUserCreateWithoutActivitiesInput, Prisma.VendorUserUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.VendorUserCreateOrConnectWithoutActivitiesInput
+  connect?: Prisma.VendorUserWhereUniqueInput
+}
+
+export type VendorUserUpdateOneWithoutActivitiesNestedInput = {
+  create?: Prisma.XOR<Prisma.VendorUserCreateWithoutActivitiesInput, Prisma.VendorUserUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.VendorUserCreateOrConnectWithoutActivitiesInput
+  upsert?: Prisma.VendorUserUpsertWithoutActivitiesInput
+  disconnect?: Prisma.VendorUserWhereInput | boolean
+  delete?: Prisma.VendorUserWhereInput | boolean
+  connect?: Prisma.VendorUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUserUpdateToOneWithWhereWithoutActivitiesInput, Prisma.VendorUserUpdateWithoutActivitiesInput>, Prisma.VendorUserUncheckedUpdateWithoutActivitiesInput>
+}
+
 export type VendorUserCreateNestedOneWithoutOwnedOnboardingsInput = {
   create?: Prisma.XOR<Prisma.VendorUserCreateWithoutOwnedOnboardingsInput, Prisma.VendorUserUncheckedCreateWithoutOwnedOnboardingsInput>
   connectOrCreate?: Prisma.VendorUserCreateOrConnectWithoutOwnedOnboardingsInput
@@ -449,6 +472,68 @@ export type VendorUserUpdateOneWithoutOwnedTasksNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUserUpdateToOneWithWhereWithoutOwnedTasksInput, Prisma.VendorUserUpdateWithoutOwnedTasksInput>, Prisma.VendorUserUncheckedUpdateWithoutOwnedTasksInput>
 }
 
+export type VendorUserCreateWithoutActivitiesInput = {
+  authUserId?: string | null
+  email: string
+  name: string
+  role?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedOnboardings?: Prisma.OnboardingCreateNestedManyWithoutOwnerUserInput
+  ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerUserInput
+}
+
+export type VendorUserUncheckedCreateWithoutActivitiesInput = {
+  id?: number
+  authUserId?: string | null
+  email: string
+  name: string
+  role?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedOnboardings?: Prisma.OnboardingUncheckedCreateNestedManyWithoutOwnerUserInput
+  ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerUserInput
+}
+
+export type VendorUserCreateOrConnectWithoutActivitiesInput = {
+  where: Prisma.VendorUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.VendorUserCreateWithoutActivitiesInput, Prisma.VendorUserUncheckedCreateWithoutActivitiesInput>
+}
+
+export type VendorUserUpsertWithoutActivitiesInput = {
+  update: Prisma.XOR<Prisma.VendorUserUpdateWithoutActivitiesInput, Prisma.VendorUserUncheckedUpdateWithoutActivitiesInput>
+  create: Prisma.XOR<Prisma.VendorUserCreateWithoutActivitiesInput, Prisma.VendorUserUncheckedCreateWithoutActivitiesInput>
+  where?: Prisma.VendorUserWhereInput
+}
+
+export type VendorUserUpdateToOneWithWhereWithoutActivitiesInput = {
+  where?: Prisma.VendorUserWhereInput
+  data: Prisma.XOR<Prisma.VendorUserUpdateWithoutActivitiesInput, Prisma.VendorUserUncheckedUpdateWithoutActivitiesInput>
+}
+
+export type VendorUserUpdateWithoutActivitiesInput = {
+  authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedOnboardings?: Prisma.OnboardingUpdateManyWithoutOwnerUserNestedInput
+  ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerUserNestedInput
+}
+
+export type VendorUserUncheckedUpdateWithoutActivitiesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedOnboardings?: Prisma.OnboardingUncheckedUpdateManyWithoutOwnerUserNestedInput
+  ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerUserNestedInput
+}
+
 export type VendorUserCreateWithoutOwnedOnboardingsInput = {
   authUserId?: string | null
   email: string
@@ -457,6 +542,7 @@ export type VendorUserCreateWithoutOwnedOnboardingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerUserInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutActorVendorInput
 }
 
 export type VendorUserUncheckedCreateWithoutOwnedOnboardingsInput = {
@@ -468,6 +554,7 @@ export type VendorUserUncheckedCreateWithoutOwnedOnboardingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerUserInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorVendorInput
 }
 
 export type VendorUserCreateOrConnectWithoutOwnedOnboardingsInput = {
@@ -494,6 +581,7 @@ export type VendorUserUpdateWithoutOwnedOnboardingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerUserNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutActorVendorNestedInput
 }
 
 export type VendorUserUncheckedUpdateWithoutOwnedOnboardingsInput = {
@@ -505,6 +593,7 @@ export type VendorUserUncheckedUpdateWithoutOwnedOnboardingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerUserNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorVendorNestedInput
 }
 
 export type VendorUserCreateWithoutOwnedTasksInput = {
@@ -515,6 +604,7 @@ export type VendorUserCreateWithoutOwnedTasksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOnboardings?: Prisma.OnboardingCreateNestedManyWithoutOwnerUserInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutActorVendorInput
 }
 
 export type VendorUserUncheckedCreateWithoutOwnedTasksInput = {
@@ -526,6 +616,7 @@ export type VendorUserUncheckedCreateWithoutOwnedTasksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOnboardings?: Prisma.OnboardingUncheckedCreateNestedManyWithoutOwnerUserInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorVendorInput
 }
 
 export type VendorUserCreateOrConnectWithoutOwnedTasksInput = {
@@ -552,6 +643,7 @@ export type VendorUserUpdateWithoutOwnedTasksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOnboardings?: Prisma.OnboardingUpdateManyWithoutOwnerUserNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutActorVendorNestedInput
 }
 
 export type VendorUserUncheckedUpdateWithoutOwnedTasksInput = {
@@ -563,6 +655,7 @@ export type VendorUserUncheckedUpdateWithoutOwnedTasksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOnboardings?: Prisma.OnboardingUncheckedUpdateManyWithoutOwnerUserNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorVendorNestedInput
 }
 
 
@@ -573,11 +666,13 @@ export type VendorUserUncheckedUpdateWithoutOwnedTasksInput = {
 export type VendorUserCountOutputType = {
   ownedOnboardings: number
   ownedTasks: number
+  activities: number
 }
 
 export type VendorUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ownedOnboardings?: boolean | VendorUserCountOutputTypeCountOwnedOnboardingsArgs
   ownedTasks?: boolean | VendorUserCountOutputTypeCountOwnedTasksArgs
+  activities?: boolean | VendorUserCountOutputTypeCountActivitiesArgs
 }
 
 /**
@@ -604,6 +699,13 @@ export type VendorUserCountOutputTypeCountOwnedTasksArgs<ExtArgs extends runtime
   where?: Prisma.TaskWhereInput
 }
 
+/**
+ * VendorUserCountOutputType without action
+ */
+export type VendorUserCountOutputTypeCountActivitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ActivityLogWhereInput
+}
+
 
 export type VendorUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -615,6 +717,7 @@ export type VendorUserSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   updatedAt?: boolean
   ownedOnboardings?: boolean | Prisma.VendorUser$ownedOnboardingsArgs<ExtArgs>
   ownedTasks?: boolean | Prisma.VendorUser$ownedTasksArgs<ExtArgs>
+  activities?: boolean | Prisma.VendorUser$activitiesArgs<ExtArgs>
   _count?: boolean | Prisma.VendorUserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendorUser"]>
 
@@ -652,6 +755,7 @@ export type VendorUserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type VendorUserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ownedOnboardings?: boolean | Prisma.VendorUser$ownedOnboardingsArgs<ExtArgs>
   ownedTasks?: boolean | Prisma.VendorUser$ownedTasksArgs<ExtArgs>
+  activities?: boolean | Prisma.VendorUser$activitiesArgs<ExtArgs>
   _count?: boolean | Prisma.VendorUserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type VendorUserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -662,6 +766,7 @@ export type $VendorUserPayload<ExtArgs extends runtime.Types.Extensions.Internal
   objects: {
     ownedOnboardings: Prisma.$OnboardingPayload<ExtArgs>[]
     ownedTasks: Prisma.$TaskPayload<ExtArgs>[]
+    activities: Prisma.$ActivityLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1067,6 +1172,7 @@ export interface Prisma__VendorUserClient<T, Null = never, ExtArgs extends runti
   readonly [Symbol.toStringTag]: "PrismaPromise"
   ownedOnboardings<T extends Prisma.VendorUser$ownedOnboardingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorUser$ownedOnboardingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OnboardingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ownedTasks<T extends Prisma.VendorUser$ownedTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorUser$ownedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  activities<T extends Prisma.VendorUser$activitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorUser$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1536,6 +1642,30 @@ export type VendorUser$ownedTasksArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.TaskScalarFieldEnum | Prisma.TaskScalarFieldEnum[]
+}
+
+/**
+ * VendorUser.activities
+ */
+export type VendorUser$activitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ActivityLog
+   */
+  select?: Prisma.ActivityLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ActivityLog
+   */
+  omit?: Prisma.ActivityLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActivityLogInclude<ExtArgs> | null
+  where?: Prisma.ActivityLogWhereInput
+  orderBy?: Prisma.ActivityLogOrderByWithRelationInput | Prisma.ActivityLogOrderByWithRelationInput[]
+  cursor?: Prisma.ActivityLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ActivityLogScalarFieldEnum | Prisma.ActivityLogScalarFieldEnum[]
 }
 
 /**

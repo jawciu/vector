@@ -50,6 +50,11 @@ export type Company = Prisma.CompanyModel
  */
 export type VendorUser = Prisma.VendorUserModel
 /**
+ * Model ActivityLog
+ * 
+ */
+export type ActivityLog = Prisma.ActivityLogModel
+/**
  * Model Onboarding
  * 
  */

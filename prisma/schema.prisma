@@ -20,15 +20,36 @@ model Company {
 }
 
 model VendorUser {
-  id               Int          @id @default(autoincrement())
-  authUserId       String?      @unique
-  email            String       @unique
+  id               Int            @id @default(autoincrement())
+  authUserId       String?        @unique
+  email            String         @unique
   name             String
-  role             String       @default("admin") // admin | member | viewer
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @default(now()) @updatedAt
+  role             String         @default("admin") // admin | member | viewer
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @default(now()) @updatedAt
   ownedOnboardings Onboarding[]
   ownedTasks       Task[]
+  activities       ActivityLog[]
+}
+
+model ActivityLog {
+  id             Int         @id @default(autoincrement())
+  onboardingId   Int
+  onboarding     Onboarding  @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
+  actorType      String      // "vendor" | "contact" | "system"
+  actorVendorId  Int?
+  actorVendor    VendorUser? @relation(fields: [actorVendorId], references: [id], onDelete: SetNull)
+  actorContactId Int?
+  actorContact   Contact?    @relation(fields: [actorContactId], references: [id], onDelete: SetNull)
+  verb           String      // created | completed | status_changed | assigned | commented | uploaded | link_activated | health_flipped
+  entityType     String      // task | file | comment | onboarding | magic_link
+  entityId       Int
+  metadata       Json        @default("{}")
+  createdAt      DateTime    @default(now())
+
+  @@index([onboardingId, createdAt])
+  @@index([actorVendorId])
+  @@index([actorContactId])
 }
 
 model Onboarding {
@@ -47,6 +68,7 @@ model Onboarding {
   phases        Phase[]
   magicLinks    MagicLink[]
   files         File[]
+  activities    ActivityLog[]
 }
 
 model Contact {
@@ -59,6 +81,7 @@ model Contact {
   magicLinks    MagicLink[]
   assignedTasks Task[]
   files         File[]
+  activities    ActivityLog[]
 }
 
 model Phase {

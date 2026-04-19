@@ -30,7 +30,7 @@ export async function POST(request, { params }) {
     }
 
     const author = user.user_metadata?.full_name || user.email || "Unknown";
-    const comment = await createComment(id, author, body.trim());
+    const comment = await createComment(id, author, body.trim(), { actor: { type: "vendor", authUser: user } });
     return NextResponse.json(comment);
   } catch (error) {
     console.error("[POST /api/tasks/:id/comments]", error);

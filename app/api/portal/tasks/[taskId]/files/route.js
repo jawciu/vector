@@ -62,16 +62,19 @@ export async function POST(request, { params }) {
     }
 
     // Create DB record
-    const fileRecord = await createFile({
-      taskId,
-      onboardingId,
-      contactId,
-      uploadedBy: contactName,
-      fileName: file.name,
-      fileSize: file.size,
-      mimeType: file.type || "application/octet-stream",
-      storagePath,
-    });
+    const fileRecord = await createFile(
+      {
+        taskId,
+        onboardingId,
+        contactId,
+        uploadedBy: contactName,
+        fileName: file.name,
+        fileSize: file.size,
+        mimeType: file.type || "application/octet-stream",
+        storagePath,
+      },
+      { actor: { type: "contact", contactId } }
+    );
 
     return NextResponse.json(fileRecord, { status: 201 });
   } catch (error) {

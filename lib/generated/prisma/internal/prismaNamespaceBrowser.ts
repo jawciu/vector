@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Company: 'Company',
   VendorUser: 'VendorUser',
+  ActivityLog: 'ActivityLog',
   Onboarding: 'Onboarding',
   Contact: 'Contact',
   Phase: 'Phase',
@@ -97,6 +98,22 @@ export const VendorUserScalarFieldEnum = {
 } as const
 
 export type VendorUserScalarFieldEnum = (typeof VendorUserScalarFieldEnum)[keyof typeof VendorUserScalarFieldEnum]
+
+
+export const ActivityLogScalarFieldEnum = {
+  id: 'id',
+  onboardingId: 'onboardingId',
+  actorType: 'actorType',
+  actorVendorId: 'actorVendorId',
+  actorContactId: 'actorContactId',
+  verb: 'verb',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type ActivityLogScalarFieldEnum = (typeof ActivityLogScalarFieldEnum)[keyof typeof ActivityLogScalarFieldEnum]
 
 
 export const OnboardingScalarFieldEnum = {
@@ -210,6 +227,13 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -224,4 +248,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

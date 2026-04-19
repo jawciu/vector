@@ -13,7 +13,7 @@ export async function PATCH(request, { params }) {
     const { id } = await params;
     const body = await request.json();
 
-    const task = await updateTask(id, body);
+    const task = await updateTask(id, body, { actor: { type: "vendor", authUser: user } });
     if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }

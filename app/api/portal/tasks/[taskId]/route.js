@@ -23,7 +23,8 @@ export async function PATCH(request, { params }) {
     const updated = await updateTaskAsPortalUser(
       taskId,
       session.magicLink.onboardingId,
-      body
+      body,
+      { actor: { type: "contact", contactId: session.contact.id } }
     );
 
     if (!updated) {

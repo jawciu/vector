@@ -21,7 +21,7 @@ export async function POST(request) {
       );
     }
 
-    const task = await createTask(body);
+    const task = await createTask(body, { actor: { type: "vendor", authUser: user } });
     return NextResponse.json(task, { status: 201 });
   } catch (error) {
     console.error("[POST /api/tasks]", error);

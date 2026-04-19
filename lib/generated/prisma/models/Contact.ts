@@ -224,6 +224,7 @@ export type ContactWhereInput = {
   magicLinks?: Prisma.MagicLinkListRelationFilter
   assignedTasks?: Prisma.TaskListRelationFilter
   files?: Prisma.FileListRelationFilter
+  activities?: Prisma.ActivityLogListRelationFilter
 }
 
 export type ContactOrderByWithRelationInput = {
@@ -236,6 +237,7 @@ export type ContactOrderByWithRelationInput = {
   magicLinks?: Prisma.MagicLinkOrderByRelationAggregateInput
   assignedTasks?: Prisma.TaskOrderByRelationAggregateInput
   files?: Prisma.FileOrderByRelationAggregateInput
+  activities?: Prisma.ActivityLogOrderByRelationAggregateInput
 }
 
 export type ContactWhereUniqueInput = Prisma.AtLeast<{
@@ -251,6 +253,7 @@ export type ContactWhereUniqueInput = Prisma.AtLeast<{
   magicLinks?: Prisma.MagicLinkListRelationFilter
   assignedTasks?: Prisma.TaskListRelationFilter
   files?: Prisma.FileListRelationFilter
+  activities?: Prisma.ActivityLogListRelationFilter
 }, "id">
 
 export type ContactOrderByWithAggregationInput = {
@@ -285,6 +288,7 @@ export type ContactCreateInput = {
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeContactInput
   files?: Prisma.FileCreateNestedManyWithoutContactInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutActorContactInput
 }
 
 export type ContactUncheckedCreateInput = {
@@ -296,6 +300,7 @@ export type ContactUncheckedCreateInput = {
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeContactInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutContactInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorContactInput
 }
 
 export type ContactUpdateInput = {
@@ -306,6 +311,7 @@ export type ContactUpdateInput = {
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeContactNestedInput
   files?: Prisma.FileUpdateManyWithoutContactNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutActorContactNestedInput
 }
 
 export type ContactUncheckedUpdateInput = {
@@ -317,6 +323,7 @@ export type ContactUncheckedUpdateInput = {
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeContactNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutContactNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorContactNestedInput
 }
 
 export type ContactCreateManyInput = {
@@ -339,6 +346,11 @@ export type ContactUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type ContactNullableScalarRelationFilter = {
+  is?: Prisma.ContactWhereInput | null
+  isNot?: Prisma.ContactWhereInput | null
 }
 
 export type ContactListRelationFilter = {
@@ -385,14 +397,25 @@ export type ContactSumOrderByAggregateInput = {
   onboardingId?: Prisma.SortOrder
 }
 
-export type ContactNullableScalarRelationFilter = {
-  is?: Prisma.ContactWhereInput | null
-  isNot?: Prisma.ContactWhereInput | null
-}
-
 export type ContactScalarRelationFilter = {
   is?: Prisma.ContactWhereInput
   isNot?: Prisma.ContactWhereInput
+}
+
+export type ContactCreateNestedOneWithoutActivitiesInput = {
+  create?: Prisma.XOR<Prisma.ContactCreateWithoutActivitiesInput, Prisma.ContactUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.ContactCreateOrConnectWithoutActivitiesInput
+  connect?: Prisma.ContactWhereUniqueInput
+}
+
+export type ContactUpdateOneWithoutActivitiesNestedInput = {
+  create?: Prisma.XOR<Prisma.ContactCreateWithoutActivitiesInput, Prisma.ContactUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.ContactCreateOrConnectWithoutActivitiesInput
+  upsert?: Prisma.ContactUpsertWithoutActivitiesInput
+  disconnect?: Prisma.ContactWhereInput | boolean
+  delete?: Prisma.ContactWhereInput | boolean
+  connect?: Prisma.ContactWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContactUpdateToOneWithWhereWithoutActivitiesInput, Prisma.ContactUpdateWithoutActivitiesInput>, Prisma.ContactUncheckedUpdateWithoutActivitiesInput>
 }
 
 export type ContactCreateNestedManyWithoutOnboardingInput = {
@@ -483,6 +506,64 @@ export type ContactUpdateOneWithoutFilesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ContactUpdateToOneWithWhereWithoutFilesInput, Prisma.ContactUpdateWithoutFilesInput>, Prisma.ContactUncheckedUpdateWithoutFilesInput>
 }
 
+export type ContactCreateWithoutActivitiesInput = {
+  name: string
+  email?: string
+  role?: string
+  onboarding: Prisma.OnboardingCreateNestedOneWithoutContactsInput
+  magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutContactInput
+  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeContactInput
+  files?: Prisma.FileCreateNestedManyWithoutContactInput
+}
+
+export type ContactUncheckedCreateWithoutActivitiesInput = {
+  id?: number
+  onboardingId: number
+  name: string
+  email?: string
+  role?: string
+  magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutContactInput
+  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeContactInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutContactInput
+}
+
+export type ContactCreateOrConnectWithoutActivitiesInput = {
+  where: Prisma.ContactWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContactCreateWithoutActivitiesInput, Prisma.ContactUncheckedCreateWithoutActivitiesInput>
+}
+
+export type ContactUpsertWithoutActivitiesInput = {
+  update: Prisma.XOR<Prisma.ContactUpdateWithoutActivitiesInput, Prisma.ContactUncheckedUpdateWithoutActivitiesInput>
+  create: Prisma.XOR<Prisma.ContactCreateWithoutActivitiesInput, Prisma.ContactUncheckedCreateWithoutActivitiesInput>
+  where?: Prisma.ContactWhereInput
+}
+
+export type ContactUpdateToOneWithWhereWithoutActivitiesInput = {
+  where?: Prisma.ContactWhereInput
+  data: Prisma.XOR<Prisma.ContactUpdateWithoutActivitiesInput, Prisma.ContactUncheckedUpdateWithoutActivitiesInput>
+}
+
+export type ContactUpdateWithoutActivitiesInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutContactsNestedInput
+  magicLinks?: Prisma.MagicLinkUpdateManyWithoutContactNestedInput
+  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeContactNestedInput
+  files?: Prisma.FileUpdateManyWithoutContactNestedInput
+}
+
+export type ContactUncheckedUpdateWithoutActivitiesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutContactNestedInput
+  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeContactNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutContactNestedInput
+}
+
 export type ContactCreateWithoutOnboardingInput = {
   name: string
   email?: string
@@ -490,6 +571,7 @@ export type ContactCreateWithoutOnboardingInput = {
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeContactInput
   files?: Prisma.FileCreateNestedManyWithoutContactInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutActorContactInput
 }
 
 export type ContactUncheckedCreateWithoutOnboardingInput = {
@@ -500,6 +582,7 @@ export type ContactUncheckedCreateWithoutOnboardingInput = {
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeContactInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutContactInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorContactInput
 }
 
 export type ContactCreateOrConnectWithoutOnboardingInput = {
@@ -546,6 +629,7 @@ export type ContactCreateWithoutAssignedTasksInput = {
   onboarding: Prisma.OnboardingCreateNestedOneWithoutContactsInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutContactInput
   files?: Prisma.FileCreateNestedManyWithoutContactInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutActorContactInput
 }
 
 export type ContactUncheckedCreateWithoutAssignedTasksInput = {
@@ -556,6 +640,7 @@ export type ContactUncheckedCreateWithoutAssignedTasksInput = {
   role?: string
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutContactInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutContactInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorContactInput
 }
 
 export type ContactCreateOrConnectWithoutAssignedTasksInput = {
@@ -581,6 +666,7 @@ export type ContactUpdateWithoutAssignedTasksInput = {
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutContactsNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutContactNestedInput
   files?: Prisma.FileUpdateManyWithoutContactNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutActorContactNestedInput
 }
 
 export type ContactUncheckedUpdateWithoutAssignedTasksInput = {
@@ -591,6 +677,7 @@ export type ContactUncheckedUpdateWithoutAssignedTasksInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutContactNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutContactNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorContactNestedInput
 }
 
 export type ContactCreateWithoutMagicLinksInput = {
@@ -600,6 +687,7 @@ export type ContactCreateWithoutMagicLinksInput = {
   onboarding: Prisma.OnboardingCreateNestedOneWithoutContactsInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeContactInput
   files?: Prisma.FileCreateNestedManyWithoutContactInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutActorContactInput
 }
 
 export type ContactUncheckedCreateWithoutMagicLinksInput = {
@@ -610,6 +698,7 @@ export type ContactUncheckedCreateWithoutMagicLinksInput = {
   role?: string
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeContactInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutContactInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorContactInput
 }
 
 export type ContactCreateOrConnectWithoutMagicLinksInput = {
@@ -635,6 +724,7 @@ export type ContactUpdateWithoutMagicLinksInput = {
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutContactsNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeContactNestedInput
   files?: Prisma.FileUpdateManyWithoutContactNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutActorContactNestedInput
 }
 
 export type ContactUncheckedUpdateWithoutMagicLinksInput = {
@@ -645,6 +735,7 @@ export type ContactUncheckedUpdateWithoutMagicLinksInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeContactNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutContactNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorContactNestedInput
 }
 
 export type ContactCreateWithoutFilesInput = {
@@ -654,6 +745,7 @@ export type ContactCreateWithoutFilesInput = {
   onboarding: Prisma.OnboardingCreateNestedOneWithoutContactsInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeContactInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutActorContactInput
 }
 
 export type ContactUncheckedCreateWithoutFilesInput = {
@@ -664,6 +756,7 @@ export type ContactUncheckedCreateWithoutFilesInput = {
   role?: string
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeContactInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorContactInput
 }
 
 export type ContactCreateOrConnectWithoutFilesInput = {
@@ -689,6 +782,7 @@ export type ContactUpdateWithoutFilesInput = {
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutContactsNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeContactNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutActorContactNestedInput
 }
 
 export type ContactUncheckedUpdateWithoutFilesInput = {
@@ -699,6 +793,7 @@ export type ContactUncheckedUpdateWithoutFilesInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeContactNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorContactNestedInput
 }
 
 export type ContactCreateManyOnboardingInput = {
@@ -715,6 +810,7 @@ export type ContactUpdateWithoutOnboardingInput = {
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeContactNestedInput
   files?: Prisma.FileUpdateManyWithoutContactNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutActorContactNestedInput
 }
 
 export type ContactUncheckedUpdateWithoutOnboardingInput = {
@@ -725,6 +821,7 @@ export type ContactUncheckedUpdateWithoutOnboardingInput = {
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeContactNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutContactNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorContactNestedInput
 }
 
 export type ContactUncheckedUpdateManyWithoutOnboardingInput = {
@@ -743,12 +840,14 @@ export type ContactCountOutputType = {
   magicLinks: number
   assignedTasks: number
   files: number
+  activities: number
 }
 
 export type ContactCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   magicLinks?: boolean | ContactCountOutputTypeCountMagicLinksArgs
   assignedTasks?: boolean | ContactCountOutputTypeCountAssignedTasksArgs
   files?: boolean | ContactCountOutputTypeCountFilesArgs
+  activities?: boolean | ContactCountOutputTypeCountActivitiesArgs
 }
 
 /**
@@ -782,6 +881,13 @@ export type ContactCountOutputTypeCountFilesArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.FileWhereInput
 }
 
+/**
+ * ContactCountOutputType without action
+ */
+export type ContactCountOutputTypeCountActivitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ActivityLogWhereInput
+}
+
 
 export type ContactSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -793,6 +899,7 @@ export type ContactSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   magicLinks?: boolean | Prisma.Contact$magicLinksArgs<ExtArgs>
   assignedTasks?: boolean | Prisma.Contact$assignedTasksArgs<ExtArgs>
   files?: boolean | Prisma.Contact$filesArgs<ExtArgs>
+  activities?: boolean | Prisma.Contact$activitiesArgs<ExtArgs>
   _count?: boolean | Prisma.ContactCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contact"]>
 
@@ -828,6 +935,7 @@ export type ContactInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   magicLinks?: boolean | Prisma.Contact$magicLinksArgs<ExtArgs>
   assignedTasks?: boolean | Prisma.Contact$assignedTasksArgs<ExtArgs>
   files?: boolean | Prisma.Contact$filesArgs<ExtArgs>
+  activities?: boolean | Prisma.Contact$activitiesArgs<ExtArgs>
   _count?: boolean | Prisma.ContactCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ContactIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -844,6 +952,7 @@ export type $ContactPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     magicLinks: Prisma.$MagicLinkPayload<ExtArgs>[]
     assignedTasks: Prisma.$TaskPayload<ExtArgs>[]
     files: Prisma.$FilePayload<ExtArgs>[]
+    activities: Prisma.$ActivityLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1249,6 +1358,7 @@ export interface Prisma__ContactClient<T, Null = never, ExtArgs extends runtime.
   magicLinks<T extends Prisma.Contact$magicLinksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contact$magicLinksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MagicLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignedTasks<T extends Prisma.Contact$assignedTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contact$assignedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   files<T extends Prisma.Contact$filesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contact$filesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  activities<T extends Prisma.Contact$activitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contact$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1748,6 +1858,30 @@ export type Contact$filesArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.FileScalarFieldEnum | Prisma.FileScalarFieldEnum[]
+}
+
+/**
+ * Contact.activities
+ */
+export type Contact$activitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ActivityLog
+   */
+  select?: Prisma.ActivityLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ActivityLog
+   */
+  omit?: Prisma.ActivityLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActivityLogInclude<ExtArgs> | null
+  where?: Prisma.ActivityLogWhereInput
+  orderBy?: Prisma.ActivityLogOrderByWithRelationInput | Prisma.ActivityLogOrderByWithRelationInput[]
+  cursor?: Prisma.ActivityLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ActivityLogScalarFieldEnum | Prisma.ActivityLogScalarFieldEnum[]
 }
 
 /**

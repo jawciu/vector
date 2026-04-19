@@ -23,7 +23,8 @@ export async function POST(request, { params }) {
       taskId,
       session.magicLink.onboardingId,
       session.contact.name,
-      body.trim()
+      body.trim(),
+      { actor: { type: "contact", contactId: session.contact.id } }
     );
 
     if (!comment) {

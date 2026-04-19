@@ -255,6 +255,7 @@ export type OnboardingWhereInput = {
   phases?: Prisma.PhaseListRelationFilter
   magicLinks?: Prisma.MagicLinkListRelationFilter
   files?: Prisma.FileListRelationFilter
+  activities?: Prisma.ActivityLogListRelationFilter
 }
 
 export type OnboardingOrderByWithRelationInput = {
@@ -273,6 +274,7 @@ export type OnboardingOrderByWithRelationInput = {
   phases?: Prisma.PhaseOrderByRelationAggregateInput
   magicLinks?: Prisma.MagicLinkOrderByRelationAggregateInput
   files?: Prisma.FileOrderByRelationAggregateInput
+  activities?: Prisma.ActivityLogOrderByRelationAggregateInput
 }
 
 export type OnboardingWhereUniqueInput = Prisma.AtLeast<{
@@ -294,6 +296,7 @@ export type OnboardingWhereUniqueInput = Prisma.AtLeast<{
   phases?: Prisma.PhaseListRelationFilter
   magicLinks?: Prisma.MagicLinkListRelationFilter
   files?: Prisma.FileListRelationFilter
+  activities?: Prisma.ActivityLogListRelationFilter
 }, "id">
 
 export type OnboardingOrderByWithAggregationInput = {
@@ -339,6 +342,7 @@ export type OnboardingCreateInput = {
   phases?: Prisma.PhaseCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingUncheckedCreateInput = {
@@ -355,6 +359,7 @@ export type OnboardingUncheckedCreateInput = {
   phases?: Prisma.PhaseUncheckedCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingUpdateInput = {
@@ -370,6 +375,7 @@ export type OnboardingUpdateInput = {
   phases?: Prisma.PhaseUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateInput = {
@@ -386,6 +392,7 @@ export type OnboardingUncheckedUpdateInput = {
   phases?: Prisma.PhaseUncheckedUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingCreateManyInput = {
@@ -426,6 +433,11 @@ export type OnboardingListRelationFilter = {
 
 export type OnboardingOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type OnboardingScalarRelationFilter = {
+  is?: Prisma.OnboardingWhereInput
+  isNot?: Prisma.OnboardingWhereInput
 }
 
 export type OnboardingCountOrderByAggregateInput = {
@@ -471,11 +483,6 @@ export type OnboardingSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
-}
-
-export type OnboardingScalarRelationFilter = {
-  is?: Prisma.OnboardingWhereInput
-  isNot?: Prisma.OnboardingWhereInput
 }
 
 export type OnboardingCreateNestedManyWithoutCompanyInput = {
@@ -562,16 +569,22 @@ export type OnboardingUncheckedUpdateManyWithoutOwnerUserNestedInput = {
   deleteMany?: Prisma.OnboardingScalarWhereInput | Prisma.OnboardingScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
+export type OnboardingCreateNestedOneWithoutActivitiesInput = {
+  create?: Prisma.XOR<Prisma.OnboardingCreateWithoutActivitiesInput, Prisma.OnboardingUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.OnboardingCreateOrConnectWithoutActivitiesInput
+  connect?: Prisma.OnboardingWhereUniqueInput
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
+export type OnboardingUpdateOneRequiredWithoutActivitiesNestedInput = {
+  create?: Prisma.XOR<Prisma.OnboardingCreateWithoutActivitiesInput, Prisma.OnboardingUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.OnboardingCreateOrConnectWithoutActivitiesInput
+  upsert?: Prisma.OnboardingUpsertWithoutActivitiesInput
+  connect?: Prisma.OnboardingWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OnboardingUpdateToOneWithWhereWithoutActivitiesInput, Prisma.OnboardingUpdateWithoutActivitiesInput>, Prisma.OnboardingUncheckedUpdateWithoutActivitiesInput>
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type OnboardingCreateNestedOneWithoutContactsInput = {
@@ -656,6 +669,7 @@ export type OnboardingCreateWithoutCompanyInput = {
   phases?: Prisma.PhaseCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingUncheckedCreateWithoutCompanyInput = {
@@ -671,6 +685,7 @@ export type OnboardingUncheckedCreateWithoutCompanyInput = {
   phases?: Prisma.PhaseUncheckedCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingCreateOrConnectWithoutCompanyInput = {
@@ -725,6 +740,7 @@ export type OnboardingCreateWithoutOwnerUserInput = {
   phases?: Prisma.PhaseCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingUncheckedCreateWithoutOwnerUserInput = {
@@ -740,6 +756,7 @@ export type OnboardingUncheckedCreateWithoutOwnerUserInput = {
   phases?: Prisma.PhaseUncheckedCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingCreateOrConnectWithoutOwnerUserInput = {
@@ -768,6 +785,84 @@ export type OnboardingUpdateManyWithWhereWithoutOwnerUserInput = {
   data: Prisma.XOR<Prisma.OnboardingUpdateManyMutationInput, Prisma.OnboardingUncheckedUpdateManyWithoutOwnerUserInput>
 }
 
+export type OnboardingCreateWithoutActivitiesInput = {
+  owner?: string
+  status?: string
+  targetGoLive?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedOnboardingsInput
+  company: Prisma.CompanyCreateNestedOneWithoutOnboardingsInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutOnboardingInput
+  contacts?: Prisma.ContactCreateNestedManyWithoutOnboardingInput
+  phases?: Prisma.PhaseCreateNestedManyWithoutOnboardingInput
+  magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutOnboardingInput
+  files?: Prisma.FileCreateNestedManyWithoutOnboardingInput
+}
+
+export type OnboardingUncheckedCreateWithoutActivitiesInput = {
+  id?: number
+  companyId: number
+  owner?: string
+  ownerId?: number | null
+  status?: string
+  targetGoLive?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOnboardingInput
+  contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOnboardingInput
+  phases?: Prisma.PhaseUncheckedCreateNestedManyWithoutOnboardingInput
+  magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutOnboardingInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutOnboardingInput
+}
+
+export type OnboardingCreateOrConnectWithoutActivitiesInput = {
+  where: Prisma.OnboardingWhereUniqueInput
+  create: Prisma.XOR<Prisma.OnboardingCreateWithoutActivitiesInput, Prisma.OnboardingUncheckedCreateWithoutActivitiesInput>
+}
+
+export type OnboardingUpsertWithoutActivitiesInput = {
+  update: Prisma.XOR<Prisma.OnboardingUpdateWithoutActivitiesInput, Prisma.OnboardingUncheckedUpdateWithoutActivitiesInput>
+  create: Prisma.XOR<Prisma.OnboardingCreateWithoutActivitiesInput, Prisma.OnboardingUncheckedCreateWithoutActivitiesInput>
+  where?: Prisma.OnboardingWhereInput
+}
+
+export type OnboardingUpdateToOneWithWhereWithoutActivitiesInput = {
+  where?: Prisma.OnboardingWhereInput
+  data: Prisma.XOR<Prisma.OnboardingUpdateWithoutActivitiesInput, Prisma.OnboardingUncheckedUpdateWithoutActivitiesInput>
+}
+
+export type OnboardingUpdateWithoutActivitiesInput = {
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedOnboardingsNestedInput
+  company?: Prisma.CompanyUpdateOneRequiredWithoutOnboardingsNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutOnboardingNestedInput
+  contacts?: Prisma.ContactUpdateManyWithoutOnboardingNestedInput
+  phases?: Prisma.PhaseUpdateManyWithoutOnboardingNestedInput
+  magicLinks?: Prisma.MagicLinkUpdateManyWithoutOnboardingNestedInput
+  files?: Prisma.FileUpdateManyWithoutOnboardingNestedInput
+}
+
+export type OnboardingUncheckedUpdateWithoutActivitiesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  companyId?: Prisma.IntFieldUpdateOperationsInput | number
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutOnboardingNestedInput
+  contacts?: Prisma.ContactUncheckedUpdateManyWithoutOnboardingNestedInput
+  phases?: Prisma.PhaseUncheckedUpdateManyWithoutOnboardingNestedInput
+  magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutOnboardingNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutOnboardingNestedInput
+}
+
 export type OnboardingCreateWithoutContactsInput = {
   owner?: string
   status?: string
@@ -780,6 +875,7 @@ export type OnboardingCreateWithoutContactsInput = {
   phases?: Prisma.PhaseCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingUncheckedCreateWithoutContactsInput = {
@@ -795,6 +891,7 @@ export type OnboardingUncheckedCreateWithoutContactsInput = {
   phases?: Prisma.PhaseUncheckedCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingCreateOrConnectWithoutContactsInput = {
@@ -825,6 +922,7 @@ export type OnboardingUpdateWithoutContactsInput = {
   phases?: Prisma.PhaseUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateWithoutContactsInput = {
@@ -840,6 +938,7 @@ export type OnboardingUncheckedUpdateWithoutContactsInput = {
   phases?: Prisma.PhaseUncheckedUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingCreateWithoutPhasesInput = {
@@ -854,6 +953,7 @@ export type OnboardingCreateWithoutPhasesInput = {
   contacts?: Prisma.ContactCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingUncheckedCreateWithoutPhasesInput = {
@@ -869,6 +969,7 @@ export type OnboardingUncheckedCreateWithoutPhasesInput = {
   contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingCreateOrConnectWithoutPhasesInput = {
@@ -899,6 +1000,7 @@ export type OnboardingUpdateWithoutPhasesInput = {
   contacts?: Prisma.ContactUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateWithoutPhasesInput = {
@@ -914,6 +1016,7 @@ export type OnboardingUncheckedUpdateWithoutPhasesInput = {
   contacts?: Prisma.ContactUncheckedUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingCreateWithoutTasksInput = {
@@ -928,6 +1031,7 @@ export type OnboardingCreateWithoutTasksInput = {
   phases?: Prisma.PhaseCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingUncheckedCreateWithoutTasksInput = {
@@ -943,6 +1047,7 @@ export type OnboardingUncheckedCreateWithoutTasksInput = {
   phases?: Prisma.PhaseUncheckedCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingCreateOrConnectWithoutTasksInput = {
@@ -973,6 +1078,7 @@ export type OnboardingUpdateWithoutTasksInput = {
   phases?: Prisma.PhaseUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateWithoutTasksInput = {
@@ -988,6 +1094,7 @@ export type OnboardingUncheckedUpdateWithoutTasksInput = {
   phases?: Prisma.PhaseUncheckedUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingCreateWithoutMagicLinksInput = {
@@ -1002,6 +1109,7 @@ export type OnboardingCreateWithoutMagicLinksInput = {
   contacts?: Prisma.ContactCreateNestedManyWithoutOnboardingInput
   phases?: Prisma.PhaseCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingUncheckedCreateWithoutMagicLinksInput = {
@@ -1017,6 +1125,7 @@ export type OnboardingUncheckedCreateWithoutMagicLinksInput = {
   contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOnboardingInput
   phases?: Prisma.PhaseUncheckedCreateNestedManyWithoutOnboardingInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingCreateOrConnectWithoutMagicLinksInput = {
@@ -1047,6 +1156,7 @@ export type OnboardingUpdateWithoutMagicLinksInput = {
   contacts?: Prisma.ContactUpdateManyWithoutOnboardingNestedInput
   phases?: Prisma.PhaseUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateWithoutMagicLinksInput = {
@@ -1062,6 +1172,7 @@ export type OnboardingUncheckedUpdateWithoutMagicLinksInput = {
   contacts?: Prisma.ContactUncheckedUpdateManyWithoutOnboardingNestedInput
   phases?: Prisma.PhaseUncheckedUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingCreateWithoutFilesInput = {
@@ -1076,6 +1187,7 @@ export type OnboardingCreateWithoutFilesInput = {
   contacts?: Prisma.ContactCreateNestedManyWithoutOnboardingInput
   phases?: Prisma.PhaseCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingUncheckedCreateWithoutFilesInput = {
@@ -1091,6 +1203,7 @@ export type OnboardingUncheckedCreateWithoutFilesInput = {
   contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOnboardingInput
   phases?: Prisma.PhaseUncheckedCreateNestedManyWithoutOnboardingInput
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutOnboardingInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutOnboardingInput
 }
 
 export type OnboardingCreateOrConnectWithoutFilesInput = {
@@ -1121,6 +1234,7 @@ export type OnboardingUpdateWithoutFilesInput = {
   contacts?: Prisma.ContactUpdateManyWithoutOnboardingNestedInput
   phases?: Prisma.PhaseUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateWithoutFilesInput = {
@@ -1136,6 +1250,7 @@ export type OnboardingUncheckedUpdateWithoutFilesInput = {
   contacts?: Prisma.ContactUncheckedUpdateManyWithoutOnboardingNestedInput
   phases?: Prisma.PhaseUncheckedUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingCreateManyCompanyInput = {
@@ -1160,6 +1275,7 @@ export type OnboardingUpdateWithoutCompanyInput = {
   phases?: Prisma.PhaseUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateWithoutCompanyInput = {
@@ -1175,6 +1291,7 @@ export type OnboardingUncheckedUpdateWithoutCompanyInput = {
   phases?: Prisma.PhaseUncheckedUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateManyWithoutCompanyInput = {
@@ -1209,6 +1326,7 @@ export type OnboardingUpdateWithoutOwnerUserInput = {
   phases?: Prisma.PhaseUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateWithoutOwnerUserInput = {
@@ -1224,6 +1342,7 @@ export type OnboardingUncheckedUpdateWithoutOwnerUserInput = {
   phases?: Prisma.PhaseUncheckedUpdateManyWithoutOnboardingNestedInput
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutOnboardingNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutOnboardingNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutOnboardingNestedInput
 }
 
 export type OnboardingUncheckedUpdateManyWithoutOwnerUserInput = {
@@ -1247,6 +1366,7 @@ export type OnboardingCountOutputType = {
   phases: number
   magicLinks: number
   files: number
+  activities: number
 }
 
 export type OnboardingCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1255,6 +1375,7 @@ export type OnboardingCountOutputTypeSelect<ExtArgs extends runtime.Types.Extens
   phases?: boolean | OnboardingCountOutputTypeCountPhasesArgs
   magicLinks?: boolean | OnboardingCountOutputTypeCountMagicLinksArgs
   files?: boolean | OnboardingCountOutputTypeCountFilesArgs
+  activities?: boolean | OnboardingCountOutputTypeCountActivitiesArgs
 }
 
 /**
@@ -1302,6 +1423,13 @@ export type OnboardingCountOutputTypeCountFilesArgs<ExtArgs extends runtime.Type
   where?: Prisma.FileWhereInput
 }
 
+/**
+ * OnboardingCountOutputType without action
+ */
+export type OnboardingCountOutputTypeCountActivitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ActivityLogWhereInput
+}
+
 
 export type OnboardingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1319,6 +1447,7 @@ export type OnboardingSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   phases?: boolean | Prisma.Onboarding$phasesArgs<ExtArgs>
   magicLinks?: boolean | Prisma.Onboarding$magicLinksArgs<ExtArgs>
   files?: boolean | Prisma.Onboarding$filesArgs<ExtArgs>
+  activities?: boolean | Prisma.Onboarding$activitiesArgs<ExtArgs>
   _count?: boolean | Prisma.OnboardingCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["onboarding"]>
 
@@ -1368,6 +1497,7 @@ export type OnboardingInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   phases?: boolean | Prisma.Onboarding$phasesArgs<ExtArgs>
   magicLinks?: boolean | Prisma.Onboarding$magicLinksArgs<ExtArgs>
   files?: boolean | Prisma.Onboarding$filesArgs<ExtArgs>
+  activities?: boolean | Prisma.Onboarding$activitiesArgs<ExtArgs>
   _count?: boolean | Prisma.OnboardingCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OnboardingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1389,6 +1519,7 @@ export type $OnboardingPayload<ExtArgs extends runtime.Types.Extensions.Internal
     phases: Prisma.$PhasePayload<ExtArgs>[]
     magicLinks: Prisma.$MagicLinkPayload<ExtArgs>[]
     files: Prisma.$FilePayload<ExtArgs>[]
+    activities: Prisma.$ActivityLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1800,6 +1931,7 @@ export interface Prisma__OnboardingClient<T, Null = never, ExtArgs extends runti
   phases<T extends Prisma.Onboarding$phasesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Onboarding$phasesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PhasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   magicLinks<T extends Prisma.Onboarding$magicLinksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Onboarding$magicLinksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MagicLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   files<T extends Prisma.Onboarding$filesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Onboarding$filesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  activities<T extends Prisma.Onboarding$activitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Onboarding$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2369,6 +2501,30 @@ export type Onboarding$filesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.FileScalarFieldEnum | Prisma.FileScalarFieldEnum[]
+}
+
+/**
+ * Onboarding.activities
+ */
+export type Onboarding$activitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ActivityLog
+   */
+  select?: Prisma.ActivityLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ActivityLog
+   */
+  omit?: Prisma.ActivityLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActivityLogInclude<ExtArgs> | null
+  where?: Prisma.ActivityLogWhereInput
+  orderBy?: Prisma.ActivityLogOrderByWithRelationInput | Prisma.ActivityLogOrderByWithRelationInput[]
+  cursor?: Prisma.ActivityLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ActivityLogScalarFieldEnum | Prisma.ActivityLogScalarFieldEnum[]
 }
 
 /**
