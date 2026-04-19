@@ -385,6 +385,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Company: 'Company',
+  VendorUser: 'VendorUser',
   Onboarding: 'Onboarding',
   Contact: 'Contact',
   Phase: 'Phase',
@@ -407,7 +408,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "company" | "onboarding" | "contact" | "phase" | "task" | "comment" | "magicLink" | "file"
+    modelProps: "company" | "vendorUser" | "onboarding" | "contact" | "phase" | "task" | "comment" | "magicLink" | "file"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -482,6 +483,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CompanyCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CompanyCountAggregateOutputType> | number
+        }
+      }
+    }
+    VendorUser: {
+      payload: Prisma.$VendorUserPayload<ExtArgs>
+      fields: Prisma.VendorUserFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VendorUserFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorUserPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VendorUserFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorUserPayload>
+        }
+        findFirst: {
+          args: Prisma.VendorUserFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorUserPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VendorUserFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorUserPayload>
+        }
+        findMany: {
+          args: Prisma.VendorUserFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorUserPayload>[]
+        }
+        create: {
+          args: Prisma.VendorUserCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorUserPayload>
+        }
+        createMany: {
+          args: Prisma.VendorUserCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VendorUserCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorUserPayload>[]
+        }
+        delete: {
+          args: Prisma.VendorUserDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorUserPayload>
+        }
+        update: {
+          args: Prisma.VendorUserUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorUserPayload>
+        }
+        deleteMany: {
+          args: Prisma.VendorUserDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VendorUserUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VendorUserUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorUserPayload>[]
+        }
+        upsert: {
+          args: Prisma.VendorUserUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorUserPayload>
+        }
+        aggregate: {
+          args: Prisma.VendorUserAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVendorUser>
+        }
+        groupBy: {
+          args: Prisma.VendorUserGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VendorUserGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VendorUserCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VendorUserCountAggregateOutputType> | number
         }
       }
     }
@@ -1050,10 +1125,24 @@ export const CompanyScalarFieldEnum = {
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
 
 
+export const VendorUserScalarFieldEnum = {
+  id: 'id',
+  authUserId: 'authUserId',
+  email: 'email',
+  name: 'name',
+  role: 'role',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VendorUserScalarFieldEnum = (typeof VendorUserScalarFieldEnum)[keyof typeof VendorUserScalarFieldEnum]
+
+
 export const OnboardingScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
   owner: 'owner',
+  ownerId: 'ownerId',
   status: 'status',
   targetGoLive: 'targetGoLive',
   createdAt: 'createdAt',
@@ -1095,6 +1184,7 @@ export const TaskScalarFieldEnum = {
   status: 'status',
   due: 'due',
   owner: 'owner',
+  ownerId: 'ownerId',
   members: 'members',
   notes: 'notes',
   sortOrder: 'sortOrder',
@@ -1339,6 +1429,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   company?: Prisma.CompanyOmit
+  vendorUser?: Prisma.VendorUserOmit
   onboarding?: Prisma.OnboardingOmit
   contact?: Prisma.ContactOmit
   phase?: Prisma.PhaseOmit

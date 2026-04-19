@@ -19,10 +19,24 @@ model Company {
   onboardings Onboarding[]
 }
 
+model VendorUser {
+  id               Int          @id @default(autoincrement())
+  authUserId       String?      @unique
+  email            String       @unique
+  name             String
+  role             String       @default("admin") // admin | member | viewer
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @default(now()) @updatedAt
+  ownedOnboardings Onboarding[]
+  ownedTasks       Task[]
+}
+
 model Onboarding {
   id            Int          @id @default(autoincrement())
   companyId     Int
   owner         String       @default("")
+  ownerId       Int?
+  ownerUser     VendorUser?  @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   status        String       @default("Active") // Active | Completed | Paused | Archived
   targetGoLive  DateTime?
   createdAt     DateTime     @default(now())
@@ -69,6 +83,8 @@ model Task {
   status          String  // Not started | In progress | Under investigation | Blocked | Done
   due             String  // e.g. "2026-03-01"
   owner           String  @default("")
+  ownerId         Int?
+  ownerUser       VendorUser? @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   members         String[] @default([])
   notes           String  @default("")
   sortOrder       Int     @default(0)

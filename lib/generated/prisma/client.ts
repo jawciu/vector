@@ -45,6 +45,11 @@ export { Prisma }
  */
 export type Company = Prisma.CompanyModel
 /**
+ * Model VendorUser
+ * 
+ */
+export type VendorUser = Prisma.VendorUserModel
+/**
  * Model Onboarding
  * 
  */

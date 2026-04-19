@@ -34,6 +34,20 @@ async function main() {
   await prisma.onboarding.deleteMany();
   await prisma.company.deleteMany();
 
+  // Vendor user for Caroline — seeded idempotently so real login (which sets authUserId)
+  // survives re-seeds. Fictional owner names below stay as strings; they don't get
+  // VendorUser rows because they don't perform actions in the app.
+  await prisma.vendorUser.upsert({
+    where: { email: "jaworskycaroline@gmail.com" },
+    update: {},
+    create: {
+      authUserId: process.env.SEED_VENDOR_AUTH_USER_ID ?? null,
+      email: "jaworskycaroline@gmail.com",
+      name: "Caroline Jaworsky",
+      role: "admin",
+    },
+  });
+
   // --- Companies ---
   const [acme, techcorp, globex, initech, umbrella, stark, wayne, cyberdyne, soylent, wonka] =
     await Promise.all([

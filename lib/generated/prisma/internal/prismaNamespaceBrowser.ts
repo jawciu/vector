@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Company: 'Company',
+  VendorUser: 'VendorUser',
   Onboarding: 'Onboarding',
   Contact: 'Contact',
   Phase: 'Phase',
@@ -85,10 +86,24 @@ export const CompanyScalarFieldEnum = {
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
 
 
+export const VendorUserScalarFieldEnum = {
+  id: 'id',
+  authUserId: 'authUserId',
+  email: 'email',
+  name: 'name',
+  role: 'role',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VendorUserScalarFieldEnum = (typeof VendorUserScalarFieldEnum)[keyof typeof VendorUserScalarFieldEnum]
+
+
 export const OnboardingScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
   owner: 'owner',
+  ownerId: 'ownerId',
   status: 'status',
   targetGoLive: 'targetGoLive',
   createdAt: 'createdAt',
@@ -130,6 +145,7 @@ export const TaskScalarFieldEnum = {
   status: 'status',
   due: 'due',
   owner: 'owner',
+  ownerId: 'ownerId',
   members: 'members',
   notes: 'notes',
   sortOrder: 'sortOrder',
