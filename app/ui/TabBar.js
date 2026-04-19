@@ -19,32 +19,14 @@ export default function TabBar({ tabs, activeTab, onTabChange }) {
             key={tab.id}
             type="button"
             onClick={() => onTabChange(tab.id)}
-            className="flex items-center gap-1.5 text-sm font-medium pb-2 relative"
-            style={{
-              color: isActive ? "var(--text)" : "var(--text-muted)",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              paddingLeft: 8,
-              paddingRight: 8,
-              paddingTop: 6,
-            }}
+            className="tab-btn"
+            data-active={isActive || undefined}
           >
-            {tab.icon}
-            {tab.label}
-            {isActive && (
-              <span
-                style={{
-                  position: "absolute",
-                  bottom: -1,
-                  left: 0,
-                  right: 0,
-                  height: 2,
-                  borderRadius: 99,
-                  background: "var(--text)",
-                }}
-              />
-            )}
+            <span className="tab-btn__inner">
+              {tab.icon}
+              {tab.label}
+            </span>
+            {isActive && <span className="tab-btn__indicator" />}
           </button>
         );
       })}
