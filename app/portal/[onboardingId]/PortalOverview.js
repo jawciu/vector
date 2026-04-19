@@ -1,5 +1,7 @@
 "use client";
 
+import PortalUpdatesBanner from "./PortalUpdatesBanner";
+
 const STATUS_COLORS = {
   done: "var(--success)",
   inProgress: "var(--action)",
@@ -192,6 +194,8 @@ function PhaseCard({ phase }) {
 export default function PortalOverview({ data }) {
   return (
     <div className="flex flex-col gap-3">
+      <PortalUpdatesBanner />
+
       {/* Health + Go-live: side by side on desktop */}
       <div className="flex flex-col md:flex-row gap-3">
         <div className="md:flex-1">

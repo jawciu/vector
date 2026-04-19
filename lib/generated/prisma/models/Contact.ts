@@ -42,6 +42,7 @@ export type ContactMinAggregateOutputType = {
   name: string | null
   email: string | null
   role: string | null
+  lastSeenPortalAt: Date | null
 }
 
 export type ContactMaxAggregateOutputType = {
@@ -50,6 +51,7 @@ export type ContactMaxAggregateOutputType = {
   name: string | null
   email: string | null
   role: string | null
+  lastSeenPortalAt: Date | null
 }
 
 export type ContactCountAggregateOutputType = {
@@ -58,6 +60,7 @@ export type ContactCountAggregateOutputType = {
   name: number
   email: number
   role: number
+  lastSeenPortalAt: number
   _all: number
 }
 
@@ -78,6 +81,7 @@ export type ContactMinAggregateInputType = {
   name?: true
   email?: true
   role?: true
+  lastSeenPortalAt?: true
 }
 
 export type ContactMaxAggregateInputType = {
@@ -86,6 +90,7 @@ export type ContactMaxAggregateInputType = {
   name?: true
   email?: true
   role?: true
+  lastSeenPortalAt?: true
 }
 
 export type ContactCountAggregateInputType = {
@@ -94,6 +99,7 @@ export type ContactCountAggregateInputType = {
   name?: true
   email?: true
   role?: true
+  lastSeenPortalAt?: true
   _all?: true
 }
 
@@ -189,6 +195,7 @@ export type ContactGroupByOutputType = {
   name: string
   email: string
   role: string
+  lastSeenPortalAt: Date | null
   _count: ContactCountAggregateOutputType | null
   _avg: ContactAvgAggregateOutputType | null
   _sum: ContactSumAggregateOutputType | null
@@ -220,6 +227,7 @@ export type ContactWhereInput = {
   name?: Prisma.StringFilter<"Contact"> | string
   email?: Prisma.StringFilter<"Contact"> | string
   role?: Prisma.StringFilter<"Contact"> | string
+  lastSeenPortalAt?: Prisma.DateTimeNullableFilter<"Contact"> | Date | string | null
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
   magicLinks?: Prisma.MagicLinkListRelationFilter
   assignedTasks?: Prisma.TaskListRelationFilter
@@ -234,6 +242,7 @@ export type ContactOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  lastSeenPortalAt?: Prisma.SortOrderInput | Prisma.SortOrder
   onboarding?: Prisma.OnboardingOrderByWithRelationInput
   magicLinks?: Prisma.MagicLinkOrderByRelationAggregateInput
   assignedTasks?: Prisma.TaskOrderByRelationAggregateInput
@@ -251,6 +260,7 @@ export type ContactWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Contact"> | string
   email?: Prisma.StringFilter<"Contact"> | string
   role?: Prisma.StringFilter<"Contact"> | string
+  lastSeenPortalAt?: Prisma.DateTimeNullableFilter<"Contact"> | Date | string | null
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
   magicLinks?: Prisma.MagicLinkListRelationFilter
   assignedTasks?: Prisma.TaskListRelationFilter
@@ -265,6 +275,7 @@ export type ContactOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  lastSeenPortalAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ContactCountOrderByAggregateInput
   _avg?: Prisma.ContactAvgOrderByAggregateInput
   _max?: Prisma.ContactMaxOrderByAggregateInput
@@ -281,12 +292,14 @@ export type ContactScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Contact"> | string
   email?: Prisma.StringWithAggregatesFilter<"Contact"> | string
   role?: Prisma.StringWithAggregatesFilter<"Contact"> | string
+  lastSeenPortalAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Contact"> | Date | string | null
 }
 
 export type ContactCreateInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   onboarding: Prisma.OnboardingCreateNestedOneWithoutContactsInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeContactInput
@@ -301,6 +314,7 @@ export type ContactUncheckedCreateInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeContactInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutContactInput
@@ -312,6 +326,7 @@ export type ContactUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutContactsNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeContactNestedInput
@@ -326,6 +341,7 @@ export type ContactUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeContactNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutContactNestedInput
@@ -339,12 +355,14 @@ export type ContactCreateManyInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
 }
 
 export type ContactUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ContactUncheckedUpdateManyInput = {
@@ -353,6 +371,7 @@ export type ContactUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ContactNullableScalarRelationFilter = {
@@ -376,6 +395,7 @@ export type ContactCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  lastSeenPortalAt?: Prisma.SortOrder
 }
 
 export type ContactAvgOrderByAggregateInput = {
@@ -389,6 +409,7 @@ export type ContactMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  lastSeenPortalAt?: Prisma.SortOrder
 }
 
 export type ContactMinOrderByAggregateInput = {
@@ -397,6 +418,7 @@ export type ContactMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  lastSeenPortalAt?: Prisma.SortOrder
 }
 
 export type ContactSumOrderByAggregateInput = {
@@ -533,6 +555,7 @@ export type ContactCreateWithoutActivitiesInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   onboarding: Prisma.OnboardingCreateNestedOneWithoutContactsInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeContactInput
@@ -546,6 +569,7 @@ export type ContactUncheckedCreateWithoutActivitiesInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeContactInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutContactInput
@@ -572,6 +596,7 @@ export type ContactUpdateWithoutActivitiesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutContactsNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeContactNestedInput
@@ -585,6 +610,7 @@ export type ContactUncheckedUpdateWithoutActivitiesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeContactNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutContactNestedInput
@@ -595,6 +621,7 @@ export type ContactCreateWithoutNotificationsInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   onboarding: Prisma.OnboardingCreateNestedOneWithoutContactsInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeContactInput
@@ -608,6 +635,7 @@ export type ContactUncheckedCreateWithoutNotificationsInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeContactInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutContactInput
@@ -634,6 +662,7 @@ export type ContactUpdateWithoutNotificationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutContactsNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeContactNestedInput
@@ -647,6 +676,7 @@ export type ContactUncheckedUpdateWithoutNotificationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeContactNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutContactNestedInput
@@ -657,6 +687,7 @@ export type ContactCreateWithoutOnboardingInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeContactInput
   files?: Prisma.FileCreateNestedManyWithoutContactInput
@@ -669,6 +700,7 @@ export type ContactUncheckedCreateWithoutOnboardingInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeContactInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutContactInput
@@ -711,12 +743,14 @@ export type ContactScalarWhereInput = {
   name?: Prisma.StringFilter<"Contact"> | string
   email?: Prisma.StringFilter<"Contact"> | string
   role?: Prisma.StringFilter<"Contact"> | string
+  lastSeenPortalAt?: Prisma.DateTimeNullableFilter<"Contact"> | Date | string | null
 }
 
 export type ContactCreateWithoutAssignedTasksInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   onboarding: Prisma.OnboardingCreateNestedOneWithoutContactsInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutContactInput
   files?: Prisma.FileCreateNestedManyWithoutContactInput
@@ -730,6 +764,7 @@ export type ContactUncheckedCreateWithoutAssignedTasksInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutContactInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutContactInput
   activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorContactInput
@@ -756,6 +791,7 @@ export type ContactUpdateWithoutAssignedTasksInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutContactsNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutContactNestedInput
   files?: Prisma.FileUpdateManyWithoutContactNestedInput
@@ -769,6 +805,7 @@ export type ContactUncheckedUpdateWithoutAssignedTasksInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutContactNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutContactNestedInput
   activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorContactNestedInput
@@ -779,6 +816,7 @@ export type ContactCreateWithoutMagicLinksInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   onboarding: Prisma.OnboardingCreateNestedOneWithoutContactsInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeContactInput
   files?: Prisma.FileCreateNestedManyWithoutContactInput
@@ -792,6 +830,7 @@ export type ContactUncheckedCreateWithoutMagicLinksInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeContactInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutContactInput
   activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorContactInput
@@ -818,6 +857,7 @@ export type ContactUpdateWithoutMagicLinksInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutContactsNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeContactNestedInput
   files?: Prisma.FileUpdateManyWithoutContactNestedInput
@@ -831,6 +871,7 @@ export type ContactUncheckedUpdateWithoutMagicLinksInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeContactNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutContactNestedInput
   activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorContactNestedInput
@@ -841,6 +882,7 @@ export type ContactCreateWithoutFilesInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   onboarding: Prisma.OnboardingCreateNestedOneWithoutContactsInput
   magicLinks?: Prisma.MagicLinkCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeContactInput
@@ -854,6 +896,7 @@ export type ContactUncheckedCreateWithoutFilesInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
   magicLinks?: Prisma.MagicLinkUncheckedCreateNestedManyWithoutContactInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeContactInput
   activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorContactInput
@@ -880,6 +923,7 @@ export type ContactUpdateWithoutFilesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutContactsNestedInput
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeContactNestedInput
@@ -893,6 +937,7 @@ export type ContactUncheckedUpdateWithoutFilesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeContactNestedInput
   activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorContactNestedInput
@@ -904,12 +949,14 @@ export type ContactCreateManyOnboardingInput = {
   name: string
   email?: string
   role?: string
+  lastSeenPortalAt?: Date | string | null
 }
 
 export type ContactUpdateWithoutOnboardingInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   magicLinks?: Prisma.MagicLinkUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeContactNestedInput
   files?: Prisma.FileUpdateManyWithoutContactNestedInput
@@ -922,6 +969,7 @@ export type ContactUncheckedUpdateWithoutOnboardingInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   magicLinks?: Prisma.MagicLinkUncheckedUpdateManyWithoutContactNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeContactNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutContactNestedInput
@@ -934,6 +982,7 @@ export type ContactUncheckedUpdateManyWithoutOnboardingInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeenPortalAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -1009,6 +1058,7 @@ export type ContactSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name?: boolean
   email?: boolean
   role?: boolean
+  lastSeenPortalAt?: boolean
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
   magicLinks?: boolean | Prisma.Contact$magicLinksArgs<ExtArgs>
   assignedTasks?: boolean | Prisma.Contact$assignedTasksArgs<ExtArgs>
@@ -1024,6 +1074,7 @@ export type ContactSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   name?: boolean
   email?: boolean
   role?: boolean
+  lastSeenPortalAt?: boolean
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contact"]>
 
@@ -1033,6 +1084,7 @@ export type ContactSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   name?: boolean
   email?: boolean
   role?: boolean
+  lastSeenPortalAt?: boolean
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contact"]>
 
@@ -1042,9 +1094,10 @@ export type ContactSelectScalar = {
   name?: boolean
   email?: boolean
   role?: boolean
+  lastSeenPortalAt?: boolean
 }
 
-export type ContactOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "onboardingId" | "name" | "email" | "role", ExtArgs["result"]["contact"]>
+export type ContactOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "onboardingId" | "name" | "email" | "role" | "lastSeenPortalAt", ExtArgs["result"]["contact"]>
 export type ContactInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
   magicLinks?: boolean | Prisma.Contact$magicLinksArgs<ExtArgs>
@@ -1077,6 +1130,7 @@ export type $ContactPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     name: string
     email: string
     role: string
+    lastSeenPortalAt: Date | null
   }, ExtArgs["result"]["contact"]>
   composites: {}
 }
@@ -1511,6 +1565,7 @@ export interface ContactFieldRefs {
   readonly name: Prisma.FieldRef<"Contact", 'String'>
   readonly email: Prisma.FieldRef<"Contact", 'String'>
   readonly role: Prisma.FieldRef<"Contact", 'String'>
+  readonly lastSeenPortalAt: Prisma.FieldRef<"Contact", 'DateTime'>
 }
     
 

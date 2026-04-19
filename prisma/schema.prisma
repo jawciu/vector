@@ -94,17 +94,18 @@ model Onboarding {
 }
 
 model Contact {
-  id            Int          @id @default(autoincrement())
-  onboardingId  Int
-  onboarding    Onboarding   @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
-  name          String
-  email         String       @default("")
-  role          String       @default("")
-  magicLinks    MagicLink[]
-  assignedTasks Task[]
-  files         File[]
-  activities    ActivityLog[]
-  notifications Notification[] @relation("NotificationRecipientContact")
+  id               Int          @id @default(autoincrement())
+  onboardingId     Int
+  onboarding       Onboarding   @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
+  name             String
+  email            String       @default("")
+  role             String       @default("")
+  lastSeenPortalAt DateTime?
+  magicLinks       MagicLink[]
+  assignedTasks    Task[]
+  files            File[]
+  activities       ActivityLog[]
+  notifications    Notification[] @relation("NotificationRecipientContact")
 }
 
 model Phase {
