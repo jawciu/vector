@@ -430,6 +430,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
   onClose,
   onTaskUpdated,
   people = [],
+  contacts = [],
   allTasks = [],
 }, ref) {
   const [localTask, setLocalTask] = useState(task);
@@ -447,6 +448,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
   const [statusHovered, setStatusHovered] = useState(false);
   const [priorityHovered, setPriorityHovered] = useState(false);
   const [ownerHovered, setOwnerHovered] = useState(false);
+  const [assigneeHovered, setAssigneeHovered] = useState(false);
   const [membersHovered, setMembersHovered] = useState(false);
   const [depsHovered, setDepsHovered] = useState(false);
 
@@ -462,6 +464,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
   const [statusOpen, setStatusOpen] = useState(false);
   const [priorityOpen, setPriorityOpen] = useState(false);
   const [ownerOpen, setOwnerOpen] = useState(false);
+  const [assigneeOpen, setAssigneeOpen] = useState(false);
   const [membersOpen, setMembersOpen] = useState(false);
   const [membersSearch, setMembersSearch] = useState("");
   const [depsOpen, setDepsOpen] = useState(false);
@@ -471,6 +474,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
   const statusRef = useRef(null);
   const priorityRef = useRef(null);
   const ownerRef = useRef(null);
+  const assigneeRef = useRef(null);
   const membersRef = useRef(null);
   const membersSearchRef = useRef(null);
   const depsRef = useRef(null);
@@ -527,18 +531,20 @@ const TaskDrawer = forwardRef(function TaskDrawer({
       if (statusOpen && statusRef.current && !statusRef.current.contains(e.target)) setStatusOpen(false);
       if (priorityOpen && priorityRef.current && !priorityRef.current.contains(e.target)) setPriorityOpen(false);
       if (ownerOpen && ownerRef.current && !ownerRef.current.contains(e.target)) setOwnerOpen(false);
+      if (assigneeOpen && assigneeRef.current && !assigneeRef.current.contains(e.target)) setAssigneeOpen(false);
       if (membersOpen && membersRef.current && !membersRef.current.contains(e.target)) { setMembersOpen(false); setMembersSearch(""); }
       if (depsOpen && depsRef.current && !depsRef.current.contains(e.target)) setDepsOpen(false);
     }
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [open, calendarOpen, statusOpen, priorityOpen, ownerOpen, membersOpen, depsOpen]);
+  }, [open, calendarOpen, statusOpen, priorityOpen, ownerOpen, assigneeOpen, membersOpen, depsOpen]);
 
   function closeAllDropdowns() {
     setCalendarOpen(false);
     setStatusOpen(false);
     setPriorityOpen(false);
     setOwnerOpen(false);
+    setAssigneeOpen(false);
     setMembersOpen(false);
     setMembersSearch("");
     setDepsOpen(false);
@@ -916,6 +922,69 @@ const TaskDrawer = forwardRef(function TaskDrawer({
                       </div>
                     </MenuOption>
                   ))
+                )}
+              </MenuList>
+            )}
+          </div>
+
+          {/* Assignee (customer-side) */}
+          <div ref={assigneeRef} className="relative" onMouseEnter={() => setAssigneeHovered(true)} onMouseLeave={() => setAssigneeHovered(false)}>
+            <FieldRow
+              icon={<OwnerIcon style={{ flexShrink: 0 }} />}
+              active={assigneeOpen}
+              onClick={() => toggleDropdown(assigneeOpen, setAssigneeOpen)}
+            >
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Assignee</span>
+              {localTask.assigneeContact && (
+                <div className="flex items-center gap-1.5">
+                  <Avatar name={localTask.assigneeContact.name} size={20} />
+                  <span className="text-sm" style={{ color: "var(--text)" }}>{localTask.assigneeContact.name}</span>
+                  {(assigneeHovered || assigneeOpen) && (
+                    <PillClearButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        patchTask({ assigneeContactId: null });
+                        setLocalTask((prev) => ({ ...prev, assigneeContact: null, assigneeContactId: null }));
+                        setAssigneeOpen(false);
+                      }}
+                    />
+                  )}
+                </div>
+              )}
+            </FieldRow>
+            {assigneeOpen && (
+              <MenuList style={{ minWidth: "100%", maxHeight: 160, overflowY: "auto" }}>
+                {contacts.length === 0 ? (
+                  <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No contacts on this onboarding</div>
+                ) : (
+                  contacts.map((contact) => {
+                    const isActive = localTask.assigneeContactId === contact.id;
+                    return (
+                      <MenuOption
+                        key={contact.id}
+                        active={isActive}
+                        onClick={() => {
+                          if (isActive) {
+                            patchTask({ assigneeContactId: null });
+                            setLocalTask((prev) => ({ ...prev, assigneeContact: null, assigneeContactId: null }));
+                          } else {
+                            patchTask({ assigneeContactId: contact.id });
+                            setLocalTask((prev) => ({
+                              ...prev,
+                              assigneeContactId: contact.id,
+                              assigneeContact: { id: contact.id, name: contact.name },
+                            }));
+                          }
+                          setAssigneeOpen(false);
+                        }}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Avatar name={contact.name} size={20} />
+                          <span>{contact.name}</span>
+                        </div>
+                      </MenuOption>
+                    );
+                  })
                 )}
               </MenuList>
             )}

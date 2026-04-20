@@ -747,6 +747,7 @@ export default function OnboardingDetailClient({
         onClose={closeDrawer}
         onTaskUpdated={handleTaskUpdated}
         people={people}
+        contacts={contacts}
         allTasks={tasks}
       />
     </main>

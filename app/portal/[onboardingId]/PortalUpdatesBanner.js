@@ -52,6 +52,7 @@ function eventPhrase(e) {
     case "status_changed": return `moved "${md.title ?? "a task"}" → ${md.to ?? "—"}`;
     case "commented": return `commented on "${md.taskTitle ?? "a task"}"`;
     case "uploaded": return `uploaded ${md.fileName ?? "a file"}${md.taskTitle ? ` to "${md.taskTitle}"` : ""}`;
+    case "assigned": return `assigned "${md.title ?? "a task"}" to ${md.assigneeName ?? "someone"}`;
     default: return e.verb;
   }
 }
