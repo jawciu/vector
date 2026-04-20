@@ -5,7 +5,7 @@ import Button from "../ui/Button";
 import FieldPill from "../ui/FieldPill";
 import FieldRow from "../ui/FieldRow";
 import CalendarDropdown from "../ui/CalendarDropdown";
-import { CalendarIcon, PriorityIcon, StatusIcon, OwnerIcon, MembersIcon, DependenciesIcon } from "../ui/Icons";
+import { CalendarIcon, PriorityIcon, StatusIcon, OwnerIcon, AssigneeIcon, MembersIcon, DependenciesIcon } from "../ui/Icons";
 import { MenuList, MenuOption } from "./Menu";
 import { TASK_STATUSES, PRIORITIES, STATUS_COLORS } from "@/lib/constants";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
@@ -58,6 +58,7 @@ export default function CreateTaskModal({
   companyName,
   onTaskCreated,
   people = [],
+  contacts = [],
   allTasks = [],
 }) {
   const [loading, setLoading] = useState(false);
@@ -71,6 +72,7 @@ export default function CreateTaskModal({
     priority: null,
     due: "",
     owner: "",
+    assigneeContactId: null,
     members: [],
     notes: "",
     blockedByTaskId: null,
@@ -80,6 +82,7 @@ export default function CreateTaskModal({
   const [statusOpen, setStatusOpen] = useState(false);
   const [priorityOpen, setPriorityOpen] = useState(false);
   const [ownerOpen, setOwnerOpen] = useState(false);
+  const [assigneeOpen, setAssigneeOpen] = useState(false);
   const [membersOpen, setMembersOpen] = useState(false);
   const [membersSearch, setMembersSearch] = useState("");
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -92,6 +95,7 @@ export default function CreateTaskModal({
   const priorityRef = useRef(null);
   const statusRef = useRef(null);
   const ownerRef = useRef(null);
+  const assigneeRef = useRef(null);
   const membersRef = useRef(null);
   const membersSearchRef = useRef(null);
   const dependenciesRef = useRef(null);
@@ -120,12 +124,13 @@ export default function CreateTaskModal({
       if (priorityOpen && priorityRef.current && !priorityRef.current.contains(e.target)) setPriorityOpen(false);
       if (statusOpen && statusRef.current && !statusRef.current.contains(e.target)) setStatusOpen(false);
       if (ownerOpen && ownerRef.current && !ownerRef.current.contains(e.target)) setOwnerOpen(false);
+      if (assigneeOpen && assigneeRef.current && !assigneeRef.current.contains(e.target)) setAssigneeOpen(false);
       if (membersOpen && membersRef.current && !membersRef.current.contains(e.target)) { setMembersOpen(false); setMembersSearch(""); }
       if (dependenciesOpen && dependenciesRef.current && !dependenciesRef.current.contains(e.target)) setDependenciesOpen(false);
     }
     document.addEventListener("mousedown", handleMouseDown);
     return () => document.removeEventListener("mousedown", handleMouseDown);
-  }, [open, calendarOpen, priorityOpen, statusOpen, ownerOpen, membersOpen, dependenciesOpen]);
+  }, [open, calendarOpen, priorityOpen, statusOpen, ownerOpen, assigneeOpen, membersOpen, dependenciesOpen]);
 
   // Close all dropdowns (used before opening a new one)
   function closeAll() {
@@ -133,6 +138,7 @@ export default function CreateTaskModal({
     setPriorityOpen(false);
     setStatusOpen(false);
     setOwnerOpen(false);
+    setAssigneeOpen(false);
     setMembersOpen(false);
     setMembersSearch("");
     setDependenciesOpen(false);
@@ -153,6 +159,7 @@ export default function CreateTaskModal({
       priority: null,
       due: "",
       owner: "",
+      assigneeContactId: null,
       members: [],
       notes: "",
       blockedByTaskId: null,
@@ -195,6 +202,7 @@ export default function CreateTaskModal({
           priority: formData.priority,
           due: formData.due,
           owner: formData.owner,
+          assigneeContactId: formData.assigneeContactId,
           members: formData.members,
           notes: formData.notes,
           blockedByTaskId: formData.blockedByTaskId,
@@ -451,6 +459,64 @@ export default function CreateTaskModal({
                       </div>
                     </MenuOption>
                   ))
+                )}
+              </MenuList>
+            )}
+          </div>
+
+          {/* Assignee (customer-side) */}
+          <div ref={assigneeRef} className="relative">
+            <FieldPill
+              icon={<AssigneeIcon style={{ flexShrink: 0 }} />}
+              active={assigneeOpen}
+              onClick={() => toggleDropdown("assignee", assigneeOpen, setAssigneeOpen)}
+            >
+              <span className="text-sm" style={{ color: assigneeOpen ? "var(--text)" : "var(--text-muted)" }}>Assignee</span>
+              {formData.assigneeContactId && (() => {
+                const selected = contacts.find((c) => c.id === formData.assigneeContactId);
+                if (!selected) return null;
+                return (
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="flex shrink-0 w-5 h-5 rounded-full items-center justify-center text-[8px] font-semibold"
+                      style={{ background: avatarColor(selected.name), color: "var(--text-dark)" }}
+                    >
+                      {avatarInitials(selected.name)}
+                    </span>
+                    <span className="text-sm" style={{ color: "var(--text)" }}>{selected.name}</span>
+                    <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("assigneeContactId", null); }} />
+                  </div>
+                );
+              })()}
+            </FieldPill>
+            {assigneeOpen && (
+              <MenuList style={{ background: "var(--bg-elevated)", width: "100%", maxHeight: 160, overflowY: "auto" }}>
+                {contacts.length === 0 ? (
+                  <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No contacts on this onboarding</div>
+                ) : (
+                  contacts.map((contact) => {
+                    const isActive = formData.assigneeContactId === contact.id;
+                    return (
+                      <MenuOption
+                        key={contact.id}
+                        active={isActive}
+                        onClick={() => {
+                          handleChange("assigneeContactId", isActive ? null : contact.id);
+                          setAssigneeOpen(false);
+                        }}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className="flex shrink-0 w-[18px] h-[18px] rounded-full items-center justify-center text-[8px] font-semibold"
+                            style={{ background: avatarColor(contact.name), color: "var(--text-dark)" }}
+                          >
+                            {avatarInitials(contact.name)}
+                          </span>
+                          {contact.name}
+                        </div>
+                      </MenuOption>
+                    );
+                  })
                 )}
               </MenuList>
             )}

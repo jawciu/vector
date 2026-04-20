@@ -12,6 +12,7 @@ import {
   PriorityIcon,
   StatusIcon,
   OwnerIcon,
+  AssigneeIcon,
   MembersIcon,
   DependenciesIcon,
 } from "@/app/ui/Icons";
@@ -930,7 +931,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
           {/* Assignee (customer-side) */}
           <div ref={assigneeRef} className="relative" onMouseEnter={() => setAssigneeHovered(true)} onMouseLeave={() => setAssigneeHovered(false)}>
             <FieldRow
-              icon={<OwnerIcon style={{ flexShrink: 0 }} />}
+              icon={<AssigneeIcon style={{ flexShrink: 0 }} />}
               active={assigneeOpen}
               onClick={() => toggleDropdown(assigneeOpen, setAssigneeOpen)}
             >

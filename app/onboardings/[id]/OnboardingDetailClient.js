@@ -736,6 +736,7 @@ export default function OnboardingDetailClient({
         companyName={onboarding.companyName}
         onTaskCreated={handleTaskCreated}
         people={people}
+        contacts={contacts}
         allTasks={tasks}
       />
 
