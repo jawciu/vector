@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
+import { createClient } from "@/lib/supabase/client";
 
 function BellIcon() {
   return (
@@ -92,6 +93,32 @@ export default function NotificationBell() {
     const onFocus = () => refetch();
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
+  }, [refetch]);
+
+  // Realtime: push updates via Supabase Realtime. RLS on Notification
+  // scopes events to this vendor, so no filter clause is needed.
+  // Poll-on-focus above stays as a fallback for dropped subscriptions.
+  useEffect(() => {
+    let cancelled = false;
+    let client = null;
+    let channel = null;
+    (async () => {
+      const supabase = await createClient();
+      if (cancelled || !supabase) return;
+      client = supabase;
+      channel = supabase
+        .channel("notifications")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "Notification" },
+          () => refetch()
+        )
+        .subscribe();
+    })();
+    return () => {
+      cancelled = true;
+      if (channel && client) client.removeChannel(channel);
+    };
   }, [refetch]);
 
   useEffect(() => {
