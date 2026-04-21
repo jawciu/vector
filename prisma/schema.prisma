@@ -101,6 +101,7 @@ model Contact {
   email            String       @default("")
   role             String       @default("")
   lastSeenPortalAt DateTime?
+  bouncedAt        DateTime?
   magicLinks       MagicLink[]
   assignedTasks    Task[]
   files            File[]

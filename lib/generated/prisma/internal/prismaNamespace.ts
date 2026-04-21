@@ -1340,7 +1340,8 @@ export const ContactScalarFieldEnum = {
   name: 'name',
   email: 'email',
   role: 'role',
-  lastSeenPortalAt: 'lastSeenPortalAt'
+  lastSeenPortalAt: 'lastSeenPortalAt',
+  bouncedAt: 'bouncedAt'
 } as const
 
 export type ContactScalarFieldEnum = (typeof ContactScalarFieldEnum)[keyof typeof ContactScalarFieldEnum]
