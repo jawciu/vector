@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -86,6 +86,11 @@ function CheckboxButton({ isDone, isCompleting, onClick }) {
 
 export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, onCardClick, isOverlay }) {
   const [completing, setCompleting] = useState(false);
+  // "today"-relative date labels are computed client-side only to avoid
+  // SSR/hydration drift when the day boundary crosses between server
+  // render and client mount.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const {
     attributes,
@@ -104,8 +109,8 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted, onCardCli
 
   const isDone = task.status === "Done" || completing;
   const statusColor = STATUS_STYLES[task.status] || "var(--text-secondary)";
-  const dueInfo = task.due ? formatDueDate(task.due) : null;
-  const daysLeft = task.due ? getDaysLeft(task.due) : null;
+  const dueInfo = mounted && task.due ? formatDueDate(task.due) : null;
+  const daysLeft = mounted && task.due ? getDaysLeft(task.due) : null;
   const ownerInitials = task.owner ? avatarInitials(task.owner) : null;
 
   async function handleToggleDone(e) {
