@@ -43,16 +43,19 @@ export async function POST(request) {
   }
 
   if (type === "email.bounced") {
-    const bounceType =
+    // Resend's actual path is event.data.bounce.type with values
+    // "Permanent" (hard), "Transient" (soft), or "Undetermined".
+    const bounceType = (
+      event?.data?.bounce?.type ??
       event?.data?.bounce?.bounce_type ??
       event?.data?.bounce_type ??
-      null;
-    // Resend emits "Permanent" for hard bounces, "Transient" for soft.
-    if (bounceType === "Permanent" || bounceType === "hard" || bounceType === "undetermined") {
+      ""
+    ).toLowerCase();
+    if (bounceType === "permanent") {
       const updated = await markContactBounced(recipient);
       return NextResponse.json({ ok: true, marked: updated });
     }
-    return NextResponse.json({ ok: true, note: "soft bounce, ignored" });
+    return NextResponse.json({ ok: true, note: `${bounceType || "unknown"} bounce, ignored` });
   }
 
   if (type === "email.complained") {
