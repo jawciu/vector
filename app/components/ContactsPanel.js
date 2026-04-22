@@ -518,9 +518,8 @@ function ContactRow({
         style={{ ...cellStyle(2, isLast), color: "var(--text)" }}
         className="truncate flex items-center gap-1.5"
       >
-        <span className="truncate">{contact.email || "—"}</span>
         {contact.bouncedAt && (
-          <Tooltip label="Email bounced — this address may no longer be valid. Ask for a new one.">
+          <Tooltip lines={["Email bounced.", "This address might no longer be valid."]}>
             <span
               aria-label="Email bounced"
               style={{ flexShrink: 0, lineHeight: 0, display: "inline-flex" }}
@@ -529,6 +528,7 @@ function ContactRow({
             </span>
           </Tooltip>
         )}
+        <span className="truncate">{contact.email || "—"}</span>
       </span>
       {/* Role */}
       <span style={cellStyle(3, isLast)}>
@@ -577,7 +577,7 @@ function ContactRow({
         ) : (
           <div className="flex items-center gap-1.5" key={showFailed ? flashKey : undefined}>
             {showFailed && (
-              <Tooltip label="Invite email failed to send — try Resend, or check the contact's email address.">
+              <Tooltip lines={["Invite email failed to send.", "Check contact's email and resend."]}>
                 <span style={{ display: "inline-flex", lineHeight: 0 }}>
                   <WarningIcon />
                 </span>
