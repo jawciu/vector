@@ -3,6 +3,7 @@
 import React, { useState, useRef, useCallback, useMemo } from "react";
 import Button from "../ui/Button";
 import IconButton from "../ui/IconButton";
+import Tooltip from "../ui/Tooltip";
 import { MenuList, MenuOption } from "./Menu";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import MemberModal from "./MemberModal";
@@ -519,17 +520,14 @@ function ContactRow({
       >
         <span className="truncate">{contact.email || "—"}</span>
         {contact.bouncedAt && (
-          <span
-            title="Email bounced — this address may no longer be valid. Ask for a new one."
-            aria-label="Email bounced"
-            style={{ color: "var(--danger)", flexShrink: 0, lineHeight: 0 }}
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M12 9v4" />
-              <path d="M12 17h.01" />
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-            </svg>
-          </span>
+          <Tooltip label="Email bounced — this address may no longer be valid. Ask for a new one.">
+            <span
+              aria-label="Email bounced"
+              style={{ flexShrink: 0, lineHeight: 0, display: "inline-flex" }}
+            >
+              <WarningIcon />
+            </span>
+          </Tooltip>
         )}
       </span>
       {/* Role */}
@@ -579,9 +577,11 @@ function ContactRow({
         ) : (
           <div className="flex items-center gap-1.5" key={showFailed ? flashKey : undefined}>
             {showFailed && (
-              <span title="Email failed to send">
-                <WarningIcon />
-              </span>
+              <Tooltip label="Invite email failed to send — try Resend, or check the contact's email address.">
+                <span style={{ display: "inline-flex", lineHeight: 0 }}>
+                  <WarningIcon />
+                </span>
+              </Tooltip>
             )}
             <span className={`text-sm${showFailed ? " portal-flash" : ""}`} style={{ color: "var(--text-muted)" }}>
               Portal inactive
