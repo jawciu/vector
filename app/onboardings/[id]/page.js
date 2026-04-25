@@ -1,16 +1,26 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { getOnboarding, getTasksForOnboarding, getContactsForOnboarding, getPhasesForOnboarding, getMagicLinksForOnboarding } from "@/lib/db";
+import {
+  getOnboarding,
+  getTasksForOnboarding,
+  getContactsForOnboarding,
+  getPhasesForOnboarding,
+  getMagicLinksForOnboarding,
+  getCachedInsight,
+} from "@/lib/db";
+import { buildOnboardingSnapshot, hashSnapshot } from "@/lib/ai/context";
 import OnboardingDetailClient from "./OnboardingDetailClient";
 
 export default async function OnboardingDetailPage({ params }) {
   const { id } = await params;
-  const [onboarding, tasks, contacts, phases, magicLinks] = await Promise.all([
+  const [onboarding, tasks, contacts, phases, magicLinks, snapshot, cachedInsight] = await Promise.all([
     getOnboarding(id),
     getTasksForOnboarding(id),
     getContactsForOnboarding(id),
     getPhasesForOnboarding(id),
     getMagicLinksForOnboarding(id),
+    buildOnboardingSnapshot(id),
+    getCachedInsight("onboarding", id),
   ]);
 
   if (!onboarding) {
@@ -24,9 +34,27 @@ export default async function OnboardingDetailPage({ params }) {
     );
   }
 
+  const contextHash = snapshot ? hashSnapshot(snapshot) : null;
+  const cachedInsightSerialised = cachedInsight
+    ? {
+        contextHash: cachedInsight.contextHash,
+        payload: cachedInsight.payload,
+        generatedAt: cachedInsight.generatedAt.toISOString(),
+      }
+    : null;
+
   return (
     <Suspense>
-      <OnboardingDetailClient onboarding={onboarding} tasks={tasks} contacts={contacts} phases={phases} magicLinks={magicLinks} />
+      <OnboardingDetailClient
+        onboarding={onboarding}
+        tasks={tasks}
+        contacts={contacts}
+        phases={phases}
+        magicLinks={magicLinks}
+        insightSnapshot={snapshot}
+        insightContextHash={contextHash}
+        cachedInsight={cachedInsightSerialised}
+      />
     </Suspense>
   );
 }

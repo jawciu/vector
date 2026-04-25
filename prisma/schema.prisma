@@ -189,3 +189,38 @@ model File {
   storagePath   String
   createdAt     DateTime   @default(now())
 }
+
+// Append-only log of AI-generated insight summaries.
+// "Latest" = MAX(generatedAt) for a given (scope, scopeId).
+// scopeId is a string so it can hold either an onboarding ID or "portfolio".
+model Insight {
+  id           Int      @id @default(autoincrement())
+  scope        String   // "onboarding" | "portfolio"
+  scopeId      String
+  contextHash  String   // digest of meaningful state at generation time
+  payload      Json     // structured Claude response (headline, focus*, risks, wins, nudges, trend)
+  model        String
+  generatedAt  DateTime @default(now())
+  durationMs   Int
+
+  @@index([scope, scopeId, generatedAt])
+}
+
+// Append-only log of every Claude API call — feeds the cost/observability dashboard.
+model AICall {
+  id               Int      @id @default(autoincrement())
+  createdAt        DateTime @default(now())
+  kind             String   // "insight_onboarding" | "insight_portfolio" | "transcript" | …
+  scopeId          String?
+  model            String
+  inputTokens      Int
+  cacheReadTokens  Int      @default(0)
+  cacheWriteTokens Int      @default(0)
+  outputTokens     Int
+  costUsd          Decimal  @db.Decimal(10, 6)
+  durationMs       Int
+  error            String?
+  requestId        String?  // Anthropic request_id for cross-referencing in their dashboard
+
+  @@index([kind, createdAt])
+}

@@ -394,7 +394,9 @@ export const ModelName = {
   Task: 'Task',
   Comment: 'Comment',
   MagicLink: 'MagicLink',
-  File: 'File'
+  File: 'File',
+  Insight: 'Insight',
+  AICall: 'AICall'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -410,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "company" | "vendorUser" | "activityLog" | "notification" | "onboarding" | "contact" | "phase" | "task" | "comment" | "magicLink" | "file"
+    modelProps: "company" | "vendorUser" | "activityLog" | "notification" | "onboarding" | "contact" | "phase" | "task" | "comment" | "magicLink" | "file" | "insight" | "aICall"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1228,6 +1230,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Insight: {
+      payload: Prisma.$InsightPayload<ExtArgs>
+      fields: Prisma.InsightFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InsightFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InsightPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InsightFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InsightPayload>
+        }
+        findFirst: {
+          args: Prisma.InsightFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InsightPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InsightFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InsightPayload>
+        }
+        findMany: {
+          args: Prisma.InsightFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InsightPayload>[]
+        }
+        create: {
+          args: Prisma.InsightCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InsightPayload>
+        }
+        createMany: {
+          args: Prisma.InsightCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InsightCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InsightPayload>[]
+        }
+        delete: {
+          args: Prisma.InsightDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InsightPayload>
+        }
+        update: {
+          args: Prisma.InsightUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InsightPayload>
+        }
+        deleteMany: {
+          args: Prisma.InsightDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InsightUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InsightUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InsightPayload>[]
+        }
+        upsert: {
+          args: Prisma.InsightUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InsightPayload>
+        }
+        aggregate: {
+          args: Prisma.InsightAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInsight>
+        }
+        groupBy: {
+          args: Prisma.InsightGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InsightGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InsightCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InsightCountAggregateOutputType> | number
+        }
+      }
+    }
+    AICall: {
+      payload: Prisma.$AICallPayload<ExtArgs>
+      fields: Prisma.AICallFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AICallFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AICallPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AICallFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AICallPayload>
+        }
+        findFirst: {
+          args: Prisma.AICallFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AICallPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AICallFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AICallPayload>
+        }
+        findMany: {
+          args: Prisma.AICallFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AICallPayload>[]
+        }
+        create: {
+          args: Prisma.AICallCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AICallPayload>
+        }
+        createMany: {
+          args: Prisma.AICallCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AICallCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AICallPayload>[]
+        }
+        delete: {
+          args: Prisma.AICallDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AICallPayload>
+        }
+        update: {
+          args: Prisma.AICallUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AICallPayload>
+        }
+        deleteMany: {
+          args: Prisma.AICallDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AICallUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AICallUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AICallPayload>[]
+        }
+        upsert: {
+          args: Prisma.AICallUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AICallPayload>
+        }
+        aggregate: {
+          args: Prisma.AICallAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAICall>
+        }
+        groupBy: {
+          args: Prisma.AICallGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AICallGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AICallCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AICallCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1425,6 +1575,39 @@ export const FileScalarFieldEnum = {
 export type FileScalarFieldEnum = (typeof FileScalarFieldEnum)[keyof typeof FileScalarFieldEnum]
 
 
+export const InsightScalarFieldEnum = {
+  id: 'id',
+  scope: 'scope',
+  scopeId: 'scopeId',
+  contextHash: 'contextHash',
+  payload: 'payload',
+  model: 'model',
+  generatedAt: 'generatedAt',
+  durationMs: 'durationMs'
+} as const
+
+export type InsightScalarFieldEnum = (typeof InsightScalarFieldEnum)[keyof typeof InsightScalarFieldEnum]
+
+
+export const AICallScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  kind: 'kind',
+  scopeId: 'scopeId',
+  model: 'model',
+  inputTokens: 'inputTokens',
+  cacheReadTokens: 'cacheReadTokens',
+  cacheWriteTokens: 'cacheWriteTokens',
+  outputTokens: 'outputTokens',
+  costUsd: 'costUsd',
+  durationMs: 'durationMs',
+  error: 'error',
+  requestId: 'requestId'
+} as const
+
+export type AICallScalarFieldEnum = (typeof AICallScalarFieldEnum)[keyof typeof AICallScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1531,6 +1714,20 @@ export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
     
 
 
@@ -1653,6 +1850,8 @@ export type GlobalOmitConfig = {
   comment?: Prisma.CommentOmit
   magicLink?: Prisma.MagicLinkOmit
   file?: Prisma.FileOmit
+  insight?: Prisma.InsightOmit
+  aICall?: Prisma.AICallOmit
 }
 
 /* Types for Logging */

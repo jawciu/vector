@@ -61,7 +61,9 @@ export const ModelName = {
   Task: 'Task',
   Comment: 'Comment',
   MagicLink: 'MagicLink',
-  File: 'File'
+  File: 'File',
+  Insight: 'Insight',
+  AICall: 'AICall'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -236,6 +238,39 @@ export const FileScalarFieldEnum = {
 } as const
 
 export type FileScalarFieldEnum = (typeof FileScalarFieldEnum)[keyof typeof FileScalarFieldEnum]
+
+
+export const InsightScalarFieldEnum = {
+  id: 'id',
+  scope: 'scope',
+  scopeId: 'scopeId',
+  contextHash: 'contextHash',
+  payload: 'payload',
+  model: 'model',
+  generatedAt: 'generatedAt',
+  durationMs: 'durationMs'
+} as const
+
+export type InsightScalarFieldEnum = (typeof InsightScalarFieldEnum)[keyof typeof InsightScalarFieldEnum]
+
+
+export const AICallScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  kind: 'kind',
+  scopeId: 'scopeId',
+  model: 'model',
+  inputTokens: 'inputTokens',
+  cacheReadTokens: 'cacheReadTokens',
+  cacheWriteTokens: 'cacheWriteTokens',
+  outputTokens: 'outputTokens',
+  costUsd: 'costUsd',
+  durationMs: 'durationMs',
+  error: 'error',
+  requestId: 'requestId'
+} as const
+
+export type AICallScalarFieldEnum = (typeof AICallScalarFieldEnum)[keyof typeof AICallScalarFieldEnum]
 
 
 export const SortOrder = {

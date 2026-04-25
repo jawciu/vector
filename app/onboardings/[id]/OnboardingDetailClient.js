@@ -30,6 +30,7 @@ import OnboardingTabs from "@/app/components/OnboardingTabs";
 import DetailsTab from "@/app/components/DetailsTab";
 import MembersTab from "@/app/components/MembersTab";
 import CommunicationTab from "@/app/components/CommunicationTab";
+import InsightsPanel from "@/app/components/InsightsPanel";
 import TaskFilterMenu from "@/app/components/TaskFilterMenu";
 import { taskMatchesFilter } from "@/lib/taskFilters";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
@@ -71,6 +72,9 @@ export default function OnboardingDetailClient({
   contacts: initialContacts,
   phases: initialPhases,
   magicLinks: initialMagicLinks,
+  insightSnapshot,
+  insightContextHash,
+  cachedInsight,
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -133,7 +137,7 @@ export default function OnboardingDetailClient({
     setDrawerOpen(true);
   }, [searchParams, drawerTask, drawerOpen]);
 
-  const activeTab = searchParams.get("tab") || "tasks";
+  const activeTab = searchParams.get("tab") || "insights";
   const taskFilter = searchParams.get("filter") || "active";
 
   function setTab(tab) {
@@ -431,6 +435,16 @@ export default function OnboardingDetailClient({
       )}
 
       {/* Tab content */}
+      {activeTab === "insights" && insightSnapshot && (
+        <InsightsPanel
+          scope="onboarding"
+          scopeId={onboarding.id}
+          snapshot={insightSnapshot}
+          contextHash={insightContextHash}
+          cachedInsight={cachedInsight}
+        />
+      )}
+
       {activeTab === "tasks" && (
         <div className="flex flex-col flex-1 overflow-hidden">
           {/* Action bar */}

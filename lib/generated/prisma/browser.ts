@@ -72,3 +72,13 @@ export type MagicLink = Prisma.MagicLinkModel
  * 
  */
 export type File = Prisma.FileModel
+/**
+ * Model Insight
+ * 
+ */
+export type Insight = Prisma.InsightModel
+/**
+ * Model AICall
+ * 
+ */
+export type AICall = Prisma.AICallModel
