@@ -22,7 +22,7 @@ export const runtime = "edge";
 
 import { createClient } from "@/lib/supabase/server";
 import { anthropic } from "@/lib/ai/client";
-import { renderSystemPrompt, INSIGHT_SCHEMA, parseInsightPayload, buildUserMessage } from "@/lib/ai/insights";
+import { renderSystemPrompt, getInsightSchema, parseInsightPayload, buildUserMessage } from "@/lib/ai/insights";
 
 export async function POST(req, { params }) {
   const { scope, id } = await params;
@@ -66,12 +66,12 @@ export async function POST(req, { params }) {
       system: [
         {
           type: "text",
-          text: renderSystemPrompt(today),
+          text: renderSystemPrompt(scope, today),
           cache_control: { type: "ephemeral" },
         },
       ],
       messages: [{ role: "user", content: buildUserMessage(snapshot) }],
-      output_config: { format: { type: "json_schema", schema: INSIGHT_SCHEMA } },
+      output_config: { format: { type: "json_schema", schema: getInsightSchema(scope) } },
     });
   } catch (err) {
     return new Response(

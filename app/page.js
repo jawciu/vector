@@ -1,7 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import { getOnboardings } from "@/lib/db";
+import { getOnboardings, getCachedInsight } from "@/lib/db";
+import { buildPortfolioSnapshot, hashPortfolioSnapshot } from "@/lib/ai/context";
 import OnboardingsActionBar from "./components/OnboardingsActionBar";
+import PortfolioInsightsHero from "./components/PortfolioInsightsHero";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
 import Tooltip from "@/app/ui/Tooltip";
 
@@ -20,7 +22,20 @@ function statusBadge(ob) {
 export default async function OnboardingsListPage({ searchParams }) {
   const params = await searchParams;
   const statusFilter = params?.status || "Active";
-  const onboardings = await getOnboardings(statusFilter);
+  const [onboardings, portfolioSnapshot, cachedPortfolioInsight] = await Promise.all([
+    getOnboardings(statusFilter),
+    buildPortfolioSnapshot({ statusFilter }),
+    getCachedInsight("portfolio", "all"),
+  ]);
+
+  const portfolioContextHash = portfolioSnapshot ? hashPortfolioSnapshot(portfolioSnapshot) : null;
+  const cachedPortfolioInsightSerialised = cachedPortfolioInsight
+    ? {
+        contextHash: cachedPortfolioInsight.contextHash,
+        payload: cachedPortfolioInsight.payload,
+        generatedAt: cachedPortfolioInsight.generatedAt.toISOString(),
+      }
+    : null;
 
   return (
     <div className="w-full pt-0 pb-0 h-full overflow-y-auto">
@@ -41,6 +56,13 @@ export default async function OnboardingsListPage({ searchParams }) {
           Onboardings
         </h1>
       </div>
+      {portfolioSnapshot && portfolioSnapshot.onboardings.length > 0 && (
+        <PortfolioInsightsHero
+          snapshot={portfolioSnapshot}
+          contextHash={portfolioContextHash}
+          cachedInsight={cachedPortfolioInsightSerialised}
+        />
+      )}
       <div
         className="w-full"
         style={{
