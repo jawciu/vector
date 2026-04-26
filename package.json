@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "npm run build:ds",
     "dev": "next dev --webpack",
+    "prebuild": "npm run build:ds",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
+    "lint:ds": "design.md lint DESIGN.md",
+    "build:ds": "node scripts/build-theme.mjs",
     "seed": "npx tsx prisma/seed.js"
   },
   "dependencies": {
@@ -25,6 +29,7 @@
     "seed": "node --import=tsx prisma/seed.js"
   },
   "devDependencies": {
+    "@google/design.md": "^0.1.1",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@tailwindcss/postcss": "^4.1.18",
