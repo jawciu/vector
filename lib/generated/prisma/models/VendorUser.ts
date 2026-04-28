@@ -423,10 +423,6 @@ export type VendorUserNullableScalarRelationFilter = {
   isNot?: Prisma.VendorUserWhereInput | null
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }

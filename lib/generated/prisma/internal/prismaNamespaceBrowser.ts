@@ -63,6 +63,9 @@ export const ModelName = {
   MagicLink: 'MagicLink',
   File: 'File',
   Insight: 'Insight',
+  ExternalEvent: 'ExternalEvent',
+  PendingAIChange: 'PendingAIChange',
+  IntegrationConnection: 'IntegrationConnection',
   AICall: 'AICall'
 } as const
 
@@ -84,7 +87,8 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const CompanyScalarFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  domain: 'domain'
 } as const
 
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
@@ -252,6 +256,55 @@ export const InsightScalarFieldEnum = {
 } as const
 
 export type InsightScalarFieldEnum = (typeof InsightScalarFieldEnum)[keyof typeof InsightScalarFieldEnum]
+
+
+export const ExternalEventScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  sourceId: 'sourceId',
+  occurredAt: 'occurredAt',
+  receivedAt: 'receivedAt',
+  processedAt: 'processedAt',
+  payload: 'payload',
+  onboardingId: 'onboardingId',
+  matchAmbiguous: 'matchAmbiguous',
+  error: 'error'
+} as const
+
+export type ExternalEventScalarFieldEnum = (typeof ExternalEventScalarFieldEnum)[keyof typeof ExternalEventScalarFieldEnum]
+
+
+export const PendingAIChangeScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  sourceEventId: 'sourceEventId',
+  onboardingId: 'onboardingId',
+  action: 'action',
+  payload: 'payload',
+  sourceQuote: 'sourceQuote',
+  sourceUrl: 'sourceUrl',
+  confidence: 'confidence',
+  status: 'status',
+  rejectedReason: 'rejectedReason',
+  createdAt: 'createdAt',
+  resolvedAt: 'resolvedAt',
+  resolvedBy: 'resolvedBy',
+  appliedTaskId: 'appliedTaskId'
+} as const
+
+export type PendingAIChangeScalarFieldEnum = (typeof PendingAIChangeScalarFieldEnum)[keyof typeof PendingAIChangeScalarFieldEnum]
+
+
+export const IntegrationConnectionScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  status: 'status',
+  config: 'config',
+  connectedAt: 'connectedAt',
+  lastEventAt: 'lastEventAt'
+} as const
+
+export type IntegrationConnectionScalarFieldEnum = (typeof IntegrationConnectionScalarFieldEnum)[keyof typeof IntegrationConnectionScalarFieldEnum]
 
 
 export const AICallScalarFieldEnum = {

@@ -37,16 +37,19 @@ export type CompanySumAggregateOutputType = {
 export type CompanyMinAggregateOutputType = {
   id: number | null
   name: string | null
+  domain: string | null
 }
 
 export type CompanyMaxAggregateOutputType = {
   id: number | null
   name: string | null
+  domain: string | null
 }
 
 export type CompanyCountAggregateOutputType = {
   id: number
   name: number
+  domain: number
   _all: number
 }
 
@@ -62,16 +65,19 @@ export type CompanySumAggregateInputType = {
 export type CompanyMinAggregateInputType = {
   id?: true
   name?: true
+  domain?: true
 }
 
 export type CompanyMaxAggregateInputType = {
   id?: true
   name?: true
+  domain?: true
 }
 
 export type CompanyCountAggregateInputType = {
   id?: true
   name?: true
+  domain?: true
   _all?: true
 }
 
@@ -164,6 +170,7 @@ export type CompanyGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type CompanyGroupByOutputType = {
   id: number
   name: string
+  domain: string | null
   _count: CompanyCountAggregateOutputType | null
   _avg: CompanyAvgAggregateOutputType | null
   _sum: CompanySumAggregateOutputType | null
@@ -192,12 +199,14 @@ export type CompanyWhereInput = {
   NOT?: Prisma.CompanyWhereInput | Prisma.CompanyWhereInput[]
   id?: Prisma.IntFilter<"Company"> | number
   name?: Prisma.StringFilter<"Company"> | string
+  domain?: Prisma.StringNullableFilter<"Company"> | string | null
   onboardings?: Prisma.OnboardingListRelationFilter
 }
 
 export type CompanyOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  domain?: Prisma.SortOrderInput | Prisma.SortOrder
   onboardings?: Prisma.OnboardingOrderByRelationAggregateInput
 }
 
@@ -207,12 +216,14 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.CompanyWhereInput[]
   NOT?: Prisma.CompanyWhereInput | Prisma.CompanyWhereInput[]
   name?: Prisma.StringFilter<"Company"> | string
+  domain?: Prisma.StringNullableFilter<"Company"> | string | null
   onboardings?: Prisma.OnboardingListRelationFilter
 }, "id">
 
 export type CompanyOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  domain?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.CompanyCountOrderByAggregateInput
   _avg?: Prisma.CompanyAvgOrderByAggregateInput
   _max?: Prisma.CompanyMaxOrderByAggregateInput
@@ -226,47 +237,56 @@ export type CompanyScalarWhereWithAggregatesInput = {
   NOT?: Prisma.CompanyScalarWhereWithAggregatesInput | Prisma.CompanyScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Company"> | number
   name?: Prisma.StringWithAggregatesFilter<"Company"> | string
+  domain?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
 }
 
 export type CompanyCreateInput = {
   name: string
+  domain?: string | null
   onboardings?: Prisma.OnboardingCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyUncheckedCreateInput = {
   id?: number
   name: string
+  domain?: string | null
   onboardings?: Prisma.OnboardingUncheckedCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   onboardings?: Prisma.OnboardingUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   onboardings?: Prisma.OnboardingUncheckedUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyCreateManyInput = {
   id?: number
   name: string
+  domain?: string | null
 }
 
 export type CompanyUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CompanyUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CompanyCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  domain?: Prisma.SortOrder
 }
 
 export type CompanyAvgOrderByAggregateInput = {
@@ -276,11 +296,13 @@ export type CompanyAvgOrderByAggregateInput = {
 export type CompanyMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  domain?: Prisma.SortOrder
 }
 
 export type CompanyMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  domain?: Prisma.SortOrder
 }
 
 export type CompanySumOrderByAggregateInput = {
@@ -294,6 +316,10 @@ export type CompanyScalarRelationFilter = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type IntFieldUpdateOperationsInput = {
@@ -320,11 +346,13 @@ export type CompanyUpdateOneRequiredWithoutOnboardingsNestedInput = {
 
 export type CompanyCreateWithoutOnboardingsInput = {
   name: string
+  domain?: string | null
 }
 
 export type CompanyUncheckedCreateWithoutOnboardingsInput = {
   id?: number
   name: string
+  domain?: string | null
 }
 
 export type CompanyCreateOrConnectWithoutOnboardingsInput = {
@@ -345,11 +373,13 @@ export type CompanyUpdateToOneWithWhereWithoutOnboardingsInput = {
 
 export type CompanyUpdateWithoutOnboardingsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CompanyUncheckedUpdateWithoutOnboardingsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -386,6 +416,7 @@ export type CompanyCountOutputTypeCountOnboardingsArgs<ExtArgs extends runtime.T
 export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  domain?: boolean
   onboardings?: boolean | Prisma.Company$onboardingsArgs<ExtArgs>
   _count?: boolean | Prisma.CompanyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["company"]>
@@ -393,19 +424,22 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type CompanySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  domain?: boolean
 }, ExtArgs["result"]["company"]>
 
 export type CompanySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  domain?: boolean
 }, ExtArgs["result"]["company"]>
 
 export type CompanySelectScalar = {
   id?: boolean
   name?: boolean
+  domain?: boolean
 }
 
-export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name", ExtArgs["result"]["company"]>
+export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "domain", ExtArgs["result"]["company"]>
 export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   onboardings?: boolean | Prisma.Company$onboardingsArgs<ExtArgs>
   _count?: boolean | Prisma.CompanyCountOutputTypeDefaultArgs<ExtArgs>
@@ -421,6 +455,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     name: string
+    domain: string | null
   }, ExtArgs["result"]["company"]>
   composites: {}
 }
@@ -847,6 +882,7 @@ export interface Prisma__CompanyClient<T, Null = never, ExtArgs extends runtime.
 export interface CompanyFieldRefs {
   readonly id: Prisma.FieldRef<"Company", 'Int'>
   readonly name: Prisma.FieldRef<"Company", 'String'>
+  readonly domain: Prisma.FieldRef<"Company", 'String'>
 }
     
 

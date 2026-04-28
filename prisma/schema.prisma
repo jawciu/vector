@@ -16,6 +16,7 @@ datasource db {
 model Company {
   id          Int           @id @default(autoincrement())
   name        String
+  domain      String?       // Email domain (e.g. "acme.com"). Used to match Miniti meeting attendees → company.
   onboardings Onboarding[]
 }
 
@@ -75,22 +76,24 @@ model Notification {
 }
 
 model Onboarding {
-  id            Int          @id @default(autoincrement())
-  companyId     Int
-  owner         String       @default("")
-  ownerId       Int?
-  ownerUser     VendorUser?  @relation(fields: [ownerId], references: [id], onDelete: SetNull)
-  status        String       @default("Active") // Active | Completed | Paused | Archived
-  targetGoLive  DateTime?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @default(now()) @updatedAt
-  company       Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  tasks         Task[]
-  contacts      Contact[]
-  phases        Phase[]
-  magicLinks    MagicLink[]
-  files         File[]
-  activities    ActivityLog[]
+  id             Int               @id @default(autoincrement())
+  companyId      Int
+  owner          String            @default("")
+  ownerId        Int?
+  ownerUser      VendorUser?       @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  status         String            @default("Active") // Active | Completed | Paused | Archived
+  targetGoLive   DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @default(now()) @updatedAt
+  company        Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  tasks          Task[]
+  contacts       Contact[]
+  phases         Phase[]
+  magicLinks     MagicLink[]
+  files          File[]
+  activities     ActivityLog[]
+  externalEvents ExternalEvent[]
+  pendingChanges PendingAIChange[]
 }
 
 model Contact {
@@ -204,6 +207,64 @@ model Insight {
   durationMs   Int
 
   @@index([scope, scopeId, generatedAt])
+}
+
+// Raw events from external integrations (Miniti / Linear / Attio).
+// Webhook handlers write here; orchestrator reads unprocessed rows.
+model ExternalEvent {
+  id             Int              @id @default(autoincrement())
+  source         String           // "miniti" | "linear" | "attio"
+  sourceId       String           // their event ID for idempotency / dedup
+  occurredAt     DateTime
+  receivedAt     DateTime         @default(now())
+  processedAt    DateTime?
+  payload        Json             // raw payload as received
+  onboardingId   Int?
+  onboarding     Onboarding?      @relation(fields: [onboardingId], references: [id], onDelete: SetNull)
+  matchAmbiguous Boolean          @default(false)  // true → needs Caroline to assign manually
+  error          String?          // last processing error, if any
+  pendingChanges PendingAIChange[]
+
+  @@unique([source, sourceId])
+  @@index([processedAt])
+  @@index([onboardingId])
+}
+
+// Drafts of AI-proposed changes — the "Vector suggests" inbox.
+// Approved drafts execute via existing createTask / updateTask paths.
+model PendingAIChange {
+  id             Int            @id @default(autoincrement())
+  source         String         // "miniti" | "linear" | "attio" | "insights"
+  sourceEventId  Int?
+  sourceEvent    ExternalEvent? @relation(fields: [sourceEventId], references: [id], onDelete: SetNull)
+  onboardingId   Int
+  onboarding     Onboarding     @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
+  action         String         // "create_task" | "match_existing" | "update_status" | "reassign" | "reprioritise"
+  payload        Json           // proposed change — tool call arguments
+  sourceQuote    String?        // transcript snippet / event description that justified it
+  sourceUrl      String?        // link back to original (Miniti URL, Linear issue link, etc.)
+  confidence     String         // "low" | "medium" | "high"
+  status         String         @default("pending")  // pending | approved | rejected | applied
+  rejectedReason String?
+  createdAt      DateTime       @default(now())
+  resolvedAt     DateTime?
+  resolvedBy     Int?           // VendorUser.id who approved / rejected
+  appliedTaskId  Int?           // if applied → which task was created/updated
+
+  @@index([onboardingId, status])
+  @@index([status, createdAt])
+}
+
+// Stores connection status + secrets per integration source.
+model IntegrationConnection {
+  id           Int       @id @default(autoincrement())
+  source       String    @unique  // "miniti" | "linear" | "attio"
+  status       String    @default("connected")  // connected | disconnected | error
+  config       Json      // source-specific (webhook secret, account ID, etc.)
+  connectedAt  DateTime  @default(now())
+  lastEventAt  DateTime?
+
+  @@index([status])
 }
 
 // Append-only log of every Claude API call — feeds the cost/observability dashboard.

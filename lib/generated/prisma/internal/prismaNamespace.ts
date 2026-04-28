@@ -396,6 +396,9 @@ export const ModelName = {
   MagicLink: 'MagicLink',
   File: 'File',
   Insight: 'Insight',
+  ExternalEvent: 'ExternalEvent',
+  PendingAIChange: 'PendingAIChange',
+  IntegrationConnection: 'IntegrationConnection',
   AICall: 'AICall'
 } as const
 
@@ -412,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "company" | "vendorUser" | "activityLog" | "notification" | "onboarding" | "contact" | "phase" | "task" | "comment" | "magicLink" | "file" | "insight" | "aICall"
+    modelProps: "company" | "vendorUser" | "activityLog" | "notification" | "onboarding" | "contact" | "phase" | "task" | "comment" | "magicLink" | "file" | "insight" | "externalEvent" | "pendingAIChange" | "integrationConnection" | "aICall"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1304,6 +1307,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ExternalEvent: {
+      payload: Prisma.$ExternalEventPayload<ExtArgs>
+      fields: Prisma.ExternalEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ExternalEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ExternalEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalEventPayload>
+        }
+        findFirst: {
+          args: Prisma.ExternalEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ExternalEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalEventPayload>
+        }
+        findMany: {
+          args: Prisma.ExternalEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalEventPayload>[]
+        }
+        create: {
+          args: Prisma.ExternalEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalEventPayload>
+        }
+        createMany: {
+          args: Prisma.ExternalEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ExternalEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalEventPayload>[]
+        }
+        delete: {
+          args: Prisma.ExternalEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalEventPayload>
+        }
+        update: {
+          args: Prisma.ExternalEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.ExternalEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ExternalEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ExternalEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.ExternalEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalEventPayload>
+        }
+        aggregate: {
+          args: Prisma.ExternalEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateExternalEvent>
+        }
+        groupBy: {
+          args: Prisma.ExternalEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExternalEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ExternalEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExternalEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    PendingAIChange: {
+      payload: Prisma.$PendingAIChangePayload<ExtArgs>
+      fields: Prisma.PendingAIChangeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PendingAIChangeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAIChangePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PendingAIChangeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAIChangePayload>
+        }
+        findFirst: {
+          args: Prisma.PendingAIChangeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAIChangePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PendingAIChangeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAIChangePayload>
+        }
+        findMany: {
+          args: Prisma.PendingAIChangeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAIChangePayload>[]
+        }
+        create: {
+          args: Prisma.PendingAIChangeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAIChangePayload>
+        }
+        createMany: {
+          args: Prisma.PendingAIChangeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PendingAIChangeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAIChangePayload>[]
+        }
+        delete: {
+          args: Prisma.PendingAIChangeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAIChangePayload>
+        }
+        update: {
+          args: Prisma.PendingAIChangeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAIChangePayload>
+        }
+        deleteMany: {
+          args: Prisma.PendingAIChangeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PendingAIChangeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PendingAIChangeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAIChangePayload>[]
+        }
+        upsert: {
+          args: Prisma.PendingAIChangeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAIChangePayload>
+        }
+        aggregate: {
+          args: Prisma.PendingAIChangeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePendingAIChange>
+        }
+        groupBy: {
+          args: Prisma.PendingAIChangeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PendingAIChangeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PendingAIChangeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PendingAIChangeCountAggregateOutputType> | number
+        }
+      }
+    }
+    IntegrationConnection: {
+      payload: Prisma.$IntegrationConnectionPayload<ExtArgs>
+      fields: Prisma.IntegrationConnectionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.IntegrationConnectionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IntegrationConnectionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.IntegrationConnectionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IntegrationConnectionPayload>
+        }
+        findFirst: {
+          args: Prisma.IntegrationConnectionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IntegrationConnectionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.IntegrationConnectionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IntegrationConnectionPayload>
+        }
+        findMany: {
+          args: Prisma.IntegrationConnectionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IntegrationConnectionPayload>[]
+        }
+        create: {
+          args: Prisma.IntegrationConnectionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IntegrationConnectionPayload>
+        }
+        createMany: {
+          args: Prisma.IntegrationConnectionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.IntegrationConnectionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IntegrationConnectionPayload>[]
+        }
+        delete: {
+          args: Prisma.IntegrationConnectionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IntegrationConnectionPayload>
+        }
+        update: {
+          args: Prisma.IntegrationConnectionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IntegrationConnectionPayload>
+        }
+        deleteMany: {
+          args: Prisma.IntegrationConnectionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.IntegrationConnectionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.IntegrationConnectionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IntegrationConnectionPayload>[]
+        }
+        upsert: {
+          args: Prisma.IntegrationConnectionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IntegrationConnectionPayload>
+        }
+        aggregate: {
+          args: Prisma.IntegrationConnectionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateIntegrationConnection>
+        }
+        groupBy: {
+          args: Prisma.IntegrationConnectionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IntegrationConnectionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.IntegrationConnectionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IntegrationConnectionCountAggregateOutputType> | number
+        }
+      }
+    }
     AICall: {
       payload: Prisma.$AICallPayload<ExtArgs>
       fields: Prisma.AICallFieldRefs
@@ -1419,7 +1644,8 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const CompanyScalarFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  domain: 'domain'
 } as const
 
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
@@ -1587,6 +1813,55 @@ export const InsightScalarFieldEnum = {
 } as const
 
 export type InsightScalarFieldEnum = (typeof InsightScalarFieldEnum)[keyof typeof InsightScalarFieldEnum]
+
+
+export const ExternalEventScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  sourceId: 'sourceId',
+  occurredAt: 'occurredAt',
+  receivedAt: 'receivedAt',
+  processedAt: 'processedAt',
+  payload: 'payload',
+  onboardingId: 'onboardingId',
+  matchAmbiguous: 'matchAmbiguous',
+  error: 'error'
+} as const
+
+export type ExternalEventScalarFieldEnum = (typeof ExternalEventScalarFieldEnum)[keyof typeof ExternalEventScalarFieldEnum]
+
+
+export const PendingAIChangeScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  sourceEventId: 'sourceEventId',
+  onboardingId: 'onboardingId',
+  action: 'action',
+  payload: 'payload',
+  sourceQuote: 'sourceQuote',
+  sourceUrl: 'sourceUrl',
+  confidence: 'confidence',
+  status: 'status',
+  rejectedReason: 'rejectedReason',
+  createdAt: 'createdAt',
+  resolvedAt: 'resolvedAt',
+  resolvedBy: 'resolvedBy',
+  appliedTaskId: 'appliedTaskId'
+} as const
+
+export type PendingAIChangeScalarFieldEnum = (typeof PendingAIChangeScalarFieldEnum)[keyof typeof PendingAIChangeScalarFieldEnum]
+
+
+export const IntegrationConnectionScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  status: 'status',
+  config: 'config',
+  connectedAt: 'connectedAt',
+  lastEventAt: 'lastEventAt'
+} as const
+
+export type IntegrationConnectionScalarFieldEnum = (typeof IntegrationConnectionScalarFieldEnum)[keyof typeof IntegrationConnectionScalarFieldEnum]
 
 
 export const AICallScalarFieldEnum = {
@@ -1851,6 +2126,9 @@ export type GlobalOmitConfig = {
   magicLink?: Prisma.MagicLinkOmit
   file?: Prisma.FileOmit
   insight?: Prisma.InsightOmit
+  externalEvent?: Prisma.ExternalEventOmit
+  pendingAIChange?: Prisma.PendingAIChangeOmit
+  integrationConnection?: Prisma.IntegrationConnectionOmit
   aICall?: Prisma.AICallOmit
 }
 

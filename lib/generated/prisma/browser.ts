@@ -78,6 +78,21 @@ export type File = Prisma.FileModel
  */
 export type Insight = Prisma.InsightModel
 /**
+ * Model ExternalEvent
+ * 
+ */
+export type ExternalEvent = Prisma.ExternalEventModel
+/**
+ * Model PendingAIChange
+ * 
+ */
+export type PendingAIChange = Prisma.PendingAIChangeModel
+/**
+ * Model IntegrationConnection
+ * 
+ */
+export type IntegrationConnection = Prisma.IntegrationConnectionModel
+/**
  * Model AICall
  * 
  */
