@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getAICallStats, getRecentAICalls } from "@/lib/db";
+import { getAICallStats, getRecentAICalls, getIntegrationStats, countAmbiguousEvents, listStuckEvents } from "@/lib/db";
+import StuckEventsList from "@/app/components/StuckEventsList";
 
 export const dynamic = "force-dynamic";
 
@@ -10,11 +12,15 @@ export default async function AdminAIPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [stats30d, stats7d, statsToday, recent] = await Promise.all([
+  const [stats30d, stats7d, statsToday, recent, minitiStats7d, minitiStats30d, ambiguousNow, stuckEvents] = await Promise.all([
     getAICallStats({ days: 30 }),
     getAICallStats({ days: 7 }),
     getAICallStats({ days: 1 }),
     getRecentAICalls({ limit: 50 }),
+    getIntegrationStats({ source: "miniti", days: 7 }),
+    getIntegrationStats({ source: "miniti", days: 30 }),
+    countAmbiguousEvents({ source: "miniti" }),
+    listStuckEvents({ source: "miniti", limit: 20 }),
   ]);
 
   const total = (rows) => rows.reduce((acc, r) => acc + r.totalCostUsd, 0);
@@ -84,6 +90,53 @@ export default async function AdminAIPage() {
           )}
         </Section>
 
+        {/* Integrations — Miniti throughput + unprocessed counts */}
+        <Section title="Integrations">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
+            <IntegrationCard label="Miniti — last 7 days" stats={minitiStats7d} />
+            <IntegrationCard label="Miniti — last 30 days" stats={minitiStats30d} />
+          </div>
+          {ambiguousNow > 0 && (
+            <div
+              style={{
+                marginTop: 12,
+                padding: "10px 14px",
+                borderRadius: 8,
+                background: "rgba(255, 218, 145, 0.08)",
+                border: "1px solid var(--alert)",
+                fontSize: 13,
+                color: "var(--text)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+              }}
+            >
+              <span>
+                <strong>{ambiguousNow}</strong> meeting{ambiguousNow === 1 ? "" : "s"} waiting for manual assignment.
+              </span>
+              <Link
+                href="/ai-drafts"
+                style={{ color: "var(--action)", fontSize: 13, fontWeight: 500 }}
+              >
+                Review →
+              </Link>
+            </div>
+          )}
+
+          {stuckEvents.length > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <h3 style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5, color: "var(--text-muted)", margin: "0 0 6px" }}>
+                Stuck events
+              </h3>
+              <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "0 0 8px", lineHeight: 1.5 }}>
+                Matched to an onboarding but never finished processing — almost always means the orchestrator was killed mid-run (Vercel Hobby kills Node functions at 10s). Click reprocess to retry; it&apos;s idempotent.
+              </p>
+              <StuckEventsList initialEvents={stuckEvents} />
+            </div>
+          )}
+        </Section>
+
         {/* Recent calls log */}
         <Section title="Recent calls (latest 50)">
           {recent.length === 0 ? (
@@ -131,6 +184,56 @@ export default async function AdminAIPage() {
         </Section>
       </div>
     </div>
+  );
+}
+
+function IntegrationCard({ label, stats }) {
+  const { total, processed, ambiguous, errored, stuck, inFlight } = stats;
+  const successRate = total > 0 ? Math.round((processed / total) * 100) : null;
+
+  return (
+    <div
+      style={{
+        padding: "14px 16px",
+        borderRadius: 10,
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+      }}
+    >
+      <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5, color: "var(--text-muted)" }}>
+        {label}
+      </span>
+      <span style={{ fontSize: 22, fontWeight: 600, color: "var(--text)" }}>{total}</span>
+      <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+        events received{successRate != null ? ` · ${successRate}% processed cleanly` : ""}
+      </span>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
+        <Pill label="processed" value={processed} color="var(--success, #5cd6a5)" />
+        {inFlight > 0 && <Pill label="in-flight" value={inFlight} color="var(--text-muted)" />}
+        {ambiguous > 0 && <Pill label="ambiguous" value={ambiguous} color="var(--alert)" />}
+        {stuck > 0 && <Pill label="stuck" value={stuck} color="var(--danger)" />}
+        {errored > 0 && <Pill label="errored" value={errored} color="var(--danger)" />}
+      </div>
+    </div>
+  );
+}
+
+function Pill({ label, value, color }) {
+  return (
+    <span
+      style={{
+        fontSize: 11,
+        color,
+        padding: "2px 8px",
+        borderRadius: 4,
+        border: `1px solid ${color}`,
+      }}
+    >
+      {value} {label}
+    </span>
   );
 }
 

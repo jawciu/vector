@@ -21,17 +21,8 @@
  */
 
 import { NextResponse, after } from "next/server";
-import { validateMinitiPayload, matchMeetingToOnboarding, buildOrchestratorContext } from "@/lib/integrations/miniti";
-import { runMinitiOrchestrator, toolCallToAction } from "@/lib/ai/orchestrator";
-import {
-  createExternalEvent,
-  getExternalEvent,
-  markExternalEventProcessed,
-  createPendingAIChange,
-  getTasksForOnboarding,
-  getContactsForOnboarding,
-  getPhasesForOnboarding,
-} from "@/lib/db";
+import { validateMinitiPayload, matchMeetingToOnboarding, processMinitiEvent } from "@/lib/integrations/miniti";
+import { createExternalEvent, markExternalEventProcessed } from "@/lib/db";
 
 export async function POST(request) {
   // 1. Auth — token query param.
@@ -91,7 +82,8 @@ export async function POST(request) {
   if (match.onboardingId && !match.ambiguous) {
     after(async () => {
       try {
-        await processMinitiEvent(externalEvent.id, match.onboardingId);
+        const result = await processMinitiEvent(externalEvent.id, match.onboardingId);
+        console.log(`[miniti] event ${externalEvent.id} processed: ${result.draftIds?.length ?? 0} drafts`);
       } catch (err) {
         console.error("[miniti orchestrator]", err);
         await markExternalEventProcessed(externalEvent.id, { error: String(err.message ?? err) }).catch(() => {});
@@ -107,53 +99,4 @@ export async function POST(request) {
     matchedBy: match.matchedBy,
     ambiguous: match.ambiguous,
   });
-}
-
-/**
- * Run the AI orchestrator on a single ExternalEvent.
- * Loads context, calls Claude, persists draft rows, marks event processed.
- */
-async function processMinitiEvent(eventId, onboardingId) {
-  const event = await getExternalEvent(eventId);
-  if (!event) throw new Error(`event ${eventId} not found`);
-  if (event.processedAt) return; // already done by a previous invocation
-
-  const meeting = event.payload?.meeting;
-  if (!meeting) throw new Error(`event ${eventId} has no meeting payload`);
-
-  const [tasks, contacts, phases] = await Promise.all([
-    getTasksForOnboarding(onboardingId),
-    getContactsForOnboarding(onboardingId),
-    getPhasesForOnboarding(onboardingId),
-  ]);
-
-  const context = buildOrchestratorContext({ meeting, tasks, contacts, phases });
-
-  const result = await runMinitiOrchestrator({ context, kind: "transcript" });
-
-  // Translate Claude's tool calls → PendingAIChange rows.
-  const drafts = [];
-  for (const call of result.calls) {
-    const action = toolCallToAction(call.tool);
-    if (action === "no_action") {
-      // Nothing to surface — note in the event metadata only.
-      continue;
-    }
-    const draft = await createPendingAIChange({
-      source: "miniti",
-      sourceEventId: eventId,
-      onboardingId,
-      action,
-      payload: call.input,
-      sourceQuote: call.input.sourceQuote ?? null,
-      sourceUrl: null, // Miniti doesn't include a source URL today
-      confidence: call.input.confidence ?? "medium",
-    });
-    drafts.push(draft.id);
-  }
-
-  await markExternalEventProcessed(eventId);
-  console.log(
-    `[miniti] event ${eventId} processed: ${drafts.length} drafts (calls=${result.calls.length}, cost=${result.usage.input_tokens}/${result.usage.output_tokens} tok)`
-  );
 }
