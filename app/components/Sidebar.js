@@ -12,6 +12,9 @@ const navItems = [
 ];
 
 const iconSize = 14;
+const EXPANDED_WIDTH = 240;
+const COLLAPSED_WIDTH = 56;
+const STORAGE_KEY = "sidebarCollapsed";
 
 function OnboardingsIcon({ className, style }) {
   return (
@@ -38,12 +41,96 @@ function SettingsIcon({ className, style }) {
   );
 }
 
+function ChevronIcon({ size = 14, style }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" style={style}>
+      <path d="M9 3L5 7l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/**
+ * Right-positioned tooltip used when the sidebar is collapsed.
+ * Standard pattern for icon-only nav (Linear, VS Code, etc).
+ */
+function NavTooltip({ label, enabled, children }) {
+  const [visible, setVisible] = useState(false);
+  const [top, setTop] = useState(0);
+  const ref = useRef(null);
+
+  if (!enabled) return children;
+
+  function show() {
+    const rect = ref.current?.getBoundingClientRect();
+    if (rect) setTop(rect.top + rect.height / 2);
+    setVisible(true);
+  }
+
+  return (
+    <span
+      ref={ref}
+      onMouseEnter={show}
+      onMouseLeave={() => setVisible(false)}
+      style={{ position: "relative", display: "block" }}
+    >
+      {children}
+      {visible && (
+        <span
+          style={{
+            position: "fixed",
+            top,
+            left: COLLAPSED_WIDTH + 8,
+            transform: "translateY(-50%)",
+            zIndex: 9999,
+            pointerEvents: "none",
+            padding: "5px 10px",
+            background: "var(--surface-hover)",
+            border: "1px solid var(--border)",
+            borderRadius: 6,
+            color: "var(--text)",
+            fontSize: 12,
+            fontWeight: 500,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {label}
+        </span>
+      )}
+    </span>
+  );
+}
+
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Load collapse state from localStorage once on mount. Can't read storage
+  // during SSR so we hydrate to the saved value here, then transition normally.
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (stored === "true") setCollapsed(true);
+    } catch {
+      // Blocked storage — keep default (expanded)
+    }
+    setHydrated(true);
+  }, []);
+
+  function toggleCollapsed() {
+    setCollapsed((c) => {
+      const next = !c;
+      try { localStorage.setItem(STORAGE_KEY, String(next)); } catch {}
+      // Close the dropdown if it was open — its position changes with width.
+      setDropdownOpen(false);
+      return next;
+    });
+  }
 
   useEffect(() => {
     let subscription;
@@ -85,13 +172,18 @@ export default function Sidebar() {
 
   return (
     <aside
-      className="flex flex-col h-full border-r transition-colors shrink-0"
+      className="flex flex-col h-full border-r shrink-0"
       style={{
-        width: 240,
+        width: collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH,
         background: "var(--bg-elevated)",
         borderColor: "var(--border)",
+        // Suppress transition until hydration so we don't animate from the
+        // SSR-default expanded width to the user's saved collapsed width.
+        transition: hydrated ? "width 0.2s ease" : "none",
+        overflow: "hidden",
       }}
     >
+      {/* User dropdown trigger */}
       <div ref={dropdownRef} className="relative">
         <button
           type="button"
@@ -101,12 +193,15 @@ export default function Sidebar() {
             height: "44px",
             paddingTop: 0,
             paddingBottom: 0,
-            paddingLeft: "8px",
-            paddingRight: "8px",
+            paddingLeft: collapsed ? 0 : "8px",
+            paddingRight: collapsed ? 0 : "8px",
+            justifyContent: collapsed ? "center" : "flex-start",
             borderColor: "var(--border)",
           }}
           aria-expanded={dropdownOpen}
           aria-haspopup="true"
+          aria-label={collapsed ? label : undefined}
+          title={collapsed ? label : undefined}
         >
           <div
             className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
@@ -114,21 +209,28 @@ export default function Sidebar() {
           >
             {initial}
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium" style={{ color: "var(--text)" }}>
-              {label}
-            </p>
-          </div>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-muted)", flexShrink: 0 }} aria-hidden>
-            <path d="M6 9l6 6 6-6" />
-          </svg>
+          {!collapsed && (
+            <>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium" style={{ color: "var(--text)" }}>
+                  {label}
+                </p>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-muted)", flexShrink: 0 }} aria-hidden>
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </>
+          )}
         </button>
         {dropdownOpen && (
           <div
-            className="absolute left-2 right-2 top-full z-10 mt-1 rounded-lg border py-1 shadow-lg"
+            className="absolute top-full z-10 mt-1 rounded-lg border py-1 shadow-lg"
             style={{
               background: "var(--bg)",
               borderColor: "var(--border)",
+              left: collapsed ? COLLAPSED_WIDTH - 4 : 8,
+              right: collapsed ? "auto" : 8,
+              width: collapsed ? 160 : "auto",
             }}
           >
             <button
@@ -142,29 +244,62 @@ export default function Sidebar() {
           </div>
         )}
       </div>
-      <nav className="flex-1 flex flex-col gap-0.5 p-2" style={{ padding: "8px" }}>
+
+      {/* Nav items */}
+      <nav className="flex-1 flex flex-col gap-0.5" style={{ padding: "8px" }}>
         {navItems.map(({ href, label: itemLabel, icon: Icon }) => {
           const isActive =
             href === "/"
               ? pathname === "/"
               : pathname.startsWith(href);
           return (
-            <Link
-              key={href}
-              href={href}
-              className={`flex h-fit items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium transition-colors ${
-                isActive
-                  ? "bg-[var(--surface-hover)] text-[var(--text)]"
-                  : "text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text)]"
-              }`}
-              style={{ padding: "4px 8px" }}
-            >
-              <Icon className="shrink-0" style={{ color: "var(--text-muted)" }} />
-              {itemLabel}
-            </Link>
+            <NavTooltip key={href} label={itemLabel} enabled={collapsed}>
+              <Link
+                href={href}
+                className={`flex h-fit items-center rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? "bg-[var(--surface-hover)] text-[var(--text)]"
+                    : "text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text)]"
+                }`}
+                style={{
+                  padding: collapsed ? "6px" : "4px 8px",
+                  justifyContent: collapsed ? "center" : "flex-start",
+                  gap: collapsed ? 0 : 6,
+                }}
+                aria-label={collapsed ? itemLabel : undefined}
+              >
+                <Icon className="shrink-0" style={{ color: "var(--text-muted)" }} />
+                {!collapsed && itemLabel}
+              </Link>
+            </NavTooltip>
           );
         })}
       </nav>
+
+      {/* Collapse / expand toggle */}
+      <button
+        type="button"
+        onClick={toggleCollapsed}
+        className="border-t flex items-center transition-colors hover:bg-[var(--bg-hover)]"
+        style={{
+          height: 36,
+          padding: collapsed ? 0 : "0 12px",
+          justifyContent: collapsed ? "center" : "flex-end",
+          background: "none",
+          color: "var(--text-muted)",
+          borderColor: "var(--border)",
+          cursor: "pointer",
+        }}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+      >
+        <ChevronIcon
+          style={{
+            transform: collapsed ? "rotate(180deg)" : "none",
+            transition: "transform 0.2s ease",
+          }}
+        />
+      </button>
     </aside>
   );
 }
