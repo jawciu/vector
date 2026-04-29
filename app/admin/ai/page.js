@@ -188,7 +188,7 @@ export default async function AdminAIPage() {
 }
 
 function IntegrationCard({ label, stats }) {
-  const { total, processed, ambiguous, errored, stuck, inFlight } = stats;
+  const { total, processed, ambiguous, errored, stuck, inFlight, stranded } = stats;
   const successRate = total > 0 ? Math.round((processed / total) * 100) : null;
 
   return (
@@ -216,6 +216,7 @@ function IntegrationCard({ label, stats }) {
         {ambiguous > 0 && <Pill label="ambiguous" value={ambiguous} color="var(--alert)" />}
         {stuck > 0 && <Pill label="stuck" value={stuck} color="var(--danger)" />}
         {errored > 0 && <Pill label="errored" value={errored} color="var(--danger)" />}
+        {stranded > 0 && <Pill label="stranded" value={stranded} color="var(--danger)" />}
       </div>
     </div>
   );
