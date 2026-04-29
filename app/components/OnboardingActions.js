@@ -22,6 +22,7 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
     targetGoLive: onboarding.targetGoLive
       ? onboarding.targetGoLive.split("T")[0]
       : "",
+    domain: onboarding.companyDomain || "",
   });
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
@@ -36,6 +37,7 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
     setError("");
 
     try {
+      // Patch the onboarding fields.
       const res = await fetch(`/api/onboardings/${onboarding.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -49,6 +51,23 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.error || "Failed to update");
+      }
+
+      // If the domain changed, patch the linked company. Domain lives on
+      // Company (one company → many onboardings), so this updates all
+      // sibling onboardings' match keys at once.
+      const newDomain = editForm.domain.trim().toLowerCase() || null;
+      const oldDomain = onboarding.companyDomain || null;
+      if (onboarding.companyId && newDomain !== oldDomain) {
+        const cRes = await fetch(`/api/companies/${onboarding.companyId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ domain: newDomain }),
+        });
+        if (!cRes.ok) {
+          const err = await cRes.json();
+          throw new Error(err.error || "Failed to update company domain");
+        }
       }
 
       const updated = await res.json();
@@ -245,6 +264,26 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
                 >
                   {onboarding.companyName}
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>
+                  Domain
+                </label>
+                <input
+                  type="text"
+                  value={editForm.domain}
+                  onChange={(e) => setEditForm((f) => ({ ...f, domain: e.target.value }))}
+                  placeholder="acme.com"
+                  autoComplete="off"
+                  spellCheck={false}
+                  className="py-2.5 px-3 rounded-lg text-sm w-full"
+                  style={{
+                    border: "1px solid var(--border)",
+                    background: "var(--surface)",
+                    color: "var(--text)",
+                  }}
+                />
               </div>
 
               <div className="flex flex-col gap-2">

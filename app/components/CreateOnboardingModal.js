@@ -38,6 +38,7 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
   const [companyMode, setCompanyMode] = useState("new"); // "new" | "existing"
   const [selectedCompanyId, setSelectedCompanyId] = useState("");
   const [newCompanyName, setNewCompanyName] = useState("");
+  const [domain, setDomain] = useState("");
   const [owner, setOwner] = useState("");
   const [targetGoLive, setTargetGoLive] = useState("");
 
@@ -76,6 +77,7 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
     setCompanyMode("new");
     setSelectedCompanyId("");
     setNewCompanyName("");
+    setDomain("");
     setOwner("");
     setTargetGoLive("");
     setError("");
@@ -91,6 +93,14 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
 
   const selectedCompany = companies.find((c) => String(c.id) === String(selectedCompanyId));
 
+  // When user picks an existing company, prefill the domain from its record
+  // so they can see/edit it without a second click.
+  useEffect(() => {
+    if (companyMode === "existing" && selectedCompany) {
+      setDomain(selectedCompany.domain ?? "");
+    }
+  }, [companyMode, selectedCompany]);
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
@@ -98,6 +108,7 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
 
     try {
       let companyId = selectedCompanyId;
+      const trimmedDomain = domain.trim().toLowerCase() || null;
 
       if (companyMode === "new") {
         if (!newCompanyName.trim()) {
@@ -108,7 +119,7 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
         const companyRes = await fetch("/api/companies", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: newCompanyName.trim() }),
+          body: JSON.stringify({ name: newCompanyName.trim(), domain: trimmedDomain }),
         });
         if (!companyRes.ok) {
           const err = await companyRes.json();
@@ -116,6 +127,17 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
         }
         const newCompany = await companyRes.json();
         companyId = newCompany.id;
+      } else if (selectedCompany && (selectedCompany.domain ?? null) !== trimmedDomain) {
+        // Existing company selected and the user changed the domain — patch it.
+        const patchRes = await fetch(`/api/companies/${companyId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ domain: trimmedDomain }),
+        });
+        if (!patchRes.ok) {
+          const err = await patchRes.json();
+          throw new Error(err.error || "Failed to update company domain");
+        }
       }
 
       if (!companyId) {
@@ -304,6 +326,33 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
             />
           )}
 
+          {/* Domain — used to match meeting attendees to this company (Miniti integration) */}
+          <FieldPill icon={<DomainIcon style={{ flexShrink: 0 }} />}>
+            <input
+              type="text"
+              placeholder="Domain"
+              value={domain}
+              onChange={(e) => setDomain(e.target.value)}
+              autoComplete="off"
+              spellCheck={false}
+              className="text-sm w-full outline-none"
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "var(--text)",
+                padding: 0,
+              }}
+            />
+            {domain && (
+              <PillClearButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDomain("");
+                }}
+              />
+            )}
+          </FieldPill>
+
           {/* Owner */}
           <FieldPill icon={<OwnerIcon style={{ flexShrink: 0 }} />}>
             <input
@@ -387,6 +436,15 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
         </div>
       </form>
     </div>
+  );
+}
+
+function DomainIcon({ style }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-muted)", ...style }}>
+      <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1" />
+      <path d="M1.5 7H12.5M7 1.5C8.5 3 9.5 5 9.5 7C9.5 9 8.5 11 7 12.5M7 1.5C5.5 3 4.5 5 4.5 7C4.5 9 5.5 11 7 12.5" stroke="currentColor" strokeWidth="1" />
+    </svg>
   );
 }
 

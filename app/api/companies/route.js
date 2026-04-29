@@ -38,7 +38,7 @@ export async function POST(request) {
       );
     }
 
-    const company = await createCompany(body.name);
+    const company = await createCompany(body.name, { domain: body.domain ?? null });
     return NextResponse.json(company, { status: 201 });
   } catch (error) {
     console.error("[POST /api/companies]", error);
