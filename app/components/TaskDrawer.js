@@ -17,6 +17,7 @@ import {
   DependenciesIcon,
 } from "@/app/ui/Icons";
 import { MenuList, MenuOption } from "./Menu";
+import FollowUpModal from "./FollowUpModal";
 import { TASK_STATUSES, PRIORITIES, STATUS_COLORS } from "@/lib/constants";
 import { AVATAR_IMAGES, avatarColor, avatarInitials } from "@/lib/avatar";
 
@@ -456,6 +457,9 @@ const TaskDrawer = forwardRef(function TaskDrawer({
   // Inline editing state
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState("");
+
+  // Follow-up draft modal (Vector-generated email draft).
+  const [followUpOpen, setFollowUpOpen] = useState(false);
   const [editingDesc, setEditingDesc] = useState(false);
   const [descValue, setDescValue] = useState("");
   const [notesValue, setNotesValue] = useState("");
@@ -693,6 +697,26 @@ const TaskDrawer = forwardRef(function TaskDrawer({
               <path d="M2.5 6.5L5 9L9.5 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <span>{isDone ? "Done" : "Mark as done"}</span>
+          </button>
+
+          {/* Draft follow-up with Vector */}
+          <button
+            type="button"
+            onClick={() => setFollowUpOpen(true)}
+            disabled={!localTask?.id}
+            className="btn-secondary flex items-center gap-1 rounded-lg text-sm"
+            style={{
+              padding: "4px 8px",
+              cursor: localTask?.id ? "pointer" : "default",
+              marginLeft: "auto",
+              marginRight: 8,
+            }}
+            title="Draft a follow-up email with Vector"
+          >
+            <svg width="11" height="11" viewBox="0 0 14 14" fill="currentColor" style={{ color: "var(--action)" }}>
+              <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" />
+            </svg>
+            <span>Draft follow-up</span>
           </button>
 
           {/* Close button */}
@@ -1322,8 +1346,17 @@ const TaskDrawer = forwardRef(function TaskDrawer({
           </div>
         </div>
       </div>
+
+      {/* Follow-up draft modal (mounted at drawer root so it overlays everything). */}
+      <FollowUpModal
+        open={followUpOpen}
+        onClose={() => setFollowUpOpen(false)}
+        taskId={localTask?.id}
+        taskTitle={localTask?.title}
+      />
     </div>
   );
 });
 
 export default TaskDrawer;
+

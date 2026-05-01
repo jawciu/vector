@@ -479,6 +479,8 @@ model Contact {
 
 ### Phase 3 — AI & automation (make it smart)
 
+> **Implementation plan + current state for the AI features lives in [AI_PLAN.md](AI_PLAN.md).** That's the canonical agent-readable reference; the sections below describe the original product intent.
+
 #### 3.1 AI follow-up drafts
 - Button on blocked/overdue tasks: "Draft follow-up"
 - AI generates a polite, contextual message using: task title, who it's waiting on, how long it's been, what's needed

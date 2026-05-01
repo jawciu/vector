@@ -107,7 +107,34 @@ export default function Sidebar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [inboxCount, setInboxCount] = useState(0);
   const dropdownRef = useRef(null);
+
+  // Poll the Vector-suggests inbox count for the sidebar badge.
+  // 30s is fine — webhook events arrive sporadically and the user can
+  // always click into the inbox to force-refresh.
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchCount() {
+      try {
+        const res = await fetch("/api/ai-drafts/badge", { cache: "no-store" });
+        if (!res.ok) return;
+        const body = await res.json();
+        if (!cancelled) setInboxCount(body.count ?? 0);
+      } catch {
+        // Silent — badge is best-effort.
+      }
+    }
+    fetchCount();
+    const interval = setInterval(fetchCount, 30_000);
+    function onFocus() { fetchCount(); }
+    window.addEventListener("focus", onFocus);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, []);
 
   // Load collapse state from localStorage once on mount. Can't read storage
   // during SSR so we hydrate to the saved value here, then transition normally.
@@ -252,8 +279,9 @@ export default function Sidebar() {
             href === "/"
               ? pathname === "/"
               : pathname.startsWith(href);
+          const badge = href === "/ai-drafts" && inboxCount > 0 ? inboxCount : 0;
           return (
-            <NavTooltip key={href} label={itemLabel} enabled={collapsed}>
+            <NavTooltip key={href} label={badge > 0 ? `${itemLabel} (${badge})` : itemLabel} enabled={collapsed}>
               <Link
                 href={href}
                 className={`flex h-fit items-center rounded-lg text-sm font-medium transition-colors ${
@@ -265,11 +293,49 @@ export default function Sidebar() {
                   padding: collapsed ? "6px" : "4px 8px",
                   justifyContent: collapsed ? "center" : "flex-start",
                   gap: collapsed ? 0 : 6,
+                  position: "relative",
                 }}
                 aria-label={collapsed ? itemLabel : undefined}
               >
-                <Icon className="shrink-0" style={{ color: "var(--text-muted)" }} />
-                {!collapsed && itemLabel}
+                <span style={{ position: "relative", display: "inline-flex" }}>
+                  <Icon className="shrink-0" style={{ color: "var(--text-muted)" }} />
+                  {collapsed && badge > 0 && (
+                    <span
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        top: -3,
+                        right: -3,
+                        width: 7,
+                        height: 7,
+                        borderRadius: "50%",
+                        background: "var(--action)",
+                        border: "1px solid var(--bg-elevated)",
+                      }}
+                    />
+                  )}
+                </span>
+                {!collapsed && (
+                  <>
+                    <span style={{ flex: 1 }}>{itemLabel}</span>
+                    {badge > 0 && (
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 600,
+                          padding: "1px 6px",
+                          borderRadius: 9999,
+                          background: "var(--action)",
+                          color: "var(--action-text)",
+                          minWidth: 18,
+                          textAlign: "center",
+                        }}
+                      >
+                        {badge > 99 ? "99+" : badge}
+                      </span>
+                    )}
+                  </>
+                )}
               </Link>
             </NavTooltip>
           );

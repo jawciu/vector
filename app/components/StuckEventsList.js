@@ -12,6 +12,9 @@ export default function StuckEventsList({ initialEvents }) {
   const [events, setEvents] = useState(initialEvents);
   const [busyIds, setBusyIds] = useState(new Set());
   const [errors, setErrors] = useState({});
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkError, setBulkError] = useState(null);
+  const [bulkResult, setBulkResult] = useState(null);
 
   function setBusy(id, busy) {
     setBusyIds((prev) => {
@@ -39,10 +42,71 @@ export default function StuckEventsList({ initialEvents }) {
     }
   }
 
-  if (events.length === 0) return null;
+  async function handleReprocessAll() {
+    setBulkBusy(true);
+    setBulkError(null);
+    setBulkResult(null);
+    try {
+      const res = await fetch("/api/external-events/reprocess-all-stuck", { method: "POST" });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.error || `Reprocess-all failed (${res.status})`);
+      }
+      const body = await res.json();
+      // Optimistically clear the list — orchestrators run async; if any
+      // re-fail, they'll reappear on the next page refresh.
+      setEvents([]);
+      setBulkResult(`Scheduled ${body.scheduled} reprocess${body.scheduled === 1 ? "" : "es"}. Refresh in ~15s to see updated state.`);
+    } catch (err) {
+      setBulkError(err.message);
+    } finally {
+      setBulkBusy(false);
+    }
+  }
+
+  if (events.length === 0 && !bulkResult) return null;
 
   return (
-    <ul style={{ display: "flex", flexDirection: "column", gap: 6, margin: 0, padding: 0, listStyle: "none" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {events.length > 1 && (
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button
+            onClick={handleReprocessAll}
+            disabled={bulkBusy}
+            className="btn-secondary text-sm rounded-lg"
+            style={{ padding: "4px 10px", fontSize: 12, opacity: bulkBusy ? 0.5 : 1 }}
+          >
+            {bulkBusy ? "Scheduling…" : `Reprocess all ${events.length}`}
+          </button>
+        </div>
+      )}
+      {bulkResult && (
+        <div
+          style={{
+            fontSize: 12,
+            color: "var(--text-secondary)",
+            background: "var(--bg)",
+            padding: "6px 10px",
+            borderRadius: 6,
+          }}
+        >
+          {bulkResult}
+        </div>
+      )}
+      {bulkError && (
+        <div
+          style={{
+            fontSize: 12,
+            color: "var(--danger)",
+            background: "rgba(255, 137, 155, 0.1)",
+            padding: "6px 10px",
+            borderRadius: 6,
+          }}
+        >
+          {bulkError}
+        </div>
+      )}
+      <ul style={{ display: "flex", flexDirection: "column", gap: 6, margin: 0, padding: 0, listStyle: "none" }}>
       {events.map((event) => {
         const busy = busyIds.has(event.id);
         const error = errors[event.id];
@@ -91,6 +155,7 @@ export default function StuckEventsList({ initialEvents }) {
           </li>
         );
       })}
-    </ul>
+      </ul>
+    </div>
   );
 }

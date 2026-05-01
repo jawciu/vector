@@ -143,6 +143,7 @@ proxy.js                  # Next.js middleware entry point (Supabase session)
 
 | File | Purpose |
 |------|---------|
+| `AI_PLAN.md` | **AI features implementation plan — current state + architecture + open work.** Read this first when picking up AI work. |
 | `DESIGN.md` | **Design system source of truth** — tokens, components, do's and don'ts |
 | `PLAN.md` | Product vision, feature phases, tech stack, build priority |
 | `DECISIONS.md` | All major decisions with rationale |
