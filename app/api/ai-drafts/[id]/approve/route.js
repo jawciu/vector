@@ -90,9 +90,30 @@ export async function POST(request, { params }) {
       await updateTask(merged.taskId, { status: merged.newStatus }, { actor });
       appliedTaskId = merged.taskId;
     } else if (draft.action === "draft_followup") {
-      // No DB mutation — Caroline sends the email herself via mailto.
-      // Approving just acknowledges "I sent this" for the record.
-      appliedTaskId = draft.payload?.taskId ?? null;
+      // Email itself is sent by Caroline via mailto. Approving mirrors the
+      // message as a portal-visible comment so the customer can see what
+      // was said and the vendor team has a per-task communication trail.
+      // Comment is attributed to the task owner (whose voice the email is
+      // in), not the approver.
+      const merged = { ...draft.payload, ...overrides };
+      const targetTaskId = merged.taskId;
+      if (targetTaskId) {
+        const author = merged.fromName || vu.name;
+        const recipient = merged.toName || merged.to || "the customer";
+        const body = [
+          `📧 Sent follow-up to ${recipient}:`,
+          "",
+          `Subject: ${merged.subject ?? "(no subject)"}`,
+          "",
+          merged.body ?? "",
+        ].join("\n");
+        try {
+          await createComment(targetTaskId, author, body, { actor });
+        } catch (err) {
+          console.warn("[approve draft_followup] mirror comment failed", err);
+        }
+        appliedTaskId = targetTaskId;
+      }
     } else {
       return NextResponse.json(
         { error: `Unknown action ${draft.action}` },
