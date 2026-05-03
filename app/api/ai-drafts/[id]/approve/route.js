@@ -89,6 +89,10 @@ export async function POST(request, { params }) {
       const merged = { ...draft.payload, ...overrides };
       await updateTask(merged.taskId, { status: merged.newStatus }, { actor });
       appliedTaskId = merged.taskId;
+    } else if (draft.action === "draft_followup") {
+      // No DB mutation — Caroline sends the email herself via mailto.
+      // Approving just acknowledges "I sent this" for the record.
+      appliedTaskId = draft.payload?.taskId ?? null;
     } else {
       return NextResponse.json(
         { error: `Unknown action ${draft.action}` },

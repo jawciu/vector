@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { listPendingAIChanges, listAmbiguousEvents, getOnboardings } from "@/lib/db";
+import { listPendingAIChanges, listAmbiguousEvents, getOnboardings, getOrCreateVendorUser } from "@/lib/db";
 import AIDraftInbox from "@/app/components/AIDraftInbox";
 import UnmatchedEvents from "@/app/components/UnmatchedEvents";
 
@@ -27,8 +27,15 @@ export default async function AIDraftsPage({ searchParams }) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // Resolve the vendor user so we can scope follow-up drafts to their tasks.
+  const vu = await getOrCreateVendorUser({
+    authUserId: user.id,
+    email: user.email,
+    name: user.user_metadata?.full_name ?? user.email,
+  });
+
   const [drafts, ambiguousEvents, allOnboardings] = await Promise.all([
-    listPendingAIChanges({ status, limit: 200 }),
+    listPendingAIChanges({ status, limit: 200, forVendorUserId: vu.id }),
     status === "pending"
       ? listAmbiguousEvents({ source: "miniti", limit: 50 })
       : Promise.resolve([]),

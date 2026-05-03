@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAICallStats, getRecentAICalls, getIntegrationStats, countAmbiguousEvents, listStuckEvents } from "@/lib/db";
 import StuckEventsList from "@/app/components/StuckEventsList";
+import ScanStaleButton from "@/app/components/ScanStaleButton";
 
 export const dynamic = "force-dynamic";
 
@@ -88,6 +89,14 @@ export default async function AdminAIPage() {
               </tbody>
             </table>
           )}
+        </Section>
+
+        {/* Stale-task scanner — Vector autonomously drafts follow-up emails. */}
+        <Section title="Stale-task scanner">
+          <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "0 0 10px", lineHeight: 1.5 }}>
+            Walks active onboardings, finds your overdue or blocked tasks, and drafts follow-up emails for each. Runs weekly via cron; you can also trigger it manually.
+          </p>
+          <ScanStaleButton />
         </Section>
 
         {/* Integrations — Miniti throughput + unprocessed counts */}

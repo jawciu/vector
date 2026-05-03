@@ -300,6 +300,7 @@ function DraftCard({
   const heading = describeAction(action, payload);
   const meta = describeMeta(action, payload);
   const canEdit = isPending && action === "create_task";
+  const isFollowup = action === "draft_followup";
 
   return (
     <div
@@ -397,6 +398,8 @@ function DraftCard({
         />
       )}
 
+      {isFollowup && <FollowupBody payload={payload} /> }
+
       {error && (
         <div
           style={{
@@ -431,18 +434,75 @@ function DraftCard({
               Edit
             </button>
           )}
+          {isFollowup && (
+            <a
+              href={buildMailto(payload)}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-secondary text-sm rounded-lg"
+              style={{ padding: "4px 12px", fontSize: 13, textDecoration: "none" }}
+            >
+              Open in mail ↗
+            </a>
+          )}
           <button
             onClick={() => onApprove({})}
             disabled={busy}
             className="btn-primary text-sm rounded-lg"
             style={{ padding: "4px 14px", opacity: busy ? 0.5 : 1, fontSize: 13, fontWeight: 600 }}
           >
-            {busy ? "…" : "Approve →"}
+            {busy ? "…" : isFollowup ? "Mark sent" : "Approve →"}
           </button>
         </div>
       )}
     </div>
   );
+}
+
+function FollowupBody({ payload }) {
+  const { subject, body, to, toName, fromName, fromEmail } = payload ?? {};
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+        padding: "10px 12px",
+        background: "var(--bg)",
+        border: "1px solid var(--border-subtle)",
+        borderRadius: 8,
+        fontSize: 12,
+      }}
+    >
+      <div style={{ display: "flex", gap: 12, color: "var(--text-muted)" }}>
+        <span><strong style={{ color: "var(--text-secondary)" }}>From:</strong> {fromName ?? "(unknown)"}{fromEmail ? ` <${fromEmail}>` : ""}</span>
+      </div>
+      <div style={{ display: "flex", gap: 12, color: "var(--text-muted)" }}>
+        <span><strong style={{ color: "var(--text-secondary)" }}>To:</strong> {toName ?? to ?? "(no contact email)"}{to && toName ? ` <${to}>` : ""}</span>
+      </div>
+      {subject && (
+        <div style={{ color: "var(--text)", fontWeight: 500 }}>
+          {subject}
+        </div>
+      )}
+      {body && (
+        <div style={{ color: "var(--text-secondary)", whiteSpace: "pre-wrap", lineHeight: 1.5 }}>
+          {body}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function buildMailto(payload) {
+  const to = payload?.to ?? "";
+  const subject = payload?.subject ?? "";
+  const body = payload?.body ?? "";
+  const params = new URLSearchParams();
+  if (subject) params.set("subject", subject);
+  if (body) params.set("body", body);
+  const qs = params.toString();
+  return `mailto:${encodeURIComponent(to)}${qs ? `?${qs}` : ""}`;
 }
 
 function EditCreateTaskForm({ draft, busy, onCancel, onSave }) {
@@ -562,6 +622,8 @@ function describeAction(action, payload) {
     }
     case "update_status":
       return `Mark task #${payload.taskId} as ${payload.newStatus}`;
+    case "draft_followup":
+      return `Follow up on task #${payload.taskId}`;
     default:
       return action;
   }
@@ -575,6 +637,14 @@ function describeMeta(action, payload) {
     if (payload.priority) parts.push(`Priority: ${payload.priority}`);
     return parts.join(" · ") || null;
   }
+  if (action === "draft_followup") {
+    const parts = [];
+    if (Array.isArray(payload.reasons) && payload.reasons.length) {
+      parts.push(payload.reasons.join(" + "));
+    }
+    if (payload.tone) parts.push(`Tone: ${payload.tone}`);
+    return parts.join(" · ") || null;
+  }
   return null;
 }
 
@@ -583,6 +653,7 @@ function ActionIcon({ action }) {
     create_task: "+",
     match_existing: "≡",
     update_status: "↻",
+    draft_followup: "✉",
   };
   const symbol = map[action] || "•";
   return (

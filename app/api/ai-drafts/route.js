@@ -7,7 +7,7 @@
 
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { listPendingAIChanges, countPendingAIChanges } from "@/lib/db";
+import { listPendingAIChanges, countPendingAIChanges, getOrCreateVendorUser } from "@/lib/db";
 
 export async function GET(request) {
   const supabase = await createClient();
@@ -16,13 +16,19 @@ export async function GET(request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const vu = await getOrCreateVendorUser({
+    authUserId: user.id,
+    email: user.email,
+    name: user.user_metadata?.full_name ?? user.email,
+  });
+
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status") ?? "pending";
   const limit = Math.min(Number(searchParams.get("limit") ?? 100), 200);
 
   const [drafts, pendingCount] = await Promise.all([
-    listPendingAIChanges({ status, limit }),
-    countPendingAIChanges(),
+    listPendingAIChanges({ status, limit, forVendorUserId: vu.id }),
+    countPendingAIChanges({ forVendorUserId: vu.id }),
   ]);
 
   return NextResponse.json({ drafts, pendingCount });

@@ -1,18 +1,19 @@
 /**
  * [POST /api/tasks/[id]/follow-up?tone=friendly|firmer|escalation]
  *
- * Edge-runtime SSE stream that produces a `{ subject, body }` follow-up
- * email for the given task. Logs cost to AICall on completion.
+ * Streams a `{ subject, body }` follow-up email for the given task. Logs cost
+ * to AICall on completion.
  *
- * Edge runtime means we use the Supabase JS client (Prisma's adapter-pg
- * isn't edge-compatible) — same trade-off as the insights streaming route.
+ * Runs on Node so we can use Prisma via lib/db.js — same DB layer as the
+ * rest of the app. Streaming still works fine through ReadableStream. Hobby
+ * tier's 10s function ceiling is the constraint; follow-up gen typically
+ * runs ~3–8s so we're inside the budget.
  */
 
-export const runtime = "edge";
-
-import { createClient } from "@supabase/supabase-js";
+import { createClient as createSSRClient } from "@/lib/supabase/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { computeCost } from "@/lib/ai/client";
+import { getTaskForFollowup, getOrCreateVendorUser, logAICall } from "@/lib/db";
 import {
   renderFollowupSystemPrompt,
   buildFollowupUserMessage,
@@ -42,14 +43,7 @@ export async function POST(req, { params }) {
     });
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      auth: { persistSession: false },
-      global: { headers: { Cookie: req.headers.get("cookie") ?? "" } },
-    }
-  );
+  const supabase = await createSSRClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -58,66 +52,31 @@ export async function POST(req, { params }) {
     });
   }
 
-  // Fetch task + onboarding + recent comments + assignee. RLS is bypassed
-  // because we already authenticated above; queries use the anon-key-based
-  // client which goes through PostgREST. RLS is enabled but no SELECT
-  // policies are defined → PostgREST will return empty results. Use the
-  // service role key instead.
-  const adminClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
-    { auth: { persistSession: false } }
-  );
-
-  const { data: task, error: taskErr } = await adminClient
-    .from("Task")
-    .select(`
-      id, title, description, status, due, priority, owner, "ownerId", "assigneeContactId", "blockedByTaskId", "onboardingId"
-    `)
-    .eq("id", taskId)
-    .single();
-  if (taskErr || !task) {
+  const ctx = await getTaskForFollowup(taskId);
+  if (!ctx) {
     return new Response(JSON.stringify({ error: "Task not found" }), {
       status: 404,
       headers: { "Content-Type": "application/json" },
     });
   }
 
-  const [{ data: onboarding }, { data: comments }, { data: assignee }, { data: blockedByTask }, { data: vendorRow }] = await Promise.all([
-    adminClient
-      .from("Onboarding")
-      .select(`id, "targetGoLive", "companyId", Company:Company(name)`)
-      .eq("id", task.onboardingId)
-      .single(),
-    adminClient
-      .from("Comment")
-      .select(`id, author, body, "createdAt"`)
-      .eq("taskId", task.id)
-      .order("createdAt", { ascending: true }),
-    task.assigneeContactId
-      ? adminClient.from("Contact").select(`id, name, email`).eq("id", task.assigneeContactId).single()
-      : Promise.resolve({ data: null }),
-    task.blockedByTaskId
-      ? adminClient.from("Task").select(`id, title, status`).eq("id", task.blockedByTaskId).single()
-      : Promise.resolve({ data: null }),
-    adminClient.from("VendorUser").select(`id, name, email`).eq("authUserId", user.id).single(),
-  ]);
-
-  const vendorName =
-    vendorRow?.name ||
-    user.user_metadata?.full_name ||
-    user.email ||
-    "the vendor";
+  let vendorName = user.user_metadata?.full_name || user.email || "the vendor";
+  try {
+    const vu = await getOrCreateVendorUser({
+      authUserId: user.id,
+      email: user.email,
+      name: user.user_metadata?.full_name,
+    });
+    if (vu?.name) vendorName = vu.name;
+  } catch (err) {
+    console.warn("[followup] vendor lookup failed", err);
+  }
 
   const userMessage = buildFollowupUserMessage({
-    task: { ...task, blockedByTask },
-    onboarding: {
-      id: onboarding?.id,
-      companyName: onboarding?.Company?.name ?? "(unknown company)",
-      targetGoLive: onboarding?.targetGoLive ?? null,
-    },
-    recentComments: comments ?? [],
-    assignee,
+    task: ctx.task,
+    onboarding: ctx.onboarding,
+    recentComments: ctx.comments,
+    assignee: ctx.assignee,
     vendorName,
     tone,
   });
@@ -161,8 +120,7 @@ export async function POST(req, { params }) {
         const payload = parseFollowupPayload(final);
         const durationMs = Date.now() - startedAt;
 
-        // Fire-and-forget cost log via the admin client.
-        adminClient.from("AICall").insert({
+        logAICall({
           kind: "followup_draft",
           scopeId: String(taskId),
           model: final.model,
@@ -173,9 +131,7 @@ export async function POST(req, { params }) {
           costUsd: computeCost(final.model, final.usage),
           durationMs,
           requestId: final.id,
-        }).then(({ error }) => {
-          if (error) console.warn("[followup] AICall log failed", error);
-        });
+        }).catch((err) => console.warn("[followup] AICall log failed", err));
 
         controller.enqueue(
           encoder.encode(`data: ${JSON.stringify({ done: true, payload })}\n\n`)
