@@ -432,6 +432,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
   onClose,
   onTaskUpdated,
   people = [],
+  vendorUsers = [],
   contacts = [],
   allTasks = [],
 }, ref) {
@@ -914,7 +915,8 @@ const TaskDrawer = forwardRef(function TaskDrawer({
             )}
           </div>
 
-          {/* Owner */}
+          {/* Owner — must be a VendorUser (Vector team). The picker writes
+              ownerId (FK) and keeps the owner string in sync for display. */}
           <div ref={ownerRef} className="relative" onMouseEnter={() => setOwnerHovered(true)} onMouseLeave={() => setOwnerHovered(false)}>
             <FieldRow
               icon={<OwnerIcon style={{ flexShrink: 0 }} />}
@@ -926,27 +928,36 @@ const TaskDrawer = forwardRef(function TaskDrawer({
                 <div className="flex items-center gap-1.5">
                   <Avatar name={localTask.owner} size={20} />
                   <span className="text-sm" style={{ color: "var(--text)" }}>{localTask.owner}</span>
-                  {(ownerHovered || ownerOpen) && <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ owner: "" }); setOwnerOpen(false); }} />}
+                  {(ownerHovered || ownerOpen) && <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ owner: "", ownerId: null }); setOwnerOpen(false); }} />}
                 </div>
               )}
             </FieldRow>
             {ownerOpen && (
-              <MenuList style={{ minWidth: "100%", maxHeight: 160, overflowY: "auto" }}>
-                {people.length === 0 ? (
-                  <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No people available</div>
+              <MenuList style={{ minWidth: "100%", maxHeight: 200, overflowY: "auto" }}>
+                {vendorUsers.length === 0 ? (
+                  <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>
+                    No team members yet — add one in <a href="/settings" style={{ color: "var(--action)" }}>Settings</a>.
+                  </div>
                 ) : (
-                  people.map((person) => (
-                    <MenuOption
-                      key={person}
-                      active={localTask.owner === person}
-                      onClick={() => { patchTask({ owner: localTask.owner === person ? "" : person }); setOwnerOpen(false); }}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <Avatar name={person} size={20} />
-                        <span>{person}</span>
-                      </div>
-                    </MenuOption>
-                  ))
+                  vendorUsers.map((vu) => {
+                    const selected = localTask.ownerId === vu.id;
+                    return (
+                      <MenuOption
+                        key={vu.id}
+                        active={selected}
+                        onClick={() => {
+                          if (selected) patchTask({ owner: "", ownerId: null });
+                          else patchTask({ owner: vu.name, ownerId: vu.id });
+                          setOwnerOpen(false);
+                        }}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Avatar name={vu.name} size={20} />
+                          <span>{vu.name}</span>
+                        </div>
+                      </MenuOption>
+                    );
+                  })
                 )}
               </MenuList>
             )}

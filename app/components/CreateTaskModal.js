@@ -58,6 +58,7 @@ export default function CreateTaskModal({
   companyName,
   onTaskCreated,
   people = [],
+  vendorUsers = [],
   contacts = [],
   allTasks = [],
 }) {
@@ -72,6 +73,7 @@ export default function CreateTaskModal({
     priority: null,
     due: "",
     owner: "",
+    ownerId: null,
     assigneeContactId: null,
     members: [],
     notes: "",
@@ -159,6 +161,7 @@ export default function CreateTaskModal({
       priority: null,
       due: "",
       owner: "",
+      ownerId: null,
       assigneeContactId: null,
       members: [],
       notes: "",
@@ -202,6 +205,7 @@ export default function CreateTaskModal({
           priority: formData.priority,
           due: formData.due,
           owner: formData.owner,
+          ownerId: formData.ownerId,
           assigneeContactId: formData.assigneeContactId,
           members: formData.members,
           notes: formData.notes,
@@ -433,32 +437,41 @@ export default function CreateTaskModal({
                     {avatarInitials(formData.owner)}
                   </span>
                   <span className="text-sm" style={{ color: "var(--text)" }}>{formData.owner}</span>
-                  <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("owner", ""); }} />
+                  <PillClearButton onClick={(e) => { e.stopPropagation(); setFormData((p) => ({ ...p, owner: "", ownerId: null })); }} />
                 </div>
               )}
             </FieldPill>
             {ownerOpen && (
-              <MenuList style={{ background: "var(--bg-elevated)", width: "100%", maxHeight: 160, overflowY: "auto" }}>
-                {people.length === 0 ? (
-                  <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No people available</div>
+              <MenuList style={{ background: "var(--bg-elevated)", width: "100%", maxHeight: 200, overflowY: "auto" }}>
+                {vendorUsers.length === 0 ? (
+                  <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>
+                    No team members yet — add one in <a href="/settings" style={{ color: "var(--action)" }}>Settings</a>.
+                  </div>
                 ) : (
-                  people.map((person) => (
-                    <MenuOption
-                      key={person}
-                      active={formData.owner === person}
-                      onClick={() => { handleChange("owner", formData.owner === person ? "" : person); setOwnerOpen(false); }}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <span
-                          className="flex shrink-0 w-[18px] h-[18px] rounded-full items-center justify-center text-[8px] font-semibold"
-                          style={{ background: avatarColor(person), color: "var(--text-dark)" }}
-                        >
-                          {avatarInitials(person)}
-                        </span>
-                        {person}
-                      </div>
-                    </MenuOption>
-                  ))
+                  vendorUsers.map((vu) => {
+                    const selected = formData.ownerId === vu.id;
+                    return (
+                      <MenuOption
+                        key={vu.id}
+                        active={selected}
+                        onClick={() => {
+                          if (selected) setFormData((p) => ({ ...p, owner: "", ownerId: null }));
+                          else setFormData((p) => ({ ...p, owner: vu.name, ownerId: vu.id }));
+                          setOwnerOpen(false);
+                        }}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className="flex shrink-0 w-[18px] h-[18px] rounded-full items-center justify-center text-[8px] font-semibold"
+                            style={{ background: avatarColor(vu.name), color: "var(--text-dark)" }}
+                          >
+                            {avatarInitials(vu.name)}
+                          </span>
+                          {vu.name}
+                        </div>
+                      </MenuOption>
+                    );
+                  })
                 )}
               </MenuList>
             )}

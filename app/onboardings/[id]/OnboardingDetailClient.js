@@ -72,6 +72,7 @@ export default function OnboardingDetailClient({
   contacts: initialContacts,
   phases: initialPhases,
   magicLinks: initialMagicLinks,
+  vendorUsers: initialVendorUsers,
   insightSnapshot,
   insightContextHash,
   cachedInsight,
@@ -177,6 +178,9 @@ export default function OnboardingDetailClient({
       .sort((a, b) => a.sortOrder - b.sortOrder),
   }));
 
+  // `people` (string list) is still used for the legacy Members field on
+  // tasks. Owner now uses the `vendorUsers` array (see TaskDrawer).
+  const vendorUsers = initialVendorUsers ?? [];
   const people = Array.from(
     new Set([
       ...contacts.map((c) => c.name).filter(Boolean),
@@ -750,6 +754,7 @@ export default function OnboardingDetailClient({
         companyName={onboarding.companyName}
         onTaskCreated={handleTaskCreated}
         people={people}
+        vendorUsers={vendorUsers}
         contacts={contacts}
         allTasks={tasks}
       />
@@ -762,6 +767,7 @@ export default function OnboardingDetailClient({
         onClose={closeDrawer}
         onTaskUpdated={handleTaskUpdated}
         people={people}
+        vendorUsers={vendorUsers}
         contacts={contacts}
         allTasks={tasks}
       />

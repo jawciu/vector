@@ -7,13 +7,14 @@ import {
   getPhasesForOnboarding,
   getMagicLinksForOnboarding,
   getCachedInsight,
+  listVendorUsers,
 } from "@/lib/db";
 import { buildOnboardingSnapshot, hashSnapshot } from "@/lib/ai/context";
 import OnboardingDetailClient from "./OnboardingDetailClient";
 
 export default async function OnboardingDetailPage({ params }) {
   const { id } = await params;
-  const [onboarding, tasks, contacts, phases, magicLinks, snapshot, cachedInsight] = await Promise.all([
+  const [onboarding, tasks, contacts, phases, magicLinks, snapshot, cachedInsight, vendorUsers] = await Promise.all([
     getOnboarding(id),
     getTasksForOnboarding(id),
     getContactsForOnboarding(id),
@@ -21,6 +22,7 @@ export default async function OnboardingDetailPage({ params }) {
     getMagicLinksForOnboarding(id),
     buildOnboardingSnapshot(id),
     getCachedInsight("onboarding", id),
+    listVendorUsers(),
   ]);
 
   if (!onboarding) {
@@ -51,6 +53,7 @@ export default async function OnboardingDetailPage({ params }) {
         contacts={contacts}
         phases={phases}
         magicLinks={magicLinks}
+        vendorUsers={vendorUsers}
         insightSnapshot={snapshot}
         insightContextHash={contextHash}
         cachedInsight={cachedInsightSerialised}
