@@ -187,7 +187,7 @@ export default function OnboardingDetailClient({
     setDrawerOpen(true);
   }, [searchParams, drawerTask, drawerOpen]);
 
-  const activeTab = searchParams.get("tab") || "insights";
+  const activeTab = searchParams.get("tab") || "overview";
   const taskFilter = searchParams.get("filter") || "active";
 
   function setTab(tab) {
@@ -492,7 +492,7 @@ export default function OnboardingDetailClient({
       )}
 
       {/* Tab content */}
-      {activeTab === "insights" && insightSnapshot && (
+      {activeTab === "overview" && insightSnapshot && (
         <InsightsPanel
           scope="onboarding"
           scopeId={onboarding.id}

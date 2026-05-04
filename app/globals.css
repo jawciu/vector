@@ -92,7 +92,7 @@ a {
   bottom: -1px;
   height: 2px;
   border-radius: 99px;
-  background: var(--text);
+  background: var(--action);
 }
 
 /* Shared focus state for all buttons */

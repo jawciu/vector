@@ -4,11 +4,18 @@ import TabBar from "../ui/TabBar";
 
 const TABS = [
   {
-    id: "insights",
-    label: "Insights",
+    id: "overview",
+    label: "Overview",
     icon: (
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" fill="currentColor" />
+        <g clipPath="url(#overview-clip)">
+          <path d="M3.1396 7.21616H1.93426C1.54826 7.21616 1.2356 7.5295 1.2356 7.91483V12.4682C1.2356 12.8535 1.54893 13.1668 1.93426 13.1668H3.14026C3.52693 13.1668 3.8396 12.8535 3.8396 12.4675V7.91483C3.83942 7.72941 3.76568 7.55163 3.63457 7.42052C3.50346 7.28941 3.32568 7.21567 3.14026 7.2155M7.60293 0.833496H6.3976C6.01093 0.833496 5.69826 1.14683 5.69826 1.53283V12.4668C5.69826 12.8535 6.0116 13.1662 6.39826 13.1662H7.60293C7.9896 13.1662 8.30226 12.8528 8.30226 12.4668V1.5335C8.30226 1.14683 7.98893 0.834163 7.60226 0.834163M12.0663 4.28483H10.8603C10.4736 4.28483 10.1609 4.59816 10.1609 4.98483V12.4668C10.1609 12.8535 10.4743 13.1662 10.8603 13.1662H12.0656C12.251 13.166 12.4288 13.0922 12.5599 12.9611C12.691 12.83 12.7648 12.6522 12.7649 12.4668V4.98416C12.7649 4.5975 12.4516 4.28483 12.0649 4.28483" stroke="currentColor" strokeWidth="0.866667" strokeLinecap="round" strokeLinejoin="round" />
+        </g>
+        <defs>
+          <clipPath id="overview-clip">
+            <rect width="14" height="14" fill="white" />
+          </clipPath>
+        </defs>
       </svg>
     ),
   },
@@ -64,8 +71,12 @@ const TABS = [
     id: "workflows",
     label: "Workflows",
     icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" fill="currentColor" />
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="4.5" height="4.5" rx="1" />
+        <rect x="8.5" y="1" width="4.5" height="4.5" rx="1" />
+        <rect x="4.75" y="8.5" width="4.5" height="4.5" rx="1" />
+        <path d="M3.25 5.75 v1.25 h7.5 v-1.25" />
+        <path d="M7 7 v1.5" />
       </svg>
     ),
   },

@@ -241,7 +241,7 @@ For SVG fills the gradient must be inlined as a `<linearGradient>` referencing t
 
 ### TabBar — `app/ui/TabBar.js`
 
-Underline-as-selection pattern. Inactive tabs are `textMuted`, hover bumps to `textSecondary` (NOT to `text`), active tabs are `text` with a 2px underline indicator. **No background pill** on hover — the underline is the only "selected" cue, doubling up reads as redundantly selected.
+Underline-as-selection pattern. Inactive tabs are `textMuted`, hover bumps to `textSecondary` (NOT to `text`), active tabs are `text` with a 2px underline indicator in `action` (lilac). **No background pill** on hover — the underline is the only "selected" cue, doubling up reads as redundantly selected.
 
 ## Do's and don'ts
 
