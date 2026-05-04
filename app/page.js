@@ -1,6 +1,13 @@
 import React from "react";
 import Link from "next/link";
-import { getOnboardings, getCachedInsight } from "@/lib/db";
+import { redirect } from "next/navigation";
+import {
+  getOnboardings,
+  getCachedInsight,
+  getOrCreateVendorUser,
+  getPendingAIChangeCountsByOnboarding,
+} from "@/lib/db";
+import { createClient } from "@/lib/supabase/server";
 import { buildPortfolioSnapshot, hashPortfolioSnapshot } from "@/lib/ai/context";
 import OnboardingsActionBar from "./components/OnboardingsActionBar";
 import PortfolioInsightsHero from "./components/PortfolioInsightsHero";
@@ -22,10 +29,21 @@ function statusBadge(ob) {
 export default async function OnboardingsListPage({ searchParams }) {
   const params = await searchParams;
   const statusFilter = params?.status || "Active";
-  const [onboardings, portfolioSnapshot, cachedPortfolioInsight] = await Promise.all([
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const me = await getOrCreateVendorUser({
+    authUserId: user.id,
+    email: user.email,
+    name: user.user_metadata?.full_name ?? user.email,
+  });
+
+  const [onboardings, portfolioSnapshot, cachedPortfolioInsight, workflowCounts] = await Promise.all([
     getOnboardings(statusFilter),
     buildPortfolioSnapshot({ statusFilter }),
     getCachedInsight("portfolio", "all"),
+    getPendingAIChangeCountsByOnboarding({ forVendorUserId: me.id }),
   ]);
 
   const portfolioContextHash = portfolioSnapshot ? hashPortfolioSnapshot(portfolioSnapshot) : null;
@@ -82,13 +100,13 @@ export default async function OnboardingsListPage({ searchParams }) {
       <div
         className="w-full overflow-x-auto grid text-left text-sm"
         style={{
-          gridTemplateColumns: "1fr 100px 80px 80px 1.2fr 120px 140px",
+          gridTemplateColumns: "1fr 100px 80px 80px 1.2fr 120px 140px 110px",
           borderColor: "var(--border)",
           borderBottom: "1px solid var(--border)",
         }}
       >
         {/* Header cells */}
-        {["Company", "Status", "Tasks", "Blocked", "Next action", "Last activity", "Owner"].map(
+        {["Company", "Status", "Tasks", "Blocked", "Next action", "Last activity", "Owner", "Workflows"].map(
           (label, i) => (
             <span
               key={label}
@@ -98,7 +116,7 @@ export default async function OnboardingsListPage({ searchParams }) {
                 paddingTop: 12,
                 paddingBottom: 12,
                 paddingLeft: i === 0 ? 20 : 12,
-                paddingRight: i === 6 ? 20 : 12,
+                paddingRight: i === 7 ? 20 : 12,
                 borderBottom: "1px solid var(--border)",
                 borderLeft: i > 0 ? "1px solid var(--border)" : undefined,
               }}
@@ -114,10 +132,13 @@ export default async function OnboardingsListPage({ searchParams }) {
             paddingTop: 8,
             paddingBottom: 8,
             paddingLeft: colIdx === 0 ? 20 : 12,
-            paddingRight: colIdx === 6 ? 20 : 12,
+            paddingRight: colIdx === 7 ? 20 : 12,
             borderBottom: isLast ? undefined : "1px solid var(--border-subtle)",
             borderLeft: colIdx > 0 ? "1px solid var(--border)" : undefined,
           });
+          // getOnboardings stringifies ob.id; the count Map keys are numbers
+          // (Prisma's onboardingId is Int). Coerce to keep the lookup honest.
+          const workflowCount = workflowCounts.get(Number(ob.id)) ?? 0;
           return (
             <React.Fragment key={ob.id}>
               {/* Company */}
@@ -213,6 +234,40 @@ export default async function OnboardingsListPage({ searchParams }) {
                   <span style={{ color: "var(--text-muted)" }}>—</span>
                 )}
               </span>
+              {/* Workflows — pending draft count, links to the per-onboarding tab. */}
+              <Link
+                href={`/onboardings/${ob.id}?tab=workflows`}
+                className="flex items-center no-underline"
+                style={cellStyle(7)}
+                aria-label={
+                  workflowCount > 0
+                    ? `${workflowCount} pending workflow ${workflowCount === 1 ? "draft" : "drafts"}`
+                    : "No pending workflow drafts"
+                }
+              >
+                {workflowCount > 0 ? (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minWidth: 22,
+                      height: 22,
+                      padding: "0 7px",
+                      borderRadius: 9999,
+                      background: "var(--action)",
+                      color: "var(--action-text)",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {workflowCount > 99 ? "99+" : workflowCount}
+                  </span>
+                ) : (
+                  <span style={{ color: "var(--text-muted)" }}>—</span>
+                )}
+              </Link>
             </React.Fragment>
           );
         })}

@@ -25,10 +25,15 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status") ?? "pending";
   const limit = Math.min(Number(searchParams.get("limit") ?? 100), 200);
+  const onboardingIdRaw = searchParams.get("onboardingId");
+  const onboardingId = onboardingIdRaw != null ? Number(onboardingIdRaw) : null;
+  if (onboardingIdRaw != null && Number.isNaN(onboardingId)) {
+    return NextResponse.json({ error: "Invalid onboardingId" }, { status: 400 });
+  }
 
   const [drafts, pendingCount] = await Promise.all([
-    listPendingAIChanges({ status, limit, forVendorUserId: vu.id }),
-    countPendingAIChanges({ forVendorUserId: vu.id }),
+    listPendingAIChanges({ status, limit, forVendorUserId: vu.id, onboardingId }),
+    countPendingAIChanges({ forVendorUserId: vu.id, onboardingId }),
   ]);
 
   return NextResponse.json({ drafts, pendingCount });

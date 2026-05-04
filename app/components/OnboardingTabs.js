@@ -61,23 +61,17 @@ const TABS = [
     ),
   },
   {
-    id: "communication",
-    label: "Communication",
+    id: "workflows",
+    label: "Workflows",
     icon: (
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <g clipPath="url(#comms-clip)">
-          <path d="M4.14698 4.78028H9.85428M4.14698 7.31686H7.63477M0.65918 6.04857C0.65918 5.56028 0.667424 5.08277 0.684545 4.62174C0.737179 3.11692 0.763814 2.36419 1.37576 1.74716C1.98771 1.13078 2.762 1.0978 4.30932 1.03122C5.20592 0.993573 6.10323 0.974967 7.00063 0.975411C7.93916 0.975411 8.84282 0.994435 9.69194 1.03122C11.2393 1.0978 12.0129 1.13078 12.6255 1.7478C13.2374 2.36419 13.2641 3.11692 13.3167 4.62174C13.3502 5.57267 13.3502 6.52447 13.3167 7.47539C13.2641 8.98022 13.2374 9.73295 12.6255 10.35C12.0135 10.9664 11.2393 10.9993 9.69194 11.0659C9.22605 11.0858 8.74516 11.1006 8.24926 11.1103C7.77999 11.1192 7.54472 11.123 7.33799 11.2023C7.13126 11.2815 6.95751 11.4293 6.60999 11.7273L5.22819 12.9132C5.16094 12.9708 5.07857 13.0079 4.99085 13.0202C4.90314 13.0324 4.81376 13.0192 4.73331 12.9821C4.65287 12.9451 4.58474 12.8857 4.53702 12.8111C4.48929 12.7365 4.46397 12.6498 4.46405 12.5612V11.0723L4.30932 11.0659C2.762 10.9993 1.98835 10.9664 1.37576 10.3493C0.763814 9.73295 0.737179 8.98022 0.684545 7.47539C0.667729 6.99997 0.659272 6.52429 0.65918 6.04857Z" stroke="currentColor" strokeWidth="0.951217" strokeLinecap="round" strokeLinejoin="round" />
-        </g>
-        <defs>
-          <clipPath id="comms-clip">
-            <rect width="13.999" height="13.999" fill="white" />
-          </clipPath>
-        </defs>
+        <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" fill="currentColor" />
       </svg>
     ),
   },
 ];
 
-export default function OnboardingTabs({ activeTab, onTabChange }) {
-  return <TabBar tabs={TABS} activeTab={activeTab} onTabChange={onTabChange} />;
+export default function OnboardingTabs({ activeTab, onTabChange, badges = {} }) {
+  const tabs = TABS.map((t) => ({ ...t, badge: badges[t.id] }));
+  return <TabBar tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} />;
 }

@@ -29,10 +29,11 @@ import PhaseHeader from "@/app/components/PhaseHeader";
 import OnboardingTabs from "@/app/components/OnboardingTabs";
 import DetailsTab from "@/app/components/DetailsTab";
 import MembersTab from "@/app/components/MembersTab";
-import CommunicationTab from "@/app/components/CommunicationTab";
+import WorkflowsTab from "@/app/components/WorkflowsTab";
 import InsightsPanel from "@/app/components/InsightsPanel";
 import TaskFilterMenu from "@/app/components/TaskFilterMenu";
 import { taskMatchesFilter } from "@/lib/taskFilters";
+import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
 import Tooltip from "@/app/ui/Tooltip";
 
@@ -73,6 +74,7 @@ export default function OnboardingDetailClient({
   phases: initialPhases,
   magicLinks: initialMagicLinks,
   vendorUsers: initialVendorUsers,
+  workflowCount: initialWorkflowCount = 0,
   insightSnapshot,
   insightContextHash,
   cachedInsight,
@@ -92,6 +94,53 @@ export default function OnboardingDetailClient({
   const [mounted, setMounted] = useState(false);
   const [drawerTask, setDrawerTask] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [workflowCount, setWorkflowCount] = useState(initialWorkflowCount);
+
+  // Live-update the Workflows tab badge. Server provides initial count;
+  // we refetch on any PendingAIChange change for this onboarding (insert,
+  // approve, reject), and on window focus as a fallback.
+  useEffect(() => {
+    let cancelled = false;
+    let client = null;
+    let channel = null;
+
+    async function refetchCount() {
+      try {
+        const res = await fetch(
+          `/api/ai-drafts?status=pending&onboardingId=${onboarding.id}&limit=200`,
+          { cache: "no-store" }
+        );
+        if (!res.ok) return;
+        const json = await res.json();
+        if (!cancelled) setWorkflowCount(json.pendingCount ?? 0);
+      } catch {
+        // Silent — badge is best-effort.
+      }
+    }
+
+    function onFocus() { refetchCount(); }
+    window.addEventListener("focus", onFocus);
+
+    (async () => {
+      const supabase = await createSupabaseClient();
+      if (cancelled || !supabase) return;
+      client = supabase;
+      channel = supabase
+        .channel(`onboarding-${onboarding.id}-workflow-count`)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "PendingAIChange" },
+          () => refetchCount()
+        )
+        .subscribe();
+    })();
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("focus", onFocus);
+      if (channel && client) client.removeChannel(channel);
+    };
+  }, [onboarding.id]);
   const drawerRef = useRef(null);
   const tasksRef = useRef(tasks);
   tasksRef.current = tasks;
@@ -423,7 +472,11 @@ export default function OnboardingDetailClient({
       </nav>
 
       {/* Tab bar */}
-      <OnboardingTabs activeTab={activeTab} onTabChange={setTab} />
+      <OnboardingTabs
+        activeTab={activeTab}
+        onTabChange={setTab}
+        badges={{ workflows: workflowCount }}
+      />
 
       {error && (
         <div
@@ -738,9 +791,9 @@ export default function OnboardingDetailClient({
         </div>
       )}
 
-      {activeTab === "communication" && (
-        <div className="flex-1 overflow-y-auto">
-          <CommunicationTab />
+      {activeTab === "workflows" && (
+        <div className="flex-1 overflow-y-auto" style={{ padding: "0 24px" }}>
+          <WorkflowsTab onboardingId={onboarding.id} />
         </div>
       )}
 

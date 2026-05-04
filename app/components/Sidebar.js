@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
   { href: "/", label: "Onboardings", icon: OnboardingsIcon },
-  { href: "/ai-drafts", label: "Vector suggests", icon: SparkleIcon },
+  { href: "/ai-drafts", label: "Workflows", icon: SparkleIcon },
   { href: "/settings", label: "Settings", icon: SettingsIcon },
 ];
 
@@ -110,18 +110,16 @@ export default function Sidebar() {
   const [inboxCount, setInboxCount] = useState(0);
   const dropdownRef = useRef(null);
 
-  // Sidebar inbox-count badge.
-  //   Push: subscribe to PendingAIChange INSERTs via Supabase Realtime
-  //   (mirrors NotificationBell). New Miniti drafts / cron-generated
-  //   follow-ups light up the badge within ~1s.
-  //   Fallback: refetch on window focus, in case the realtime channel
-  //   dropped while the tab was backgrounded. No polling interval —
-  //   focus refetch + push covers it.
+  // Sidebar Workflows badge — counts ambiguous Miniti events that need
+  // manual onboarding assignment. Per-onboarding draft counts moved to the
+  // home table after the per-onboarding Workflows tab landed.
+  //
+  // No polling; refetch on window focus. Ambiguous events are rare, and
+  // when one arrives the user typically lands on the page from a notification
+  // anyway. (If push becomes important later, subscribe to ExternalEvent
+  // UPDATE where matchAmbiguous=true via Realtime.)
   useEffect(() => {
     let cancelled = false;
-    let client = null;
-    let channel = null;
-
     async function fetchCount() {
       try {
         const res = await fetch("/api/ai-drafts/badge", { cache: "no-store" });
@@ -132,30 +130,12 @@ export default function Sidebar() {
         // Silent — badge is best-effort.
       }
     }
-
     fetchCount();
-
     function onFocus() { fetchCount(); }
     window.addEventListener("focus", onFocus);
-
-    (async () => {
-      const supabase = await createClient();
-      if (cancelled || !supabase) return;
-      client = supabase;
-      channel = supabase
-        .channel("ai-drafts-badge")
-        .on(
-          "postgres_changes",
-          { event: "INSERT", schema: "public", table: "PendingAIChange" },
-          () => fetchCount()
-        )
-        .subscribe();
-    })();
-
     return () => {
       cancelled = true;
       window.removeEventListener("focus", onFocus);
-      if (channel && client) client.removeChannel(channel);
     };
   }, []);
 
