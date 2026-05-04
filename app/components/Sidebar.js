@@ -110,11 +110,18 @@ export default function Sidebar() {
   const [inboxCount, setInboxCount] = useState(0);
   const dropdownRef = useRef(null);
 
-  // Poll the Vector-suggests inbox count for the sidebar badge.
-  // 30s is fine — webhook events arrive sporadically and the user can
-  // always click into the inbox to force-refresh.
+  // Sidebar inbox-count badge.
+  //   Push: subscribe to PendingAIChange INSERTs via Supabase Realtime
+  //   (mirrors NotificationBell). New Miniti drafts / cron-generated
+  //   follow-ups light up the badge within ~1s.
+  //   Fallback: refetch on window focus, in case the realtime channel
+  //   dropped while the tab was backgrounded. No polling interval —
+  //   focus refetch + push covers it.
   useEffect(() => {
     let cancelled = false;
+    let client = null;
+    let channel = null;
+
     async function fetchCount() {
       try {
         const res = await fetch("/api/ai-drafts/badge", { cache: "no-store" });
@@ -125,14 +132,30 @@ export default function Sidebar() {
         // Silent — badge is best-effort.
       }
     }
+
     fetchCount();
-    const interval = setInterval(fetchCount, 30_000);
+
     function onFocus() { fetchCount(); }
     window.addEventListener("focus", onFocus);
+
+    (async () => {
+      const supabase = await createClient();
+      if (cancelled || !supabase) return;
+      client = supabase;
+      channel = supabase
+        .channel("ai-drafts-badge")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "PendingAIChange" },
+          () => fetchCount()
+        )
+        .subscribe();
+    })();
+
     return () => {
       cancelled = true;
-      clearInterval(interval);
       window.removeEventListener("focus", onFocus);
+      if (channel && client) client.removeChannel(channel);
     };
   }, []);
 
