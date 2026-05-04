@@ -504,6 +504,22 @@ function FollowupEditor({ draft, busy, onApprove, onReject }) {
   const mailto = buildMailto({ to: initial.to, subject, body });
   const canSend = !busy && subject.trim().length > 0;
 
+  // Copy-to-clipboard fallback for users without a registered mailto handler
+  // (e.g. browser-only Gmail/Outlook users on a fresh Chrome profile). Copies
+  // subject + body so it can be pasted into any compose form.
+  const [copied, setCopied] = useState(false);
+  async function handleCopy() {
+    const text = [subject.trim(), body.trim()].filter(Boolean).join("\n\n");
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Older browsers / non-secure contexts.
+      setSaveError("Couldn't copy — your browser blocked clipboard access.");
+    }
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       {recipient && (
@@ -568,10 +584,21 @@ function FollowupEditor({ draft, busy, onApprove, onReject }) {
         >
           Reject
         </button>
+        <button
+          onClick={handleCopy}
+          disabled={busy || (!subject.trim() && !body.trim())}
+          className="btn-secondary text-sm rounded-lg"
+          style={{ padding: "4px 12px", fontSize: 13, opacity: busy ? 0.5 : 1 }}
+          title="Copy subject + body to clipboard, paste into any mail app"
+        >
+          {copied ? "Copied ✓" : "Copy"}
+        </button>
+        {/* No target="_blank" — mailto:'s protocol handler launches its own
+            tab. Adding target="_blank" + rel="noreferrer" can drop user
+            activation context in Chrome and silently fall back to a Google
+            search of the encoded mailto string. */}
         <a
           href={mailto}
-          target="_blank"
-          rel="noreferrer"
           className="btn-secondary text-sm rounded-lg"
           style={{ padding: "4px 12px", fontSize: 13, textDecoration: "none" }}
         >
