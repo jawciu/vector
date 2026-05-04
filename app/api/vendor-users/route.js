@@ -1,6 +1,6 @@
 /**
  * [GET /api/vendor-users] — list team members (Vector team).
- * [POST /api/vendor-users] — add a team member by name + email.
+ * [POST /api/vendor-users] — invite a team member by name + email. Admin-only.
  *
  * Used by the Owner picker on tasks and the Team section in /settings. Note
  * that POST does NOT create a Supabase auth account; the new member can sign
@@ -9,7 +9,7 @@
 
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { listVendorUsers, createVendorUser } from "@/lib/db";
+import { listVendorUsers, createVendorUser, getOrCreateVendorUser } from "@/lib/db";
 
 export async function GET() {
   const supabase = await createClient();
@@ -24,6 +24,19 @@ export async function POST(request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  // Admin-only — non-admins can't invite teammates.
+  const me = await getOrCreateVendorUser({
+    authUserId: user.id,
+    email: user.email,
+    name: user.user_metadata?.full_name ?? user.email,
+  });
+  if (me.role !== "admin") {
+    return NextResponse.json(
+      { error: "Only admins can invite team members" },
+      { status: 403 }
+    );
+  }
 
   let body;
   try {

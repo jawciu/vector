@@ -30,6 +30,14 @@ export default function AIDraftInbox({ initialDrafts, mode = "pending" }) {
   const [errors, setErrors] = useState({});
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [editingId, setEditingId] = useState(null);
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
+
+  function flashToast(message) {
+    setToast(message);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 4000);
+  }
 
   const isPending = mode === "pending";
 
@@ -79,6 +87,9 @@ export default function AIDraftInbox({ initialDrafts, mode = "pending" }) {
         next.delete(draft.id);
         return next;
       });
+      if (draft.action === "draft_followup") {
+        flashToast("Sent — comment posted on task");
+      }
     } catch (err) {
       setErrors((e) => ({ ...e, [draft.id]: err.message }));
     } finally {
@@ -124,6 +135,7 @@ export default function AIDraftInbox({ initialDrafts, mode = "pending" }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12, position: "relative" }}>
+      {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
       {isPending && selectedIds.size > 0 && (
         <BulkActionBar
           count={selectedIds.size}
@@ -238,6 +250,38 @@ function DraftGroup({
           />
         ))}
       </div>
+    </div>
+  );
+}
+
+/** Transient confirmation banner — shown for ~4s after Send-to-portal. */
+function Toast({ message, onDismiss }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      onClick={onDismiss}
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 6,
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        padding: "8px 12px",
+        background: "var(--bg-elevated)",
+        border: "1px solid var(--success, #5cd6a5)",
+        borderRadius: 8,
+        fontSize: 13,
+        color: "var(--text)",
+        cursor: "pointer",
+      }}
+    >
+      <span style={{ color: "var(--success, #5cd6a5)" }}>✓</span>
+      <span>{message}</span>
+      <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--text-muted)" }}>
+        See <a href="/ai-drafts?status=applied" style={{ color: "var(--action)" }} onClick={(e) => e.stopPropagation()}>Applied</a>
+      </span>
     </div>
   );
 }

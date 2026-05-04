@@ -21,12 +21,19 @@ export async function DELETE(_request, { params }) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Don't let users delete themselves — would lock them out of their own data.
+  // Admin-only — and admins can't delete themselves either (would lock them
+  // out, and the last admin removing themselves would orphan the project).
   const me = await getOrCreateVendorUser({
     authUserId: user.id,
     email: user.email,
     name: user.user_metadata?.full_name ?? user.email,
   });
+  if (me.role !== "admin") {
+    return NextResponse.json(
+      { error: "Only admins can remove team members" },
+      { status: 403 }
+    );
+  }
   if (me.id === id) {
     return NextResponse.json({ error: "Can't delete yourself" }, { status: 400 });
   }
