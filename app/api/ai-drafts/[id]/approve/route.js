@@ -5,8 +5,10 @@
  * createComment call, records the appliedTaskId, marks the draft applied.
  *
  * Optional body: { overrides: {...} } — when Caroline edited fields before
- * approving (UI's "Edit then approve" path), those overrides are merged into
- * the payload before execution.
+ * approving (UI's "Edit then approve" / `draft_followup` Send-to-portal path),
+ * those overrides are merged into the payload before execution. `taskId` is
+ * NOT overridable — it's set at draft-creation time and acts as a security
+ * boundary (the draft's target task must belong to draft.onboardingId).
  */
 
 import { NextResponse } from "next/server";
@@ -14,6 +16,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   getPendingAIChange,
   markAIChangeApplied,
+  markAIChangeRejected,
+  getTaskOnboardingId,
   createTask,
   updateTask,
   createComment,
@@ -40,7 +44,9 @@ export async function POST(request, { params }) {
 
     let body = {};
     try { body = await request.json(); } catch { /* empty body is fine */ }
-    const overrides = body?.overrides ?? {};
+    // taskId is never overridable — it's a security boundary, not user data.
+    const overrides = { ...(body?.overrides ?? {}) };
+    delete overrides.taskId;
 
     // Resolve the approver's VendorUser so we can record resolvedBy.
     const vu = await getOrCreateVendorUser({
@@ -50,11 +56,28 @@ export async function POST(request, { params }) {
     });
     const actor = { type: "vendor", vendorUserId: vu.id };
 
+    // Helper: assert the draft's referenced task belongs to draft.onboardingId.
+    // If the task is missing or moved, auto-resolve the draft so it doesn't
+    // get stuck in pending forever.
+    async function assertTaskBelongs(taskId) {
+      const obId = await getTaskOnboardingId(taskId);
+      if (obId == null) {
+        await markAIChangeRejected(draftId, {
+          resolvedBy: vu.id,
+          reason: "task no longer exists",
+        });
+        return { ok: false, status: 410, error: "Target task no longer exists; draft auto-rejected" };
+      }
+      if (obId !== draft.onboardingId) {
+        return { ok: false, status: 400, error: "Draft's target task doesn't belong to its onboarding" };
+      }
+      return { ok: true };
+    }
+
     let appliedTaskId = null;
 
     if (draft.action === "create_task") {
       const merged = { ...draft.payload, ...overrides };
-      // Map "owner: vendor|customer" → DB columns. v1: vendor → ownerId=vu, customer → leave unassigned (Caroline assigns a contact later).
       const taskData = {
         onboardingId: draft.onboardingId,
         phaseId: merged.phaseId,
@@ -68,7 +91,10 @@ export async function POST(request, { params }) {
       appliedTaskId = task.id;
     } else if (draft.action === "match_existing") {
       const merged = { ...draft.payload, ...overrides };
-      const targetId = merged.taskId;
+      const targetId = draft.payload?.taskId;
+      const check = await assertTaskBelongs(targetId);
+      if (!check.ok) return NextResponse.json({ error: check.error }, { status: check.status });
+
       if (merged.action === "comment_only" && merged.commentBody) {
         await createComment(targetId, vu.name, merged.commentBody, { actor });
       } else if (merged.action === "reprioritise" && merged.newPriority) {
@@ -76,7 +102,6 @@ export async function POST(request, { params }) {
       } else if (merged.action === "update_due_date" && merged.newDueDate) {
         await updateTask(targetId, { due: merged.newDueDate }, { actor });
       } else if (merged.action === "reassign") {
-        // v1: leave assignment to manual flow — record a comment instead.
         await createComment(
           targetId,
           vu.name,
@@ -87,33 +112,31 @@ export async function POST(request, { params }) {
       appliedTaskId = targetId;
     } else if (draft.action === "update_status") {
       const merged = { ...draft.payload, ...overrides };
-      await updateTask(merged.taskId, { status: merged.newStatus }, { actor });
-      appliedTaskId = merged.taskId;
+      const targetId = draft.payload?.taskId;
+      const check = await assertTaskBelongs(targetId);
+      if (!check.ok) return NextResponse.json({ error: check.error }, { status: check.status });
+      await updateTask(targetId, { status: merged.newStatus }, { actor });
+      appliedTaskId = targetId;
     } else if (draft.action === "draft_followup") {
-      // Email itself is sent by Caroline via mailto. Approving mirrors the
-      // message as a portal-visible comment so the customer can see what
-      // was said and the vendor team has a per-task communication trail.
-      // Comment is attributed to the task owner (whose voice the email is
-      // in), not the approver.
+      // "Send to portal" — publishes the email body as a Comment visible in
+      // the customer portal. Caroline sends the actual email via mailto from
+      // the inbox UI; this path only mirrors the content.
+      // Comment is attributed to the task owner (whose voice the email is in)
+      // and reads cleanly without vendor-side scaffolding: subject becomes
+      // the first line if present, then the body. Empty parts are omitted.
       const merged = { ...draft.payload, ...overrides };
-      const targetTaskId = merged.taskId;
-      if (targetTaskId) {
-        const author = merged.fromName || vu.name;
-        const recipient = merged.toName || merged.to || "the customer";
-        const body = [
-          `📧 Sent follow-up to ${recipient}:`,
-          "",
-          `Subject: ${merged.subject ?? "(no subject)"}`,
-          "",
-          merged.body ?? "",
-        ].join("\n");
-        try {
-          await createComment(targetTaskId, author, body, { actor });
-        } catch (err) {
-          console.warn("[approve draft_followup] mirror comment failed", err);
-        }
-        appliedTaskId = targetTaskId;
+      const targetTaskId = draft.payload?.taskId;
+      const check = await assertTaskBelongs(targetTaskId);
+      if (!check.ok) return NextResponse.json({ error: check.error }, { status: check.status });
+
+      const author = merged.fromName || vu.name;
+      const subject = (merged.subject ?? "").trim();
+      const bodyText = (merged.body ?? "").trim();
+      const commentBody = [subject, bodyText].filter(Boolean).join("\n\n");
+      if (commentBody) {
+        await createComment(targetTaskId, author, commentBody, { actor });
       }
+      appliedTaskId = targetTaskId;
     } else {
       return NextResponse.json(
         { error: `Unknown action ${draft.action}` },

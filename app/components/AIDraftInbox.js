@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 
 /**
@@ -398,7 +398,15 @@ function DraftCard({
         />
       )}
 
-      {isFollowup && <FollowupBody payload={payload} /> }
+      {isFollowup && isPending && (
+        <FollowupEditor
+          draft={draft}
+          busy={busy}
+          onApprove={onApprove}
+          onReject={onReject}
+        />
+      )}
+      {isFollowup && !isPending && <FollowupBodyReadonly payload={payload} />}
 
       {error && (
         <div
@@ -414,7 +422,7 @@ function DraftCard({
         </div>
       )}
 
-      {isPending && !editing && (
+      {isPending && !editing && !isFollowup && (
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
           <button
             onClick={onReject}
@@ -434,24 +442,13 @@ function DraftCard({
               Edit
             </button>
           )}
-          {isFollowup && (
-            <a
-              href={buildMailto(payload)}
-              target="_blank"
-              rel="noreferrer"
-              className="btn-secondary text-sm rounded-lg"
-              style={{ padding: "4px 12px", fontSize: 13, textDecoration: "none" }}
-            >
-              Open in mail ↗
-            </a>
-          )}
           <button
             onClick={() => onApprove({})}
             disabled={busy}
             className="btn-primary text-sm rounded-lg"
             style={{ padding: "4px 14px", opacity: busy ? 0.5 : 1, fontSize: 13, fontWeight: 600 }}
           >
-            {busy ? "…" : isFollowup ? "Mark sent" : "Approve →"}
+            {busy ? "…" : "Approve →"}
           </button>
         </div>
       )}
@@ -459,8 +456,145 @@ function DraftCard({
   );
 }
 
-function FollowupBody({ payload }) {
-  const { subject, body, to, toName, fromName, fromEmail } = payload ?? {};
+/**
+ * Editable view of a pending draft_followup. Owns subject/body local state,
+ * autosaves to /api/ai-drafts/[id] on edit (debounced 800ms), and renders
+ * its own action row (Reject / Open in mail / Send to portal). Send-to-portal
+ * passes current local state as `overrides` so the action doesn't depend on
+ * the in-flight autosave.
+ */
+function FollowupEditor({ draft, busy, onApprove, onReject }) {
+  const initial = draft.payload ?? {};
+  const [subject, setSubject] = useState(initial.subject ?? "");
+  const [body, setBody] = useState(initial.body ?? "");
+  const [saveError, setSaveError] = useState(null);
+  const saveTimer = useRef(null);
+  const lastSaved = useRef({ subject: initial.subject ?? "", body: initial.body ?? "" });
+
+  // Debounced autosave. We don't show a "saving…" indicator (silent by
+  // request); only surface a banner if the save fails.
+  useEffect(() => {
+    if (subject === lastSaved.current.subject && body === lastSaved.current.body) {
+      return;
+    }
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/ai-drafts/${draft.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ payload: { subject, body } }),
+        });
+        if (!res.ok && res.status !== 204) {
+          const errBody = await res.json().catch(() => ({}));
+          throw new Error(errBody.error || `Autosave failed (${res.status})`);
+        }
+        lastSaved.current = { subject, body };
+        setSaveError(null);
+      } catch (err) {
+        setSaveError(err.message);
+      }
+    }, 800);
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, [subject, body, draft.id]);
+
+  const recipient = initial.toName || initial.to || null;
+  const mailto = buildMailto({ to: initial.to, subject, body });
+  const canSend = !busy && subject.trim().length > 0;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {recipient && (
+        <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
+          → To: <span style={{ color: "var(--text-secondary)" }}>{recipient}</span>
+          {initial.to && initial.toName && (
+            <span style={{ color: "var(--text-muted)" }}> &lt;{initial.to}&gt;</span>
+          )}
+        </div>
+      )}
+      <input
+        type="text"
+        value={subject}
+        onChange={(e) => setSubject(e.target.value)}
+        disabled={busy}
+        placeholder="Subject"
+        aria-label="Subject"
+        style={{
+          width: "100%",
+          padding: "8px 12px",
+          fontSize: 13,
+          fontWeight: 500,
+          background: "var(--bg-elevated)",
+          color: "var(--text)",
+          border: "1px solid var(--border)",
+          borderRadius: 6,
+          outline: "none",
+        }}
+      />
+      <textarea
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+        disabled={busy}
+        rows={6}
+        placeholder="Body"
+        aria-label="Body"
+        style={{
+          width: "100%",
+          padding: "10px 12px",
+          fontSize: 13,
+          fontFamily: "inherit",
+          background: "var(--bg-elevated)",
+          color: "var(--text)",
+          border: "1px solid var(--border)",
+          borderRadius: 6,
+          outline: "none",
+          resize: "vertical",
+          lineHeight: 1.5,
+        }}
+      />
+      {saveError && (
+        <div role="alert" style={{ fontSize: 11, color: "var(--danger)" }}>
+          Couldn&rsquo;t autosave: {saveError}
+        </div>
+      )}
+      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", flexWrap: "wrap" }}>
+        <button
+          onClick={onReject}
+          disabled={busy}
+          className="btn-secondary text-sm rounded-lg"
+          style={{ padding: "4px 12px", opacity: busy ? 0.5 : 1, fontSize: 13 }}
+        >
+          Reject
+        </button>
+        <a
+          href={mailto}
+          target="_blank"
+          rel="noreferrer"
+          className="btn-secondary text-sm rounded-lg"
+          style={{ padding: "4px 12px", fontSize: 13, textDecoration: "none" }}
+        >
+          Open in mail ↗
+        </a>
+        <button
+          onClick={() => onApprove({ subject, body })}
+          disabled={!canSend}
+          className="btn-primary text-sm rounded-lg"
+          style={{ padding: "4px 14px", opacity: !canSend ? 0.5 : 1, fontSize: 13, fontWeight: 600 }}
+          title="Publishes the email body as a Comment visible in the customer portal."
+        >
+          {busy ? "…" : "Send to portal →"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** Read-only render for applied/rejected follow-ups — shows what was sent. */
+function FollowupBodyReadonly({ payload }) {
+  const { subject, body, to, toName } = payload ?? {};
+  const recipient = toName || to || null;
   return (
     <div
       style={{
@@ -474,17 +608,12 @@ function FollowupBody({ payload }) {
         fontSize: 12,
       }}
     >
-      <div style={{ display: "flex", gap: 12, color: "var(--text-muted)" }}>
-        <span><strong style={{ color: "var(--text-secondary)" }}>From:</strong> {fromName ?? "(unknown)"}{fromEmail ? ` <${fromEmail}>` : ""}</span>
-      </div>
-      <div style={{ display: "flex", gap: 12, color: "var(--text-muted)" }}>
-        <span><strong style={{ color: "var(--text-secondary)" }}>To:</strong> {toName ?? to ?? "(no contact email)"}{to && toName ? ` <${to}>` : ""}</span>
-      </div>
-      {subject && (
-        <div style={{ color: "var(--text)", fontWeight: 500 }}>
-          {subject}
+      {recipient && (
+        <div style={{ color: "var(--text-muted)" }}>
+          → To: <span style={{ color: "var(--text-secondary)" }}>{recipient}</span>
         </div>
       )}
+      {subject && <div style={{ color: "var(--text)", fontWeight: 500 }}>{subject}</div>}
       {body && (
         <div style={{ color: "var(--text-secondary)", whiteSpace: "pre-wrap", lineHeight: 1.5 }}>
           {body}
@@ -494,15 +623,17 @@ function FollowupBody({ payload }) {
   );
 }
 
-function buildMailto(payload) {
-  const to = payload?.to ?? "";
-  const subject = payload?.subject ?? "";
-  const body = payload?.body ?? "";
+/** Build a mailto: URL. The recipient address goes in unencoded (per RFC
+ *  6068 — percent-encoding the address breaks some clients including
+ *  Thunderbird and addresses with `+` aliases). Subject/body params ARE
+ *  encoded via URLSearchParams. */
+function buildMailto({ to, subject, body }) {
+  const recipient = to ?? "";
   const params = new URLSearchParams();
   if (subject) params.set("subject", subject);
   if (body) params.set("body", body);
   const qs = params.toString();
-  return `mailto:${encodeURIComponent(to)}${qs ? `?${qs}` : ""}`;
+  return `mailto:${recipient}${qs ? `?${qs}` : ""}`;
 }
 
 function EditCreateTaskForm({ draft, busy, onCancel, onSave }) {
