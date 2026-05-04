@@ -138,6 +138,7 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
 
   return (
     <div
+      className="pi-card"
       style={{
         margin: "12px 16px 0",
         borderRadius: 20,
@@ -188,7 +189,7 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
         </button>
       </div>
 
-      <hr className="ai-divider" />
+      <hr style={{ height: 1, width: "100%", border: 0, background: "var(--border-subtle)", margin: 0 }} />
 
       {error && (
         <div
@@ -205,39 +206,40 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
         </div>
       )}
 
-      {/* Body — three columns */}
-      <div style={{ display: "flex", alignItems: "stretch", gap: 16, padding: "0 16px" }}>
-        <Section title="Summary" style={{ flex: "0 0 288px", paddingTop: 16, paddingBottom: 16 }}>
-          <p style={{ fontSize: 14, lineHeight: "18px", color: "var(--text)", margin: 0 }}>
-            {summary}
-          </p>
+      {/* Body — three columns, reflows via container queries (see globals.css). */}
+      <div className="pi-body">
+        <Section title="Summary" className="pi-section pi-section--summary">
+          <div className="pi-section-body">
+            <p style={{ fontSize: 14, lineHeight: "18px", color: "var(--text)", margin: 0 }}>
+              {summary}
+            </p>
+          </div>
         </Section>
 
-        <VerticalDivider />
-
-        <Section title={priorityHeading} style={{ flex: 1, padding: "16px 0" }}>
-          {priorityItems.length === 0 ? (
-            <EmptyMessage>{payload ? "Nothing flagged right now." : "Generating…"}</EmptyMessage>
-          ) : (
-            <div style={{ display: "flex", gap: 0, borderRadius: 12, overflow: "hidden" }}>
-              {priorityItems.slice(0, 3).map((item, i) => (
-                <PriorityCard
-                  key={item.onboardingId}
-                  onboardingId={item.onboardingId}
-                  company={companyById.get(item.onboardingId) ?? `Onboarding #${item.onboardingId}`}
-                  issues={item.issues ?? []}
-                  position={cardPosition(i, priorityItems.length)}
-                />
-              ))}
-            </div>
-          )}
+        <Section title={priorityHeading} className="pi-section pi-section--risk">
+          <div className="pi-section-body">
+            {priorityItems.length === 0 ? (
+              <EmptyMessage>{payload ? "Nothing flagged right now." : "Generating…"}</EmptyMessage>
+            ) : (
+              <div style={{ display: "flex", gap: 0, borderRadius: 12, overflow: "hidden", flex: 1, alignItems: "stretch" }}>
+                {priorityItems.slice(0, 3).map((item, i) => (
+                  <PriorityCard
+                    key={item.onboardingId}
+                    onboardingId={item.onboardingId}
+                    company={companyById.get(item.onboardingId) ?? `Onboarding #${item.onboardingId}`}
+                    issues={item.issues ?? []}
+                    position={cardPosition(i, priorityItems.length)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </Section>
 
         {wins.length > 0 && (
-          <>
-            <VerticalDivider />
-            <Section title="Wins" style={{ flex: 1, padding: "16px 0" }}>
-              <div style={{ display: "flex", flexDirection: "column", borderRadius: 12, overflow: "hidden" }}>
+          <Section title="Wins" className="pi-section pi-section--wins">
+            <div className="pi-section-body">
+              <div style={{ display: "flex", flexDirection: "column", borderRadius: 12, overflow: "hidden", flex: 1 }}>
                 {wins.slice(0, 2).map((w, i) => (
                   <WinRow
                     key={`${w.onboardingId}-${i}`}
@@ -248,17 +250,17 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
                   />
                 ))}
               </div>
-            </Section>
-          </>
+            </div>
+          </Section>
         )}
       </div>
     </div>
   );
 }
 
-function Section({ title, style, children }) {
+function Section({ title, className, children }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "stretch", ...style }}>
+    <div className={className}>
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <span
           style={{
@@ -278,20 +280,6 @@ function Section({ title, style, children }) {
   );
 }
 
-function VerticalDivider() {
-  return (
-    <div
-      aria-hidden="true"
-      style={{
-        width: 1,
-        alignSelf: "stretch",
-        background: "var(--ai-gradient)",
-        flexShrink: 0,
-      }}
-    />
-  );
-}
-
 function PriorityCard({ onboardingId, company, issues, position }) {
   const radius = {
     left: { borderTopLeftRadius: 12, borderBottomLeftRadius: 12 },
@@ -305,7 +293,7 @@ function PriorityCard({ onboardingId, company, issues, position }) {
       href={`/onboardings/${onboardingId}`}
       style={{
         flex: "1 1 0",
-        minWidth: 0,
+        minWidth: 160,
         textDecoration: "none",
         color: "inherit",
         display: "flex",
@@ -316,13 +304,21 @@ function PriorityCard({ onboardingId, company, issues, position }) {
       }}
       className="priority-card"
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "8px 12px",
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
         <CompanyAvatar name={company} size={16} />
         <span style={{ fontSize: 14, fontWeight: 500, color: "var(--text)", lineHeight: "20px" }}>
           {company}
         </span>
       </div>
-      <div style={{ padding: "4px 12px 16px", display: "flex", flexDirection: "column", gap: 4 }}>
+      <div style={{ padding: "8px 12px 16px", display: "flex", flexDirection: "column", gap: 4 }}>
         <span style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: "18px" }}>Issues</span>
         <div style={{ fontSize: 14, color: "var(--text)", lineHeight: "18px" }}>
           {issues.map((line, i) => (
@@ -347,6 +343,7 @@ function WinRow({ company, detail, position }) {
         alignItems: "flex-start",
         gap: 8,
         padding: "8px 12px",
+        flex: "1 1 0",
         borderTop,
         borderRight: "1px solid var(--border)",
         borderBottom: "1px solid var(--border)",
@@ -392,8 +389,11 @@ function SparkleIcon() {
       <defs>
         {/* Hex stops mirror DESIGN.md aiGradientFrom/aiGradientTo. SVG <stop>
             doesn't reliably resolve CSS custom properties across all browsers,
-            so the values are inlined here. Update both if the tokens change. */}
-        <linearGradient id="vector-sparkle-gradient" x1="0" y1="0" x2="14" y2="14" gradientUnits="userSpaceOnUse">
+            so the values are inlined. Gradient runs vertically across the
+            shape's bounding box so the top tip reads pure purple and the
+            bottom tip reads pure peach (a diagonal sweep on a 4-point star
+            samples mostly the muddy middle). */}
+        <linearGradient id="vector-sparkle-gradient" x1="7" y1="-3" x2="7" y2="15" gradientUnits="userSpaceOnUse">
           <stop offset="0" stopColor="#C098FF" />
           <stop offset="1" stopColor="#FF9C7D" />
         </linearGradient>

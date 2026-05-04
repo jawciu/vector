@@ -419,21 +419,24 @@ a {
   cursor: default;
 }
 
-/* Status pill — outlined (default) and filled variants. Pair with an inline
-   `color` (outlined) or `background` (filled) of the relevant status token. */
+/* Status pill — outlined (default) and filled variants. Same outer
+   dimensions in both variants so they sit on the same baseline as the
+   table health pills. Pair with an inline `color` (outlined) or
+   `background` (filled) of the relevant status token. */
 .status-pill {
   display: inline-flex;
   align-items: center;
   padding: 2px 4px;
   border-radius: 6px;
   font-size: 12px;
+  font-weight: 500;
   line-height: 1;
-  border: 1px solid currentColor;
+  border: 0.5px solid currentColor;
   white-space: nowrap;
 }
 
 .status-pill--filled {
-  border: none;
+  border: 0.5px solid transparent;
   color: var(--text-dark);
 }
 
@@ -456,6 +459,93 @@ a {
 
 .priority-card:hover {
   background: var(--bg-elevated-hover);
+}
+
+/* Portfolio insights hero — responsive section layout.
+   Three breakpoints driven by container queries on the card itself, so the
+   layout adapts to its actual rendered width rather than the viewport.
+     wide   (>1100px): summary | risk | wins
+     medium (>720px) : summary | wins on top, risk full-width below
+     narrow (else)   : summary, risk, wins all stacked
+   Section dividers are borders on the sections, not separate elements, so
+   they can be repositioned per-breakpoint without DOM tricks. */
+.pi-card {
+  container-type: inline-size;
+}
+
+.pi-body {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 3fr) minmax(0, 2fr);
+  grid-template-areas: "summary risk wins";
+  align-items: stretch;
+  padding: 0 16px;
+}
+
+.pi-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  min-width: 0;
+}
+
+.pi-section--summary {
+  grid-area: summary;
+  padding-left: 0;
+  border-right: 1px solid var(--border-subtle);
+}
+.pi-section--risk {
+  grid-area: risk;
+  border-right: 1px solid var(--border-subtle);
+}
+.pi-section--wins {
+  grid-area: wins;
+  padding-right: 0;
+}
+
+/* Inner content area inside each section grows to fill the section
+   vertically, so Risk focus and Wins always end at the same baseline. */
+.pi-section-body {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+}
+
+@container (max-width: 1100px) {
+  .pi-body {
+    grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+    grid-template-areas:
+      "summary wins"
+      "risk    risk";
+  }
+  .pi-section--risk {
+    grid-area: risk;
+    border-right: none;
+    border-top: 1px solid var(--border-subtle);
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+@container (max-width: 720px) {
+  .pi-body {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "summary"
+      "risk"
+      "wins";
+  }
+  .pi-section {
+    padding: 12px 0;
+  }
+  .pi-section--summary {
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .pi-section--risk {
+    border-top: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
 }
 
 /* Add task button */

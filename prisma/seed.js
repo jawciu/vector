@@ -28,6 +28,7 @@ const D = {
 };
 
 async function main() {
+  await prisma.activityLog.deleteMany();
   await prisma.task.deleteMany();
   await prisma.phase.deleteMany();
   await prisma.contact.deleteMany();
@@ -238,12 +239,49 @@ async function main() {
     { onboardingId: ob10.id, phaseId: wo3.id, title: "Post-launch retrospective",       status: "Done", due: D.overdue3d,  owner: "Jordan Cole", priority: "low",    notes: "",                        commentCount: 0 },
   ]});
 
-  const [companyCount, taskCount, phaseCount] = await Promise.all([
+  // Recent completion activity — gives the portfolio insights "wins" section
+  // real events to anchor on (last 7 days). Backdated createdAt so the same
+  // entries spread across the window. Caroline is the actor where she exists.
+  const caroline = await prisma.vendorUser.findUnique({
+    where: { email: "jaworskycaroline@gmail.com" },
+    select: { id: true },
+  });
+  const dayMs = 24 * 60 * 60 * 1000;
+  const winSeeds = [
+    // [onboardingId, taskTitle, daysAgo]
+    [ob3.id, "Stakeholder alignment session", 6],
+    [ob3.id, "Define success metrics",        4],
+    [ob7.id, "Discovery workshop",            5],
+    [ob7.id, "Identify admin users",          2],
+    [ob8.id, "Technical discovery",           3],
+  ];
+  for (const [onboardingId, title, daysAgo] of winSeeds) {
+    const task = await prisma.task.findFirst({
+      where: { onboardingId, title },
+      select: { id: true },
+    });
+    if (!task) continue;
+    await prisma.activityLog.create({
+      data: {
+        onboardingId,
+        actorType: "vendor",
+        actorVendorId: caroline?.id ?? null,
+        verb: "completed",
+        entityType: "task",
+        entityId: task.id,
+        metadata: {},
+        createdAt: new Date(Date.now() - daysAgo * dayMs),
+      },
+    });
+  }
+
+  const [companyCount, taskCount, phaseCount, activityCount] = await Promise.all([
     prisma.company.count(),
     prisma.task.count(),
     prisma.phase.count(),
+    prisma.activityLog.count(),
   ]);
-  console.log(`Seeded: ${companyCount} companies, ${phaseCount} phases, ${taskCount} tasks.`);
+  console.log(`Seeded: ${companyCount} companies, ${phaseCount} phases, ${taskCount} tasks, ${activityCount} activity events.`);
 }
 
 main()
