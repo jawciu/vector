@@ -23,6 +23,8 @@
   --success: #9cffa6;
   --danger: #ff899b;
   --danger-hover: #ffb0bc;
+  --danger-active: #e5677b;
+  --danger-disabled: #80444e;
   --alert: #ffda91;
   --warning: #fbbf24;
   --accent: #22d3ee;
@@ -34,8 +36,11 @@
   --lilac: #b3a5ff;
   --sky: #85c0ff;
   --candy: #ff9ee5;
+  --ai-gradient-to: #ff9c7d;
   --button-secondary-border: #2e2c38;
   --primary: #c098ff;
   --secondary: #f1eaf1;
   --tertiary: #22d3ee;
+  --focus-ring: #c098ff;
+  --ai-gradient-from: #c098ff;
 }

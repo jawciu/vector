@@ -1,25 +1,31 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
+import CompanyAvatar from "@/app/ui/CompanyAvatar";
 
 const SOFT_TTL_MS = 4 * 60 * 60 * 1000;
 
 /**
- * Compact AI hero card on the onboardings home dashboard. Same SSE
- * streaming flow as InsightsPanel but with a tighter layout suited to
- * sitting above the onboardings table.
+ * AI hero card on the onboardings home dashboard.
  *
- * Props:
- *   snapshot      — Layer 1 portfolio snapshot (built server-side)
- *   contextHash   — hash of the snapshot
- *   cachedInsight — { contextHash, payload, generatedAt } | null
+ * Layout: PORTFOLIO TODAY header + status pill, then three columns
+ * (Summary / Risk focus or Focus this week / Wins) separated by AI-gradient
+ * dividers. Streams via SSE through /api/insights/portfolio/all.
  */
 export default function PortfolioInsightsHero({ snapshot, contextHash, cachedInsight }) {
-  const [payload, setPayload] = useState(cachedInsight?.payload ?? null);
+  const companyById = useMemo(() => {
+    const m = new Map();
+    for (const o of snapshot?.onboardings ?? []) m.set(o.id, o.company);
+    return m;
+  }, [snapshot]);
+
+  const [payload, setPayload] = useState(() =>
+    isNewShape(cachedInsight?.payload) ? cachedInsight.payload : null
+  );
   const [streamingText, setStreamingText] = useState("");
   const [status, setStatus] = useState(() => {
-    if (!cachedInsight) return "needs-generate";
+    if (!cachedInsight || !isNewShape(cachedInsight.payload)) return "needs-generate";
     if (cachedInsight.contextHash !== contextHash) return "stale";
     const age = Date.now() - new Date(cachedInsight.generatedAt).getTime();
     return age > SOFT_TTL_MS ? "stale" : "fresh";
@@ -121,58 +127,60 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
 
   const isStreaming = status === "streaming";
   const showStreamingText = isStreaming && !payload;
-  const headline = showStreamingText
-    ? extractField(streamingText, "headline") || "Generating…"
-    : payload?.headline || "—";
-  const tldr = showStreamingText
-    ? extractField(streamingText, "tldr") || ""
-    : payload?.tldr || "";
+  const summary = showStreamingText
+    ? extractField(streamingText, "summary") || "Generating…"
+    : payload?.summary || "—";
+  const portfolioStatus = payload?.status ?? null;
+  const priorityMode = payload?.priority?.mode ?? null;
+  const priorityItems = payload?.priority?.items ?? [];
+  const wins = payload?.wins ?? [];
+  const priorityHeading = priorityMode === "focus" ? "Focus this week" : "Risk focus";
 
   return (
     <div
       style={{
         margin: "12px 16px 0",
-        padding: "16px 20px",
-        borderRadius: 10,
-        background: "var(--surface)",
-        border: "1px solid var(--border)",
+        borderRadius: 20,
+        border: "1px solid var(--button-secondary-border)",
+        background: "var(--bg)",
         display: "flex",
         flexDirection: "column",
-        gap: 12,
       }}
     >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 16px 12px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <SparkleIcon />
-            <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 0.6, color: "var(--text-muted)" }}>
-              Vector — across all onboardings
+            <span
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                letterSpacing: "0.6px",
+                textTransform: "uppercase",
+                color: "var(--text)",
+                lineHeight: "16.5px",
+              }}
+            >
+              Portfolio today
             </span>
-            {payload?.trend && <TrendPill trend={payload.trend} />}
-            {isStreaming && payload && (
-              <span style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>
-                regenerating…
-              </span>
-            )}
           </div>
-          <h2 style={{ fontSize: 17, fontWeight: 600, color: "var(--text)", margin: 0, lineHeight: 1.3 }}>
-            {headline}
-          </h2>
-          {tldr && (
-            <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: "4px 0 0", lineHeight: 1.5 }}>
-              {tldr}
-            </p>
+          {portfolioStatus && <StatusPill status={portfolioStatus} />}
+          {isStreaming && payload && (
+            <span style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>
+              regenerating…
+            </span>
           )}
         </div>
         <button
           onClick={regenerate}
           disabled={isStreaming}
+          aria-label="Regenerate"
           className="btn-secondary text-sm rounded-lg"
           style={{
             padding: "4px 10px",
             opacity: isStreaming ? 0.5 : 1,
             cursor: isStreaming ? "default" : "pointer",
-            flexShrink: 0,
             fontSize: 12,
           }}
         >
@@ -180,9 +188,12 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
         </button>
       </div>
 
+      <hr className="ai-divider" />
+
       {error && (
         <div
           style={{
+            margin: 16,
             fontSize: 12,
             color: "var(--danger)",
             background: "rgba(255, 137, 155, 0.1)",
@@ -194,115 +205,213 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
         </div>
       )}
 
-      {payload && (payload.focusToday?.length > 0 || payload.risks?.length > 0) && (
-        <div
+      {/* Body — three columns */}
+      <div style={{ display: "flex", alignItems: "stretch", gap: 16, padding: "0 16px" }}>
+        <Section title="Summary" style={{ flex: "0 0 288px", paddingTop: 16, paddingBottom: 16 }}>
+          <p style={{ fontSize: 14, lineHeight: "18px", color: "var(--text)", margin: 0 }}>
+            {summary}
+          </p>
+        </Section>
+
+        <VerticalDivider />
+
+        <Section title={priorityHeading} style={{ flex: 1, padding: "16px 0" }}>
+          {priorityItems.length === 0 ? (
+            <EmptyMessage>{payload ? "Nothing flagged right now." : "Generating…"}</EmptyMessage>
+          ) : (
+            <div style={{ display: "flex", gap: 0, borderRadius: 12, overflow: "hidden" }}>
+              {priorityItems.slice(0, 3).map((item, i) => (
+                <PriorityCard
+                  key={item.onboardingId}
+                  onboardingId={item.onboardingId}
+                  company={companyById.get(item.onboardingId) ?? `Onboarding #${item.onboardingId}`}
+                  issues={item.issues ?? []}
+                  position={cardPosition(i, priorityItems.length)}
+                />
+              ))}
+            </div>
+          )}
+        </Section>
+
+        {wins.length > 0 && (
+          <>
+            <VerticalDivider />
+            <Section title="Wins" style={{ flex: 1, padding: "16px 0" }}>
+              <div style={{ display: "flex", flexDirection: "column", borderRadius: 12, overflow: "hidden" }}>
+                {wins.slice(0, 2).map((w, i) => (
+                  <WinRow
+                    key={`${w.onboardingId}-${i}`}
+                    company={companyById.get(w.onboardingId) ?? w.headline}
+                    detail={w.detail}
+                    position={i === 0 ? "top" : "bottom"}
+                    isLast={i === wins.length - 1}
+                  />
+                ))}
+              </div>
+            </Section>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Section({ title, style, children }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "stretch", ...style }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <span
           style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 12,
-            paddingTop: 4,
-            borderTop: "1px solid var(--border-subtle)",
-            marginTop: 4,
+            fontSize: 14,
+            fontWeight: 600,
+            letterSpacing: "0.5px",
+            color: "var(--text-muted)",
+            lineHeight: "16.5px",
           }}
         >
-          <FocusList items={payload.focusToday} />
-          <RiskList risks={payload.risks} />
+          {title}
+        </span>
+        <hr className="ai-divider" />
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function VerticalDivider() {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        width: 1,
+        alignSelf: "stretch",
+        background: "var(--ai-gradient)",
+        flexShrink: 0,
+      }}
+    />
+  );
+}
+
+function PriorityCard({ onboardingId, company, issues, position }) {
+  const radius = {
+    left: { borderTopLeftRadius: 12, borderBottomLeftRadius: 12 },
+    middle: {},
+    right: { borderTopRightRadius: 12, borderBottomRightRadius: 12 },
+    only: { borderRadius: 12 },
+  }[position];
+
+  return (
+    <Link
+      href={`/onboardings/${onboardingId}`}
+      style={{
+        flex: "1 1 0",
+        minWidth: 0,
+        textDecoration: "none",
+        color: "inherit",
+        display: "flex",
+        flexDirection: "column",
+        border: "1px solid var(--border)",
+        marginRight: position === "right" || position === "only" ? 0 : -1,
+        ...radius,
+      }}
+      className="priority-card"
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px" }}>
+        <CompanyAvatar name={company} size={16} />
+        <span style={{ fontSize: 14, fontWeight: 500, color: "var(--text)", lineHeight: "20px" }}>
+          {company}
+        </span>
+      </div>
+      <div style={{ padding: "4px 12px 16px", display: "flex", flexDirection: "column", gap: 4 }}>
+        <span style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: "18px" }}>Issues</span>
+        <div style={{ fontSize: 14, color: "var(--text)", lineHeight: "18px" }}>
+          {issues.map((line, i) => (
+            <div key={i}>{line}</div>
+          ))}
         </div>
-      )}
-    </div>
+      </div>
+    </Link>
   );
 }
 
-function FocusList({ items }) {
+function WinRow({ company, detail, position }) {
+  const radius =
+    position === "top"
+      ? { borderTopLeftRadius: 12, borderTopRightRadius: 12 }
+      : { borderBottomLeftRadius: 12, borderBottomRightRadius: 12 };
+  const borderTop = position === "top" ? "1px solid var(--border)" : "none";
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      <h3 style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5, color: "var(--text-muted)", margin: "4px 0" }}>
-        Focus today
-      </h3>
-      {(!items || items.length === 0) ? (
-        <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0 }}>Nothing pressing.</p>
-      ) : (
-        <ul style={{ display: "flex", flexDirection: "column", gap: 4, margin: 0, padding: 0, listStyle: "none" }}>
-          {items.map((item, i) => (
-            <li key={i} style={{ fontSize: 12, lineHeight: 1.5 }}>
-              {item.onboardingId ? (
-                <Link
-                  href={`/onboardings/${item.onboardingId}`}
-                  style={{ color: "var(--text)", textDecoration: "none" }}
-                >
-                  <span style={{ color: "var(--text-muted)", fontFamily: "monospace", fontSize: 10, marginRight: 6 }}>
-                    #{item.onboardingId}
-                  </span>
-                  {item.reason}
-                </Link>
-              ) : (
-                <span style={{ color: "var(--text)" }}>{item.reason}</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 8,
+        padding: "8px 12px",
+        borderTop,
+        borderRight: "1px solid var(--border)",
+        borderBottom: "1px solid var(--border)",
+        borderLeft: "1px solid var(--border)",
+        ...radius,
+      }}
+    >
+      <div style={{ paddingTop: 2 }}>
+        <CompanyAvatar name={company} size={16} />
+      </div>
+      <p style={{ margin: 0, fontSize: 14, fontWeight: 500, lineHeight: "20px", color: "var(--text)" }}>
+        {company}{" "}
+        <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>{detail}</span>
+      </p>
     </div>
   );
 }
 
-function RiskList({ risks }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      <h3 style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5, color: "var(--text-muted)", margin: "4px 0" }}>
-        Top risks
-      </h3>
-      {(!risks || risks.length === 0) ? (
-        <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0 }}>No active risks.</p>
-      ) : (
-        <ul style={{ display: "flex", flexDirection: "column", gap: 4, margin: 0, padding: 0, listStyle: "none" }}>
-          {risks.slice(0, 3).map((r, i) => (
-            <li key={i} style={{ fontSize: 12, lineHeight: 1.5, display: "flex", gap: 6 }}>
-              <SeverityDot severity={r.severity} />
-              <span style={{ color: "var(--text)" }}>
-                {r.onboardingId && (
-                  <Link href={`/onboardings/${r.onboardingId}`} style={{ color: "var(--text-muted)", textDecoration: "none", fontFamily: "monospace", fontSize: 10, marginRight: 6 }}>
-                    #{r.onboardingId}
-                  </Link>
-                )}
-                {r.summary}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-function SeverityDot({ severity }) {
-  const color =
-    severity === "high" ? "var(--danger)" :
-    severity === "medium" ? "var(--alert)" :
-    "var(--text-muted)";
-  return <span style={{ width: 6, height: 6, borderRadius: "50%", background: color, marginTop: 6, flexShrink: 0 }} />;
-}
-
-function TrendPill({ trend }) {
+function StatusPill({ status }) {
   const map = {
-    improving: { label: "↗ improving", color: "var(--success, #5cd6a5)" },
-    stable: { label: "→ stable", color: "var(--text-muted)" },
-    declining: { label: "↘ declining", color: "var(--alert)" },
+    Declining: "var(--danger)",
+    "At risk": "var(--alert)",
+    "On track": "var(--success)",
+    Improving: "var(--mint)",
   };
-  const m = map[trend] || map.stable;
+  const bg = map[status] ?? "var(--text-muted)";
   return (
-    <span style={{ fontSize: 10, color: m.color, padding: "1px 5px", borderRadius: 4, border: `1px solid ${m.color}` }}>
-      {m.label}
+    <span className="status-pill status-pill--filled" style={{ background: bg }}>
+      {status}
     </span>
+  );
+}
+
+function EmptyMessage({ children }) {
+  return (
+    <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0 }}>{children}</p>
   );
 }
 
 function SparkleIcon() {
   return (
-    <svg width="11" height="11" viewBox="0 0 14 14" fill="none" style={{ color: "var(--action)" }}>
-      <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" fill="currentColor" />
+    <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <defs>
+        {/* Hex stops mirror DESIGN.md aiGradientFrom/aiGradientTo. SVG <stop>
+            doesn't reliably resolve CSS custom properties across all browsers,
+            so the values are inlined here. Update both if the tokens change. */}
+        <linearGradient id="vector-sparkle-gradient" x1="0" y1="0" x2="14" y2="14" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#C098FF" />
+          <stop offset="1" stopColor="#FF9C7D" />
+        </linearGradient>
+      </defs>
+      <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" fill="url(#vector-sparkle-gradient)" />
     </svg>
   );
+}
+
+function cardPosition(index, total) {
+  if (total === 1) return "only";
+  if (index === 0) return "left";
+  if (index === total - 1) return "right";
+  return "middle";
+}
+
+function isNewShape(p) {
+  return Boolean(p && typeof p.summary === "string" && p.priority && Array.isArray(p.priority.items));
 }
 
 function extractField(text, key) {

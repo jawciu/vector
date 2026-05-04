@@ -95,21 +95,36 @@ a {
   background: var(--text);
 }
 
+/* Shared focus state for all buttons */
+.icon-btn:focus-visible,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-destructive:focus-visible,
+.text-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 /* Icon button (meatball menu, etc.) */
 .icon-btn {
   color: var(--text-muted);
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.icon-btn:hover {
+.icon-btn:hover:not(:disabled) {
   background-color: var(--bg-hover);
   color: var(--text);
 }
 
-.icon-btn:active,
+.icon-btn:active:not(:disabled),
 .icon-btn--active {
   background-color: var(--surface-hover);
   color: var(--text);
+}
+
+.icon-btn:disabled {
+  color: var(--icon-tertiary);
+  cursor: not-allowed;
 }
 
 /* Secondary button */
@@ -129,7 +144,7 @@ a {
 }
 
 .btn-secondary:disabled {
-  color: var(--text);
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 
@@ -150,6 +165,26 @@ a {
 
 .btn-primary:disabled {
   background-color: var(--action-disabled);
+  cursor: not-allowed;
+}
+
+/* Destructive button */
+.btn-destructive {
+  background-color: var(--danger);
+  color: var(--text-dark);
+  transition: background-color 0.15s ease;
+}
+
+.btn-destructive:hover:not(:disabled) {
+  background-color: var(--danger-hover);
+}
+
+.btn-destructive:active:not(:disabled) {
+  background-color: var(--danger-active);
+}
+
+.btn-destructive:disabled {
+  background-color: var(--danger-disabled);
   cursor: not-allowed;
 }
 
@@ -188,11 +223,16 @@ a {
   transition: color 0.15s ease;
 }
 
+.text-btn:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
 .text-btn-action {
   color: var(--action);
 }
 
-.text-btn-action:hover {
+.text-btn-action:hover:not(:disabled) {
   color: var(--action-hover);
 }
 
@@ -200,7 +240,7 @@ a {
   color: var(--danger);
 }
 
-.text-btn-danger:hover {
+.text-btn-danger:hover:not(:disabled) {
   color: var(--danger-hover);
 }
 
@@ -377,6 +417,45 @@ a {
 /* Health tooltip */
 .health-pill {
   cursor: default;
+}
+
+/* Status pill — outlined (default) and filled variants. Pair with an inline
+   `color` (outlined) or `background` (filled) of the relevant status token. */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 4px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+
+.status-pill--filled {
+  border: none;
+  color: var(--text-dark);
+}
+
+/* AI surface treatment — gradient used on the Vector sparkle and any
+   in-card section dividers that mark output as AI-generated. */
+:root {
+  --ai-gradient: linear-gradient(135deg, var(--ai-gradient-from), var(--ai-gradient-to));
+}
+
+.ai-divider {
+  height: 1px;
+  width: 100%;
+  background: var(--ai-gradient);
+  border: 0;
+}
+
+.priority-card {
+  transition: background 0.15s ease;
+}
+
+.priority-card:hover {
+  background: var(--bg-elevated-hover);
 }
 
 /* Add task button */

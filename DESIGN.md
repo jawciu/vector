@@ -38,8 +38,13 @@ colors:
   success: "#9CFFA6"            # Success — completion, positive state
   danger: "#FF899B"             # Destructive — delete, error
   dangerHover: "#FFB0BC"        # Destructive hover
+  dangerActive: "#E5677B"       # Destructive pressed
+  dangerDisabled: "#80444E"     # Destructive disabled
   alert: "#FFDA91"              # Warning, caution
   warning: "#FBBF24"            # Warning amber (notifications, badges)
+
+  # Focus
+  focusRing: "{colors.action}"  # Outline colour for :focus-visible on interactive elements
 
   # Accent / utility
   accent: "#22D3EE"             # Cyan accent (rare use)
@@ -53,6 +58,12 @@ colors:
   lilac: "#B3A5FF"
   sky: "#85C0FF"
   candy: "#FF9EE5"
+
+  # AI gradient — used for the Vector sparkle, AI-section dividers, and any
+  # surface marking output as AI-generated. Pair `aiGradientFrom` (= action lilac)
+  # with `aiGradientTo` (warm peach) at a 135deg sweep.
+  aiGradientFrom: "{colors.action}"
+  aiGradientTo: "#FF9C7D"
 
   # Component-level
   buttonSecondaryBorder: "#2E2C38"
@@ -179,15 +190,19 @@ Depth is communicated by **background colour layering**, not shadows. The only s
 
 ### `Button` — `app/ui/Button.js`
 
-Variants: `primary` | `secondary`. Sizes: `xs` | `sm` (default).
+Variants: `primary` | `secondary` | `destructive` | `text`. Sizes: `xs` | `sm` (default). Solid variants share `rounded-lg` (8px) and `gap-2` (8px) between leading icon and label.
 - **Primary**: `font-semibold`, uses `.btn-primary` CSS class. Default `action`, hover `actionHover`, active `actionActive`, disabled `actionDisabled`. Text always `actionText`.
 - **Secondary**: `font-normal`, uses `.btn-secondary` CSS class. `surface` background, `border` border, `text` colour. Hover `bgHover`, active `surfaceHover`. Disabled keeps the border but text becomes `textMuted`.
+- **Destructive**: `font-semibold`, uses `.btn-destructive` CSS class. Default `danger`, hover `dangerHover`, active `dangerActive`, disabled `dangerDisabled`. Text always `textDark`. Use only for irreversible actions (delete, revoke).
+- **Text**: inline text-only button via `.text-btn`. Pair with `tone="action"` (default, `action` colour) or `tone="danger"` (`danger` colour). No padding, no background, no radius. Use sparingly for inline actions like Copy / Revoke.
 
 Cancel/dismiss buttons alongside a primary always use `variant="secondary"` at the same size.
 
+All button variants share a `:focus-visible` outline (`2px solid focusRing`, `2px` offset).
+
 ### `IconButton` — `app/ui/IconButton.js`
 
-Small square icon-only buttons (meatball menus, plus icons, close buttons). Fixed at `w-5 h-5` (20×20px). `rounded` (NOT `rounded-full`). Uses `.icon-btn` CSS class. Add `isActive` while the menu it controls is open — applies `.icon-btn--active` (`surfaceHover` background + full `text` colour).
+Small square icon-only buttons (meatball menus, plus icons, close buttons). Fixed at `w-5 h-5` (20×20px). `rounded` (NOT `rounded-full`). Uses `.icon-btn` CSS class. Add `isActive` while the menu it controls is open — applies `.icon-btn--active` (`surfaceHover` background + full `text` colour). Disabled state suppresses hover and dims to `iconTertiary`.
 
 Inner SVGs should be 11–12px and use `currentColor`.
 
@@ -200,6 +215,29 @@ To be migrated to `app/ui/dropdown/` when DS formalises.
 - **`MenuOption`** — menu row. `rounded`, padding `4px 8px`. Hover via `.menu-option` (`bgHover`), active via `.menu-option-active` (`surfaceHover`).
 
 **Every dropdown / popover MUST use `MenuList` + `MenuOption`.** This guarantees the consistent 4px container padding, 4px row gap, hover/active states, and border.
+
+### Status pill — `.status-pill`, `.status-pill--filled`
+
+Small uppercase-or-cased label communicating state. Two variants:
+
+- **`.status-pill`** (default, outlined): transparent background, 1px border in the status colour, text in the status colour. Use inline alongside text or chips.
+- **`.status-pill--filled`**: filled in the status colour, text in `textDark`. Use as a louder header-level status (e.g. the "Declining" pill on `PortfolioInsightsHero`). Same proportions as the default variant: `padding: 2px 4px`, `rounded.sm` (6px), `12px` text.
+
+Status → token mapping (used by Vector trend / portfolio status):
+- `Declining` → `danger`
+- `At risk` → `alert`
+- `On track` → `success`
+- `Improving` → `mint`
+
+### AI surface treatment
+
+When marking output as AI-generated (the Vector sparkle, AI section dividers inside an AI card, hover highlights on AI-actionable items), use the gradient:
+
+```css
+background: linear-gradient(135deg, var(--ai-gradient-from), var(--ai-gradient-to));
+```
+
+For SVG fills the gradient must be inlined as a `<linearGradient>` referencing the two stops. The Vector sparkle is fixed at **16×16** with the gradient applied as the icon fill.
 
 ### TabBar — `app/ui/TabBar.js`
 

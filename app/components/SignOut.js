@@ -42,7 +42,7 @@ export default function SignOut() {
     <button
       type="button"
       onClick={handleSignOut}
-      className="btn-primary w-full h-9 text-center px-3 py-2 rounded-xl text-sm font-bold"
+      className="btn-primary w-full h-9 text-center px-3 py-2 rounded-lg text-sm font-bold"
     >
       Sign out
     </button>

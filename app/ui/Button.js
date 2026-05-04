@@ -4,21 +4,30 @@
  * Button — DS primitive
  *
  * Variants:
- *   primary    — solid purple action button
- *   secondary  — bordered surface button (cancel, dismiss)
+ *   primary     — solid purple action button
+ *   secondary   — bordered surface button (cancel, dismiss)
+ *   destructive — solid danger button (delete, revoke)
+ *   text        — inline text-only button (use with `tone`)
  *
- * Sizes:
+ * Sizes (primary | secondary | destructive only):
  *   xs  — compact inline (py-0.5 px-2 text-xs)
  *   sm  — default (py-1 px-2 text-sm)
+ *
+ * Tone (text variant only):
+ *   action  — purple (default)
+ *   danger  — red/pink
  */
 const SIZE_CLASSES = {
   xs: "py-0.5 px-2 text-xs",
   sm: "py-1 px-2 text-sm",
 };
 
+const SOLID_BASE = "flex items-center gap-2 rounded-lg";
+
 export default function Button({
   variant = "primary",
   size = "sm",
+  tone = "action",
   children,
   className = "",
   ...props
@@ -27,7 +36,7 @@ export default function Button({
     return (
       <button
         type="button"
-        className={`btn-primary flex items-center gap-2 rounded-lg font-semibold ${SIZE_CLASSES[size]} ${className}`}
+        className={`btn-primary ${SOLID_BASE} font-semibold ${SIZE_CLASSES[size]} ${className}`}
         {...props}
       >
         {children}
@@ -39,7 +48,32 @@ export default function Button({
     return (
       <button
         type="button"
-        className={`btn-secondary flex items-center gap-2 rounded-lg font-normal ${SIZE_CLASSES[size]} ${className}`}
+        className={`btn-secondary ${SOLID_BASE} font-normal ${SIZE_CLASSES[size]} ${className}`}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  }
+
+  if (variant === "destructive") {
+    return (
+      <button
+        type="button"
+        className={`btn-destructive ${SOLID_BASE} font-semibold ${SIZE_CLASSES[size]} ${className}`}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  }
+
+  if (variant === "text") {
+    const toneClass = tone === "danger" ? "text-btn-danger" : "text-btn-action";
+    return (
+      <button
+        type="button"
+        className={`text-btn ${toneClass} ${className}`}
         {...props}
       >
         {children}
