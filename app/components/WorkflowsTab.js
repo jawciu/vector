@@ -94,7 +94,21 @@ export default function WorkflowsTab({ onboardingId }) {
   const currentLabel = STATUSES.find((s) => s.id === status)?.label ?? "Pending";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: "16px 0" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 16,
+        padding: "16px 0",
+        // Cap the review column so paragraph prose in follow-up drafts stays
+        // in the readable measure (~70-90 chars). The status filter,
+        // search bar, and draft cards all inherit this width.
+        maxWidth: 720,
+        width: "100%",
+        marginLeft: "auto",
+        marginRight: "auto",
+      }}
+    >
       <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <div ref={menuRef} className="relative">
           <MenuTriggerButton
