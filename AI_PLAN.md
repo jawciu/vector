@@ -41,6 +41,7 @@ Small, valuable improvements that don't need a new phase:
 - **Linear smart nudges (PLAN.md §3.2)** — proactive suggestions: "this task has been blocked for 5 days — want to follow up?". Some scaffolding exists via the `nudges[]` field on insights.
 - **"Reprocess all stuck events" button** — currently per-row. Bulk version saves clicks if Vercel killed several in a row.
 - **Edit-before-approve audit trail** — when vendor edits a draft before approving, store the diff so we can analyse "what does Vector get wrong?" later.
+- **Tone of voice — user-customisable per vendor** — currently every follow-up draft generates with `tone: "friendly"` (hardcoded in `lib/ai/scan-stale.js`). The follow-up card already reads `payload.tone` and renders it in the meta row, so plumbing is half done. Future: settings UI for the vendor to pick a default tone (friendly / firmer / escalation) and optionally a custom voice ("warm but direct, no 'I hope you're well'"); store on `VendorUser`; pass through to the follow-up prompt.
 
 ---
 
