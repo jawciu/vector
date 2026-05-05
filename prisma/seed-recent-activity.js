@@ -93,6 +93,32 @@ async function plantTaskUnblocked({ onboardingId, taskTitle, daysAgo, actorVendo
   return { ok: true, taskTitle };
 }
 
+async function plantHealthImprovement({ onboardingId, from, to, daysAgo, actorVendorId }) {
+  if (
+    await alreadyLogged({
+      onboardingId,
+      verb: "health_flipped",
+      entityType: "onboarding",
+      entityId: onboardingId,
+    })
+  ) {
+    return { skipped: "exists" };
+  }
+  await prisma.activityLog.create({
+    data: {
+      onboardingId,
+      actorType: "vendor",
+      actorVendorId,
+      verb: "health_flipped",
+      entityType: "onboarding",
+      entityId: onboardingId,
+      metadata: { from, to },
+      createdAt: new Date(Date.now() - daysAgo * DAY_MS),
+    },
+  });
+  return { ok: true };
+}
+
 async function plantContactFirstLogin({ onboardingId, daysAgo, actorVendorId }) {
   // Find any contact for this onboarding without an existing link_activated
   // activity. Create or reuse a magic link to anchor the row.
@@ -191,6 +217,19 @@ async function main() {
         onboardingId: byCompany.get("Wayne Industries"),
         taskTitle: "Identify admin users",
         daysAgo: 3,
+        actorVendorId,
+      })]);
+  }
+
+  // Globex Industries — health flip from At risk → On track to demo
+  // the health_improved win kind.
+  if (byCompany.has("Globex Industries")) {
+    results.push(["Globex/health_improved",
+      await plantHealthImprovement({
+        onboardingId: byCompany.get("Globex Industries"),
+        from: "At risk",
+        to: "On track",
+        daysAgo: 2,
         actorVendorId,
       })]);
   }

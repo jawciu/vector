@@ -2,6 +2,8 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
+import Tooltip from "@/app/ui/Tooltip";
+import { DependenciesIcon } from "@/app/ui/Icons";
 
 /**
  * "Vector suggests" inbox — list of PendingAIChange rows.
@@ -31,6 +33,7 @@ export default function AIDraftInbox({ initialDrafts, mode = "pending" }) {
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [editingId, setEditingId] = useState(null);
   const [toast, setToast] = useState(null);
+  const [query, setQuery] = useState("");
   const toastTimer = useRef(null);
 
   function flashToast(message) {
@@ -41,9 +44,27 @@ export default function AIDraftInbox({ initialDrafts, mode = "pending" }) {
 
   const isPending = mode === "pending";
 
+  // Search across task title (linked or payload), follow-up subject,
+  // create_task title, meeting title, and onboarding name. Plain
+  // case-insensitive substring match — list is small.
+  const filteredDrafts = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return drafts;
+    return drafts.filter((d) => {
+      const haystacks = [
+        d.taskTitle,
+        d.payload?.subject,
+        d.payload?.title,
+        d.meetingTitle,
+        d.onboardingName,
+      ];
+      return haystacks.some((s) => typeof s === "string" && s.toLowerCase().includes(q));
+    });
+  }, [drafts, query]);
+
   // Group drafts by sourceEventId so we can show a "reject all from meeting"
   // header when 2+ drafts came from the same Miniti transcript.
-  const groups = useMemo(() => groupDraftsByEvent(drafts), [drafts]);
+  const groups = useMemo(() => groupDraftsByEvent(filteredDrafts), [filteredDrafts]);
 
   function setBusy(id, busy) {
     setBusyIds((prev) => {
@@ -136,12 +157,31 @@ export default function AIDraftInbox({ initialDrafts, mode = "pending" }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12, position: "relative" }}>
       {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
+      <SearchBar
+        value={query}
+        onChange={setQuery}
+        resultCount={filteredDrafts.length}
+        totalCount={drafts.length}
+      />
       {isPending && selectedIds.size > 0 && (
         <BulkActionBar
           count={selectedIds.size}
           onReject={() => handleBulkReject(Array.from(selectedIds), "bulk reject")}
           onClear={clearSelection}
         />
+      )}
+
+      {filteredDrafts.length === 0 && drafts.length > 0 && (
+        <div
+          style={{
+            padding: "24px 16px",
+            textAlign: "center",
+            color: "var(--text-muted)",
+            fontSize: 13,
+          }}
+        >
+          No drafts match &ldquo;{query}&rdquo;.
+        </div>
       )}
 
       {groups.map((group) => (
@@ -233,22 +273,34 @@ function DraftGroup({
         </div>
       )}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {group.drafts.map((draft) => (
-          <DraftCard
-            key={draft.id}
-            draft={draft}
-            mode={mode}
-            busy={busyIds.has(draft.id)}
-            error={errors[draft.id]}
-            selected={selectedIds.has(draft.id)}
-            editing={editingId === draft.id}
-            onToggleSelect={() => onToggleSelect(draft.id)}
-            onApprove={(overrides) => onApprove(draft, overrides)}
-            onReject={() => onReject(draft, null)}
-            onStartEdit={() => onStartEdit(draft.id)}
-            onCancelEdit={onCancelEdit}
-          />
-        ))}
+        {group.drafts.map((draft) =>
+          draft.action === "draft_followup" ? (
+            <FollowupCard
+              key={draft.id}
+              draft={draft}
+              mode={mode}
+              busy={busyIds.has(draft.id)}
+              error={errors[draft.id]}
+              onApprove={(overrides) => onApprove(draft, overrides)}
+              onReject={() => onReject(draft, null)}
+            />
+          ) : (
+            <DraftCard
+              key={draft.id}
+              draft={draft}
+              mode={mode}
+              busy={busyIds.has(draft.id)}
+              error={errors[draft.id]}
+              selected={selectedIds.has(draft.id)}
+              editing={editingId === draft.id}
+              onToggleSelect={() => onToggleSelect(draft.id)}
+              onApprove={(overrides) => onApprove(draft, overrides)}
+              onReject={() => onReject(draft, null)}
+              onStartEdit={() => onStartEdit(draft.id)}
+              onCancelEdit={onCancelEdit}
+            />
+          )
+        )}
       </div>
     </div>
   );
@@ -283,6 +335,64 @@ function Toast({ message, onDismiss }) {
         See <a href="/ai-drafts?status=applied" style={{ color: "var(--action)" }} onClick={(e) => e.stopPropagation()}>Applied</a>
       </span>
     </div>
+  );
+}
+
+function SearchBar({ value, onChange, resultCount, totalCount }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        padding: "8px 12px",
+        background: "var(--bg)",
+        border: "1px solid var(--border)",
+        borderRadius: 10,
+      }}
+    >
+      <SearchIcon />
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Search by task, follow-up title, or meeting…"
+        aria-label="Search drafts"
+        style={{
+          flex: 1,
+          background: "transparent",
+          border: "none",
+          outline: "none",
+          color: "var(--text)",
+          fontSize: 13,
+        }}
+      />
+      {value && (
+        <>
+          <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+            {resultCount} of {totalCount}
+          </span>
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            aria-label="Clear search"
+            className="text-btn"
+            style={{ padding: "2px 6px", fontSize: 12, color: "var(--text-muted)" }}
+          >
+            Clear
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "var(--text-muted)", flexShrink: 0 }}>
+      <circle cx="6" cy="6" r="4.25" stroke="currentColor" strokeWidth="1.2" />
+      <path d="M9.5 9.5L12 12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
   );
 }
 
@@ -344,7 +454,6 @@ function DraftCard({
   const heading = describeAction(action, payload);
   const meta = describeMeta(action, payload);
   const canEdit = isPending && action === "create_task";
-  const isFollowup = action === "draft_followup";
 
   return (
     <div
@@ -442,16 +551,6 @@ function DraftCard({
         />
       )}
 
-      {isFollowup && isPending && (
-        <FollowupEditor
-          draft={draft}
-          busy={busy}
-          onApprove={onApprove}
-          onReject={onReject}
-        />
-      )}
-      {isFollowup && !isPending && <FollowupBodyReadonly payload={payload} />}
-
       {error && (
         <div
           style={{
@@ -466,7 +565,7 @@ function DraftCard({
         </div>
       )}
 
-      {isPending && !editing && !isFollowup && (
+      {isPending && !editing && (
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
           <button
             onClick={onReject}
@@ -501,23 +600,33 @@ function DraftCard({
 }
 
 /**
- * Editable view of a pending draft_followup. Owns subject/body local state,
- * autosaves to /api/ai-drafts/[id] on edit (debounced 800ms), and renders
- * its own action row (Reject / Open in mail / Send to portal). Send-to-portal
- * passes current local state as `overrides` so the action doesn't depend on
- * the in-flight autosave.
+ * Self-contained follow-up draft card (Vector DS, Figma 133:21373).
+ *
+ * Replaces the older meta-header-plus-FollowupEditor split. Layout:
+ *   - Header row: dependencies icon + "Follow up" + chevron + task title pill
+ *   - Meta sub-row 1: ✨ "From vector" · createdAt · "Tone: …"
+ *   - Meta sub-row 2: stale reason · confidence pill (tooltip "AI confidence")
+ *                     · "From meeting: <title>" when applicable
+ *   - Title input + Message textarea (with copy-icon button over the textarea)
+ *   - Footer: Dismiss (left, text) · Open in mail (secondary) · Comment (primary)
+ *
+ * Same backend semantics as before — Dismiss = /reject, Comment = /approve
+ * (publishes the message body as a portal Comment). Renaming UI only.
  */
-function FollowupEditor({ draft, busy, onApprove, onReject }) {
+function FollowupCard({ draft, mode, busy, error, onApprove, onReject }) {
+  const isPending = mode === "pending";
   const initial = draft.payload ?? {};
   const [subject, setSubject] = useState(initial.subject ?? "");
   const [body, setBody] = useState(initial.body ?? "");
   const [saveError, setSaveError] = useState(null);
+  const [copied, setCopied] = useState(false);
   const saveTimer = useRef(null);
   const lastSaved = useRef({ subject: initial.subject ?? "", body: initial.body ?? "" });
 
-  // Debounced autosave. We don't show a "saving…" indicator (silent by
-  // request); only surface a banner if the save fails.
+  // Debounced autosave (silent on success; surface errors only). Only runs
+  // while the card is editable.
   useEffect(() => {
+    if (!isPending) return;
     if (subject === lastSaved.current.subject && body === lastSaved.current.body) {
       return;
     }
@@ -542,125 +651,283 @@ function FollowupEditor({ draft, busy, onApprove, onReject }) {
     return () => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
     };
-  }, [subject, body, draft.id]);
+  }, [subject, body, draft.id, isPending]);
 
-  const recipient = initial.toName || initial.to || null;
   const mailto = buildMailto({ to: initial.to, subject, body });
   const canSend = !busy && subject.trim().length > 0;
+  const taskLabel = draft.taskTitle ?? `Task #${initial.taskId ?? ""}`.trim();
+  const generatedDate = draft.createdAt
+    ? new Date(draft.createdAt).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+    : null;
 
-  // Copy-to-clipboard fallback for users without a registered mailto handler
-  // (e.g. browser-only Gmail/Outlook users on a fresh Chrome profile). Copies
-  // subject + body so it can be pasted into any compose form.
-  const [copied, setCopied] = useState(false);
-  async function handleCopy() {
-    const text = [subject.trim(), body.trim()].filter(Boolean).join("\n\n");
+  // Copies only the body (per Caroline's UX call — subject lives in mail).
+  async function handleCopyBody() {
+    if (!body.trim()) return;
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(body);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      // Older browsers / non-secure contexts.
       setSaveError("Couldn't copy — your browser blocked clipboard access.");
     }
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      {recipient && (
-        <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
-          → To: <span style={{ color: "var(--text-secondary)" }}>{recipient}</span>
-          {initial.to && initial.toName && (
-            <span style={{ color: "var(--text-muted)" }}> &lt;{initial.to}&gt;</span>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 32,
+        padding: 24,
+        borderRadius: 20,
+        border: "1px solid var(--button-secondary-border)",
+        background: "var(--bg)",
+      }}
+    >
+      {/* Header — breadcrumb + meta rows */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <DependenciesIcon style={{ color: "var(--text-secondary)" }} />
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>Follow up</span>
+          <ChevronRight />
+          {draft.onboardingId && taskLabel ? (
+            <Link
+              href={`/onboardings/${draft.onboardingId}`}
+              style={{ textDecoration: "none" }}
+            >
+              <span className="task-ref">{taskLabel}</span>
+            </Link>
+          ) : (
+            <span className="task-ref">{taskLabel}</span>
           )}
         </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--text-secondary)", fontSize: 12 }}>
+              <FollowupSparkleIcon />
+              From vector
+            </span>
+            {generatedDate && <MetaDot />}
+            {generatedDate && <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{generatedDate}</span>}
+            <MetaDot />
+            <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>Tone: {initial.tone ?? "friendly"}</span>
+            {!isPending && (
+              <>
+                <MetaDot />
+                <StatusPill status={draft.status} />
+              </>
+            )}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            {draft.sourceQuote && (
+              <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{draft.sourceQuote}</span>
+            )}
+            {draft.sourceQuote && <MetaDot />}
+            <ConfidencePill confidence={draft.confidence} />
+            {draft.meetingTitle && (
+              <>
+                <MetaDot />
+                <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+                  From meeting:{" "}
+                  <span className="task-ref">{draft.meetingTitle}</span>
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Body — Title + Message */}
+      {isPending ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <FieldBlock label="Title">
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              disabled={busy}
+              placeholder="Subject"
+              aria-label="Title"
+              style={followupInputStyle}
+            />
+          </FieldBlock>
+
+          <FieldBlock
+            label="Message"
+            actions={
+              <button
+                type="button"
+                onClick={handleCopyBody}
+                disabled={!body.trim()}
+                aria-label={copied ? "Copied" : "Copy message"}
+                title={copied ? "Copied" : "Copy message"}
+                className="icon-btn"
+                style={{
+                  padding: 0,
+                  width: 16,
+                  height: 16,
+                  background: "none",
+                  border: "none",
+                  color: copied ? "var(--success)" : "var(--text-muted)",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <CopyIcon />
+              </button>
+            }
+          >
+            <textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              disabled={busy}
+              rows={5}
+              placeholder="Body"
+              aria-label="Message"
+              style={{ ...followupInputStyle, fontFamily: "inherit", lineHeight: 1.5, resize: "vertical" }}
+            />
+          </FieldBlock>
+
+          {saveError && (
+            <div role="alert" style={{ fontSize: 11, color: "var(--danger)" }}>
+              Couldn&rsquo;t save: {saveError}
+            </div>
+          )}
+        </div>
+      ) : (
+        <FollowupBodyReadonly payload={draft.payload} />
       )}
-      <input
-        type="text"
-        value={subject}
-        onChange={(e) => setSubject(e.target.value)}
-        disabled={busy}
-        placeholder="Subject"
-        aria-label="Subject"
-        style={{
-          width: "100%",
-          padding: "8px 12px",
-          fontSize: 13,
-          fontWeight: 500,
-          background: "var(--bg-elevated)",
-          color: "var(--text)",
-          border: "1px solid var(--border)",
-          borderRadius: 6,
-          outline: "none",
-        }}
-      />
-      <textarea
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
-        disabled={busy}
-        rows={6}
-        placeholder="Body"
-        aria-label="Body"
-        style={{
-          width: "100%",
-          padding: "10px 12px",
-          fontSize: 13,
-          fontFamily: "inherit",
-          background: "var(--bg-elevated)",
-          color: "var(--text)",
-          border: "1px solid var(--border)",
-          borderRadius: 6,
-          outline: "none",
-          resize: "vertical",
-          lineHeight: 1.5,
-        }}
-      />
-      {saveError && (
-        <div role="alert" style={{ fontSize: 11, color: "var(--danger)" }}>
-          Couldn&rsquo;t autosave: {saveError}
+
+      {error && (
+        <div
+          style={{
+            fontSize: 12,
+            color: "var(--danger)",
+            background: "rgba(255, 137, 155, 0.1)",
+            padding: "6px 10px",
+            borderRadius: 6,
+          }}
+        >
+          {error}
         </div>
       )}
-      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", flexWrap: "wrap" }}>
-        <button
-          onClick={onReject}
-          disabled={busy}
-          className="btn-secondary text-sm rounded-lg"
-          style={{ padding: "4px 12px", opacity: busy ? 0.5 : 1, fontSize: 13 }}
-        >
-          Reject
-        </button>
-        <button
-          onClick={handleCopy}
-          disabled={busy || (!subject.trim() && !body.trim())}
-          className="btn-secondary text-sm rounded-lg"
-          style={{ padding: "4px 12px", fontSize: 13, opacity: busy ? 0.5 : 1 }}
-          title="Copy subject + body to clipboard, paste into any mail app"
-        >
-          {copied ? "Copied ✓" : "Copy"}
-        </button>
-        {/* No target="_blank" — mailto:'s protocol handler launches its own
-            tab. Adding target="_blank" + rel="noreferrer" can drop user
-            activation context in Chrome and silently fall back to a Google
-            search of the encoded mailto string. */}
-        <a
-          href={mailto}
-          className="btn-secondary text-sm rounded-lg"
-          style={{ padding: "4px 12px", fontSize: 13, textDecoration: "none" }}
-        >
-          Open in mail ↗
-        </a>
-        <button
-          onClick={() => onApprove({ subject, body })}
-          disabled={!canSend}
-          className="btn-primary text-sm rounded-lg"
-          style={{ padding: "4px 14px", opacity: !canSend ? 0.5 : 1, fontSize: 13, fontWeight: 600 }}
-          title="Publishes the email body as a Comment visible in the customer portal."
-        >
-          {busy ? "…" : "Send to portal →"}
-        </button>
-      </div>
+
+      {/* Action row */}
+      {isPending && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <button
+            onClick={onReject}
+            disabled={busy}
+            className="text-btn"
+            style={{
+              padding: "4px 8px",
+              fontSize: 14,
+              color: "var(--text)",
+              opacity: busy ? 0.5 : 1,
+            }}
+          >
+            Dismiss
+          </button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <a
+              href={mailto}
+              className="btn-secondary text-sm rounded-lg"
+              style={{ padding: "4px 10px", fontSize: 14, textDecoration: "none" }}
+            >
+              Open in mail
+            </a>
+            <button
+              onClick={() => onApprove({ subject, body })}
+              disabled={!canSend}
+              className="btn-primary text-sm rounded-lg"
+              style={{
+                padding: "4px 10px",
+                fontSize: 14,
+                fontWeight: 600,
+                opacity: !canSend ? 0.5 : 1,
+              }}
+              title="Publishes the message body as a Comment visible in the customer portal."
+            >
+              {busy ? "…" : "Comment"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!isPending && draft.rejectedReason && (
+        <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>
+          Reason: {draft.rejectedReason}
+        </div>
+      )}
     </div>
   );
 }
+
+const followupInputStyle = {
+  width: "100%",
+  padding: "8px 12px",
+  fontSize: 14,
+  background: "var(--bg)",
+  color: "var(--text)",
+  border: "1px solid var(--surface-hover)",
+  borderRadius: 8,
+  outline: "none",
+};
+
+function FieldBlock({ label, actions, children }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 4 }}>
+        <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>{label}</span>
+        {actions}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function MetaDot() {
+  return <span style={{ color: "var(--text-muted)", fontSize: 11 }}>·</span>;
+}
+
+function ChevronRight() {
+  return (
+    <svg width="6" height="11" viewBox="0 0 6 11" fill="none" aria-hidden style={{ color: "var(--text-muted)", flexShrink: 0 }}>
+      <path d="M1 1l3.5 4.5L1 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CopyIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden xmlns="http://www.w3.org/2000/svg">
+      <rect x="3.5" y="3.5" width="8" height="9.5" rx="1.5" stroke="currentColor" strokeWidth="1.1" />
+      <path d="M2.5 10V2.5C2.5 1.67157 3.17157 1 4 1H9.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function FollowupSparkleIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <defs>
+        <linearGradient id="aidraft-sparkle" x1="7" y1="-3" x2="7" y2="15" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#C098FF" />
+          <stop offset="1" stopColor="#FF9C7D" />
+        </linearGradient>
+      </defs>
+      <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" fill="url(#aidraft-sparkle)" />
+    </svg>
+  );
+}
+
 
 /** Read-only render for applied/rejected follow-ups — shows what was sent. */
 function FollowupBodyReadonly({ payload }) {
@@ -888,9 +1155,11 @@ function ConfidencePill({ confidence }) {
   };
   const m = map[confidence] || map.medium;
   return (
-    <span style={{ color: m.color, fontFamily: "monospace" }}>
-      {m.dots} {confidence}
-    </span>
+    <Tooltip label="AI confidence">
+      <span style={{ color: m.color, fontFamily: "monospace", cursor: "default" }}>
+        {m.dots} {confidence}
+      </span>
+    </Tooltip>
   );
 }
 
