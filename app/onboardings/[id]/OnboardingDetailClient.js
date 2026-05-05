@@ -499,6 +499,9 @@ export default function OnboardingDetailClient({
           snapshot={insightSnapshot}
           contextHash={insightContextHash}
           cachedInsight={cachedInsight}
+          companyName={onboarding.companyName}
+          tasks={tasks}
+          onTaskClick={handleOpenDrawer}
         />
       )}
 

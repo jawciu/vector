@@ -1,21 +1,32 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import TaskCardView from "./TaskCardView";
+import { PriorityIcon } from "../ui/Icons";
 
 const SOFT_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
 
 /**
- * AI Insights panel — onboarding scope.
+ * AI Insights panel — onboarding scope ("Overview" tab).
  *
- * Decides on mount whether to render cached or regenerate, then streams
- * Claude's response into the UI.
+ * Layout (matches Vector DS, Figma node 129:20374):
+ *   Header        : ✨ COMPANY NAME + status pill
+ *   Top row       : Summary | Risks | Wins
+ *   Bottom row    : Focus today (with task cards) | This week (with priority chevrons)
+ *
+ * Uses TaskCardView (extracted from kanban TaskCard) for the Focus today
+ * cards so the visual matches the kanban exactly without dragging the
+ * sortable wiring along.
  *
  * Props:
- *   scope        — "onboarding" | "portfolio"
- *   scopeId      — string identifier
- *   snapshot     — Layer 1 deterministic snapshot (built server-side)
- *   contextHash  — hash of the snapshot (built server-side)
+ *   scope         — "onboarding"
+ *   scopeId       — onboarding id (string-coerced)
+ *   snapshot      — Layer 1 deterministic snapshot
+ *   contextHash   — hash of the snapshot
  *   cachedInsight — { contextHash, payload, generatedAt } | null
+ *   companyName   — display name for the header
+ *   tasks         — the same task list rendered on the kanban; used to look up Focus today taskIds
+ *   onTaskClick   — opens the task drawer (same handler the kanban uses)
  */
 export default function InsightsPanel({
   scope = "onboarding",
@@ -23,20 +34,23 @@ export default function InsightsPanel({
   snapshot,
   contextHash,
   cachedInsight,
+  companyName = "Overview",
+  tasks = [],
+  onTaskClick,
 }) {
-  const [payload, setPayload] = useState(cachedInsight?.payload ?? null);
+  const taskById = useMemo(() => {
+    const m = new Map();
+    for (const t of tasks) m.set(t.id, t);
+    return m;
+  }, [tasks]);
+
+  const [payload, setPayload] = useState(() =>
+    isNewShape(cachedInsight?.payload) ? cachedInsight.payload : null
+  );
   const [streamingText, setStreamingText] = useState("");
   const [status, setStatus] = useState(() => initialStatus(cachedInsight, contextHash));
   const [error, setError] = useState(null);
   const triggeredRef = useRef(false);
-
-  function initialStatus(cached, hash) {
-    if (!cached) return "needs-generate";
-    if (cached.contextHash !== hash) return "stale";
-    const age = Date.now() - new Date(cached.generatedAt).getTime();
-    if (age > SOFT_TTL_MS) return "stale";
-    return "fresh";
-  }
 
   const regenerate = useCallback(async () => {
     if (triggeredRef.current) return;
@@ -78,21 +92,17 @@ export default function InsightsPanel({
         const { value, done } = await reader.read();
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
-
-        // Split SSE messages (data: {...}\n\n).
         let idx;
         while ((idx = buffer.indexOf("\n\n")) !== -1) {
           const raw = buffer.slice(0, idx).trim();
           buffer = buffer.slice(idx + 2);
           if (!raw.startsWith("data:")) continue;
-          const json = raw.slice(5).trim();
           let event;
           try {
-            event = JSON.parse(json);
+            event = JSON.parse(raw.slice(5).trim());
           } catch {
             continue;
           }
-
           if (event.delta) {
             setStreamingText((prev) => prev + event.delta);
           } else if (event.done) {
@@ -117,8 +127,6 @@ export default function InsightsPanel({
       setPayload(finalPayload);
       setStatus("fresh");
     }
-
-    // Fire-and-forget persistence to the Node save route.
     if (persistData) {
       fetch("/api/insights/save", {
         method: "POST",
@@ -126,11 +134,9 @@ export default function InsightsPanel({
         body: JSON.stringify(persistData),
       }).catch((err) => console.warn("[InsightsPanel] save failed", err));
     }
-
     triggeredRef.current = false;
   }, [scope, scopeId, snapshot, contextHash]);
 
-  // Auto-trigger on mount when cache is missing or stale.
   useEffect(() => {
     if (status === "needs-generate" || status === "stale") {
       regenerate();
@@ -138,271 +144,420 @@ export default function InsightsPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const showStreamingText = status === "streaming" && !payload;
-  const showCards = !!payload && status !== "streaming";
-  const showStaleWithRegenerating = !!payload && status === "streaming";
+  const isStreaming = status === "streaming";
+  const showStreamingText = isStreaming && !payload;
+  const summary = showStreamingText
+    ? extractField(streamingText, "summary") || "Generating…"
+    : payload?.summary || "—";
+  const portfolioStatus = payload?.status ?? null;
+  const risks = payload?.risks ?? [];
+  const wins = payload?.wins ?? [];
+  const focusToday = payload?.focusToday ?? [];
+  const focusThisWeek = payload?.focusThisWeek ?? [];
 
   return (
-    <div className="flex-1 overflow-y-auto" style={{ padding: "24px" }}>
-      <div style={{ maxWidth: 920, margin: "0 auto", display: "flex", flexDirection: "column", gap: 24 }}>
-        {/* Hero — headline + tldr */}
-        <Hero
-          payload={payload}
-          streamingText={streamingText}
-          status={status}
-          showStreamingText={showStreamingText}
-          showStaleWithRegenerating={showStaleWithRegenerating}
-          onRegenerate={regenerate}
-        />
+    <div className="flex-1 overflow-y-auto" style={{ padding: 24 }}>
+      <div
+        className="oi-card"
+        style={{
+          borderRadius: 20,
+          border: "1px solid var(--button-secondary-border)",
+          background: "var(--bg)",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 16px 12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <SparkleIcon />
+              <span
+                style={{
+                  fontSize: 16,
+                  fontWeight: 600,
+                  letterSpacing: "0.6px",
+                  textTransform: "uppercase",
+                  color: "var(--text)",
+                  lineHeight: "16.5px",
+                }}
+              >
+                {companyName}
+              </span>
+            </div>
+            {portfolioStatus && <StatusPill status={portfolioStatus} />}
+            {isStreaming && payload && (
+              <span style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>regenerating…</span>
+            )}
+          </div>
+          <button
+            onClick={regenerate}
+            disabled={isStreaming}
+            aria-label="Regenerate"
+            className="btn-secondary text-sm rounded-lg"
+            style={{
+              padding: "4px 10px",
+              opacity: isStreaming ? 0.5 : 1,
+              cursor: isStreaming ? "default" : "pointer",
+              fontSize: 12,
+            }}
+          >
+            {isStreaming ? "…" : "↻"}
+          </button>
+        </div>
+
+        <hr style={{ height: 1, width: "100%", border: 0, background: "var(--border-subtle)", margin: 0 }} />
 
         {error && (
           <div
             style={{
-              padding: "12px 16px",
-              borderRadius: 8,
-              background: "rgba(255, 137, 155, 0.1)",
-              border: "1px solid var(--danger)",
+              margin: 16,
+              fontSize: 12,
               color: "var(--danger)",
-              fontSize: 13,
+              background: "rgba(255, 137, 155, 0.1)",
+              padding: "6px 10px",
+              borderRadius: 6,
             }}
           >
             {error}
           </div>
         )}
 
-        {/* Cards grid */}
-        {showCards && payload && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            <FocusCard title="Focus today" items={payload.focusToday} kind="today" />
-            <FocusCard title="This week" items={payload.focusThisWeek} kind="week" />
-            <RisksCard risks={payload.risks} />
-            <WinsCard wins={payload.wins} />
-            {payload.nudges?.length > 0 && (
-              <div style={{ gridColumn: "1 / -1" }}>
-                <NudgesCard nudges={payload.nudges} />
-              </div>
-            )}
-          </div>
-        )}
+        {/* Top row: Summary | Risks | Wins */}
+        <div className="oi-row oi-row--top">
+          <Section title="Summary" className="oi-section oi-section--summary">
+            <div className="oi-section-body">
+              <p style={{ fontSize: 14, lineHeight: "18px", color: "var(--text)", margin: 0 }}>{summary}</p>
+            </div>
+          </Section>
 
-        {!showCards && !showStreamingText && status === "needs-generate" && !error && (
-          <div style={{ color: "var(--text-muted)", fontSize: 14 }}>Vector is taking a look…</div>
-        )}
+          <Section title="Risks" className="oi-section oi-section--risks">
+            <div className="oi-section-body">
+              {risks.length === 0 ? (
+                <EmptyMessage>{payload ? "No active risks." : "Generating…"}</EmptyMessage>
+              ) : (
+                <div style={{ display: "flex", gap: 0, borderRadius: 12, overflow: "hidden", flex: 1, alignItems: "stretch" }}>
+                  {risks.slice(0, 3).map((r, i) => (
+                    <RiskCard
+                      key={i}
+                      severity={r.severity}
+                      summary={r.summary}
+                      position={cardPosition(i, Math.min(risks.length, 3))}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </Section>
+
+          <Section title="Wins" className="oi-section oi-section--wins">
+            <div className="oi-section-body">
+              {wins.length === 0 ? (
+                <EmptyMessage>{payload ? "No wins this week — keep going." : "Generating…"}</EmptyMessage>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", borderRadius: 12, overflow: "hidden", flex: 1 }}>
+                  {wins.slice(0, 2).map((w, i) => (
+                    <WinRow
+                      key={i}
+                      headline={w.headline}
+                      detail={w.detail}
+                      position={i === 0 ? "top" : "bottom"}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </Section>
+        </div>
+
+        <hr style={{ height: 1, width: "100%", border: 0, background: "var(--border-subtle)", margin: 0 }} />
+
+        {/* Bottom row: Focus today | This week */}
+        <div className="oi-row oi-row--bottom">
+          <Section title="Focus today" className="oi-section oi-section--focus">
+            <div className="oi-section-body">
+              {focusToday.length === 0 ? (
+                <EmptyMessage>{payload ? "Nothing pressing today." : "Generating…"}</EmptyMessage>
+              ) : (
+                <div style={{ display: "flex", gap: 24, flex: 1, alignItems: "stretch", flexWrap: "wrap" }}>
+                  {focusToday.slice(0, 3).map((item, i) => (
+                    <FocusTodayItem
+                      key={item.taskId}
+                      index={i + 1}
+                      reason={item.reason}
+                      task={taskById.get(item.taskId)}
+                      onTaskClick={onTaskClick}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </Section>
+
+          <Section title="This week" className="oi-section oi-section--week">
+            <div className="oi-section-body">
+              {focusThisWeek.length === 0 ? (
+                <EmptyMessage>{payload ? "Nothing strategic queued." : "Generating…"}</EmptyMessage>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", borderRadius: 12, overflow: "hidden", flex: 1 }}>
+                  {focusThisWeek.slice(0, 3).map((item, i) => (
+                    <ThisWeekRow
+                      key={i}
+                      summary={item.summary}
+                      priority={item.priority}
+                      position={
+                        focusThisWeek.length === 1
+                          ? "only"
+                          : i === 0
+                          ? "top"
+                          : i === Math.min(focusThisWeek.length, 3) - 1
+                          ? "bottom"
+                          : "middle"
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </Section>
+        </div>
       </div>
     </div>
   );
 }
 
-function Hero({ payload, streamingText, status, showStreamingText, showStaleWithRegenerating, onRegenerate }) {
-  const headline = showStreamingText
-    ? extractHeadlineFromPartial(streamingText) || "Generating…"
-    : payload?.headline || "—";
-  const tldr = showStreamingText
-    ? extractTldrFromPartial(streamingText) || ""
-    : payload?.tldr || "";
-  const trend = payload?.trend;
-
+function Section({ title, className, children }) {
   return (
-    <div
-      style={{
-        padding: "24px 28px",
-        borderRadius: 12,
-        background: "var(--surface)",
-        border: "1px solid var(--border)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 12,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-            <SparkleIcon />
-            <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 0.6, color: "var(--text-muted)" }}>
-              Vector
-            </span>
-            {trend && <TrendPill trend={trend} />}
-            {showStaleWithRegenerating && (
-              <span style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>
-                regenerating…
-              </span>
-            )}
-          </div>
-          <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--text)", lineHeight: 1.3, margin: 0 }}>
-            {headline}
-          </h1>
-          {tldr && (
-            <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 8, lineHeight: 1.5 }}>
-              {tldr}
-            </p>
-          )}
-        </div>
-        <button
-          onClick={onRegenerate}
-          disabled={status === "streaming"}
-          className="btn-secondary text-sm rounded-lg"
+    <div className={className}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <span
           style={{
-            padding: "6px 12px",
-            opacity: status === "streaming" ? 0.5 : 1,
-            cursor: status === "streaming" ? "default" : "pointer",
-            flexShrink: 0,
+            fontSize: 14,
+            fontWeight: 600,
+            letterSpacing: "0.5px",
+            color: "var(--text-muted)",
+            lineHeight: "16.5px",
           }}
         >
-          {status === "streaming" ? "…" : "↻ Regenerate"}
-        </button>
+          {title}
+        </span>
+        <hr className="ai-divider" />
       </div>
-    </div>
-  );
-}
-
-function FocusCard({ title, items, kind }) {
-  return (
-    <Card title={title}>
-      {(!items || items.length === 0) ? (
-        <Empty>Nothing pressing {kind === "today" ? "today" : "this week"}.</Empty>
-      ) : (
-        <ul style={{ display: "flex", flexDirection: "column", gap: 10, margin: 0, padding: 0, listStyle: "none" }}>
-          {items.map((item, i) => (
-            <li key={i} style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.5 }}>
-              {kind === "today" && item.taskId && (
-                <span style={{ color: "var(--text-muted)", fontFamily: "monospace", fontSize: 11, marginRight: 6 }}>
-                  #{item.taskId}
-                </span>
-              )}
-              {item.reason || item.summary}
-            </li>
-          ))}
-        </ul>
-      )}
-    </Card>
-  );
-}
-
-function RisksCard({ risks }) {
-  return (
-    <Card title="Risks">
-      {(!risks || risks.length === 0) ? (
-        <Empty>No active risks flagged.</Empty>
-      ) : (
-        <ul style={{ display: "flex", flexDirection: "column", gap: 10, margin: 0, padding: 0, listStyle: "none" }}>
-          {risks.map((r, i) => (
-            <li key={i} style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.5, display: "flex", gap: 8, alignItems: "flex-start" }}>
-              <SeverityDot severity={r.severity} />
-              <span>{r.summary}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </Card>
-  );
-}
-
-function WinsCard({ wins }) {
-  return (
-    <Card title="Wins">
-      {(!wins || wins.length === 0) ? (
-        <Empty>No recent wins to highlight.</Empty>
-      ) : (
-        <ul style={{ display: "flex", flexDirection: "column", gap: 10, margin: 0, padding: 0, listStyle: "none" }}>
-          {wins.map((w, i) => (
-            <li key={i} style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.5 }}>
-              ✓ {w.summary}
-            </li>
-          ))}
-        </ul>
-      )}
-    </Card>
-  );
-}
-
-function NudgesCard({ nudges }) {
-  return (
-    <Card title="Vector suggests">
-      <ul style={{ display: "flex", flexDirection: "column", gap: 10, margin: 0, padding: 0, listStyle: "none" }}>
-        {nudges.map((n, i) => (
-          <li key={i} style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.5, display: "flex", gap: 8 }}>
-            <NudgeIcon kind={n.kind} />
-            <span>{n.summary}</span>
-          </li>
-        ))}
-      </ul>
-    </Card>
-  );
-}
-
-function Card({ title, children }) {
-  return (
-    <div
-      style={{
-        padding: "16px 20px",
-        borderRadius: 10,
-        background: "var(--surface)",
-        border: "1px solid var(--border)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 12,
-      }}
-    >
-      <h3 style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5, color: "var(--text-muted)", margin: 0 }}>
-        {title}
-      </h3>
       {children}
     </div>
   );
 }
 
-function Empty({ children }) {
-  return <p style={{ fontSize: 13, color: "var(--text-muted)", margin: 0 }}>{children}</p>;
-}
+function RiskCard({ severity, summary, position }) {
+  const radius = {
+    left:   { borderTopLeftRadius: 12, borderBottomLeftRadius: 12 },
+    middle: {},
+    right:  { borderTopRightRadius: 12, borderBottomRightRadius: 12 },
+    only:   { borderRadius: 12 },
+  }[position];
 
-function SeverityDot({ severity }) {
-  const color =
+  const sevColor =
     severity === "high" ? "var(--danger)" :
     severity === "medium" ? "var(--alert)" :
     "var(--text-muted)";
-  return <span style={{ width: 8, height: 8, borderRadius: "50%", background: color, marginTop: 6, flexShrink: 0 }} />;
+  const sevLabel =
+    severity === "high" ? "High" :
+    severity === "medium" ? "Medium" :
+    "Low";
+
+  return (
+    <div
+      style={{
+        flex: "1 1 0",
+        minWidth: 180,
+        display: "flex",
+        flexDirection: "column",
+        border: "1px solid var(--border)",
+        marginRight: position === "right" || position === "only" ? 0 : -1,
+        ...radius,
+      }}
+    >
+      <div style={{ padding: "8px 12px", borderBottom: "1px solid var(--border)" }}>
+        <span
+          className="status-pill"
+          style={{ color: sevColor, fontSize: 12 }}
+        >
+          {sevLabel}
+        </span>
+      </div>
+      <div style={{ padding: "8px 12px 16px" }}>
+        <p style={{ margin: 0, fontSize: 14, lineHeight: "18px", color: "var(--text)" }}>{summary}</p>
+      </div>
+    </div>
+  );
 }
 
-function TrendPill({ trend }) {
-  const map = {
-    improving: { label: "↗ improving", color: "var(--success, #5cd6a5)" },
-    stable: { label: "→ stable", color: "var(--text-muted)" },
-    declining: { label: "↘ declining", color: "var(--alert)" },
-  };
-  const m = map[trend] || map.stable;
+function WinRow({ headline, detail, position }) {
+  const radius =
+    position === "top"
+      ? { borderTopLeftRadius: 12, borderTopRightRadius: 12 }
+      : { borderBottomLeftRadius: 12, borderBottomRightRadius: 12 };
+  const borderTop = position === "top" ? "1px solid var(--border)" : "none";
   return (
-    <span style={{ fontSize: 11, color: m.color, padding: "2px 6px", borderRadius: 4, border: `1px solid ${m.color}` }}>
-      {m.label}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 8,
+        padding: "8px 12px",
+        flex: "1 1 0",
+        borderTop,
+        borderRight: "1px solid var(--border)",
+        borderBottom: "1px solid var(--border)",
+        borderLeft: "1px solid var(--border)",
+        ...radius,
+      }}
+    >
+      <CheckCircle />
+      <p style={{ margin: 0, fontSize: 14, fontWeight: 500, lineHeight: "20px", color: "var(--text)" }}>
+        {headline}{" "}
+        <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>{detail}</span>
+      </p>
+    </div>
+  );
+}
+
+function FocusTodayItem({ index, reason, task, onTaskClick }) {
+  return (
+    <div style={{ flex: "1 1 240px", minWidth: 240, display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "0 8px" }}>
+        <span style={{ fontSize: 20, color: "var(--text)", lineHeight: 1, flexShrink: 0 }}>#{index}</span>
+        <p style={{ margin: 0, fontSize: 14, lineHeight: "18px", color: "var(--text)" }}>{reason}</p>
+      </div>
+      {task ? (
+        <TaskCardView task={task} onCardClick={onTaskClick} />
+      ) : (
+        <div
+          style={{
+            padding: 16,
+            borderRadius: 8,
+            border: "1px dashed var(--border)",
+            color: "var(--text-muted)",
+            fontSize: 12,
+          }}
+        >
+          Task unavailable
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ThisWeekRow({ summary, priority, position }) {
+  const radius = {
+    only:   { borderRadius: 12 },
+    top:    { borderTopLeftRadius: 12, borderTopRightRadius: 12 },
+    middle: {},
+    bottom: { borderBottomLeftRadius: 12, borderBottomRightRadius: 12 },
+  }[position];
+  const borderTop = position === "top" || position === "only" ? "1px solid var(--border)" : "none";
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 8,
+        padding: "12px",
+        borderTop,
+        borderRight: "1px solid var(--border)",
+        borderBottom: "1px solid var(--border)",
+        borderLeft: "1px solid var(--border)",
+        ...radius,
+      }}
+    >
+      <div style={{ paddingTop: 2, flexShrink: 0 }}>
+        <PriorityIcon priority={priority} size={16} />
+      </div>
+      <p style={{ margin: 0, fontSize: 14, fontWeight: 500, lineHeight: "20px", color: "var(--text)" }}>
+        {summary}
+      </p>
+    </div>
+  );
+}
+
+function StatusPill({ status }) {
+  const map = {
+    Declining: "var(--danger)",
+    "At risk": "var(--alert)",
+    "On track": "var(--success)",
+    Improving: "var(--mint)",
+  };
+  const bg = map[status] ?? "var(--text-muted)";
+  return (
+    <span className="status-pill status-pill--filled" style={{ background: bg }}>
+      {status}
     </span>
+  );
+}
+
+function CheckCircle() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      aria-hidden="true"
+      style={{ marginTop: 2, flexShrink: 0 }}
+    >
+      <path
+        d="M7 0C10.866 0 14 3.13401 14 7C14 10.866 10.866 14 7 14C3.13401 14 0 10.866 0 7C0 3.13401 3.13401 0 7 0ZM10.8125 4.10938C10.5969 3.93687 10.2819 3.97187 10.1094 4.1875L6.42773 8.78906L3.82031 6.61621C3.60827 6.43951 3.29304 6.46781 3.11621 6.67969C2.93951 6.89173 2.96781 7.20696 3.17969 7.38379L6.17969 9.88379L6.57129 10.2109L6.89062 9.8125L10.8906 4.8125C11.0631 4.59687 11.0281 4.28188 10.8125 4.10938Z"
+        fill="var(--success)"
+      />
+    </svg>
   );
 }
 
 function SparkleIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" style={{ color: "var(--action)" }}>
-      <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" fill="currentColor" />
+    <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="oi-sparkle-gradient" x1="7" y1="-3" x2="7" y2="15" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#C098FF" />
+          <stop offset="1" stopColor="#FF9C7D" />
+        </linearGradient>
+      </defs>
+      <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" fill="url(#oi-sparkle-gradient)" />
     </svg>
   );
 }
 
-function NudgeIcon({ kind }) {
-  const map = {
-    unassigned_task: "👤",
-    follow_up: "✉️",
-    stale_task: "⏳",
-    customer_dark: "💤",
-  };
-  return <span aria-hidden style={{ flexShrink: 0 }}>{map[kind] || "•"}</span>;
+function EmptyMessage({ children }) {
+  return <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0 }}>{children}</p>;
 }
 
-// Crude best-effort extraction during streaming. JSON arrives as one block,
-// so we just look for the first headline/tldr key. If we can't parse yet,
-// we show the raw streaming text.
-function extractHeadlineFromPartial(text) {
-  const m = text.match(/"headline"\s*:\s*"([^"]*)/);
-  return m ? m[1] : null;
+function cardPosition(index, total) {
+  if (total === 1) return "only";
+  if (index === 0) return "left";
+  if (index === total - 1) return "right";
+  return "middle";
 }
-function extractTldrFromPartial(text) {
-  const m = text.match(/"tldr"\s*:\s*"([^"]*)/);
+
+function initialStatus(cached, hash) {
+  if (!cached || !isNewShape(cached.payload)) return "needs-generate";
+  if (cached.contextHash !== hash) return "stale";
+  const age = Date.now() - new Date(cached.generatedAt).getTime();
+  return age > SOFT_TTL_MS ? "stale" : "fresh";
+}
+
+function isNewShape(p) {
+  return Boolean(
+    p &&
+      typeof p.summary === "string" &&
+      Array.isArray(p.risks) &&
+      Array.isArray(p.wins) &&
+      Array.isArray(p.focusToday) &&
+      Array.isArray(p.focusThisWeek)
+  );
+}
+
+function extractField(text, key) {
+  const re = new RegExp(`"${key}"\\s*:\\s*"([^"]*)`);
+  const m = text.match(re);
   return m ? m[1] : null;
 }

@@ -461,6 +461,89 @@ a {
   background: var(--bg-elevated-hover);
 }
 
+/* Onboarding insights overview — two-row layout, container-query driven.
+     Top row    : Summary | Risks | Wins
+     Bottom row : Focus today | This week
+   Reflows in two steps (1100px and 720px) like the portfolio card. */
+.oi-card { container-type: inline-size; }
+
+.oi-row {
+  display: grid;
+  align-items: stretch;
+  padding: 0 16px;
+}
+.oi-row--top {
+  grid-template-columns: minmax(220px, 280px) minmax(0, 3fr) minmax(0, 2fr);
+  grid-template-areas: "summary risks wins";
+}
+.oi-row--bottom {
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  grid-template-areas: "focus week";
+}
+
+.oi-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  min-width: 0;
+}
+.oi-section--summary { grid-area: summary; padding-left: 0; border-right: 1px solid var(--border-subtle); }
+.oi-section--risks   { grid-area: risks;   border-right: 1px solid var(--border-subtle); }
+.oi-section--wins    { grid-area: wins;    padding-right: 0; }
+.oi-section--focus   { grid-area: focus;   padding-left: 0; border-right: 1px solid var(--border-subtle); }
+.oi-section--week    { grid-area: week;    padding-right: 0; }
+
+.oi-section-body {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+}
+
+@container (max-width: 1100px) {
+  .oi-row--top {
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+    grid-template-areas:
+      "summary wins"
+      "risks   risks";
+  }
+  .oi-row--bottom {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "focus"
+      "week";
+  }
+  .oi-section--risks {
+    border-right: none;
+    border-top: 1px solid var(--border-subtle);
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .oi-section--focus {
+    border-right: none;
+    padding-right: 0;
+  }
+  .oi-section--week {
+    padding-left: 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+}
+
+@container (max-width: 720px) {
+  .oi-row--top {
+    grid-template-columns: 1fr;
+    grid-template-areas: "summary" "risks" "wins";
+  }
+  .oi-section { padding: 12px 0; }
+  .oi-section--summary,
+  .oi-section--risks  {
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .oi-section--risks  { border-top: none; }
+  .oi-section--focus  { border-bottom: 1px solid var(--border-subtle); }
+}
+
 /* Portfolio insights hero — responsive section layout.
    Three breakpoints driven by container queries on the card itself, so the
    layout adapts to its actual rendered width rather than the viewport.

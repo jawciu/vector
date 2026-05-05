@@ -28,6 +28,21 @@ const D = {
 };
 
 async function main() {
+  // SAFETY: this script wipes all onboarding data and recreates it from
+  // scratch. Running it on a working database loses ActivityLog, magic
+  // links, scan-stale drafts, comments, and any other accumulated state.
+  // Require an explicit opt-in env var so accidental `npm run seed`
+  // doesn't nuke real data.
+  if (process.env.SEED_RESET !== "1") {
+    console.error(
+      "Refusing to run: this seed wipes all onboarding data.\n" +
+        "If you really want to reset the demo state, run:\n\n" +
+        "  SEED_RESET=1 npm run seed\n\n" +
+        "For idempotent activity-only seeding (safe), use\n" +
+        "  npm run seed:activity"
+    );
+    process.exit(1);
+  }
   await prisma.activityLog.deleteMany();
   await prisma.task.deleteMany();
   await prisma.phase.deleteMany();

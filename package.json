@@ -11,7 +11,8 @@
     "lint": "eslint",
     "lint:ds": "design.md lint DESIGN.md",
     "build:ds": "node scripts/build-theme.mjs",
-    "seed": "npx tsx prisma/seed.js"
+    "seed": "npx tsx prisma/seed.js",
+    "seed:activity": "npx tsx prisma/seed-recent-activity.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.91.1",
