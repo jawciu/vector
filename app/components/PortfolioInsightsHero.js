@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import CompanyAvatar from "@/app/ui/CompanyAvatar";
+import InlineProse from "@/app/ui/InlineProse";
 
 const SOFT_TTL_MS = 4 * 60 * 60 * 1000;
 
@@ -138,15 +139,8 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
 
   return (
     <div
-      className="pi-card"
-      style={{
-        margin: "12px 16px 0",
-        borderRadius: 20,
-        border: "1px solid var(--button-secondary-border)",
-        background: "var(--bg)",
-        display: "flex",
-        flexDirection: "column",
-      }}
+      className={`pi-card${isStreaming ? " is-streaming" : ""}`}
+      style={{ margin: "12px 16px 0" }}
     >
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 16px 12px" }}>
@@ -211,7 +205,7 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
         <Section title="Summary" className="pi-section pi-section--summary">
           <div className="pi-section-body">
             <p style={{ fontSize: 14, lineHeight: "18px", color: "var(--text)", margin: 0 }}>
-              {summary}
+              <InlineProse text={summary} />
             </p>
           </div>
         </Section>
@@ -273,7 +267,7 @@ function Section({ title, className, children }) {
         >
           {title}
         </span>
-        <hr className="ai-divider" />
+        <div role="separator" aria-hidden="true" className="ai-divider" />
       </div>
       {children}
     </div>
@@ -322,7 +316,9 @@ function PriorityCard({ onboardingId, company, issues, position }) {
         <span style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: "18px" }}>Issues</span>
         <div style={{ fontSize: 14, color: "var(--text)", lineHeight: "18px" }}>
           {issues.map((line, i) => (
-            <div key={i}>{line}</div>
+            <div key={i}>
+              <InlineProse text={line} />
+            </div>
           ))}
         </div>
       </div>
@@ -356,7 +352,9 @@ function WinRow({ company, detail, position }) {
       </div>
       <p style={{ margin: 0, fontSize: 14, fontWeight: 500, lineHeight: "20px", color: "var(--text)" }}>
         {company}{" "}
-        <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>{detail}</span>
+        <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>
+          <InlineProse text={detail} />
+        </span>
       </p>
     </div>
   );

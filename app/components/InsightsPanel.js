@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import TaskCardView from "./TaskCardView";
 import { PriorityIcon } from "../ui/Icons";
+import InlineProse from "../ui/InlineProse";
 
 const SOFT_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
 
@@ -157,16 +158,7 @@ export default function InsightsPanel({
 
   return (
     <div className="flex-1 overflow-y-auto" style={{ padding: 24 }}>
-      <div
-        className="oi-card"
-        style={{
-          borderRadius: 20,
-          border: "1px solid var(--button-secondary-border)",
-          background: "var(--bg)",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <div className={`oi-card${isStreaming ? " is-streaming" : ""}`}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 16px 12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
@@ -227,7 +219,9 @@ export default function InsightsPanel({
         <div className="oi-row oi-row--top">
           <Section title="Summary" className="oi-section oi-section--summary">
             <div className="oi-section-body">
-              <p style={{ fontSize: 14, lineHeight: "18px", color: "var(--text)", margin: 0 }}>{summary}</p>
+              <p style={{ fontSize: 14, lineHeight: "18px", color: "var(--text)", margin: 0 }}>
+                <InlineProse text={summary} />
+              </p>
             </div>
           </Section>
 
@@ -341,7 +335,7 @@ function Section({ title, className, children }) {
         >
           {title}
         </span>
-        <hr className="ai-divider" />
+        <div role="separator" aria-hidden="true" className="ai-divider" />
       </div>
       {children}
     </div>
@@ -386,7 +380,9 @@ function RiskCard({ severity, summary, position }) {
         </span>
       </div>
       <div style={{ padding: "8px 12px 16px" }}>
-        <p style={{ margin: 0, fontSize: 14, lineHeight: "18px", color: "var(--text)" }}>{summary}</p>
+        <p style={{ margin: 0, fontSize: 14, lineHeight: "18px", color: "var(--text)" }}>
+          <InlineProse text={summary} />
+        </p>
       </div>
     </div>
   );
@@ -427,7 +423,9 @@ function FocusTodayItem({ index, reason, task, onTaskClick }) {
     <div style={{ flex: "1 1 240px", minWidth: 240, display: "flex", flexDirection: "column", gap: 16 }}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "0 8px" }}>
         <span style={{ fontSize: 20, color: "var(--text)", lineHeight: 1, flexShrink: 0 }}>#{index}</span>
-        <p style={{ margin: 0, fontSize: 14, lineHeight: "18px", color: "var(--text)" }}>{reason}</p>
+        <p style={{ margin: 0, fontSize: 14, lineHeight: "18px", color: "var(--text)" }}>
+          <InlineProse text={reason} />
+        </p>
       </div>
       {task ? (
         <TaskCardView task={task} onCardClick={onTaskClick} />
@@ -474,7 +472,7 @@ function ThisWeekRow({ summary, priority, position }) {
         <PriorityIcon priority={priority} size={16} />
       </div>
       <p style={{ margin: 0, fontSize: 14, fontWeight: 500, lineHeight: "20px", color: "var(--text)" }}>
-        {summary}
+        <InlineProse text={summary} />
       </p>
     </div>
   );

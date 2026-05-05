@@ -41,3 +41,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude code worktrees (created by Agent runs with isolation: worktree)
+.claude/worktrees/

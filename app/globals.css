@@ -446,11 +446,88 @@ a {
   --ai-gradient: linear-gradient(135deg, var(--ai-gradient-from), var(--ai-gradient-to));
 }
 
+/* Section divider with the AI gradient. The grey overlay (::after) sits
+   on top at opacity 0 by default, and fades in when the parent card is
+   regenerating — that's the "gradient → grey" crossfade. */
 .ai-divider {
+  position: relative;
   height: 1px;
   width: 100%;
   background: var(--ai-gradient);
   border: 0;
+  margin: 0;
+}
+
+.ai-divider::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--border-subtle);
+  opacity: 0;
+  transition: opacity 2s ease;
+  pointer-events: none;
+}
+
+/* Streaming-state card chrome.
+   The conic-gradient ring lives on a masked pseudo-element so we can
+   crossfade it via opacity. The static border stays underneath unchanged.
+   `@property --ai-spin` lets us animate the conic angle smoothly. */
+@property --ai-spin {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.pi-card,
+.oi-card {
+  position: relative;
+}
+
+.pi-card::after,
+.oi-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--ai-spin),
+    var(--ai-gradient-from),
+    var(--ai-gradient-to),
+    var(--ai-gradient-from)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+.pi-card.is-streaming::after,
+.oi-card.is-streaming::after {
+  opacity: 1;
+  animation: ai-border-spin 2.5s linear infinite;
+}
+
+.pi-card.is-streaming .ai-divider::after,
+.oi-card.is-streaming .ai-divider::after {
+  opacity: 1;
+}
+
+@keyframes ai-border-spin {
+  to { --ai-spin: 360deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pi-card.is-streaming::after,
+  .oi-card.is-streaming::after {
+    animation: none;
+  }
 }
 
 .priority-card {
@@ -461,11 +538,36 @@ a {
   background: var(--bg-elevated-hover);
 }
 
+/* Inline code-style chip for AI prose. The model wraps task title
+   references in backticks; <InlineProse> splits and renders them as
+   monospace pills with a subtle bg, similar to inline code in markdown. */
+.task-ref {
+  font-family: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+  font-size: 0.92em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--surface-hover);
+  color: var(--text);
+  /* Allow the chip to wrap mid-title without overflowing its column.
+     box-decoration-break: clone makes the padding + rounded corners
+     repeat on each wrapped line so each line is its own pill. */
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  word-break: break-word;
+}
+
 /* Onboarding insights overview — two-row layout, container-query driven.
      Top row    : Summary | Risks | Wins
      Bottom row : Focus today | This week
    Reflows in two steps (1100px and 720px) like the portfolio card. */
-.oi-card { container-type: inline-size; }
+.oi-card {
+  container-type: inline-size;
+  border-radius: 20px;
+  border: 1px solid var(--button-secondary-border);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
 
 .oi-row {
   display: grid;
@@ -554,6 +656,11 @@ a {
    they can be repositioned per-breakpoint without DOM tricks. */
 .pi-card {
   container-type: inline-size;
+  border-radius: 20px;
+  border: 1px solid var(--button-secondary-border);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
 }
 
 .pi-body {
