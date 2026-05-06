@@ -1,0 +1,37 @@
+{
+  "event": "meeting.saved",
+  "meeting": {
+    "id": "fixture-small-meeting-001",
+    "title": "Acme weekly sync",
+    "date": "2026-05-04T14:00:00Z",
+    "duration_seconds": 1320,
+    "language": "en",
+    "summary": "Quick check-in with Acme on the SSO rollout. Two follow-ups: Caroline to send the SAML metadata bundle, and Priya to confirm the IdP test user list by EOD Wednesday.",
+    "action_items": [
+      "Caroline will send the SAML metadata bundle to Priya by Tuesday",
+      "Priya will confirm the IdP test user list by Wednesday EOD"
+    ],
+    "key_decisions": [
+      "Targeting Friday for the SSO test environment cutover"
+    ],
+    "topics": ["SSO setup", "test user provisioning"],
+    "discussion_flow": [
+      "Caroline opened with status on SAML bundle",
+      "Priya raised concern about test user accounts",
+      "Agreed on Friday cutover"
+    ],
+    "notes": "Acme team energy felt good. Priya is actively unblocking on her side.",
+    "speaker_count": 2,
+    "speaker_names": ["Caroline Jaworsky", "Priya Patel"],
+    "attendees": [
+      { "email": "caroline@vendor.com", "name": "Caroline Jaworsky", "domain": "vendor.com" },
+      { "email": "priya@acme.com", "name": "Priya Patel", "domain": "acme.com" }
+    ],
+    "transcript": [
+      { "speaker": "Caroline Jaworsky", "text": "Hey Priya, thanks for jumping on. Quick one — I've got the SAML metadata bundle ready, I'll send it over by Tuesday." },
+      { "speaker": "Priya Patel", "text": "Perfect, that works. I'll need to line up the IdP test user list on our side. Can I confirm that by Wednesday end of day?" },
+      { "speaker": "Caroline Jaworsky", "text": "Yeah Wednesday is fine. Friday cutover for the test environment then?" },
+      { "speaker": "Priya Patel", "text": "Friday works, let's lock it in." }
+    ]
+  }
+}

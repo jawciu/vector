@@ -268,7 +268,9 @@ export const ExternalEventScalarFieldEnum = {
   payload: 'payload',
   onboardingId: 'onboardingId',
   matchAmbiguous: 'matchAmbiguous',
-  error: 'error'
+  error: 'error',
+  orchestratorInput: 'orchestratorInput',
+  orchestratorOutput: 'orchestratorOutput'
 } as const
 
 export type ExternalEventScalarFieldEnum = (typeof ExternalEventScalarFieldEnum)[keyof typeof ExternalEventScalarFieldEnum]
@@ -339,6 +341,14 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {

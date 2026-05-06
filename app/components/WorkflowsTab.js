@@ -22,7 +22,13 @@ const STATUSES = [
  * badge) so new drafts arriving while the tab is open auto-refresh the
  * list. Owner-scoping for draft_followup is preserved server-side.
  */
-export default function WorkflowsTab({ onboardingId }) {
+export default function WorkflowsTab({
+  onboardingId,
+  vendorUsers = [],
+  contacts = [],
+  phases = [],
+  openTasks = [],
+}) {
   const [status, setStatus] = useState("pending");
   const [drafts, setDrafts] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -150,7 +156,16 @@ export default function WorkflowsTab({ onboardingId }) {
         <EmptyState status={status} />
       )}
       {drafts != null && drafts.length > 0 && (
-        <AIDraftInbox key={status} initialDrafts={drafts} mode={status} query={query} />
+        <AIDraftInbox
+          key={status}
+          initialDrafts={drafts}
+          mode={status}
+          query={query}
+          vendorUsers={vendorUsers}
+          contacts={contacts}
+          phases={phases}
+          openTasks={openTasks}
+        />
       )}
     </div>
   );

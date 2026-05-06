@@ -71,6 +71,8 @@ export type ExternalEventCountAggregateOutputType = {
   onboardingId: number
   matchAmbiguous: number
   error: number
+  orchestratorInput: number
+  orchestratorOutput: number
   _all: number
 }
 
@@ -120,6 +122,8 @@ export type ExternalEventCountAggregateInputType = {
   onboardingId?: true
   matchAmbiguous?: true
   error?: true
+  orchestratorInput?: true
+  orchestratorOutput?: true
   _all?: true
 }
 
@@ -220,6 +224,8 @@ export type ExternalEventGroupByOutputType = {
   onboardingId: number | null
   matchAmbiguous: boolean
   error: string | null
+  orchestratorInput: runtime.JsonValue | null
+  orchestratorOutput: runtime.JsonValue | null
   _count: ExternalEventCountAggregateOutputType | null
   _avg: ExternalEventAvgAggregateOutputType | null
   _sum: ExternalEventSumAggregateOutputType | null
@@ -256,6 +262,8 @@ export type ExternalEventWhereInput = {
   onboardingId?: Prisma.IntNullableFilter<"ExternalEvent"> | number | null
   matchAmbiguous?: Prisma.BoolFilter<"ExternalEvent"> | boolean
   error?: Prisma.StringNullableFilter<"ExternalEvent"> | string | null
+  orchestratorInput?: Prisma.JsonNullableFilter<"ExternalEvent">
+  orchestratorOutput?: Prisma.JsonNullableFilter<"ExternalEvent">
   onboarding?: Prisma.XOR<Prisma.OnboardingNullableScalarRelationFilter, Prisma.OnboardingWhereInput> | null
   pendingChanges?: Prisma.PendingAIChangeListRelationFilter
 }
@@ -271,6 +279,8 @@ export type ExternalEventOrderByWithRelationInput = {
   onboardingId?: Prisma.SortOrderInput | Prisma.SortOrder
   matchAmbiguous?: Prisma.SortOrder
   error?: Prisma.SortOrderInput | Prisma.SortOrder
+  orchestratorInput?: Prisma.SortOrderInput | Prisma.SortOrder
+  orchestratorOutput?: Prisma.SortOrderInput | Prisma.SortOrder
   onboarding?: Prisma.OnboardingOrderByWithRelationInput
   pendingChanges?: Prisma.PendingAIChangeOrderByRelationAggregateInput
 }
@@ -290,6 +300,8 @@ export type ExternalEventWhereUniqueInput = Prisma.AtLeast<{
   onboardingId?: Prisma.IntNullableFilter<"ExternalEvent"> | number | null
   matchAmbiguous?: Prisma.BoolFilter<"ExternalEvent"> | boolean
   error?: Prisma.StringNullableFilter<"ExternalEvent"> | string | null
+  orchestratorInput?: Prisma.JsonNullableFilter<"ExternalEvent">
+  orchestratorOutput?: Prisma.JsonNullableFilter<"ExternalEvent">
   onboarding?: Prisma.XOR<Prisma.OnboardingNullableScalarRelationFilter, Prisma.OnboardingWhereInput> | null
   pendingChanges?: Prisma.PendingAIChangeListRelationFilter
 }, "id" | "source_sourceId">
@@ -305,6 +317,8 @@ export type ExternalEventOrderByWithAggregationInput = {
   onboardingId?: Prisma.SortOrderInput | Prisma.SortOrder
   matchAmbiguous?: Prisma.SortOrder
   error?: Prisma.SortOrderInput | Prisma.SortOrder
+  orchestratorInput?: Prisma.SortOrderInput | Prisma.SortOrder
+  orchestratorOutput?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ExternalEventCountOrderByAggregateInput
   _avg?: Prisma.ExternalEventAvgOrderByAggregateInput
   _max?: Prisma.ExternalEventMaxOrderByAggregateInput
@@ -326,6 +340,8 @@ export type ExternalEventScalarWhereWithAggregatesInput = {
   onboardingId?: Prisma.IntNullableWithAggregatesFilter<"ExternalEvent"> | number | null
   matchAmbiguous?: Prisma.BoolWithAggregatesFilter<"ExternalEvent"> | boolean
   error?: Prisma.StringNullableWithAggregatesFilter<"ExternalEvent"> | string | null
+  orchestratorInput?: Prisma.JsonNullableWithAggregatesFilter<"ExternalEvent">
+  orchestratorOutput?: Prisma.JsonNullableWithAggregatesFilter<"ExternalEvent">
 }
 
 export type ExternalEventCreateInput = {
@@ -337,6 +353,8 @@ export type ExternalEventCreateInput = {
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   matchAmbiguous?: boolean
   error?: string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   onboarding?: Prisma.OnboardingCreateNestedOneWithoutExternalEventsInput
   pendingChanges?: Prisma.PendingAIChangeCreateNestedManyWithoutSourceEventInput
 }
@@ -352,6 +370,8 @@ export type ExternalEventUncheckedCreateInput = {
   onboardingId?: number | null
   matchAmbiguous?: boolean
   error?: string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   pendingChanges?: Prisma.PendingAIChangeUncheckedCreateNestedManyWithoutSourceEventInput
 }
 
@@ -364,6 +384,8 @@ export type ExternalEventUpdateInput = {
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   matchAmbiguous?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   onboarding?: Prisma.OnboardingUpdateOneWithoutExternalEventsNestedInput
   pendingChanges?: Prisma.PendingAIChangeUpdateManyWithoutSourceEventNestedInput
 }
@@ -379,6 +401,8 @@ export type ExternalEventUncheckedUpdateInput = {
   onboardingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   matchAmbiguous?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   pendingChanges?: Prisma.PendingAIChangeUncheckedUpdateManyWithoutSourceEventNestedInput
 }
 
@@ -393,6 +417,8 @@ export type ExternalEventCreateManyInput = {
   onboardingId?: number | null
   matchAmbiguous?: boolean
   error?: string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ExternalEventUpdateManyMutationInput = {
@@ -404,6 +430,8 @@ export type ExternalEventUpdateManyMutationInput = {
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   matchAmbiguous?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ExternalEventUncheckedUpdateManyInput = {
@@ -417,6 +445,8 @@ export type ExternalEventUncheckedUpdateManyInput = {
   onboardingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   matchAmbiguous?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ExternalEventListRelationFilter = {
@@ -445,6 +475,8 @@ export type ExternalEventCountOrderByAggregateInput = {
   onboardingId?: Prisma.SortOrder
   matchAmbiguous?: Prisma.SortOrder
   error?: Prisma.SortOrder
+  orchestratorInput?: Prisma.SortOrder
+  orchestratorOutput?: Prisma.SortOrder
 }
 
 export type ExternalEventAvgOrderByAggregateInput = {
@@ -553,6 +585,8 @@ export type ExternalEventCreateWithoutOnboardingInput = {
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   matchAmbiguous?: boolean
   error?: string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   pendingChanges?: Prisma.PendingAIChangeCreateNestedManyWithoutSourceEventInput
 }
 
@@ -566,6 +600,8 @@ export type ExternalEventUncheckedCreateWithoutOnboardingInput = {
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   matchAmbiguous?: boolean
   error?: string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   pendingChanges?: Prisma.PendingAIChangeUncheckedCreateNestedManyWithoutSourceEventInput
 }
 
@@ -609,6 +645,8 @@ export type ExternalEventScalarWhereInput = {
   onboardingId?: Prisma.IntNullableFilter<"ExternalEvent"> | number | null
   matchAmbiguous?: Prisma.BoolFilter<"ExternalEvent"> | boolean
   error?: Prisma.StringNullableFilter<"ExternalEvent"> | string | null
+  orchestratorInput?: Prisma.JsonNullableFilter<"ExternalEvent">
+  orchestratorOutput?: Prisma.JsonNullableFilter<"ExternalEvent">
 }
 
 export type ExternalEventCreateWithoutPendingChangesInput = {
@@ -620,6 +658,8 @@ export type ExternalEventCreateWithoutPendingChangesInput = {
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   matchAmbiguous?: boolean
   error?: string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   onboarding?: Prisma.OnboardingCreateNestedOneWithoutExternalEventsInput
 }
 
@@ -634,6 +674,8 @@ export type ExternalEventUncheckedCreateWithoutPendingChangesInput = {
   onboardingId?: number | null
   matchAmbiguous?: boolean
   error?: string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ExternalEventCreateOrConnectWithoutPendingChangesInput = {
@@ -661,6 +703,8 @@ export type ExternalEventUpdateWithoutPendingChangesInput = {
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   matchAmbiguous?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   onboarding?: Prisma.OnboardingUpdateOneWithoutExternalEventsNestedInput
 }
 
@@ -675,6 +719,8 @@ export type ExternalEventUncheckedUpdateWithoutPendingChangesInput = {
   onboardingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   matchAmbiguous?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ExternalEventCreateManyOnboardingInput = {
@@ -687,6 +733,8 @@ export type ExternalEventCreateManyOnboardingInput = {
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   matchAmbiguous?: boolean
   error?: string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ExternalEventUpdateWithoutOnboardingInput = {
@@ -698,6 +746,8 @@ export type ExternalEventUpdateWithoutOnboardingInput = {
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   matchAmbiguous?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   pendingChanges?: Prisma.PendingAIChangeUpdateManyWithoutSourceEventNestedInput
 }
 
@@ -711,6 +761,8 @@ export type ExternalEventUncheckedUpdateWithoutOnboardingInput = {
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   matchAmbiguous?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   pendingChanges?: Prisma.PendingAIChangeUncheckedUpdateManyWithoutSourceEventNestedInput
 }
 
@@ -724,6 +776,8 @@ export type ExternalEventUncheckedUpdateManyWithoutOnboardingInput = {
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   matchAmbiguous?: Prisma.BoolFieldUpdateOperationsInput | boolean
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orchestratorInput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  orchestratorOutput?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 
@@ -768,6 +822,8 @@ export type ExternalEventSelect<ExtArgs extends runtime.Types.Extensions.Interna
   onboardingId?: boolean
   matchAmbiguous?: boolean
   error?: boolean
+  orchestratorInput?: boolean
+  orchestratorOutput?: boolean
   onboarding?: boolean | Prisma.ExternalEvent$onboardingArgs<ExtArgs>
   pendingChanges?: boolean | Prisma.ExternalEvent$pendingChangesArgs<ExtArgs>
   _count?: boolean | Prisma.ExternalEventCountOutputTypeDefaultArgs<ExtArgs>
@@ -784,6 +840,8 @@ export type ExternalEventSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   onboardingId?: boolean
   matchAmbiguous?: boolean
   error?: boolean
+  orchestratorInput?: boolean
+  orchestratorOutput?: boolean
   onboarding?: boolean | Prisma.ExternalEvent$onboardingArgs<ExtArgs>
 }, ExtArgs["result"]["externalEvent"]>
 
@@ -798,6 +856,8 @@ export type ExternalEventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   onboardingId?: boolean
   matchAmbiguous?: boolean
   error?: boolean
+  orchestratorInput?: boolean
+  orchestratorOutput?: boolean
   onboarding?: boolean | Prisma.ExternalEvent$onboardingArgs<ExtArgs>
 }, ExtArgs["result"]["externalEvent"]>
 
@@ -812,9 +872,11 @@ export type ExternalEventSelectScalar = {
   onboardingId?: boolean
   matchAmbiguous?: boolean
   error?: boolean
+  orchestratorInput?: boolean
+  orchestratorOutput?: boolean
 }
 
-export type ExternalEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "source" | "sourceId" | "occurredAt" | "receivedAt" | "processedAt" | "payload" | "onboardingId" | "matchAmbiguous" | "error", ExtArgs["result"]["externalEvent"]>
+export type ExternalEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "source" | "sourceId" | "occurredAt" | "receivedAt" | "processedAt" | "payload" | "onboardingId" | "matchAmbiguous" | "error" | "orchestratorInput" | "orchestratorOutput", ExtArgs["result"]["externalEvent"]>
 export type ExternalEventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   onboarding?: boolean | Prisma.ExternalEvent$onboardingArgs<ExtArgs>
   pendingChanges?: boolean | Prisma.ExternalEvent$pendingChangesArgs<ExtArgs>
@@ -844,6 +906,8 @@ export type $ExternalEventPayload<ExtArgs extends runtime.Types.Extensions.Inter
     onboardingId: number | null
     matchAmbiguous: boolean
     error: string | null
+    orchestratorInput: runtime.JsonValue | null
+    orchestratorOutput: runtime.JsonValue | null
   }, ExtArgs["result"]["externalEvent"]>
   composites: {}
 }
@@ -1279,6 +1343,8 @@ export interface ExternalEventFieldRefs {
   readonly onboardingId: Prisma.FieldRef<"ExternalEvent", 'Int'>
   readonly matchAmbiguous: Prisma.FieldRef<"ExternalEvent", 'Boolean'>
   readonly error: Prisma.FieldRef<"ExternalEvent", 'String'>
+  readonly orchestratorInput: Prisma.FieldRef<"ExternalEvent", 'Json'>
+  readonly orchestratorOutput: Prisma.FieldRef<"ExternalEvent", 'Json'>
 }
     
 

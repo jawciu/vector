@@ -1,0 +1,37 @@
+{
+  "event": "meeting.saved",
+  "meeting": {
+    "id": "fixture-ambiguous-match-001",
+    "title": "Q2 Planning",
+    "date": "2026-05-01T16:00:00Z",
+    "duration_seconds": 1980,
+    "language": "en",
+    "summary": "Internal Q2 planning session. Reviewed pipeline, capacity, and the upcoming round of customer onboardings. No specific customer commitments — this was pure internal alignment.",
+    "action_items": [
+      "Caroline to draft a Q2 OKR proposal by next Friday",
+      "Marcus to share the updated capacity model with the team"
+    ],
+    "key_decisions": [
+      "Hiring an additional implementation engineer in Q2"
+    ],
+    "topics": ["Q2 OKRs", "team capacity", "hiring plan"],
+    "discussion_flow": [
+      "Caroline opened with pipeline overview",
+      "Marcus walked through capacity",
+      "Closed on hiring decision"
+    ],
+    "notes": "No customer-specific work in this meeting. Should not match to any onboarding — title is generic and there are no attendees outside the vendor team.",
+    "speaker_count": 2,
+    "speaker_names": ["Caroline Jaworsky", "Marcus Internal"],
+    "attendees": [
+      { "email": "caroline@vendor.com", "name": "Caroline Jaworsky", "domain": "vendor.com" },
+      { "email": "marcus@vendor.com", "name": "Marcus Internal", "domain": "vendor.com" }
+    ],
+    "transcript": [
+      { "speaker": "Caroline Jaworsky", "text": "Q2 planning. Let's run through pipeline, capacity, and where we want to land on hiring." },
+      { "speaker": "Marcus Internal", "text": "Pipeline is healthy. We've got more demand than we can serve. I think we need to hire one more implementation engineer this quarter." },
+      { "speaker": "Caroline Jaworsky", "text": "Agreed. I'll draft a Q2 OKR proposal — should have it by next Friday. Can you share the updated capacity model with the team?" },
+      { "speaker": "Marcus Internal", "text": "Yes, I'll send it later today." }
+    ]
+  }
+}

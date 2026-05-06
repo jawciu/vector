@@ -1,0 +1,71 @@
+{
+  "event": "meeting.saved",
+  "meeting": {
+    "id": "fixture-long-transcript-001",
+    "title": "Globex implementation kick-off — week 4 review",
+    "date": "2026-05-03T15:30:00Z",
+    "duration_seconds": 3540,
+    "language": "en",
+    "summary": "Hour-long week 4 review with the Globex team. Covered data migration progress, the open question on custom field mapping, integration testing for the Salesforce connector, and training plan. Several action items spanning both teams; Marcus (Globex) is blocking on the API key rotation but everything else is moving. Caroline committed to a revised project plan reflecting the 1-week slip on the Salesforce work, and to looping in the security team on Globex's SSO requirements.",
+    "action_items": [
+      "Caroline will share a revised project plan reflecting the 1-week slip on the Salesforce connector work by Friday",
+      "Caroline will loop in the security team on Globex's IdP-initiated SSO requirements before next Tuesday's call",
+      "Marcus will rotate the production API key and share via 1Password by Wednesday",
+      "Sofia will send the custom field mapping spreadsheet, finalised, by end of day Thursday",
+      "Dan to schedule a 30-minute training session with the Globex CS team for the week of May 12",
+      "Marcus to confirm the production go-live date with the Globex exec sponsor",
+      "Caroline to update the runbook section on rollback procedure based on Sofia's questions"
+    ],
+    "key_decisions": [
+      "Salesforce connector slips by 1 week; Globex accepts the revised timeline",
+      "Custom field mapping will use Globex's existing taxonomy, not a new one",
+      "Training will be split into two sessions: admin (CS team) and end-user (sales)"
+    ],
+    "topics": [
+      "data migration status",
+      "custom field mapping",
+      "Salesforce connector testing",
+      "SSO and security review",
+      "training plan",
+      "go-live date"
+    ],
+    "discussion_flow": [
+      "Sofia opened with the data migration update — 80% complete",
+      "Marcus raised the API key rotation blocker",
+      "Caroline acknowledged the Salesforce slip, committed to revised plan",
+      "Dan walked through the proposed training structure",
+      "Closed on go-live confirmation timing"
+    ],
+    "notes": "Marcus's tone has shifted from week 2 — he's more confident now, asking sharper questions. Sofia is the operational lead and clearly the one driving day-to-day. Dan is new to me, joined as the CS lead this week. Watch for Globex execs getting nervous about the Salesforce slip — Marcus said he'd handle messaging, but I should be ready to back him up.",
+    "speaker_count": 4,
+    "speaker_names": ["Caroline Jaworsky", "Marcus Chen", "Sofia Reyes", "Dan O'Brien"],
+    "attendees": [
+      { "email": "caroline@vendor.com", "name": "Caroline Jaworsky", "domain": "vendor.com" },
+      { "email": "marcus.chen@globex.com", "name": "Marcus Chen", "domain": "globex.com" },
+      { "email": "sofia.reyes@globex.com", "name": "Sofia Reyes", "domain": "globex.com" },
+      { "email": "dan.obrien@globex.com", "name": "Dan O'Brien", "domain": "globex.com" }
+    ],
+    "transcript": [
+      { "speaker": "Caroline Jaworsky", "text": "Alright, thanks everyone for jumping on. Week 4 already — let's run the usual: status, blockers, action items. Sofia, want to kick us off with the data migration?" },
+      { "speaker": "Sofia Reyes", "text": "Sure. We're at about 80% on the migration. The contact and account objects landed cleanly. We're chewing through the activity history now — that's the slowest because of the custom field mapping decisions we still need to lock down. I'd say we've got two more days of solid work before we hit the validation phase." },
+      { "speaker": "Caroline Jaworsky", "text": "Good. And on the custom fields — Sofia, can you finalise the mapping spreadsheet? I think the only open question was whether we're carrying over the legacy 'opportunity_source_v2' field." },
+      { "speaker": "Sofia Reyes", "text": "Yeah, we'll keep it. I'll send the finalised version by Thursday end of day." },
+      { "speaker": "Marcus Chen", "text": "While we're on it — we still haven't rotated the production API key. I had it on my list and got blocked on getting AWS Secrets Manager access. That's resolved now, I'll do it Wednesday and share via 1Password." },
+      { "speaker": "Caroline Jaworsky", "text": "Perfect, thanks Marcus. That was on my critical-path list. Now — the harder conversation. Salesforce connector testing. We hit a snag on the custom object sync — the schema definitions don't match our v3 connector cleanly, so we're going to need an extra week. I want to flag that now so it's not a surprise." },
+      { "speaker": "Marcus Chen", "text": "How are you defining 'extra week' — does that push our go-live?" },
+      { "speaker": "Caroline Jaworsky", "text": "It pushes the connector ready-date by a week. Whether that pushes go-live depends on whether you want connector-ready before go-live or as a fast-follow. We've done both with other customers." },
+      { "speaker": "Marcus Chen", "text": "We need it before go-live. The exec team's expectation is everything-on-day-one. Let me confirm the new go-live date with our sponsor — I'll do that today." },
+      { "speaker": "Caroline Jaworsky", "text": "Got it. I'll share a revised project plan reflecting the slip — should have that to you by Friday. It'll include the new go-live target, dependencies, and the specific Salesforce work." },
+      { "speaker": "Sofia Reyes", "text": "Caroline — while we're talking timeline. We had a question about the rollback procedure. The runbook covers the data plane but not the connector plane. Can you update that section?" },
+      { "speaker": "Caroline Jaworsky", "text": "Yes, good catch. I'll do that with the project plan revision." },
+      { "speaker": "Marcus Chen", "text": "One more — security. Our infosec lead asked about IdP-initiated SSO. Our IdP is a custom thing, not Okta or Azure AD. Can your security team weigh in on whether that's supported?" },
+      { "speaker": "Caroline Jaworsky", "text": "Yes, I'll loop them in before our Tuesday call. Best to get that on their radar early." },
+      { "speaker": "Dan O'Brien", "text": "Hi all — Dan here, I'm the new CS lead on this. Wanted to flag the training plan. We were thinking of one big session, but I think splitting it makes more sense — admin training for our CS team, then end-user training for sales. Different audiences, different content." },
+      { "speaker": "Caroline Jaworsky", "text": "Strongly agree. Dan, can you schedule those? Maybe target the week of May 12 for the admin session, then end-user the week after?" },
+      { "speaker": "Dan O'Brien", "text": "Will do. I'll send invites by end of day." },
+      { "speaker": "Caroline Jaworsky", "text": "Perfect. Anything else from anyone?" },
+      { "speaker": "Marcus Chen", "text": "I think that's everything. Thanks for being upfront about the Salesforce slip — appreciate it." },
+      { "speaker": "Caroline Jaworsky", "text": "Of course. Talk Tuesday." }
+    ]
+  }
+}

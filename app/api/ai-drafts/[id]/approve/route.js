@@ -78,6 +78,10 @@ export async function POST(request, { params }) {
 
     if (draft.action === "create_task") {
       const merged = { ...draft.payload, ...overrides };
+      // Vector now emits structured ownerId / assigneeContactId / blockedByTaskId
+      // / notes alongside the basic fields. createTask already accepts all of
+      // these, so it's a clean pass-through (validation against the context
+      // happened server-side at draft-creation time in processMinitiEvent).
       const taskData = {
         onboardingId: draft.onboardingId,
         phaseId: merged.phaseId,
@@ -86,6 +90,10 @@ export async function POST(request, { params }) {
         status: "Not started",
         due: merged.dueDate || "",
         priority: merged.priority ?? null,
+        ownerId: merged.ownerId ?? null,
+        assigneeContactId: merged.assigneeContactId ?? null,
+        blockedByTaskId: merged.blockedByTaskId ?? null,
+        notes: merged.notes ?? "",
       };
       const task = await createTask(taskData, { actor });
       appliedTaskId = task.id;

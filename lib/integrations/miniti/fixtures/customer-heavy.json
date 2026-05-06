@@ -1,0 +1,53 @@
+{
+  "event": "meeting.saved",
+  "meeting": {
+    "id": "fixture-customer-heavy-001",
+    "title": "Initech onboarding — readiness check",
+    "date": "2026-05-02T13:00:00Z",
+    "duration_seconds": 1860,
+    "language": "en",
+    "summary": "Initech readiness check ahead of go-live. Most outstanding work sits on Initech's side: their finance team needs to sign off on the procurement workflow, IT needs to provision service accounts, and Bill (their PM) needs to schedule the kickoff with their CFO. Caroline has one item — chase the legal redlines on the DPA.",
+    "action_items": [
+      "Bill will get finance team sign-off on the procurement workflow by Friday",
+      "Bill will have IT provision the three service accounts (read, write, admin) by next Wednesday",
+      "Bill will schedule the kickoff meeting with their CFO before May 12",
+      "Samir to send the corrected user list (the previous one had duplicates) by Monday",
+      "Samir to confirm the production environment whitelist with their network team",
+      "Caroline will chase legal on the DPA redlines and report back by Thursday"
+    ],
+    "key_decisions": [
+      "Go-live target stays at May 19, conditional on the IT provisioning landing on time"
+    ],
+    "topics": [
+      "procurement signoff",
+      "service account provisioning",
+      "executive kickoff",
+      "user list cleanup",
+      "DPA legal review"
+    ],
+    "discussion_flow": [
+      "Bill walked through outstanding internal items at Initech",
+      "Samir flagged the duplicate users in the previous list",
+      "Caroline confirmed the DPA is the only vendor-side blocker",
+      "Closed on go-live conditionality"
+    ],
+    "notes": "Bill is highly engaged and clearly running this on his side. Samir is detail-oriented and already caught a list error before it caused problems downstream — keep that feedback loop tight.",
+    "speaker_count": 3,
+    "speaker_names": ["Caroline Jaworsky", "Bill Lumbergh", "Samir Nagheenanajar"],
+    "attendees": [
+      { "email": "caroline@vendor.com", "name": "Caroline Jaworsky", "domain": "vendor.com" },
+      { "email": "bill@initech.com", "name": "Bill Lumbergh", "domain": "initech.com" },
+      { "email": "samir@initech.com", "name": "Samir Nagheenanajar", "domain": "initech.com" }
+    ],
+    "transcript": [
+      { "speaker": "Caroline Jaworsky", "text": "Hi Bill, hi Samir. Readiness check — let's go through the outstanding items. Bill, where are you on procurement?" },
+      { "speaker": "Bill Lumbergh", "text": "Yeah, so, I'm gonna need finance to sign off on the workflow. I'll have that by Friday. And IT needs to provision the three service accounts — read, write, admin — should be done by Wednesday next week." },
+      { "speaker": "Bill Lumbergh", "text": "Also, I'll get a kickoff scheduled with our CFO before May 12. He wants to be looped in before go-live." },
+      { "speaker": "Samir Nagheenanajar", "text": "On the user list — the one we sent had duplicates. I'll send the corrected version Monday. And I need to confirm the prod whitelist with our network team." },
+      { "speaker": "Caroline Jaworsky", "text": "Great catch on the duplicates. From our side, the only outstanding is legal — I'm chasing the DPA redlines, I'll have an update by Thursday." },
+      { "speaker": "Bill Lumbergh", "text": "Good. So we're still tracking to May 19?" },
+      { "speaker": "Caroline Jaworsky", "text": "Yes, conditional on the IT provisioning landing on time. If that slips, go-live slips with it." },
+      { "speaker": "Bill Lumbergh", "text": "Understood. We're on it." }
+    ]
+  }
+}

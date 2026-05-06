@@ -4,6 +4,22 @@ import { createClient } from "@/lib/supabase/server";
 import { getAICallStats, getRecentAICalls, getIntegrationStats, countAmbiguousEvents, listStuckEvents } from "@/lib/db";
 import StuckEventsList from "@/app/components/StuckEventsList";
 import ScanStaleButton from "@/app/components/ScanStaleButton";
+import TestWebhookPanel from "@/app/components/TestWebhookPanel";
+import { promises as fs } from "node:fs";
+import path from "node:path";
+
+async function listFixtureNames() {
+  try {
+    const dir = path.join(process.cwd(), "lib/integrations/miniti/fixtures");
+    const entries = await fs.readdir(dir);
+    return entries
+      .filter((f) => f.endsWith(".json"))
+      .map((f) => f.replace(/\.json$/, ""))
+      .sort();
+  } catch {
+    return [];
+  }
+}
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +29,7 @@ export default async function AdminAIPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [stats30d, stats7d, statsToday, recent, minitiStats7d, minitiStats30d, ambiguousNow, stuckEvents] = await Promise.all([
+  const [stats30d, stats7d, statsToday, recent, minitiStats7d, minitiStats30d, ambiguousNow, stuckEvents, fixtures] = await Promise.all([
     getAICallStats({ days: 30 }),
     getAICallStats({ days: 7 }),
     getAICallStats({ days: 1 }),
@@ -22,6 +38,7 @@ export default async function AdminAIPage() {
     getIntegrationStats({ source: "miniti", days: 30 }),
     countAmbiguousEvents({ source: "miniti" }),
     listStuckEvents({ source: "miniti", limit: 20 }),
+    listFixtureNames(),
   ]);
 
   const total = (rows) => rows.reduce((acc, r) => acc + r.totalCostUsd, 0);
@@ -89,6 +106,11 @@ export default async function AdminAIPage() {
               </tbody>
             </table>
           )}
+        </Section>
+
+        {/* Test webhook — fire fixture payloads at our own Miniti receiver. */}
+        <Section title="Test webhook">
+          <TestWebhookPanel fixtures={fixtures} />
         </Section>
 
         {/* Stale-task scanner — Vector autonomously drafts follow-up emails. */}

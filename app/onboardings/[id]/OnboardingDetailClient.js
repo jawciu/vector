@@ -796,7 +796,13 @@ export default function OnboardingDetailClient({
 
       {activeTab === "workflows" && (
         <div className="flex-1 overflow-y-auto" style={{ padding: "0 24px" }}>
-          <WorkflowsTab onboardingId={onboarding.id} />
+          <WorkflowsTab
+            onboardingId={onboarding.id}
+            vendorUsers={vendorUsers}
+            contacts={contacts}
+            phases={phases}
+            openTasks={tasks.filter((t) => t.status !== "Done")}
+          />
         </div>
       )}
 

@@ -223,6 +223,13 @@ model ExternalEvent {
   onboarding     Onboarding?      @relation(fields: [onboardingId], references: [id], onDelete: SetNull)
   matchAmbiguous Boolean          @default(false)  // true → needs Caroline to assign manually
   error          String?          // last processing error, if any
+  // Debug surface for orchestrator iteration: the JSON we sent to Claude
+  // (the buildOrchestratorContext output) and the raw tool calls Claude
+  // returned. Populated at the end of processMinitiEvent. Both nullable
+  // because pre-existing rows + ambiguous events that never reach the
+  // orchestrator won't have them.
+  orchestratorInput  Json?
+  orchestratorOutput Json?
   pendingChanges PendingAIChange[]
 
   @@unique([source, sourceId])

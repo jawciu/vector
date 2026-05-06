@@ -15,6 +15,16 @@ export default function StuckEventsList({ initialEvents }) {
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkError, setBulkError] = useState(null);
   const [bulkResult, setBulkResult] = useState(null);
+  const [debugOpen, setDebugOpen] = useState(new Set());
+
+  function toggleDebug(id) {
+    setDebugOpen((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   function setBusy(id, busy) {
     setBusyIds((prev) => {
@@ -110,14 +120,16 @@ export default function StuckEventsList({ initialEvents }) {
       {events.map((event) => {
         const busy = busyIds.has(event.id);
         const error = errors[event.id];
+        const isDebugOpen = debugOpen.has(event.id);
+        const hasDebug =
+          event.orchestratorInput != null || event.orchestratorOutput != null;
         return (
           <li
             key={event.id}
             style={{
               display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 12,
+              flexDirection: "column",
+              gap: 8,
               padding: "8px 12px",
               background: "var(--bg)",
               border: "1px solid var(--border-subtle)",
@@ -125,37 +137,109 @@ export default function StuckEventsList({ initialEvents }) {
               fontSize: 12,
             }}
           >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ color: "var(--text)", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {event.meetingTitle}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ color: "var(--text)", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {event.meetingTitle}
+                </div>
+                <div style={{ color: "var(--text-muted)", fontSize: 11, marginTop: 2 }}>
+                  {event.onboardingName ?? `Onboarding #${event.onboardingId}`} · stuck for {event.ageMinutes}m
+                </div>
+                {error && (
+                  <div style={{ color: "var(--danger)", fontSize: 11, marginTop: 4 }}>{error}</div>
+                )}
               </div>
-              <div style={{ color: "var(--text-muted)", fontSize: 11, marginTop: 2 }}>
-                {event.onboardingName ?? `Onboarding #${event.onboardingId}`} · stuck for {event.ageMinutes}m
+              <div style={{ display: "flex", gap: 6, flexShrink: 0, alignItems: "center" }}>
+                <button
+                  onClick={() => toggleDebug(event.id)}
+                  style={{
+                    fontSize: 11,
+                    color: "var(--text-muted)",
+                    background: "transparent",
+                    border: "none",
+                    padding: "4px 8px",
+                    cursor: "pointer",
+                  }}
+                  title={hasDebug ? "Show orchestrator input/output JSON" : "No orchestrator I/O persisted yet — orchestrator never finished"}
+                >
+                  {isDebugOpen ? "Hide debug" : "Show debug"}
+                </button>
+                <Link
+                  href={`/onboardings/${event.onboardingId}`}
+                  style={{ fontSize: 11, color: "var(--text-muted)", padding: "4px 8px" }}
+                >
+                  View
+                </Link>
+                <button
+                  onClick={() => handleReprocess(event.id)}
+                  disabled={busy}
+                  className="btn-secondary text-sm rounded-lg"
+                  style={{ padding: "4px 10px", fontSize: 12, opacity: busy ? 0.5 : 1 }}
+                >
+                  {busy ? "…" : "Reprocess"}
+                </button>
               </div>
-              {error && (
-                <div style={{ color: "var(--danger)", fontSize: 11, marginTop: 4 }}>{error}</div>
-              )}
             </div>
-            <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-              <Link
-                href={`/onboardings/${event.onboardingId}`}
-                style={{ fontSize: 11, color: "var(--text-muted)", padding: "4px 8px" }}
-              >
-                View
-              </Link>
-              <button
-                onClick={() => handleReprocess(event.id)}
-                disabled={busy}
-                className="btn-secondary text-sm rounded-lg"
-                style={{ padding: "4px 10px", fontSize: 12, opacity: busy ? 0.5 : 1 }}
-              >
-                {busy ? "…" : "Reprocess"}
-              </button>
-            </div>
+            {isDebugOpen && (
+              <DebugBlocks
+                input={event.orchestratorInput}
+                output={event.orchestratorOutput}
+              />
+            )}
           </li>
         );
       })}
       </ul>
     </div>
+  );
+}
+
+/** Inline JSON viewer for orchestratorInput / orchestratorOutput on a
+ *  stuck-events row. Both halves render even if null so it's visually
+ *  obvious what's missing. */
+function DebugBlocks({ input, output }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <DebugBlock label="orchestratorInput" value={input} />
+      <DebugBlock label="orchestratorOutput" value={output} />
+    </div>
+  );
+}
+
+function DebugBlock({ label, value }) {
+  const json = value == null ? null : JSON.stringify(value, null, 2);
+  return (
+    <details style={{ fontSize: 11 }}>
+      <summary
+        style={{
+          cursor: "pointer",
+          color: "var(--text-muted)",
+          fontFamily: "monospace",
+          padding: "2px 0",
+        }}
+      >
+        {label} {value == null ? "(null)" : `(${json.length.toLocaleString()} chars)`}
+      </summary>
+      {json != null && (
+        <pre
+          style={{
+            margin: "4px 0 0",
+            padding: "8px 10px",
+            background: "var(--surface)",
+            border: "1px solid var(--border-subtle)",
+            borderRadius: 4,
+            fontSize: 10.5,
+            lineHeight: 1.4,
+            color: "var(--text)",
+            maxHeight: 320,
+            overflow: "auto",
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+          }}
+        >
+          {json}
+        </pre>
+      )}
+    </details>
   );
 }
