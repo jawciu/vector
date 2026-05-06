@@ -26,14 +26,13 @@ import { DependenciesIcon } from "@/app/ui/Icons";
  *   - Read-only — no checkboxes, no action buttons
  *   - Status-coloured pill on each card
  */
-export default function AIDraftInbox({ initialDrafts, mode = "pending" }) {
+export default function AIDraftInbox({ initialDrafts, mode = "pending", query = "" }) {
   const [drafts, setDrafts] = useState(initialDrafts);
   const [busyIds, setBusyIds] = useState(new Set());
   const [errors, setErrors] = useState({});
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [editingId, setEditingId] = useState(null);
   const [toast, setToast] = useState(null);
-  const [query, setQuery] = useState("");
   const toastTimer = useRef(null);
 
   function flashToast(message) {
@@ -157,12 +156,6 @@ export default function AIDraftInbox({ initialDrafts, mode = "pending" }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12, position: "relative" }}>
       {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
-      <SearchBar
-        value={query}
-        onChange={setQuery}
-        resultCount={filteredDrafts.length}
-        totalCount={drafts.length}
-      />
       {isPending && selectedIds.size > 0 && (
         <BulkActionBar
           count={selectedIds.size}
@@ -335,64 +328,6 @@ function Toast({ message, onDismiss }) {
         See <a href="/ai-drafts?status=applied" style={{ color: "var(--action)" }} onClick={(e) => e.stopPropagation()}>Applied</a>
       </span>
     </div>
-  );
-}
-
-function SearchBar({ value, onChange, resultCount, totalCount }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        padding: "8px 12px",
-        background: "var(--bg)",
-        border: "1px solid var(--border)",
-        borderRadius: 10,
-      }}
-    >
-      <SearchIcon />
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="Search by task, follow-up title, or meeting…"
-        aria-label="Search drafts"
-        style={{
-          flex: 1,
-          background: "transparent",
-          border: "none",
-          outline: "none",
-          color: "var(--text)",
-          fontSize: 13,
-        }}
-      />
-      {value && (
-        <>
-          <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
-            {resultCount} of {totalCount}
-          </span>
-          <button
-            type="button"
-            onClick={() => onChange("")}
-            aria-label="Clear search"
-            className="text-btn"
-            style={{ padding: "2px 6px", fontSize: 12, color: "var(--text-muted)" }}
-          >
-            Clear
-          </button>
-        </>
-      )}
-    </div>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "var(--text-muted)", flexShrink: 0 }}>
-      <circle cx="6" cy="6" r="4.25" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M9.5 9.5L12 12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
   );
 }
 

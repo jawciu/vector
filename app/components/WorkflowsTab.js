@@ -28,6 +28,7 @@ export default function WorkflowsTab({ onboardingId }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const menuRef = useRef(null);
 
   const refetch = useCallback(async () => {
@@ -136,6 +137,7 @@ export default function WorkflowsTab({ onboardingId }) {
             </MenuList>
           )}
         </div>
+        <SearchInput value={query} onChange={setQuery} />
       </header>
 
       {loading && drafts == null && (
@@ -148,7 +150,58 @@ export default function WorkflowsTab({ onboardingId }) {
         <EmptyState status={status} />
       )}
       {drafts != null && drafts.length > 0 && (
-        <AIDraftInbox key={status} initialDrafts={drafts} mode={status} />
+        <AIDraftInbox key={status} initialDrafts={drafts} mode={status} query={query} />
+      )}
+    </div>
+  );
+}
+
+/** Inline search input — sits in the WorkflowsTab header next to the
+ *  status filter. Caps at 400px wide so it doesn't dominate. */
+function SearchInput({ value, onChange }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "6px 10px",
+        background: "var(--bg)",
+        border: "1px solid var(--border)",
+        borderRadius: 10,
+        width: 300,
+        maxWidth: "100%",
+      }}
+    >
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "var(--text-muted)", flexShrink: 0 }}>
+        <circle cx="6" cy="6" r="4.25" stroke="currentColor" strokeWidth="1.2" />
+        <path d="M9.5 9.5L12 12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Search task, follow-up title, meeting…"
+        aria-label="Search drafts"
+        style={{
+          flex: 1,
+          background: "transparent",
+          border: "none",
+          outline: "none",
+          color: "var(--text)",
+          fontSize: 13,
+        }}
+      />
+      {value && (
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          aria-label="Clear search"
+          className="text-btn"
+          style={{ padding: "2px 6px", fontSize: 12, color: "var(--text-muted)" }}
+        >
+          Clear
+        </button>
       )}
     </div>
   );
