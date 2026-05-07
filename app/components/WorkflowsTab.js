@@ -99,6 +99,30 @@ export default function WorkflowsTab({
   }, [refetch, onboardingId]);
 
   const currentLabel = STATUSES.find((s) => s.id === status)?.label ?? "Pending";
+  const visibleDrafts = drafts ?? [];
+  const isPending = status === "pending";
+
+  async function handleDismissAll() {
+    if (visibleDrafts.length === 0) return;
+    const ok = typeof window !== "undefined"
+      ? window.confirm(
+          `Dismiss all ${visibleDrafts.length} draft${visibleDrafts.length === 1 ? "" : "s"} for this onboarding?`
+        )
+      : true;
+    if (!ok) return;
+    for (const draft of visibleDrafts) {
+      try {
+        await fetch(`/api/ai-drafts/${draft.id}/reject`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason: "dismiss all" }),
+        });
+      } catch (err) {
+        console.warn(`[workflows] dismiss-all failed for draft ${draft.id}`, err);
+      }
+    }
+    refetch();
+  }
 
   return (
     <div
@@ -143,7 +167,19 @@ export default function WorkflowsTab({
             </MenuList>
           )}
         </div>
-        <SearchInput value={query} onChange={setQuery} />
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <SearchInput value={query} onChange={setQuery} />
+          {isPending && visibleDrafts.length > 0 && (
+            <button
+              type="button"
+              onClick={handleDismissAll}
+              className="btn-secondary text-sm rounded-lg"
+              style={{ padding: "4px 10px", fontSize: 13, whiteSpace: "nowrap" }}
+            >
+              Dismiss all
+            </button>
+          )}
+        </div>
       </header>
 
       {loading && drafts == null && (

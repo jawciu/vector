@@ -122,7 +122,9 @@ export default function StuckEventsList({ initialEvents }) {
         const error = errors[event.id];
         const isDebugOpen = debugOpen.has(event.id);
         const hasDebug =
-          event.orchestratorInput != null || event.orchestratorOutput != null;
+          event.orchestratorInput != null ||
+          event.orchestratorExtraction != null ||
+          event.orchestratorOutput != null;
         return (
           <li
             key={event.id}
@@ -183,6 +185,7 @@ export default function StuckEventsList({ initialEvents }) {
             {isDebugOpen && (
               <DebugBlocks
                 input={event.orchestratorInput}
+                extraction={event.orchestratorExtraction}
                 output={event.orchestratorOutput}
               />
             )}
@@ -194,14 +197,18 @@ export default function StuckEventsList({ initialEvents }) {
   );
 }
 
-/** Inline JSON viewer for orchestratorInput / orchestratorOutput on a
- *  stuck-events row. Both halves render even if null so it's visually
- *  obvious what's missing. */
-function DebugBlocks({ input, output }) {
+/** Inline JSON viewer for the three-stage orchestrator pipeline. Each
+ *  stage renders even if null so it's visually obvious which one missed:
+ *    input      = Pass 0 context (buildOrchestratorContext output)
+ *    extraction = Pass 1 facts (action items, completions, mentions)
+ *    output     = Pass 2 tool calls (the create/match/update drafts)
+ */
+function DebugBlocks({ input, extraction, output }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <DebugBlock label="orchestratorInput" value={input} />
-      <DebugBlock label="orchestratorOutput" value={output} />
+      <DebugBlock label="orchestratorInput (context sent to Pass 1 + Pass 2)" value={input} />
+      <DebugBlock label="orchestratorExtraction (Pass 1 facts)" value={extraction} />
+      <DebugBlock label="orchestratorOutput (Pass 2 tool calls)" value={output} />
     </div>
   );
 }

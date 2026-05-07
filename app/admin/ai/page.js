@@ -5,6 +5,7 @@ import { getAICallStats, getRecentAICalls, getIntegrationStats, countAmbiguousEv
 import StuckEventsList from "@/app/components/StuckEventsList";
 import ScanStaleButton from "@/app/components/ScanStaleButton";
 import TestWebhookPanel from "@/app/components/TestWebhookPanel";
+import AdminAITabs from "@/app/components/AdminAITabs";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
@@ -45,6 +46,168 @@ export default async function AdminAIPage() {
   const totalCalls = (rows) => rows.reduce((acc, r) => acc + r.count, 0);
   const totalErrors = (rows) => rows.reduce((acc, r) => acc + r.errorCount, 0);
 
+  const overviewTab = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+        <SummaryCard label="Today" cost={total(statsToday)} calls={totalCalls(statsToday)} errors={totalErrors(statsToday)} />
+        <SummaryCard label="Last 7 days" cost={total(stats7d)} calls={totalCalls(stats7d)} errors={totalErrors(stats7d)} />
+        <SummaryCard label="Last 30 days" cost={total(stats30d)} calls={totalCalls(stats30d)} errors={totalErrors(stats30d)} />
+      </div>
+
+      <Section title="Stale-task scanner">
+        <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "0 0 10px", lineHeight: 1.5 }}>
+          Walks active onboardings, finds your overdue or blocked tasks, and drafts follow-up emails for each. Runs weekly via cron; you can also trigger it manually.
+        </p>
+        <ScanStaleButton />
+      </Section>
+
+      {ambiguousNow > 0 && (
+        <div
+          style={{
+            padding: "10px 14px",
+            borderRadius: 8,
+            background: "rgba(255, 218, 145, 0.08)",
+            border: "1px solid var(--alert)",
+            fontSize: 13,
+            color: "var(--text)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+          }}
+        >
+          <span>
+            <strong>{ambiguousNow}</strong> meeting{ambiguousNow === 1 ? "" : "s"} waiting for manual assignment.
+          </span>
+          <Link
+            href="/ai-drafts"
+            style={{ color: "var(--action)", fontSize: 13, fontWeight: 500 }}
+          >
+            Review →
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+
+  const usageTab = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <Section title="By feature (last 30 days)">
+        {stats30d.length === 0 ? (
+          <Empty>No AI calls yet.</Empty>
+        ) : (
+          <table style={{ width: "100%", fontSize: 13, color: "var(--text)", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ color: "var(--text-muted)", textAlign: "left" }}>
+                <Th>Kind</Th>
+                <Th align="right">Calls</Th>
+                <Th align="right">Errors</Th>
+                <Th align="right">Total cost</Th>
+                <Th align="right">Avg cost</Th>
+                <Th align="right">p95 latency</Th>
+                <Th align="right">Cache hit %</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats30d.map((r) => {
+                const totalReadable = r.totalInput + r.totalCacheRead;
+                const cacheHitPct = totalReadable > 0 ? (r.totalCacheRead / totalReadable) * 100 : 0;
+                return (
+                  <tr key={r.kind} style={{ borderTop: "1px solid var(--border-subtle)" }}>
+                    <Td><code style={{ fontSize: 12 }}>{r.kind}</code></Td>
+                    <Td align="right">{r.count}</Td>
+                    <Td align="right">
+                      {r.errorCount === 0 ? (
+                        <span style={{ color: "var(--text-muted)" }}>—</span>
+                      ) : (
+                        <span style={{ color: "var(--danger)" }}>{r.errorCount}</span>
+                      )}
+                    </Td>
+                    <Td align="right">{usd(r.totalCostUsd)}</Td>
+                    <Td align="right">{usd(r.avgCostUsd)}</Td>
+                    <Td align="right">{(r.p95DurationMs / 1000).toFixed(1)}s</Td>
+                    <Td align="right">{cacheHitPct.toFixed(0)}%</Td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </Section>
+
+      <Section title="Recent calls (latest 50)">
+        {recent.length === 0 ? (
+          <Empty>No calls logged yet.</Empty>
+        ) : (
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", fontSize: 12, color: "var(--text)", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ color: "var(--text-muted)", textAlign: "left" }}>
+                  <Th>When</Th>
+                  <Th>Kind</Th>
+                  <Th>Scope</Th>
+                  <Th>Model</Th>
+                  <Th align="right">In / cache R / cache W / Out</Th>
+                  <Th align="right">Cost</Th>
+                  <Th align="right">Duration</Th>
+                  <Th>Status</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {recent.map((r) => (
+                  <tr key={r.id} style={{ borderTop: "1px solid var(--border-subtle)" }}>
+                    <Td><time>{new Date(r.createdAt).toLocaleString()}</time></Td>
+                    <Td><code style={{ fontSize: 11 }}>{r.kind}</code></Td>
+                    <Td>{r.scopeId ?? <span style={{ color: "var(--text-muted)" }}>—</span>}</Td>
+                    <Td><span style={{ color: "var(--text-muted)" }}>{r.model}</span></Td>
+                    <Td align="right" style={{ fontFamily: "monospace", fontSize: 11 }}>
+                      {r.inputTokens} / {r.cacheReadTokens} / {r.cacheWriteTokens} / {r.outputTokens}
+                    </Td>
+                    <Td align="right">{usd(r.costUsd)}</Td>
+                    <Td align="right">{(r.durationMs / 1000).toFixed(1)}s</Td>
+                    <Td>
+                      {r.error ? (
+                        <span style={{ color: "var(--danger)", fontSize: 11 }}>{r.error}</span>
+                      ) : (
+                        <span style={{ color: "var(--success, #5cd6a5)", fontSize: 11 }}>ok</span>
+                      )}
+                    </Td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Section>
+    </div>
+  );
+
+  const integrationsTab = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <Section title="Miniti throughput">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
+          <IntegrationCard label="Last 7 days" stats={minitiStats7d} />
+          <IntegrationCard label="Last 30 days" stats={minitiStats30d} />
+        </div>
+      </Section>
+
+      {stuckEvents.length > 0 && (
+        <Section title="Stuck events">
+          <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "0 0 10px", lineHeight: 1.5 }}>
+            Matched to an onboarding but never finished processing. Almost always means the orchestrator was killed mid-run. Click reprocess to retry; it&apos;s idempotent. &ldquo;Show debug&rdquo; reveals the persisted Pass 1 extraction + Pass 2 tool calls so you can see where it stalled.
+          </p>
+          <StuckEventsList initialEvents={stuckEvents} />
+        </Section>
+      )}
+    </div>
+  );
+
+  const testTab = (
+    <Section title="Test webhook">
+      <TestWebhookPanel fixtures={fixtures} />
+    </Section>
+  );
+
   return (
     <div className="w-full h-full overflow-y-auto" style={{ padding: 24 }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", flexDirection: "column", gap: 24 }}>
@@ -57,162 +220,14 @@ export default async function AdminAIPage() {
           </p>
         </header>
 
-        {/* Top-line summary cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-          <SummaryCard label="Today" cost={total(statsToday)} calls={totalCalls(statsToday)} errors={totalErrors(statsToday)} />
-          <SummaryCard label="Last 7 days" cost={total(stats7d)} calls={totalCalls(stats7d)} errors={totalErrors(stats7d)} />
-          <SummaryCard label="Last 30 days" cost={total(stats30d)} calls={totalCalls(stats30d)} errors={totalErrors(stats30d)} />
-        </div>
-
-        {/* Per-kind breakdown for the last 30 days */}
-        <Section title="By feature (last 30 days)">
-          {stats30d.length === 0 ? (
-            <Empty>No AI calls yet.</Empty>
-          ) : (
-            <table style={{ width: "100%", fontSize: 13, color: "var(--text)", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ color: "var(--text-muted)", textAlign: "left" }}>
-                  <Th>Kind</Th>
-                  <Th align="right">Calls</Th>
-                  <Th align="right">Errors</Th>
-                  <Th align="right">Total cost</Th>
-                  <Th align="right">Avg cost</Th>
-                  <Th align="right">p95 latency</Th>
-                  <Th align="right">Cache hit %</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {stats30d.map((r) => {
-                  const totalReadable = r.totalInput + r.totalCacheRead;
-                  const cacheHitPct = totalReadable > 0 ? (r.totalCacheRead / totalReadable) * 100 : 0;
-                  return (
-                    <tr key={r.kind} style={{ borderTop: "1px solid var(--border-subtle)" }}>
-                      <Td><code style={{ fontSize: 12 }}>{r.kind}</code></Td>
-                      <Td align="right">{r.count}</Td>
-                      <Td align="right">
-                        {r.errorCount === 0 ? (
-                          <span style={{ color: "var(--text-muted)" }}>—</span>
-                        ) : (
-                          <span style={{ color: "var(--danger)" }}>{r.errorCount}</span>
-                        )}
-                      </Td>
-                      <Td align="right">{usd(r.totalCostUsd)}</Td>
-                      <Td align="right">{usd(r.avgCostUsd)}</Td>
-                      <Td align="right">{(r.p95DurationMs / 1000).toFixed(1)}s</Td>
-                      <Td align="right">{cacheHitPct.toFixed(0)}%</Td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </Section>
-
-        {/* Test webhook — fire fixture payloads at our own Miniti receiver. */}
-        <Section title="Test webhook">
-          <TestWebhookPanel fixtures={fixtures} />
-        </Section>
-
-        {/* Stale-task scanner — Vector autonomously drafts follow-up emails. */}
-        <Section title="Stale-task scanner">
-          <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "0 0 10px", lineHeight: 1.5 }}>
-            Walks active onboardings, finds your overdue or blocked tasks, and drafts follow-up emails for each. Runs weekly via cron; you can also trigger it manually.
-          </p>
-          <ScanStaleButton />
-        </Section>
-
-        {/* Integrations — Miniti throughput + unprocessed counts */}
-        <Section title="Integrations">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
-            <IntegrationCard label="Miniti — last 7 days" stats={minitiStats7d} />
-            <IntegrationCard label="Miniti — last 30 days" stats={minitiStats30d} />
-          </div>
-          {ambiguousNow > 0 && (
-            <div
-              style={{
-                marginTop: 12,
-                padding: "10px 14px",
-                borderRadius: 8,
-                background: "rgba(255, 218, 145, 0.08)",
-                border: "1px solid var(--alert)",
-                fontSize: 13,
-                color: "var(--text)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 12,
-              }}
-            >
-              <span>
-                <strong>{ambiguousNow}</strong> meeting{ambiguousNow === 1 ? "" : "s"} waiting for manual assignment.
-              </span>
-              <Link
-                href="/ai-drafts"
-                style={{ color: "var(--action)", fontSize: 13, fontWeight: 500 }}
-              >
-                Review →
-              </Link>
-            </div>
-          )}
-
-          {stuckEvents.length > 0 && (
-            <div style={{ marginTop: 12 }}>
-              <h3 style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5, color: "var(--text-muted)", margin: "0 0 6px" }}>
-                Stuck events
-              </h3>
-              <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "0 0 8px", lineHeight: 1.5 }}>
-                Matched to an onboarding but never finished processing — almost always means the orchestrator was killed mid-run (Vercel Hobby kills Node functions at 10s). Click reprocess to retry; it&apos;s idempotent.
-              </p>
-              <StuckEventsList initialEvents={stuckEvents} />
-            </div>
-          )}
-        </Section>
-
-        {/* Recent calls log */}
-        <Section title="Recent calls (latest 50)">
-          {recent.length === 0 ? (
-            <Empty>No calls logged yet.</Empty>
-          ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", fontSize: 12, color: "var(--text)", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr style={{ color: "var(--text-muted)", textAlign: "left" }}>
-                    <Th>When</Th>
-                    <Th>Kind</Th>
-                    <Th>Scope</Th>
-                    <Th>Model</Th>
-                    <Th align="right">In / cache R / cache W / Out</Th>
-                    <Th align="right">Cost</Th>
-                    <Th align="right">Duration</Th>
-                    <Th>Status</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recent.map((r) => (
-                    <tr key={r.id} style={{ borderTop: "1px solid var(--border-subtle)" }}>
-                      <Td><time>{new Date(r.createdAt).toLocaleString()}</time></Td>
-                      <Td><code style={{ fontSize: 11 }}>{r.kind}</code></Td>
-                      <Td>{r.scopeId ?? <span style={{ color: "var(--text-muted)" }}>—</span>}</Td>
-                      <Td><span style={{ color: "var(--text-muted)" }}>{r.model}</span></Td>
-                      <Td align="right" style={{ fontFamily: "monospace", fontSize: 11 }}>
-                        {r.inputTokens} / {r.cacheReadTokens} / {r.cacheWriteTokens} / {r.outputTokens}
-                      </Td>
-                      <Td align="right">{usd(r.costUsd)}</Td>
-                      <Td align="right">{(r.durationMs / 1000).toFixed(1)}s</Td>
-                      <Td>
-                        {r.error ? (
-                          <span style={{ color: "var(--danger)", fontSize: 11 }}>{r.error}</span>
-                        ) : (
-                          <span style={{ color: "var(--success, #5cd6a5)", fontSize: 11 }}>ok</span>
-                        )}
-                      </Td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Section>
+        <AdminAITabs
+          tabs={[
+            { id: "overview", label: "Overview", content: overviewTab },
+            { id: "usage", label: "Usage", content: usageTab },
+            { id: "integrations", label: "Integrations", content: integrationsTab },
+            { id: "test", label: "Test webhook", content: testTab },
+          ]}
+        />
       </div>
     </div>
   );

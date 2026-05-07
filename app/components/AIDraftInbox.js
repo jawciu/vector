@@ -169,7 +169,7 @@ export default function AIDraftInbox({
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12, position: "relative" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 32, position: "relative" }}>
       {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
       {isPending && selectedIds.size > 0 && (
         <BulkActionBar
@@ -203,7 +203,6 @@ export default function AIDraftInbox({
           onToggleSelect={toggleSelected}
           onApprove={handleApprove}
           onReject={handleReject}
-          onRejectGroup={(ids) => handleBulkReject(ids, "rejected from transcript group")}
           vendorUsers={vendorUsers}
           contacts={contacts}
           phases={phases}
@@ -246,40 +245,27 @@ function DraftGroup({
   onToggleSelect,
   onApprove,
   onReject,
-  onRejectGroup,
   vendorUsers,
   contacts,
   phases,
   openTasks,
 }) {
-  const isPending = mode === "pending";
-  const showHeader = isPending && group.drafts.length > 1 && group.eventId != null;
+  // Show a "From meeting: <title>" header above any group whose drafts
+  // came from a Miniti event. Even single-draft groups get this so the
+  // user knows the provenance at a glance — bulk-dismiss now lives at
+  // the inbox level (above the first card), not per-group.
+  const meetingTitle = group.eventId != null
+    ? group.drafts.find((d) => d.meetingTitle)?.meetingTitle ?? null
+    : null;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      {showHeader && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "6px 12px",
-            background: "var(--bg)",
-            border: "1px solid var(--border-subtle)",
-            borderRadius: 6,
-            fontSize: 11,
-            color: "var(--text-muted)",
-          }}
-        >
-          <span>
-            {group.drafts.length} drafts from the same Miniti meeting
-          </span>
-          <button
-            onClick={() => onRejectGroup(group.drafts.map((d) => d.id))}
-            className="btn-secondary text-sm rounded-lg"
-            style={{ padding: "2px 10px", fontSize: 11 }}
-          >
-            Reject all
-          </button>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {meetingTitle && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
+            <span style={{ color: "var(--text-muted)" }}>From meeting:</span>
+            <span className="task-ref">{meetingTitle}</span>
+          </div>
+          <hr className="ai-divider" style={{ margin: 0 }} />
         </div>
       )}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -999,12 +985,20 @@ function CreateTaskCard({
     }
   }
 
-  function handleDismiss() {
-    if (dirty) {
-      const ok = typeof window !== "undefined"
-        ? window.confirm("Discard unsaved changes?")
-        : true;
-      if (!ok) return;
+  function handleDismissOrExitEdit() {
+    // In edit mode, the left button reads "Exit edit" and just collapses
+    // back to compact (with dirty-confirm). In compact mode it's the
+    // actual Dismiss → reject the draft.
+    if (cardMode === "edit") {
+      if (dirty) {
+        const ok = typeof window !== "undefined"
+          ? window.confirm("Discard unsaved changes?")
+          : true;
+        if (!ok) return;
+        setEdits(savedPayload);
+      }
+      setCardMode("compact");
+      return;
     }
     onReject();
   }
@@ -1066,7 +1060,7 @@ function CreateTaskCard({
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button
             type="button"
-            onClick={handleDismiss}
+            onClick={handleDismissOrExitEdit}
             disabled={busy || saving}
             className="text-btn"
             style={{
@@ -1076,7 +1070,7 @@ function CreateTaskCard({
               opacity: busy || saving ? 0.5 : 1,
             }}
           >
-            Dismiss
+            {cardMode === "edit" ? "Exit edit" : "Dismiss"}
           </button>
           <div style={{ display: "flex", gap: 8 }}>
             {cardMode === "compact" ? (
@@ -1618,8 +1612,15 @@ function TasksBreadcrumbIcon() {
 
 function NotesIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "currentColor", flexShrink: 0 }}>
-      <path d="M3 2.5h8M3 5h8M3 7.5h5M3 10h8" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "currentColor", flexShrink: 0 }}>
+      <g clipPath="url(#aidraft-notes-clip)">
+        <path d="M3.45675 3.89835H8.94754M3.45675 7.26357H10.6029M3.45675 10.494H7.72288M11.8948 2.83855L9.9266 0.85352C9.8046 0.731724 9.6598 0.635161 9.50047 0.56935C9.34114 0.503539 9.1704 0.46977 8.99801 0.469972H2.43732C2.26179 0.474361 2.09493 0.547188 1.97235 0.672907C1.84978 0.798626 1.7812 0.967278 1.78125 1.14286V12.9521C1.7812 13.1277 1.84978 13.2963 1.97235 13.4221C2.09493 13.5478 2.26179 13.6206 2.43732 13.625H11.6223C11.8007 13.625 11.9719 13.5541 12.0981 13.4279C12.2243 13.3017 12.2952 13.1306 12.2952 12.9521V3.76714C12.2932 3.59357 12.2568 3.42212 12.188 3.26273C12.1193 3.10333 12.0196 2.95915 11.8948 2.83855Z" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" />
+      </g>
+      <defs>
+        <clipPath id="aidraft-notes-clip">
+          <rect width="14" height="14" fill="white" />
+        </clipPath>
+      </defs>
     </svg>
   );
 }

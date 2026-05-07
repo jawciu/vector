@@ -1827,6 +1827,7 @@ export const ExternalEventScalarFieldEnum = {
   matchAmbiguous: 'matchAmbiguous',
   error: 'error',
   orchestratorInput: 'orchestratorInput',
+  orchestratorExtraction: 'orchestratorExtraction',
   orchestratorOutput: 'orchestratorOutput'
 } as const
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 /**
  * Admin tool — POSTs a fixture payload at our own Miniti webhook.
@@ -133,6 +134,24 @@ export default function TestWebhookPanel({ fixtures }) {
                 <> · matched by <code style={{ fontSize: 11 }}>{result.response.matchedBy}</code></>
               )}
               {result.response.ambiguous && <> · <span style={{ color: "var(--alert)" }}>ambiguous</span></>}
+            </div>
+          )}
+          {result.response?.onboardingId != null && !result.response?.ambiguous && (
+            <div>
+              <strong>Onboarding:</strong>{" "}
+              <Link
+                href={`/onboardings/${result.response.onboardingId}?tab=workflows`}
+                style={{ color: "var(--action)" }}
+              >
+                #{result.response.onboardingId} → Workflows tab
+              </Link>
+            </div>
+          )}
+          {result.response?.ambiguous && (
+            <div style={{ color: "var(--alert)" }}>
+              Couldn&rsquo;t auto-match to a single onboarding. Drops into the global{" "}
+              <Link href="/ai-drafts" style={{ color: "var(--action)" }}>/ai-drafts</Link>{" "}
+              page for manual assignment.
             </div>
           )}
           {result.response?.deduped && (
