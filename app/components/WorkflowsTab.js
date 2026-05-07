@@ -141,45 +141,45 @@ export default function WorkflowsTab({
       }}
     >
       <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <div ref={menuRef} className="relative">
-          <MenuTriggerButton
-            active={menuOpen}
-            onClick={() => setMenuOpen((o) => !o)}
-            aria-haspopup="listbox"
-            aria-expanded={menuOpen}
-          >
-            <span className="flex items-center gap-2">
-              <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>Showing</span>
-              {currentLabel}
-            </span>
-          </MenuTriggerButton>
-          {menuOpen && (
-            <MenuList>
-              {STATUSES.map((s) => (
-                <MenuOption
-                  key={s.id}
-                  active={s.id === status}
-                  onClick={() => { setStatus(s.id); setMenuOpen(false); }}
-                >
-                  {s.label}
-                </MenuOption>
-              ))}
-            </MenuList>
-          )}
-        </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <SearchInput value={query} onChange={setQuery} />
-          {isPending && visibleDrafts.length > 0 && (
-            <button
-              type="button"
-              onClick={handleDismissAll}
-              className="btn-secondary text-sm rounded-lg"
-              style={{ padding: "4px 10px", fontSize: 13, whiteSpace: "nowrap" }}
+          <div ref={menuRef} className="relative">
+            <MenuTriggerButton
+              active={menuOpen}
+              onClick={() => setMenuOpen((o) => !o)}
+              aria-haspopup="listbox"
+              aria-expanded={menuOpen}
             >
-              Dismiss all
-            </button>
-          )}
+              <span className="flex items-center gap-2">
+                <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>Showing</span>
+                {currentLabel}
+              </span>
+            </MenuTriggerButton>
+            {menuOpen && (
+              <MenuList>
+                {STATUSES.map((s) => (
+                  <MenuOption
+                    key={s.id}
+                    active={s.id === status}
+                    onClick={() => { setStatus(s.id); setMenuOpen(false); }}
+                  >
+                    {s.label}
+                  </MenuOption>
+                ))}
+              </MenuList>
+            )}
+          </div>
         </div>
+        {isPending && visibleDrafts.length > 0 && (
+          <button
+            type="button"
+            onClick={handleDismissAll}
+            className="btn-secondary text-sm rounded-lg"
+            style={{ padding: "4px 10px", fontSize: 13, whiteSpace: "nowrap" }}
+          >
+            Dismiss all
+          </button>
+        )}
       </header>
 
       {loading && drafts == null && (

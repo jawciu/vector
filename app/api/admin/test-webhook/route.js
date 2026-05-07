@@ -128,6 +128,7 @@ export async function POST(request) {
       status: res.status,
       fixture,
       meetingId: payload.meeting.id,
+      meetingTitle: payload.meeting.title ?? null,
       response: responseBody,
     },
     { status: res.ok ? 200 : res.status }
