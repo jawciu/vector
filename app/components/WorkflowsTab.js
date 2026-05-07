@@ -142,7 +142,6 @@ export default function WorkflowsTab({
     >
       <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <SearchInput value={query} onChange={setQuery} />
           <div ref={menuRef} className="relative">
             <MenuTriggerButton
               active={menuOpen}
@@ -169,6 +168,7 @@ export default function WorkflowsTab({
               </MenuList>
             )}
           </div>
+          <SearchInput value={query} onChange={setQuery} />
         </div>
         {isPending && visibleDrafts.length > 0 && (
           <button
