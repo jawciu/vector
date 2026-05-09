@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Sparkle from "@/app/ui/Sparkle";
 
 /**
  * "Draft follow-up with Vector" modal — opens from the task drawer.
@@ -377,11 +378,7 @@ function Field({ label, onCopy, copied, disabled, children }) {
 }
 
 function SparkleIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 14 14" fill="currentColor" style={{ color: "var(--action)" }}>
-      <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" />
-    </svg>
-  );
+  return <Sparkle size={11} />;
 }
 
 function extractField(text, key) {

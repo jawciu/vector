@@ -257,7 +257,7 @@ Honors `prefers-reduced-motion: reduce` — the spin pauses, the fade still play
 
 ### AI sparkle twinkle — `.ai-sparkle-twinkle`
 
-Apply to the Vector sparkle SVG while Vector is thinking. The icon spins 360° on its own axis with an ease-in (slow start, fast finish), pauses for a beat at the end of the rotation, then loops. A lilac drop-shadow halo travels with it (1px → 5px → 2px). Used in place of a spinning loader during AI generating states (e.g. `InlineEventDrafts` while the orchestrator runs). More on-brand than a generic spinner.
+Apply to the Vector sparkle SVG while Vector is thinking. The icon spins 360° on its own axis with an ease-in (slow start, fast finish), pauses for a beat at the end of the rotation, then loops. Used in place of a spinning loader during AI generating states (e.g. `InlineEventDrafts` while the orchestrator runs). More on-brand than a generic spinner.
 
 ```jsx
 <span className="ai-sparkle-twinkle" style={{ display: "inline-flex" }}>
@@ -267,15 +267,13 @@ Apply to the Vector sparkle SVG while Vector is thinking. The icon spins 360° o
 
 ### AI text shimmer — `.ai-text-shimmer`
 
-Apply to a text node next to `.ai-sparkle-twinkle` while Vector is generating. The text itself is painted in `textSecondary` and stays visible at all times; a `::after` overlay (filled from `data-text` so it stacks the same characters on top) carries a bright lilac highlight band that sweeps left → right via `background-clip: text`. The label never disappears, the lilac just glides across it.
+Apply to a text node next to `.ai-sparkle-twinkle` while Vector is generating. Standard Vercel/Apple-style pattern: a 3-stop gradient (`textMuted` → `aiGradientFrom` → `textMuted`) sits on the text via `background-clip: text` with `background-size: 200%`, then loops `background-position` from `200%` to `0%`. The default `background-repeat: repeat` lets the gradient tile, so the lilac peak slides through the text continuously and seamlessly. No overlay, no `data-text`, no transparent edges.
 
 ```jsx
-<span className="ai-text-shimmer" data-text="Generating action draft…">
-  Generating action draft…
-</span>
+<span className="ai-text-shimmer">Generating action draft…</span>
 ```
 
-The `data-text` attribute must mirror the text content. Honors `prefers-reduced-motion: reduce` — the overlay is hidden so the text just sits at flat `textSecondary`.
+Honors `prefers-reduced-motion: reduce` — animation off, text reverts to a flat `textSecondary`.
 
 ### TabBar — `app/ui/TabBar.js`
 

@@ -13,6 +13,7 @@ import {
 } from "@/app/ui/Icons";
 import { MenuList, MenuOption } from "./Menu";
 import CalendarDropdown from "@/app/ui/CalendarDropdown";
+import Sparkle from "@/app/ui/Sparkle";
 import MeetingDrawer from "./MeetingDrawer";
 
 /**
@@ -873,20 +874,7 @@ function CopyIcon() {
 }
 
 export function FollowupSparkleIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-      <defs>
-        <linearGradient id="aidraft-sparkle" x1="7" y1="-3" x2="7" y2="15" gradientUnits="userSpaceOnUse">
-          {/* Lilac-dominant: two purple stops carry most of the icon,
-              peach only kisses the very tip. */}
-          <stop offset="0" stopColor="#D9B8FF" />
-          <stop offset="0.55" stopColor="#A87FFF" />
-          <stop offset="1" stopColor="#FF9C7D" />
-        </linearGradient>
-      </defs>
-      <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" fill="url(#aidraft-sparkle)" />
-    </svg>
-  );
+  return <Sparkle size={14} />;
 }
 
 

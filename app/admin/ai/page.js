@@ -66,8 +66,8 @@ export default async function AdminAIPage() {
           style={{
             padding: "10px 14px",
             borderRadius: 8,
-            background: "rgba(255, 218, 145, 0.08)",
-            border: "1px solid var(--alert)",
+            background: "var(--bg)",
+            border: "1px solid var(--border-subtle)",
             fontSize: 13,
             color: "var(--text)",
             display: "flex",

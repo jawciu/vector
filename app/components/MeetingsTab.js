@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, useMemo, useRef } from "react";
+import Image from "next/image";
 import CalendarDropdown from "@/app/ui/CalendarDropdown";
 import { CalendarIcon } from "@/app/ui/Icons";
+import { AVATAR_IMAGES, avatarColor, avatarInitials } from "@/lib/avatar";
+import MeetingDrawer from "./MeetingDrawer";
 
 /**
  * Per-onboarding "Meetings" tab.
@@ -11,8 +14,9 @@ import { CalendarIcon } from "@/app/ui/Icons";
  * passed in as `meetings`. Test-run events are filtered server-side,
  * so this only ever shows real Miniti meetings.
  *
- * Each row collapses to: title + date + 1-line summary + attendee chips.
- * Click "Show transcript" to reveal the speaker-labelled transcript.
+ * Each row shows: title + date + 1-line summary + attendee chips.
+ * Click a row to open the shared `MeetingDrawer` (same drawer the
+ * Actions tab opens from a draft's meeting pill).
  *
  * Filters:
  *   - Search (client-side substring across title + summary + attendee names).
@@ -28,7 +32,7 @@ import { CalendarIcon } from "@/app/ui/Icons";
 export default function MeetingsTab({ meetings = [] }) {
   const [query, setQuery] = useState("");
   const [date, setDate] = useState("");
-  const [openIds, setOpenIds] = useState(new Set());
+  const [drawerEventId, setDrawerEventId] = useState(null);
 
   const filtered = useMemo(() => {
     let list = meetings;
@@ -53,15 +57,6 @@ export default function MeetingsTab({ meetings = [] }) {
     }
     return list;
   }, [meetings, query, date]);
-
-  function toggleOpen(id) {
-    setOpenIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
 
   return (
     <div
@@ -116,93 +111,59 @@ export default function MeetingsTab({ meetings = [] }) {
           <MeetingRow
             key={m.id}
             meeting={m}
-            isOpen={openIds.has(m.id)}
-            onToggle={() => toggleOpen(m.id)}
+            onClick={() => setDrawerEventId(m.id)}
           />
         ))}
       </ul>
+
+      <MeetingDrawer
+        eventId={drawerEventId}
+        onClose={() => setDrawerEventId(null)}
+      />
     </div>
   );
 }
 
-function MeetingRow({ meeting, isOpen, onToggle }) {
+function MeetingRow({ meeting, onClick }) {
   const dateLabel = formatDate(meeting.occurredAt);
   return (
-    <li
-      style={{
-        padding: "14px 16px",
-        borderRadius: 12,
-        border: "1px solid var(--border)",
-        background: "var(--bg)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>
-              {meeting.meetingTitle}
-            </span>
-            <span style={{ fontSize: 12, color: "var(--text-muted)" }}>· {dateLabel}</span>
-          </div>
-          {meeting.summary && (
-            <p style={{ margin: 0, fontSize: 13, lineHeight: 1.45, color: "var(--text-secondary)" }}>
-              {meeting.summary}
-            </p>
-          )}
-          {meeting.attendees.length > 0 && (
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {meeting.attendees.map((a, i) => (
-                <AttendeeChip key={i} name={a.name} email={a.email} />
-              ))}
-            </div>
-          )}
-        </div>
-        <button
-          type="button"
-          onClick={onToggle}
-          className="text-btn"
-          style={{ padding: "4px 8px", fontSize: 12, color: "var(--text-muted)", whiteSpace: "nowrap" }}
-        >
-          {isOpen ? "Hide transcript" : "Show transcript"}
-        </button>
-      </div>
-      {isOpen && <Transcript transcript={meeting.transcript} />}
-    </li>
-  );
-}
-
-function Transcript({ transcript }) {
-  if (!transcript || transcript.length === 0) {
-    return (
-      <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0, fontStyle: "italic" }}>
-        No transcript on this meeting.
-      </p>
-    );
-  }
-  return (
-    <div
-      style={{
-        borderTop: "1px solid var(--border-subtle)",
-        paddingTop: 10,
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-        maxHeight: 480,
-        overflow: "auto",
-      }}
-    >
-      {transcript.map((t, i) => (
-        <div key={i} style={{ display: "flex", gap: 8 }}>
-          <span style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 500, flexShrink: 0, minWidth: 110 }}>
-            {t.speaker}
+    <li>
+      <button
+        type="button"
+        onClick={onClick}
+        className="meeting-card"
+        style={{
+          width: "100%",
+          textAlign: "left",
+          padding: "14px 16px",
+          borderRadius: 12,
+          border: "1px solid var(--border)",
+          display: "flex",
+          flexDirection: "column",
+          gap: 6,
+          cursor: "pointer",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>
+            {meeting.meetingTitle}
           </span>
-          <span style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.5 }}>{t.text}</span>
+          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>· {dateLabel}</span>
         </div>
-      ))}
-    </div>
+        {meeting.summary && (
+          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.45, color: "var(--text-secondary)" }}>
+            {meeting.summary}
+          </p>
+        )}
+        {meeting.attendees.length > 0 && (
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {meeting.attendees.map((a, i) => (
+              <AttendeeChip key={i} name={a.name} email={a.email} />
+            ))}
+          </div>
+        )}
+      </button>
+    </li>
   );
 }
 
@@ -214,17 +175,50 @@ export function AttendeeChip({ name, email }) {
         display: "inline-flex",
         alignItems: "center",
         gap: 6,
-        padding: "2px 8px",
+        padding: "2px 8px 2px 2px",
         background: "var(--surface-hover)",
         borderRadius: 12,
         fontSize: 12,
         color: "var(--text)",
       }}
     >
+      <AttendeeAvatar name={name} email={email} />
       {display}
       {name && email && (
         <span style={{ color: "var(--text-muted)", fontSize: 11 }}>{email}</span>
       )}
+    </span>
+  );
+}
+
+function AttendeeAvatar({ name, email, size = 18 }) {
+  const key = name || email || "?";
+  if (name && AVATAR_IMAGES[name]) {
+    return (
+      <Image
+        src={AVATAR_IMAGES[name]}
+        alt={name}
+        title={name}
+        width={size}
+        height={size}
+        className="rounded-full flex-shrink-0 object-cover"
+      />
+    );
+  }
+  return (
+    <span
+      className="flex items-center justify-center rounded-full flex-shrink-0"
+      style={{
+        width: size,
+        height: size,
+        background: avatarColor(key),
+        color: "var(--text-dark)",
+        fontSize: 9,
+        fontWeight: 600,
+      }}
+      title={key}
+    >
+      {avatarInitials(key)}
     </span>
   );
 }

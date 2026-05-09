@@ -20,6 +20,7 @@ export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled,
   const [busyIds, setBusyIds] = useState(new Set());
   const [errors, setErrors] = useState({});
   const [error, setError] = useState(null);
+  const [timedOut, setTimedOut] = useState(false);
   const pollTimer = useRef(null);
   const pollDeadline = useRef(0);
   const startedAt = useRef(Date.now());
@@ -81,7 +82,16 @@ export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled,
       if (Date.now() < pollDeadline.current) {
         pollTimer.current = setTimeout(tick, 2500);
       } else {
+        // 90s elapsed without a single draft landing. Almost always
+        // means the orchestrator threw or got killed before it could
+        // write tool calls — the spinner alone gives the user nothing
+        // to act on, so flip into an explicit timeout state with a
+        // refresh hint and let the parent stop the streaming border.
         stopPolling();
+        if (!seenAtLeastOne.current) {
+          setTimedOut(true);
+          onDraftsArrived?.();
+        }
       }
     };
     tick();
@@ -155,6 +165,19 @@ export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled,
     );
   }
 
+  if (timedOut && !seenAtLeastOne.current) {
+    return (
+      <div style={{ fontSize: 13, color: "var(--text-secondary)", padding: "12px 0", lineHeight: 1.5 }}>
+        Vector didn&rsquo;t produce drafts within 90 seconds — the orchestrator
+        likely errored. Refresh the page to retry, or check{" "}
+        <a href="/admin/ai" style={{ color: "var(--action)" }}>
+          /admin/ai
+        </a>{" "}
+        for the failed run.
+      </div>
+    );
+  }
+
   // Initial state — assigned but orchestrator hasn't yielded drafts yet.
   // Friendly "Vector is thinking" indicator using a twinkling sparkle —
   // the gradient border on the parent card carries the heavier visual
@@ -174,9 +197,7 @@ export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled,
         <span className="ai-sparkle-twinkle" style={{ display: "inline-flex" }}>
           <FollowupSparkleIcon />
         </span>
-        <span className="ai-text-shimmer" data-text="Generating action draft…">
-          Generating action draft…
-        </span>
+        <span className="ai-text-shimmer">Generating action draft…</span>
       </div>
     );
   }

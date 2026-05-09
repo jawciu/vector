@@ -3,6 +3,7 @@
 import InlineProse from "./InlineProse";
 import TaskCardView from "../components/TaskCardView";
 import { PriorityIcon } from "./Icons";
+import Sparkle from "./Sparkle";
 
 /**
  * Insight card primitives — extracted from `InsightsPanel` so the customer
@@ -299,17 +300,7 @@ export function CheckCircle() {
 }
 
 export function SparkleIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <defs>
-        <linearGradient id="oi-sparkle-gradient" x1="7" y1="-3" x2="7" y2="15" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#C098FF" />
-          <stop offset="1" stopColor="#FF9C7D" />
-        </linearGradient>
-      </defs>
-      <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" fill="url(#oi-sparkle-gradient)" />
-    </svg>
-  );
+  return <Sparkle size={16} />;
 }
 
 export function EmptyMessage({ children }) {

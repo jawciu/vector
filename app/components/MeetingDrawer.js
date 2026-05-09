@@ -53,7 +53,12 @@ export default function MeetingDrawer({ eventId, onClose }) {
   }, [eventId, open]);
 
   return (
-    <Drawer open={open} onClose={onClose} aria-label="Meeting details">
+    <Drawer
+      open={open}
+      onClose={onClose}
+      background="color-mix(in srgb, var(--bg) 70%, black)"
+      aria-label="Meeting details"
+    >
       {/* Header — close button lives in the Drawer primitive (top-right). */}
       <div
         style={{

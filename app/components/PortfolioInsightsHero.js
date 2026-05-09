@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import CompanyAvatar from "@/app/ui/CompanyAvatar";
 import InlineProse from "@/app/ui/InlineProse";
+import Sparkle from "@/app/ui/Sparkle";
 
 const SOFT_TTL_MS = 4 * 60 * 60 * 1000;
 
@@ -382,23 +383,7 @@ function EmptyMessage({ children }) {
 }
 
 function SparkleIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <defs>
-        {/* Hex stops mirror DESIGN.md aiGradientFrom/aiGradientTo. SVG <stop>
-            doesn't reliably resolve CSS custom properties across all browsers,
-            so the values are inlined. Gradient runs vertically across the
-            shape's bounding box so the top tip reads pure purple and the
-            bottom tip reads pure peach (a diagonal sweep on a 4-point star
-            samples mostly the muddy middle). */}
-        <linearGradient id="vector-sparkle-gradient" x1="7" y1="-3" x2="7" y2="15" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#C098FF" />
-          <stop offset="1" stopColor="#FF9C7D" />
-        </linearGradient>
-      </defs>
-      <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" fill="url(#vector-sparkle-gradient)" />
-    </svg>
-  );
+  return <Sparkle size={16} />;
 }
 
 function cardPosition(index, total) {

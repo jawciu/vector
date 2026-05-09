@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { MenuList, MenuOption } from "./Menu";
 
 /**
  * Admin tool — POSTs a fixture payload at our own Miniti webhook, then
@@ -114,24 +115,12 @@ export default function TestWebhookPanel({ fixtures }) {
         soon as they land.
       </p>
       <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-        <select
+        <FixturePicker
           value={selected}
-          onChange={(e) => setSelected(e.target.value)}
+          onChange={setSelected}
+          fixtures={fixtures}
           disabled={busy}
-          style={{
-            padding: "6px 10px",
-            fontSize: 13,
-            color: "var(--text)",
-            background: "var(--bg)",
-            border: "1px solid var(--border)",
-            borderRadius: 6,
-            minWidth: 220,
-          }}
-        >
-          {fixtures.map((f) => (
-            <option key={f} value={f}>{f}</option>
-          ))}
-        </select>
+        />
         <button
           onClick={handleSend}
           disabled={busy || !selected}
@@ -250,6 +239,106 @@ export default function TestWebhookPanel({ fixtures }) {
         </div>
       )}
     </div>
+  );
+}
+
+/** DS dropdown for fixture selection — replaces native <select> so the
+ *  picker matches the rest of the app's filter pills. */
+function FixturePicker({ value, onChange, fixtures, disabled }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handle(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative" style={{ minWidth: 220 }}>
+      <button
+        type="button"
+        onClick={() => !disabled && setOpen((o) => !o)}
+        disabled={disabled}
+        className="field-pill flex items-center gap-2 rounded-lg"
+        data-active={open ? "true" : undefined}
+        style={{
+          width: "100%",
+          border: "1px solid var(--button-secondary-border)",
+          padding: "4px 10px",
+          minHeight: 30,
+          background: "var(--bg)",
+          color: value ? "var(--text)" : "var(--text-muted)",
+          fontSize: 13,
+          textAlign: "left",
+          cursor: disabled ? "not-allowed" : "pointer",
+        }}
+      >
+        <span
+          style={{
+            flex: 1,
+            textAlign: "left",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {value || "Pick fixture…"}
+        </span>
+        <PickerChevron open={open} />
+      </button>
+      {open && (
+        <MenuList
+          style={{
+            width: "100%",
+            maxHeight: 240,
+            overflowY: "auto",
+          }}
+        >
+          {fixtures.map((f) => (
+            <MenuOption
+              key={f}
+              active={f === value}
+              onClick={() => {
+                onChange(f);
+                setOpen(false);
+              }}
+            >
+              {f}
+            </MenuOption>
+          ))}
+        </MenuList>
+      )}
+    </div>
+  );
+}
+
+function PickerChevron({ open }) {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 10 10"
+      fill="none"
+      aria-hidden
+      style={{
+        flexShrink: 0,
+        color: "var(--text-muted)",
+        transform: open ? "rotate(180deg)" : "none",
+        transition: "transform 0.15s ease",
+      }}
+    >
+      <path
+        d="M2 3.5L5 6.5L8 3.5"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 

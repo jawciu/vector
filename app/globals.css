@@ -313,6 +313,17 @@ a {
   background: var(--bg-elevated-hover);
 }
 
+/* Meetings tab — clickable meeting card */
+.meeting-card {
+  background: var(--bg-elevated);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.meeting-card:hover {
+  background: var(--bg-elevated-hover);
+  border-color: var(--button-secondary-border);
+}
+
 /* Task completion animation */
 .task-completing {
   animation: taskComplete 0.8s ease forwards;
@@ -537,17 +548,16 @@ a {
 @keyframes ai-sparkle-twinkle {
   0% {
     transform: rotate(0deg);
-    filter: drop-shadow(0 0 1px rgba(192, 152, 255, 0.35));
-    animation-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+    /* Gentle ease-in (not the dramatic cubic) so the slow start
+       doesn't feel like the icon is stuck. */
+    animation-timing-function: cubic-bezier(0.4, 0.15, 0.6, 0.4);
   }
   65% {
     transform: rotate(360deg);
-    filter: drop-shadow(0 0 5px rgba(168, 127, 255, 0.85));
     animation-timing-function: ease-out;
   }
   100% {
     transform: rotate(360deg);
-    filter: drop-shadow(0 0 2px rgba(192, 152, 255, 0.5));
   }
 }
 
@@ -557,43 +567,31 @@ a {
 }
 
 /* Text shimmer — apply `.ai-text-shimmer` to a text node while Vector
-   is generating. The text itself stays painted in `--text-secondary`;
-   a `::after` overlay (filled from `data-text` so it stacks on top of
-   the same characters) carries a bright lilac highlight band that
-   sweeps left → right via `background-clip: text`. Result: the label
-   never disappears, the lilac just glides across it. */
+   is generating. Standard Vercel/Apple-style pattern: the gradient
+   lives on the text element itself via `background-clip: text`. Base
+   stops are `--text-muted` (so the label is always readable) and the
+   peak is lilac (`--ai-gradient-from`). `background-size: 200%` plus
+   the default `background-repeat: repeat` lets the gradient tile, so
+   a seamless loop is just a 200% shift in `background-position` — no
+   overlay element, no `data-text` trick, no transparent edges. */
 @keyframes ai-text-shimmer {
-  0%   { background-position: -60% 0; }
-  100% { background-position: 160% 0; }
+  0%   { background-position: 200% 0; }
+  100% { background-position: 0% 0; }
 }
 
 .ai-text-shimmer {
-  position: relative;
-  display: inline-block;
-  color: var(--text-secondary);
-}
-
-.ai-text-shimmer::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  white-space: pre;
   background-image: linear-gradient(
     90deg,
-    transparent,
+    var(--text-muted),
     var(--ai-gradient-from) 50%,
-    transparent
+    var(--text-muted)
   );
-  background-size: 60% 100%;
-  background-repeat: no-repeat;
+  background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: ai-text-shimmer 2.4s linear infinite;
-  pointer-events: none;
+  animation: ai-text-shimmer 1.6s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -605,9 +603,11 @@ a {
   .ai-sparkle-twinkle {
     animation: none;
   }
-  .ai-text-shimmer::after {
+  .ai-text-shimmer {
     animation: none;
-    display: none;
+    background: none;
+    color: var(--text-secondary);
+    -webkit-text-fill-color: var(--text-secondary);
   }
 }
 
@@ -720,7 +720,7 @@ a {
    Vertical / horizontal separators are borders on the sections, repositioned
    per-breakpoint. */
 .oi-row--portal {
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.4fr);
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.25fr) minmax(0, 1.25fr);
   grid-template-areas: "summary wins focus";
 }
 .oi-section--summary-portal { grid-area: summary; padding-left: 0;  border-right: 1px solid var(--border-subtle); }

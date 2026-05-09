@@ -84,14 +84,10 @@ const TABS = [
     id: "meetings",
     label: "Meetings",
     icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-        {/* Calendar with a clock — meeting + time. */}
-        <rect x="1.5" y="3" width="11" height="9.5" rx="1.25" />
-        <path d="M1.5 5.5 H12.5" />
-        <path d="M4.25 1.75 V4.25" />
-        <path d="M9.75 1.75 V4.25" />
-        <circle cx="9" cy="9" r="2" />
-        <path d="M9 8 V9 L9.75 9.5" />
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0.777344 2.72046C0.777344 2.46767 0.859288 2.22524 1.00515 2.0465C1.15101 1.86775 1.34884 1.76733 1.55512 1.76733H12.444C12.6503 1.76733 12.8481 1.86775 12.994 2.0465C13.1398 2.22524 13.2218 2.46767 13.2218 2.72046V6.53296H0.777344V2.72046Z" stroke="currentColor" strokeLinejoin="round" />
+        <path d="M3.88867 2.83333V0.5M10.1109 2.83333V0.5" stroke="currentColor" strokeLinecap="round" />
+        <path d="M0.777344 6.53296H13.2218V11.7642C13.2218 11.9184 13.1398 12.0662 12.994 12.1752C12.8481 12.2842 12.6503 12.3455 12.444 12.3455H1.55512C1.34884 12.3455 1.15101 12.2842 1.00515 12.1752C0.859288 12.0662 0.777344 11.9184 0.777344 11.7642V6.53296Z" stroke="currentColor" strokeLinejoin="round" />
       </svg>
     ),
   },

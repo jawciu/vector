@@ -12,6 +12,13 @@ import { createClient } from "@/lib/supabase/server";
 import { assignExternalEventOnboarding, getExternalEvent, markExternalEventProcessed } from "@/lib/db";
 import { processMinitiEvent } from "@/lib/integrations/miniti";
 
+// Same budget as the Miniti webhook — the orchestrator runs in
+// `after()` after the 200 ack, so the route function instance has to
+// stay alive long enough for Pass 1 + Pass 2 to finish (~15-30s
+// typically). Default 10s on Vercel kills the orchestrator silently
+// and leaves the inline drafts panel polling forever.
+export const maxDuration = 60;
+
 export async function POST(request, { params }) {
   try {
     const { id: rawId } = await params;

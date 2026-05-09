@@ -45,6 +45,7 @@ const Drawer = forwardRef(function Drawer(
     useClickOutside = true,
     closeButton = true,
     className = "",
+    background = "var(--bg)",
     children,
     ...rest
   },
@@ -89,7 +90,7 @@ const Drawer = forwardRef(function Drawer(
         right: 0,
         bottom: 0,
         width,
-        background: "var(--bg)",
+        background,
         borderLeft: "1px solid var(--border)",
         display: "flex",
         flexDirection: "column",
