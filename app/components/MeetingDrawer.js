@@ -54,27 +54,18 @@ export default function MeetingDrawer({ eventId, onClose }) {
 
   return (
     <Drawer open={open} onClose={onClose} aria-label="Meeting details">
-      {/* Header */}
+      {/* Header — close button lives in the Drawer primitive (top-right). */}
       <div
         style={{
           flexShrink: 0,
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
-          padding: "14px 18px",
+          padding: "16px 20px 12px",
+          paddingRight: 32,
           borderBottom: "1px solid var(--border-subtle)",
         }}
       >
         <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>Meeting</span>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close"
-          className="text-btn"
-          style={{ padding: "4px 8px", fontSize: 12, color: "var(--text-muted)" }}
-        >
-          Close ✕
-        </button>
       </div>
 
       {/* Body */}

@@ -8,6 +8,7 @@ import FieldPill from "@/app/ui/FieldPill";
 import FieldRow from "@/app/ui/FieldRow";
 import CalendarDropdown from "@/app/ui/CalendarDropdown";
 import Drawer from "@/app/ui/Drawer";
+import { FollowupSparkleIcon } from "./AIDraftInbox";
 import {
   CalendarIcon,
   PriorityIcon,
@@ -48,15 +49,6 @@ function Avatar({ name, size = 18 }) {
     >
       {avatarInitials(name)}
     </div>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-      <path d="M1.32129 10.1182L6.2296 5.40892L1.32129 0.600098" stroke="currentColor" strokeWidth="1.06126" strokeLinecap="round" />
-      <path d="M9.67871 0.583496L9.67871 10.4167" stroke="currentColor" strokeWidth="1.06126" strokeLinecap="round" />
-    </svg>
   );
 }
 
@@ -657,8 +649,9 @@ const TaskDrawer = forwardRef(function TaskDrawer({
           background: "var(--bg)",
         }}
       >
-        {/* Row: Mark as done + Close */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        {/* Row: Mark as done + Draft follow-up — close lives in the
+            Drawer primitive (top-right). Padding-right reserves space. */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, paddingRight: 32 }}>
           {/* Mark as done button */}
           <button
             type="button"
@@ -686,7 +679,8 @@ const TaskDrawer = forwardRef(function TaskDrawer({
             <span>{isDone ? "Done" : "Mark as done"}</span>
           </button>
 
-          {/* Draft follow-up with Vector */}
+          {/* Draft follow-up with Vector — uses the AI-gradient sparkle
+              shared with the insights cards. */}
           <button
             type="button"
             onClick={() => setFollowUpOpen(true)}
@@ -695,26 +689,11 @@ const TaskDrawer = forwardRef(function TaskDrawer({
             style={{
               padding: "4px 8px",
               cursor: localTask?.id ? "pointer" : "default",
-              marginLeft: "auto",
-              marginRight: 8,
             }}
             title="Draft a follow-up email with Vector"
           >
-            <svg width="11" height="11" viewBox="0 0 14 14" fill="currentColor" style={{ color: "var(--action)" }}>
-              <path d="M7 1L8.5 5.5L13 7L8.5 8.5L7 13L5.5 8.5L1 7L5.5 5.5L7 1Z" />
-            </svg>
+            <FollowupSparkleIcon />
             <span>Draft follow-up</span>
-          </button>
-
-          {/* Close button */}
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex items-center justify-center w-5 h-5 rounded icon-btn"
-            aria-label="Close"
-            style={{ background: "none", border: "none", cursor: "pointer" }}
-          >
-            <CloseIcon />
           </button>
         </div>
 

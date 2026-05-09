@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import InlineEventDrafts from "./InlineEventDrafts";
+import { MetaDot, ChevronRight, FollowupSparkleIcon as MinitiSparkleIcon } from "./AIDraftInbox";
 
 /**
  * "Unmatched meetings" panel — shown above the drafts list when Miniti

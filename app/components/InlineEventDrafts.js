@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CreateTaskCard, FollowupCard, DraftCard } from "./AIDraftInbox";
+import { CreateTaskCard, FollowupCard, DraftCard, FollowupSparkleIcon } from "./AIDraftInbox";
 
 /**
  * Renders drafts inline below an unmatched-event card on /ai-drafts
@@ -153,20 +153,25 @@ export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled 
   }
 
   // Initial state — assigned but orchestrator hasn't yielded drafts yet.
+  // Friendly "Vector is thinking" indicator using a twinkling sparkle —
+  // the gradient border on the parent card carries the heavier visual
+  // signal, this just confirms what's about to land.
   if (drafts == null || (drafts.length === 0 && !seenAtLeastOne.current)) {
     return (
       <div
         style={{
-          fontSize: 12,
-          color: "var(--text-muted)",
-          fontStyle: "italic",
-          padding: "10px 0",
+          fontSize: 13,
+          color: "var(--text-secondary)",
+          padding: "12px 0",
           display: "flex",
           alignItems: "center",
           gap: 8,
         }}
       >
-        <Spinner /> Running orchestrator… drafts will appear below in ~10–30s.
+        <span className="ai-sparkle-twinkle" style={{ display: "inline-flex" }}>
+          <FollowupSparkleIcon />
+        </span>
+        <span>Generating action draft…</span>
       </div>
     );
   }
@@ -237,26 +242,3 @@ export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled 
   );
 }
 
-function Spinner() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden style={{ flexShrink: 0 }}>
-      <circle cx="7" cy="7" r="5" fill="none" stroke="var(--border)" strokeWidth="1.5" />
-      <path
-        d="M7 2 a 5 5 0 0 1 5 5"
-        fill="none"
-        stroke="var(--action)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      >
-        <animateTransform
-          attributeName="transform"
-          type="rotate"
-          from="0 7 7"
-          to="360 7 7"
-          dur="1s"
-          repeatCount="indefinite"
-        />
-      </path>
-    </svg>
-  );
-}

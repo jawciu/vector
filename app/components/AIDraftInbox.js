@@ -851,11 +851,11 @@ function FieldBlock({ label, actions, children }) {
   );
 }
 
-function MetaDot() {
+export function MetaDot() {
   return <span style={{ color: "var(--text-muted)", fontSize: 11 }}>·</span>;
 }
 
-function ChevronRight() {
+export function ChevronRight() {
   return (
     <svg width="6" height="11" viewBox="0 0 6 11" fill="none" aria-hidden style={{ color: "var(--text-muted)", flexShrink: 0 }}>
       <path d="M1 1l3.5 4.5L1 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -872,7 +872,7 @@ function CopyIcon() {
   );
 }
 
-function FollowupSparkleIcon() {
+export function FollowupSparkleIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
       <defs>
