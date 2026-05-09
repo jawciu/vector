@@ -7,6 +7,7 @@ import Button from "@/app/ui/Button";
 import FieldPill from "@/app/ui/FieldPill";
 import FieldRow from "@/app/ui/FieldRow";
 import CalendarDropdown from "@/app/ui/CalendarDropdown";
+import Drawer from "@/app/ui/Drawer";
 import {
   CalendarIcon,
   PriorityIcon,
@@ -519,15 +520,9 @@ const TaskDrawer = forwardRef(function TaskDrawer({
     });
   }, []);
 
-  // Close on Escape
-  useEffect(() => {
-    if (!open) return;
-    function handler(e) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [open, onClose]);
+  // ESC + outside-click are handled by the Drawer primitive (with
+  // useClickOutside=false here — OnboardingDetailClient owns the click
+  // logic so opening a sibling task swaps instead of closing).
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -643,22 +638,13 @@ const TaskDrawer = forwardRef(function TaskDrawer({
   const hasComment = commentInput.trim().length > 0;
 
   return (
-    <div
+    <Drawer
       ref={ref}
-      className={`task-drawer${open ? " task-drawer--open" : ""}`}
-      style={{
-        position: "fixed",
-        top: 44,
-        right: 0,
-        bottom: 0,
-        width: 520,
-        background: "var(--bg)",
-        borderLeft: "1px solid var(--border)",
-        display: "flex",
-        flexDirection: "column",
-        zIndex: 40,
-        overflow: "hidden",
-      }}
+      open={open}
+      onClose={onClose}
+      width={520}
+      topOffset={44}
+      useClickOutside={false}
     >
       {/* Sticky header: actions + title + description */}
       <div
@@ -1365,7 +1351,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
         taskId={localTask?.id}
         taskTitle={localTask?.title}
       />
-    </div>
+    </Drawer>
   );
 });
 

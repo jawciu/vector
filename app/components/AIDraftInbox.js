@@ -13,6 +13,7 @@ import {
 } from "@/app/ui/Icons";
 import { MenuList, MenuOption } from "./Menu";
 import CalendarDropdown from "@/app/ui/CalendarDropdown";
+import MeetingDrawer from "./MeetingDrawer";
 
 /**
  * "Vector suggests" inbox — list of PendingAIChange rows.
@@ -49,6 +50,7 @@ export default function AIDraftInbox({
   const [errors, setErrors] = useState({});
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [toast, setToast] = useState(null);
+  const [drawerEventId, setDrawerEventId] = useState(null);
   const toastTimer = useRef(null);
 
   function flashToast(message) {
@@ -207,8 +209,14 @@ export default function AIDraftInbox({
           contacts={contacts}
           phases={phases}
           openTasks={openTasks}
+          onMeetingClick={setDrawerEventId}
         />
       ))}
+
+      <MeetingDrawer
+        eventId={drawerEventId}
+        onClose={() => setDrawerEventId(null)}
+      />
     </div>
   );
 }
@@ -249,11 +257,11 @@ function DraftGroup({
   contacts,
   phases,
   openTasks,
+  onMeetingClick,
 }) {
   // Show a "From meeting: <title>" header above any group whose drafts
-  // came from a Miniti event. Even single-draft groups get this so the
-  // user knows the provenance at a glance — bulk-dismiss now lives at
-  // the inbox level (above the first card), not per-group.
+  // came from a Miniti event. Click the title pill to open the
+  // MeetingDrawer with the full transcript.
   const meetingTitle = group.eventId != null
     ? group.drafts.find((d) => d.meetingTitle)?.meetingTitle ?? null
     : null;
@@ -263,7 +271,15 @@ function DraftGroup({
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
             <span style={{ color: "var(--text-muted)" }}>From meeting:</span>
-            <span className="task-ref">{meetingTitle}</span>
+            <button
+              type="button"
+              onClick={() => onMeetingClick?.(group.eventId)}
+              className="task-ref"
+              style={{ border: "none", cursor: "pointer" }}
+              title="Open meeting transcript"
+            >
+              {meetingTitle}
+            </button>
           </div>
           <hr className="ai-divider" style={{ margin: 0 }} />
         </div>
@@ -280,6 +296,7 @@ function DraftGroup({
                 error={errors[draft.id]}
                 onApprove={(overrides) => onApprove(draft, overrides)}
                 onReject={() => onReject(draft, null)}
+                onMeetingClick={onMeetingClick}
               />
             );
           }
@@ -297,6 +314,7 @@ function DraftGroup({
                 contacts={contacts}
                 phases={phases}
                 openTasks={openTasks}
+                onMeetingClick={onMeetingClick}
               />
             );
           }
@@ -391,7 +409,7 @@ function BulkActionBar({ count, onReject, onClear }) {
   );
 }
 
-function DraftCard({
+export function DraftCard({
   draft,
   mode,
   busy,
@@ -545,7 +563,7 @@ function DraftCard({
  * Same backend semantics as before — Dismiss = /reject, Comment = /approve
  * (publishes the message body as a portal Comment). Renaming UI only.
  */
-function FollowupCard({ draft, mode, busy, error, onApprove, onReject }) {
+export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, onMeetingClick }) {
   const isPending = mode === "pending";
   const initial = draft.payload ?? {};
   const [subject, setSubject] = useState(initial.subject ?? "");
@@ -661,12 +679,20 @@ function FollowupCard({ draft, mode, busy, error, onApprove, onReject }) {
             )}
             {draft.sourceQuote && <MetaDot />}
             <ConfidencePill confidence={draft.confidence} />
-            {draft.meetingTitle && (
+            {draft.meetingTitle && draft.sourceEventId != null && (
               <>
                 <MetaDot />
                 <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
                   From meeting:{" "}
-                  <span className="task-ref">{draft.meetingTitle}</span>
+                  <button
+                    type="button"
+                    onClick={() => onMeetingClick?.(draft.sourceEventId)}
+                    className="task-ref"
+                    style={{ border: "none", cursor: "pointer" }}
+                    title="Open meeting transcript"
+                  >
+                    {draft.meetingTitle}
+                  </button>
                 </span>
               </>
             )}
@@ -920,7 +946,7 @@ function buildMailto({ to, subject, body }) {
  * Create task: approves the draft with the in-memory edits as overrides.
  * Dismiss: if there are unsaved edits, confirm before rejecting.
  */
-function CreateTaskCard({
+export function CreateTaskCard({
   draft,
   mode,
   busy,

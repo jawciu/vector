@@ -268,6 +268,7 @@ export const ExternalEventScalarFieldEnum = {
   payload: 'payload',
   onboardingId: 'onboardingId',
   matchAmbiguous: 'matchAmbiguous',
+  isTestRun: 'isTestRun',
   error: 'error',
   orchestratorInput: 'orchestratorInput',
   orchestratorExtraction: 'orchestratorExtraction',

@@ -222,6 +222,7 @@ model ExternalEvent {
   onboardingId   Int?
   onboarding     Onboarding?      @relation(fields: [onboardingId], references: [id], onDelete: SetNull)
   matchAmbiguous Boolean          @default(false)  // true → needs Caroline to assign manually
+  isTestRun      Boolean          @default(false)  // fired from /admin/ai test panel — hide from per-onboarding Meetings, show with badge in admin Pipeline
   error          String?          // last processing error, if any
   // Debug surface for orchestrator iteration. Two-pass pipeline writes:
   //   - orchestratorInput      = JSON we sent to Claude (buildOrchestratorContext output)

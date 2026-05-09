@@ -478,13 +478,19 @@ a {
   inherits: false;
 }
 
+/* Generic AI-generating state. Apply `.ai-generating` to any positioned
+   card with a `border-radius` and toggle `.is-streaming` while Vector is
+   producing content — the host gets a slow rotating conic-gradient ring
+   on a masked ::after pseudo-element. Documented in DESIGN.md. */
 .pi-card,
-.oi-card {
+.oi-card,
+.ai-generating {
   position: relative;
 }
 
 .pi-card::after,
-.oi-card::after {
+.oi-card::after,
+.ai-generating::after {
   content: "";
   position: absolute;
   inset: -1px;
@@ -509,7 +515,8 @@ a {
 }
 
 .pi-card.is-streaming::after,
-.oi-card.is-streaming::after {
+.oi-card.is-streaming::after,
+.ai-generating.is-streaming::after {
   opacity: 1;
   animation: ai-border-spin 2.5s linear infinite;
 }
@@ -523,10 +530,35 @@ a {
   to { --ai-spin: 360deg; }
 }
 
+/* Cute sparkle twinkle — apply `.ai-sparkle-twinkle` to the Vector
+   sparkle SVG (or any element you want to "blink"). Combined opacity
+   pulse + soft scale + tiny rotation gives a star-twinkling feel
+   that's calmer than a spinning loader. */
+@keyframes ai-sparkle-twinkle {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1) rotate(-6deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.18) rotate(6deg);
+  }
+}
+
+.ai-sparkle-twinkle {
+  animation: ai-sparkle-twinkle 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: center;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pi-card.is-streaming::after,
-  .oi-card.is-streaming::after {
+  .oi-card.is-streaming::after,
+  .ai-generating.is-streaming::after {
     animation: none;
+  }
+  .ai-sparkle-twinkle {
+    animation: none;
+    opacity: 1;
   }
 }
 

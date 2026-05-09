@@ -14,6 +14,7 @@
 
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { markEventAsTestRun } from "@/lib/db";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
@@ -122,6 +123,18 @@ export async function POST(request) {
   }
 
   const responseBody = await res.json().catch(() => ({}));
+
+  // Mark the resulting ExternalEvent row as a test run so it can be
+  // hidden from the per-onboarding Meetings timeline (which is for real
+  // meetings only) and badged with a test-tube in admin Pipeline.
+  if (responseBody?.eventId != null) {
+    try {
+      await markEventAsTestRun(Number(responseBody.eventId));
+    } catch (err) {
+      console.warn("[test-webhook] mark isTestRun failed:", err);
+    }
+  }
+
   return NextResponse.json(
     {
       ok: res.ok,

@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
   { href: "/", label: "Onboardings", icon: OnboardingsIcon },
-  { href: "/ai-drafts", label: "Workflows", icon: SparkleIcon },
+  { href: "/ai-drafts", label: "Actions", icon: SparkleIcon },
   { href: "/settings", label: "Settings", icon: SettingsIcon },
 ];
 
@@ -110,9 +110,9 @@ export default function Sidebar() {
   const [inboxCount, setInboxCount] = useState(0);
   const dropdownRef = useRef(null);
 
-  // Sidebar Workflows badge — counts ambiguous Miniti events that need
+  // Sidebar Actions badge — counts ambiguous Miniti events that need
   // manual onboarding assignment. Per-onboarding draft counts moved to the
-  // home table after the per-onboarding Workflows tab landed.
+  // home table after the per-onboarding Actions tab landed.
   //
   // No polling; refetch on window focus. Ambiguous events are rare, and
   // when one arrives the user typically lands on the page from a notification

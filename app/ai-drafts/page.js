@@ -7,12 +7,12 @@ import UnmatchedEvents from "@/app/components/UnmatchedEvents";
 export const dynamic = "force-dynamic";
 
 /**
- * Global Workflows page — only the things that AREN'T tied to a specific
+ * Global Actions page — only the things that AREN'T tied to a specific
  * onboarding yet. Today that means ambiguous Miniti meetings (Vector
  * couldn't auto-match them and needs Caroline to pick the onboarding).
  *
  * Per-onboarding AI drafts (create_task / match_existing / update_status /
- * draft_followup) live on each onboarding's Workflows tab, surfaced via
+ * draft_followup) live on each onboarding's Actions tab, surfaced via
  * the badge on the Onboardings table.
  */
 export default async function AIDraftsPage() {
@@ -35,10 +35,10 @@ export default async function AIDraftsPage() {
       <div style={{ maxWidth: 880, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 }}>
         <header style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--text)", margin: 0 }}>
-            Workflows
+            Actions
           </h1>
           <p style={{ fontSize: 13, color: "var(--text-muted)", margin: 0 }}>
-            Things that need your input but aren&rsquo;t yet tied to a specific onboarding. Per-onboarding drafts live on each onboarding&rsquo;s Workflows tab.
+            Things that need your input but aren&rsquo;t yet tied to a specific onboarding. Per-onboarding drafts live on each onboarding&rsquo;s Actions tab.
           </p>
         </header>
 

@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getAICallStats, getRecentAICalls, getIntegrationStats, countAmbiguousEvents, listStuckEvents } from "@/lib/db";
-import StuckEventsList from "@/app/components/StuckEventsList";
+import { getAICallStats, getRecentAICalls, getIntegrationStats, countAmbiguousEvents, listExternalEventsForAdmin } from "@/lib/db";
 import ScanStaleButton from "@/app/components/ScanStaleButton";
 import TestWebhookPanel from "@/app/components/TestWebhookPanel";
 import AdminAITabs from "@/app/components/AdminAITabs";
+import PipelineTimeline from "@/app/components/PipelineTimeline";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
@@ -30,7 +30,7 @@ export default async function AdminAIPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [stats30d, stats7d, statsToday, recent, minitiStats7d, minitiStats30d, ambiguousNow, stuckEvents, fixtures] = await Promise.all([
+  const [stats30d, stats7d, statsToday, recent, minitiStats7d, minitiStats30d, ambiguousNow, pipelineEvents, fixtures] = await Promise.all([
     getAICallStats({ days: 30 }),
     getAICallStats({ days: 7 }),
     getAICallStats({ days: 1 }),
@@ -38,7 +38,7 @@ export default async function AdminAIPage() {
     getIntegrationStats({ source: "miniti", days: 7 }),
     getIntegrationStats({ source: "miniti", days: 30 }),
     countAmbiguousEvents({ source: "miniti" }),
-    listStuckEvents({ source: "miniti", limit: 20 }),
+    listExternalEventsForAdmin({ limit: 100, state: "all" }),
     listFixtureNames(),
   ]);
 
@@ -182,7 +182,7 @@ export default async function AdminAIPage() {
     </div>
   );
 
-  const integrationsTab = (
+  const pipelineTab = (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <Section title="Miniti throughput">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
@@ -191,14 +191,12 @@ export default async function AdminAIPage() {
         </div>
       </Section>
 
-      {stuckEvents.length > 0 && (
-        <Section title="Stuck events">
-          <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "0 0 10px", lineHeight: 1.5 }}>
-            Matched to an onboarding but never finished processing. Almost always means the orchestrator was killed mid-run. Click reprocess to retry; it&apos;s idempotent. &ldquo;Show debug&rdquo; reveals the persisted Pass 1 extraction + Pass 2 tool calls so you can see where it stalled.
-          </p>
-          <StuckEventsList initialEvents={stuckEvents} />
-        </Section>
-      )}
+      <Section title="Event timeline">
+        <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "0 0 10px", lineHeight: 1.5 }}>
+          Every Miniti event we&rsquo;ve received, newest first. Filter by state to focus on stuck, ambiguous, or test runs. Expand a row to see the meeting metadata, Pass 1 extraction, Pass 2 tool calls, drafts produced, and the full transcript.
+        </p>
+        <PipelineTimeline events={pipelineEvents} />
+      </Section>
     </div>
   );
 
@@ -224,7 +222,7 @@ export default async function AdminAIPage() {
           tabs={[
             { id: "overview", label: "Overview", content: overviewTab },
             { id: "usage", label: "Usage", content: usageTab },
-            { id: "integrations", label: "Integrations", content: integrationsTab },
+            { id: "pipeline", label: "Pipeline", content: pipelineTab },
             { id: "test", label: "Test webhook", content: testTab },
           ]}
         />

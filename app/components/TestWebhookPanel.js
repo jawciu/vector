@@ -201,10 +201,10 @@ export default function TestWebhookPanel({ fixtures }) {
             <div>
               <strong>Onboarding:</strong>{" "}
               <Link
-                href={`/onboardings/${result.response.onboardingId}?tab=workflows`}
+                href={`/onboardings/${result.response.onboardingId}?tab=actions`}
                 style={{ color: "var(--action)" }}
               >
-                #{result.response.onboardingId} → Workflows tab
+                #{result.response.onboardingId} → Actions tab
               </Link>
             </div>
           )}

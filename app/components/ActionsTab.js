@@ -12,7 +12,7 @@ const STATUSES = [
 ];
 
 /**
- * Per-onboarding "Workflows" tab — shows AI drafts (create_task,
+ * Per-onboarding "Actions" tab — shows AI drafts (create_task,
  * match_existing, update_status, draft_followup) for THIS onboarding.
  *
  * Status filter uses the same pill-button + menu pattern as the home
@@ -22,7 +22,7 @@ const STATUSES = [
  * badge) so new drafts arriving while the tab is open auto-refresh the
  * list. Owner-scoping for draft_followup is preserved server-side.
  */
-export default function WorkflowsTab({
+export default function ActionsTab({
   onboardingId,
   vendorUsers = [],
   contacts = [],
@@ -84,7 +84,7 @@ export default function WorkflowsTab({
       if (cancelled || !supabase) return;
       client = supabase;
       channel = supabase
-        .channel(`workflows-tab-${onboardingId}`)
+        .channel(`actions-tab-${onboardingId}`)
         .on(
           "postgres_changes",
           { event: "INSERT", schema: "public", table: "PendingAIChange" },
@@ -118,7 +118,7 @@ export default function WorkflowsTab({
           body: JSON.stringify({ reason: "dismiss all" }),
         });
       } catch (err) {
-        console.warn(`[workflows] dismiss-all failed for draft ${draft.id}`, err);
+        console.warn(`[actions] dismiss-all failed for draft ${draft.id}`, err);
       }
     }
     refetch();
@@ -207,7 +207,7 @@ export default function WorkflowsTab({
   );
 }
 
-/** Inline search input — sits in the WorkflowsTab header next to the
+/** Inline search input — sits in the ActionsTab header next to the
  *  status filter. Caps at 400px wide so it doesn't dominate. */
 function SearchInput({ value, onChange }) {
   return (

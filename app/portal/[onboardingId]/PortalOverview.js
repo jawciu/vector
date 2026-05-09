@@ -1,137 +1,107 @@
 "use client";
 
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import InlineProse from "@/app/ui/InlineProse";
+import {
+  InsightCard,
+  InsightCardHeader,
+  InsightSection,
+  InsightStatusPill,
+  WinRow,
+  ThisWeekRow,
+  EmptyMessage,
+} from "@/app/ui/InsightCard";
+import TaskFilterMenu from "@/app/components/TaskFilterMenu";
+import { taskMatchesFilter } from "@/lib/taskFilters";
+import PortalTaskCard from "./PortalTaskCard";
 import PortalUpdatesBanner from "./PortalUpdatesBanner";
 
-const STATUS_COLORS = {
+const SOFT_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
+
+const STATUS_TILE_COLORS = {
   done: "var(--success)",
   inProgress: "var(--action)",
   blocked: "var(--danger)",
   notStarted: "var(--text-muted)",
 };
 
-function GoLiveCountdown({ targetGoLive }) {
+function formatGoLive(targetGoLive) {
   if (!targetGoLive) return null;
-
   const now = new Date();
   const goLive = new Date(targetGoLive);
-  const diffMs = goLive - now;
-  const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  const days = Math.ceil((goLive - now) / (1000 * 60 * 60 * 24));
+  const dateStr = goLive.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   if (days < 0) {
-    return (
-      <div
-        className="rounded-lg h-full"
-        style={{
-          padding: "12px 16px",
-          background: "rgba(255, 137, 155, 0.08)",
-          border: "1px solid var(--danger)",
-        }}
-      >
-        <span className="text-sm font-medium" style={{ color: "var(--danger)" }}>
-          Go-live was {Math.abs(days)} day{Math.abs(days) !== 1 ? "s" : ""} ago
-        </span>
-      </div>
-    );
+    return {
+      label: `Go-live was ${Math.abs(days)} day${Math.abs(days) !== 1 ? "s" : ""} ago`,
+      detail: dateStr,
+      color: "var(--danger)",
+    };
   }
-
-  return (
-    <div
-      className="rounded-lg h-full"
-      style={{
-        padding: "12px 16px",
-        background: "var(--surface)",
-        border: "1px solid var(--border)",
-      }}
-    >
-      <div className="text-xs" style={{ color: "var(--text-muted)", marginBottom: 4 }}>
-        Go-live target
-      </div>
-      <div className="flex items-baseline gap-2">
-        <span className="text-2xl font-semibold" style={{ color: "var(--text)" }}>
-          {days}
-        </span>
-        <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-          day{days !== 1 ? "s" : ""} remaining
-        </span>
-      </div>
-      <div className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
-        {goLive.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-      </div>
-    </div>
-  );
+  if (days === 0) {
+    return { label: "Go-live is today", detail: dateStr, color: "var(--alert)" };
+  }
+  return {
+    label: `${days} day${days !== 1 ? "s" : ""} to go-live`,
+    detail: dateStr,
+    color: "var(--text)",
+  };
 }
 
-function HealthBanner({ health }) {
-  if (health.status === "On track") {
-    return (
-      <div
-        className="rounded-lg h-full"
-        style={{
-          padding: "12px 16px",
-          background: "rgba(156, 255, 166, 0.08)",
-          border: "1px solid var(--success)",
-        }}
-      >
-        <span className="text-sm font-medium" style={{ color: "var(--success)" }}>
-          On track
-        </span>
-      </div>
-    );
-  }
-
-  const color = health.status === "Blocked" ? "var(--danger)" : "var(--alert)";
-  const bgAlpha = health.status === "Blocked" ? "rgba(255, 137, 155, 0.08)" : "rgba(255, 218, 145, 0.08)";
-
-  return (
-    <div
-      className="rounded-lg h-full"
-      style={{
-        padding: "12px 16px",
-        background: bgAlpha,
-        border: `1px solid ${color}`,
-      }}
-    >
-      <span className="text-sm font-medium" style={{ color }}>
-        {health.status}
-      </span>
-      {health.reasons.length > 0 && (
-        <div className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
-          {health.reasons.join(" · ")}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function TaskSummary({ summary }) {
+/**
+ * Deterministic header card. One pane card with go-live on the left, a
+ * single-row task-summary breakdown on the right. Stacks on narrow widths.
+ */
+function SummaryHeaderCard({ data }) {
+  const goLive = formatGoLive(data.targetGoLive);
+  const summary = data.taskSummary;
   const items = [
-    { label: "To do", count: summary.notStarted, color: STATUS_COLORS.notStarted },
-    { label: "In progress", count: summary.inProgress, color: STATUS_COLORS.inProgress },
-    { label: "Blocked", count: summary.blocked, color: STATUS_COLORS.blocked },
-    { label: "Done", count: summary.done, color: STATUS_COLORS.done },
+    { label: "To do", count: summary.notStarted, color: STATUS_TILE_COLORS.notStarted },
+    { label: "In progress", count: summary.inProgress, color: STATUS_TILE_COLORS.inProgress },
+    { label: "Blocked", count: summary.blocked, color: STATUS_TILE_COLORS.blocked },
+    { label: "Done", count: summary.done, color: STATUS_TILE_COLORS.done },
   ];
 
   return (
     <div
-      className="rounded-lg"
       style={{
-        padding: "12px 16px",
-        background: "var(--surface)",
-        border: "1px solid var(--border)",
+        borderRadius: 20,
+        border: "1px solid var(--button-secondary-border)",
+        background: "var(--bg)",
+        padding: "16px 20px",
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 16,
       }}
     >
-      <div className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>
-        Task summary
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {items.map(({ label, count, color }) => (
-          <div key={label} className="text-center">
-            <div className="text-xl font-semibold" style={{ color }}>
-              {count}
-            </div>
-            <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-              {label}
-            </div>
+      {goLive ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: goLive.color }}>
+            {goLive.label}
+          </span>
+          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{goLive.detail}</span>
+        </div>
+      ) : (
+        <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>
+          {summary.total} task{summary.total === 1 ? "" : "s"}
+        </div>
+      )}
+
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center" }}>
+        {items.map(({ label, count, color }, i) => (
+          <div
+            key={label}
+            style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}
+          >
+            <span style={{ fontWeight: 600, color }}>{count}</span>
+            <span style={{ color: "var(--text-muted)" }}>{label}</span>
+            {i < items.length - 1 && (
+              <span aria-hidden style={{ color: "var(--border)", marginLeft: 10 }}>·</span>
+            )}
           </div>
         ))}
       </div>
@@ -139,88 +109,317 @@ function TaskSummary({ summary }) {
   );
 }
 
-function SegmentedBar({ statusCounts }) {
-  const total = statusCounts.total;
-  if (total === 0) return null;
+/**
+ * Deterministic "Your tasks" section — replaces the old My Tasks tab. Same
+ * filter dropdown the vendor side uses; always scoped to the current
+ * portal contact (`isAssignedToMe`).
+ */
+function YourTasksSection({ tasks, onSessionExpired }) {
+  const [filter, setFilter] = useState("active");
+  const [localTasks, setLocalTasks] = useState(tasks);
 
-  const segments = [
-    { key: "done", count: statusCounts.done, color: STATUS_COLORS.done },
-    { key: "inProgress", count: statusCounts.inProgress, color: STATUS_COLORS.inProgress },
-    { key: "blocked", count: statusCounts.blocked, color: STATUS_COLORS.blocked },
-    { key: "notStarted", count: statusCounts.notStarted, color: STATUS_COLORS.notStarted },
-  ].filter((s) => s.count > 0);
+  // Keep local state in sync if the parent re-fetches tasks (currently never,
+  // but cheap insurance and lets task toggles stick on this surface).
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
 
-  return (
-    <div className="flex rounded-full overflow-hidden" style={{ height: 6, background: "var(--bg)" }}>
-      {segments.map(({ key, count, color }) => (
-        <div
-          key={key}
-          style={{
-            width: `${(count / total) * 100}%`,
-            background: color,
-            minWidth: 3,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
+  const myTasks = localTasks.filter((t) => t.isAssignedToMe);
+  const filtered = myTasks
+    .filter((t) => taskMatchesFilter(t, filter))
+    .sort((a, b) => {
+      const aDue = a.due ? new Date(a.due).getTime() : Infinity;
+      const bDue = b.due ? new Date(b.due).getTime() : Infinity;
+      return aDue - bDue;
+    });
 
-function PhaseCard({ phase }) {
-  const { statusCounts } = phase;
+  function handleTaskUpdated(taskId, updatedTask) {
+    setLocalTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, ...updatedTask } : t))
+    );
+  }
 
   return (
     <div
-      className="rounded-lg"
       style={{
-        padding: "12px 16px",
-        background: "var(--surface)",
-        border: "1px solid var(--border)",
+        borderRadius: 20,
+        border: "1px solid var(--button-secondary-border)",
+        background: "var(--bg)",
+        padding: 16,
       }}
     >
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium" style={{ color: "var(--text)" }}>
-          {phase.name}
-        </span>
-        <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-          {statusCounts.done}/{statusCounts.total} done
-        </span>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 12,
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <span
+            style={{
+              fontSize: 14,
+              fontWeight: 600,
+              letterSpacing: "0.5px",
+              color: "var(--text-muted)",
+              lineHeight: "16.5px",
+            }}
+          >
+            Your tasks
+          </span>
+        </div>
+        <TaskFilterMenu value={filter} onChange={setFilter} />
       </div>
-      <SegmentedBar statusCounts={statusCounts} />
+
+      {filtered.length === 0 ? (
+        <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0 }}>
+          {myTasks.length === 0
+            ? "Your vendor hasn't assigned any tasks to you yet."
+            : `No ${filter} tasks for you right now.`}
+        </p>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {filtered.map((task) => (
+            <PortalTaskCard
+              key={task.id}
+              task={task}
+              onTaskUpdated={handleTaskUpdated}
+              onSessionExpired={onSessionExpired}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-export default function PortalOverview({ data }) {
+export default function PortalOverview({ data, tasks = [], snapshot, contextHash, cachedInsight }) {
+  const router = useRouter();
+  const handleSessionExpired = useCallback(() => {
+    router.push("/portal/auth?error=expired");
+  }, [router]);
+
+  const [payload, setPayload] = useState(() =>
+    isPortalShape(cachedInsight?.payload) ? cachedInsight.payload : null
+  );
+  const [streamingText, setStreamingText] = useState("");
+  const [status, setStatus] = useState(() => initialStatus(cachedInsight, contextHash));
+  const [error, setError] = useState(null);
+  const triggeredRef = useRef(false);
+
+  const regenerate = useCallback(async () => {
+    if (triggeredRef.current) return;
+    if (!snapshot || !contextHash) return;
+    triggeredRef.current = true;
+    setStatus("streaming");
+    setStreamingText("");
+    setError(null);
+
+    let res;
+    try {
+      res = await fetch(`/api/insights/portal/${data.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ snapshot, contextHash }),
+      });
+    } catch (err) {
+      setError(`Network error: ${err.message}`);
+      setStatus("error");
+      triggeredRef.current = false;
+      return;
+    }
+
+    if (!res.ok || !res.body) {
+      const errBody = await res.text().catch(() => "");
+      setError(`Generate failed (${res.status}): ${errBody}`);
+      setStatus("error");
+      triggeredRef.current = false;
+      return;
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let finalPayload = null;
+
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        let idx;
+        while ((idx = buffer.indexOf("\n\n")) !== -1) {
+          const raw = buffer.slice(0, idx).trim();
+          buffer = buffer.slice(idx + 2);
+          if (!raw.startsWith("data:")) continue;
+          let event;
+          try {
+            event = JSON.parse(raw.slice(5).trim());
+          } catch {
+            continue;
+          }
+          if (event.delta) {
+            setStreamingText((prev) => prev + event.delta);
+          } else if (event.done) {
+            finalPayload = event.payload;
+          } else if (event.error) {
+            setError(event.error);
+            setStatus("error");
+            triggeredRef.current = false;
+            return;
+          }
+        }
+      }
+    } catch (err) {
+      setError(`Stream error: ${err.message}`);
+      setStatus("error");
+      triggeredRef.current = false;
+      return;
+    }
+
+    if (finalPayload) {
+      setPayload(finalPayload);
+      setStatus("fresh");
+    }
+    triggeredRef.current = false;
+  }, [snapshot, contextHash, data.id]);
+
+  useEffect(() => {
+    if (status === "needs-generate" || status === "stale") {
+      regenerate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const isStreaming = status === "streaming";
+  const showStreamingText = isStreaming && !payload;
+  const summary = showStreamingText
+    ? extractField(streamingText, "summary") || "Generating…"
+    : payload?.summary || "—";
+  const aiStatus = payload?.status ?? null;
+  const wins = payload?.wins ?? [];
+  const focusThisWeek = payload?.focusThisWeek ?? [];
+
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       <PortalUpdatesBanner />
 
-      {/* Health + Go-live: side by side on desktop */}
-      <div className="flex flex-col md:flex-row gap-3">
-        <div className="md:flex-1">
-          <HealthBanner health={data.health} />
-        </div>
-        {data.targetGoLive && (
-          <div className="md:flex-1">
-            <GoLiveCountdown targetGoLive={data.targetGoLive} />
+      <SummaryHeaderCard data={data} />
+
+      <InsightCard isStreaming={isStreaming}>
+        <InsightCardHeader
+          title={data.companyName}
+          statusPill={aiStatus ? <InsightStatusPill status={aiStatus} audience="customer" /> : null}
+          isStreaming={isStreaming}
+          payload={payload}
+          onRegenerate={regenerate}
+        />
+
+        {error && (
+          <div
+            style={{
+              margin: 16,
+              fontSize: 12,
+              color: "var(--danger)",
+              background: "rgba(255, 137, 155, 0.1)",
+              padding: "6px 10px",
+              borderRadius: 6,
+            }}
+          >
+            {error}
           </div>
         )}
-      </div>
 
-      <TaskSummary summary={data.taskSummary} />
+        {/* Top row: Summary | Wins */}
+        <div className="oi-row oi-row--bottom">
+          <InsightSection title="Summary" className="oi-section oi-section--focus">
+            <div className="oi-section-body">
+              <p style={{ fontSize: 14, lineHeight: "20px", color: "var(--text)", margin: 0 }}>
+                <InlineProse text={summary} />
+              </p>
+            </div>
+          </InsightSection>
 
-      {/* Phases — 2-col grid on desktop */}
-      <div>
-        <div className="text-xs mb-2" style={{ color: "var(--text-muted)" }}>
-          Phases
+          <InsightSection title="Wins" className="oi-section oi-section--week">
+            <div className="oi-section-body">
+              {wins.length === 0 ? (
+                <EmptyMessage>{payload ? "No wins to celebrate this week." : "Generating…"}</EmptyMessage>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", borderRadius: 12, overflow: "hidden", flex: 1 }}>
+                  {wins.slice(0, 2).map((w, i) => (
+                    <WinRow
+                      key={i}
+                      headline={w.headline}
+                      detail={w.detail}
+                      position={
+                        wins.length === 1 ? "only" : i === 0 ? "top" : "bottom"
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </InsightSection>
         </div>
-        <div className="flex flex-col md:grid md:grid-cols-2 gap-2">
-          {data.phases.map((phase) => (
-            <PhaseCard key={phase.id} phase={phase} />
-          ))}
+
+        <hr style={{ height: 1, width: "100%", border: 0, background: "var(--border-subtle)", margin: 0 }} />
+
+        {/* Bottom row: Focus this week, full width */}
+        <div style={{ padding: 16 }}>
+          <InsightSection title="Focus this week" className="">
+            <div style={{ marginTop: 16, display: "flex", flexDirection: "column", flex: 1 }}>
+              {focusThisWeek.length === 0 ? (
+                <EmptyMessage>{payload ? "Quiet week ahead." : "Generating…"}</EmptyMessage>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", borderRadius: 12, overflow: "hidden", flex: 1 }}>
+                  {focusThisWeek.slice(0, 3).map((item, i) => (
+                    <ThisWeekRow
+                      key={i}
+                      summary={item.summary}
+                      priority={item.priority}
+                      position={
+                        focusThisWeek.length === 1
+                          ? "only"
+                          : i === 0
+                          ? "top"
+                          : i === Math.min(focusThisWeek.length, 3) - 1
+                          ? "bottom"
+                          : "middle"
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </InsightSection>
         </div>
-      </div>
+      </InsightCard>
+
+      <YourTasksSection tasks={tasks} onSessionExpired={handleSessionExpired} />
     </div>
   );
+}
+
+function initialStatus(cached, hash) {
+  if (!cached || !isPortalShape(cached.payload)) return "needs-generate";
+  if (cached.contextHash !== hash) return "stale";
+  const age = Date.now() - new Date(cached.generatedAt).getTime();
+  return age > SOFT_TTL_MS ? "stale" : "fresh";
+}
+
+function isPortalShape(p) {
+  return Boolean(
+    p &&
+      typeof p.summary === "string" &&
+      typeof p.status === "string" &&
+      Array.isArray(p.wins) &&
+      Array.isArray(p.focusThisWeek)
+  );
+}
+
+function extractField(text, key) {
+  const re = new RegExp(`"${key}"\\s*:\\s*"([^"]*)`);
+  const m = text.match(re);
+  return m ? m[1] : null;
 }

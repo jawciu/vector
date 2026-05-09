@@ -39,7 +39,7 @@ export default async function OnboardingsListPage({ searchParams }) {
     name: user.user_metadata?.full_name ?? user.email,
   });
 
-  const [onboardings, portfolioSnapshot, cachedPortfolioInsight, workflowCounts] = await Promise.all([
+  const [onboardings, portfolioSnapshot, cachedPortfolioInsight, actionCounts] = await Promise.all([
     getOnboardings(statusFilter),
     buildPortfolioSnapshot({ statusFilter }),
     getCachedInsight("portfolio", "all"),
@@ -106,7 +106,7 @@ export default async function OnboardingsListPage({ searchParams }) {
         }}
       >
         {/* Header cells */}
-        {["Company", "Status", "Tasks", "Blocked", "Next action", "Last activity", "Owner", "Workflows"].map(
+        {["Company", "Status", "Tasks", "Blocked", "Next action", "Last activity", "Owner", "Actions"].map(
           (label, i) => (
             <span
               key={label}
@@ -138,7 +138,7 @@ export default async function OnboardingsListPage({ searchParams }) {
           });
           // getOnboardings stringifies ob.id; the count Map keys are numbers
           // (Prisma's onboardingId is Int). Coerce to keep the lookup honest.
-          const workflowCount = workflowCounts.get(Number(ob.id)) ?? 0;
+          const actionCount = actionCounts.get(Number(ob.id)) ?? 0;
           return (
             <React.Fragment key={ob.id}>
               {/* Company */}
@@ -234,18 +234,18 @@ export default async function OnboardingsListPage({ searchParams }) {
                   <span style={{ color: "var(--text-muted)" }}>—</span>
                 )}
               </span>
-              {/* Workflows — pending draft count, links to the per-onboarding tab. */}
+              {/* Actions — pending draft count, links to the per-onboarding tab. */}
               <Link
-                href={`/onboardings/${ob.id}?tab=workflows`}
+                href={`/onboardings/${ob.id}?tab=actions`}
                 className="flex items-center no-underline"
                 style={cellStyle(7)}
                 aria-label={
-                  workflowCount > 0
-                    ? `${workflowCount} pending workflow ${workflowCount === 1 ? "draft" : "drafts"}`
-                    : "No pending workflow drafts"
+                  actionCount > 0
+                    ? `${actionCount} pending action ${actionCount === 1 ? "draft" : "drafts"}`
+                    : "No pending action drafts"
                 }
               >
-                {workflowCount > 0 ? (
+                {actionCount > 0 ? (
                   <span
                     style={{
                       display: "inline-flex",
@@ -262,7 +262,7 @@ export default async function OnboardingsListPage({ searchParams }) {
                       lineHeight: 1,
                     }}
                   >
-                    {workflowCount > 99 ? "99+" : workflowCount}
+                    {actionCount > 99 ? "99+" : actionCount}
                   </span>
                 ) : (
                   <span style={{ color: "var(--text-muted)" }}>—</span>

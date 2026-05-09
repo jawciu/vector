@@ -23,16 +23,6 @@ const PORTAL_TABS = [
     ),
   },
   {
-    id: "my-tasks",
-    label: "My Tasks",
-    icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M7.29087 4.08305C7.29087 4.70184 7.04506 5.29529 6.6075 5.73285C6.16995 6.1704 5.5765 6.41622 4.9577 6.41622C4.33891 6.41622 3.74546 6.1704 3.3079 5.73285C2.87035 5.29529 2.62453 4.70184 2.62453 4.08305C2.62453 3.46425 2.87035 2.8708 3.3079 2.43325C3.74546 1.99569 4.33891 1.74988 4.9577 1.74988C5.5765 1.74988 6.16995 1.99569 6.6075 2.43325C7.04506 2.8708 7.29087 3.46425 7.29087 4.08305Z" stroke="currentColor" strokeWidth="1.16659" strokeLinecap="square" />
-        <path d="M9.3324 11.6659V11.0826C9.3324 10.4638 9.08658 9.87031 8.64903 9.43276C8.21147 8.99521 7.61802 8.74939 6.99923 8.74939H2.91618C2.29738 8.74939 1.70393 8.99521 1.26638 9.43276C0.828823 9.87031 0.583008 10.4638 0.583008 11.0826V11.6659" stroke="currentColor" strokeWidth="1.16659" strokeLinecap="square" />
-      </svg>
-    ),
-  },
-  {
     id: "all-tasks",
     label: "All Tasks",
     icon: (
@@ -50,7 +40,15 @@ const PORTAL_TABS = [
   },
 ];
 
-export default function PortalShell({ data, tasks, contactName }) {
+export default function PortalShell({
+  data,
+  tasks,
+  contactName,
+  contactId,
+  insightSnapshot,
+  insightContextHash,
+  cachedInsight,
+}) {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
@@ -79,10 +77,16 @@ export default function PortalShell({ data, tasks, contactName }) {
       <div style={{ paddingBottom: 80 }}>
         {activeTab === "overview" && (
           <div style={{ padding: "12px 16px" }}>
-            <PortalOverview data={data} />
+            <PortalOverview
+              data={data}
+              tasks={tasks}
+              contactId={contactId}
+              snapshot={insightSnapshot}
+              contextHash={insightContextHash}
+              cachedInsight={cachedInsight}
+            />
           </div>
         )}
-        {activeTab === "my-tasks" && <PortalTasks tasks={tasks} myOnly contactName={contactName} />}
         {activeTab === "all-tasks" && <PortalTasks tasks={tasks} myOnly={false} contactName={contactName} />}
       </div>
 

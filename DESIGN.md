@@ -239,9 +239,53 @@ background: linear-gradient(135deg, var(--ai-gradient-from), var(--ai-gradient-t
 
 For SVG fills the gradient must be inlined as a `<linearGradient>` referencing the two stops. The Vector sparkle is fixed at **16×16** with the gradient applied as the icon fill.
 
+### AI generating state — `.ai-generating` + `.is-streaming`
+
+The visual cue Vector uses to say *"I'm producing content right now"*. Apply `.ai-generating` to any positioned card that already has a `border-radius`, then toggle `.is-streaming` on while the underlying request is in flight. The card grows a slow-rotating conic-gradient border on a masked `::after` pseudo-element. Crossfades in over 2s and out over 2s when the class drops.
+
+Used by:
+- `InsightCard` (portfolio + onboarding overview) while regenerating insights — already wired via the `pi-card` / `oi-card` classes.
+- The unmatched-meeting card on `/ai-drafts` while the orchestrator is producing drafts.
+
+```jsx
+<div className={`ai-generating${isStreaming ? " is-streaming" : ""}`} style={{ borderRadius: 20 }}>
+  …content…
+</div>
+```
+
+Honors `prefers-reduced-motion: reduce` — the spin pauses, the fade still plays.
+
+### AI sparkle twinkle — `.ai-sparkle-twinkle`
+
+Apply to the Vector sparkle SVG (or any small element) for a friendly "thinking" indicator: 1.6s opacity pulse (0.55 → 1) + soft scale (1 → 1.18) + tiny rotation (-6° → +6°). Used in place of a spinning loader during AI generating states (e.g. `InlineEventDrafts` while the orchestrator runs). Calmer + more on-brand than a generic spinner.
+
+```jsx
+<span className="ai-sparkle-twinkle" style={{ display: "inline-flex" }}>
+  <VectorSparkleSvg />
+</span>
+```
+
 ### TabBar — `app/ui/TabBar.js`
 
 Underline-as-selection pattern. Inactive tabs are `textMuted`, hover bumps to `textSecondary` (NOT to `text`), active tabs are `text` with a 2px underline indicator in `action` (lilac). **No background pill** on hover — the underline is the only "selected" cue, doubling up reads as redundantly selected.
+
+### Insight card primitives — `app/ui/InsightCard.js`
+
+The visual language for AI-generated panels. Used by both the vendor onboarding overview (`InsightsPanel`) and the customer portal overview (`PortalOverview`) so the two surfaces feel like the same product.
+
+- **`InsightCard`** — outer shell. `rounded.xl` (20px), 1px `buttonSecondaryBorder`, `bg` background, `container-type: inline-size` so the section grid (`oi-row`) reflows at 1100px / 720px breakpoints. Pass `isStreaming` to enable the gradient sweep border animation (`.is-streaming`).
+- **`InsightCardHeader`** — `padding 16/16/12`. Slots: `title` (uppercase 16px label after the Vector sparkle), `statusPill` (rendered next to the title), `onRegenerate` (the `↻` icon button on the right). Disables the regenerate button while streaming.
+- **`InsightDivider`** — 1px `borderSubtle` rule; sits between header and the first row, and between rows.
+- **`InsightSection`** — section wrapper. Title is 14px semibold uppercase `textMuted` letter-spacing 0.5px, followed by an `.ai-divider` (the AI-gradient hairline). Section grid placement is controlled by classes `oi-section--{summary|risks|wins|focus|week}` defined in `globals.css`.
+- **`InsightStatusPill`** — `audience="vendor"` (default) maps `Declining`/`At risk`/`On track`/`Improving` → `danger`/`alert`/`success`/`mint`. `audience="customer"` maps `On track`/`Needs your input`/`In progress` → `success`/`alert`/`mint`. Both render as `.status-pill--filled`.
+- **`WinRow`** — single win, green `CheckCircle` + headline + muted detail. Use the `position` prop (`top`/`middle`/`bottom`/`only`) to round corners when stacking multiple rows into a single bordered group.
+- **`ThisWeekRow`** — single weekly priority, `PriorityIcon` + summary text. Same `position` API as `WinRow`.
+- **`RiskCard`** — vendor only. Severity pill on top (`high`/`medium`/`low` → `danger`/`alert`/`textMuted`) with the risk summary below. Stacks horizontally with `position` for shared rounded corners.
+- **`FocusTodayItem`** — vendor only. `#1`/`#2`/`#3` reason copy on top, `TaskCardView` below.
+- **`SparkleIcon`** — fixed 16×16 Vector mark. Always paired with the company name in the `InsightCardHeader`.
+- **`EmptyMessage`** — 12px `textMuted` paragraph for empty section states ("No active risks.", "Quiet week ahead.").
+
+When extending: add a new `oi-section--<name>` class in `globals.css` to place a section in the existing grid; do **not** introduce a different card shell. Customer-facing sections (`PortalOverview`) reuse the same primitives with a 2-column layout (Summary | Wins, full-width Focus this week below).
 
 ## Do's and don'ts
 

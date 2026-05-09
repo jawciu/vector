@@ -68,8 +68,8 @@ const TABS = [
     ),
   },
   {
-    id: "workflows",
-    label: "Workflows",
+    id: "actions",
+    label: "Actions",
     icon: (
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
         <rect x="1" y="1" width="4.5" height="4.5" rx="1" />
@@ -77,6 +77,21 @@ const TABS = [
         <rect x="4.75" y="8.5" width="4.5" height="4.5" rx="1" />
         <path d="M3.25 5.75 v1.25 h7.5 v-1.25" />
         <path d="M7 7 v1.5" />
+      </svg>
+    ),
+  },
+  {
+    id: "meetings",
+    label: "Meetings",
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        {/* Calendar with a clock — meeting + time. */}
+        <rect x="1.5" y="3" width="11" height="9.5" rx="1.25" />
+        <path d="M1.5 5.5 H12.5" />
+        <path d="M4.25 1.75 V4.25" />
+        <path d="M9.75 1.75 V4.25" />
+        <circle cx="9" cy="9" r="2" />
+        <path d="M9 8 V9 L9.75 9.5" />
       </svg>
     ),
   },

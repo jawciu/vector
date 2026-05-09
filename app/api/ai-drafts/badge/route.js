@@ -3,11 +3,11 @@
  *
  * Now returns ONLY ambiguous Miniti events (meetings Vector couldn't auto-
  * match to an onboarding). Per-onboarding draft counts moved to the
- * onboardings home table after the per-onboarding Workflows tab landed.
+ * onboardings home table after the per-onboarding Actions tab landed.
  *
- * The sidebar `/workflows` link uses this count to indicate "you have
+ * The sidebar Actions link uses this count to indicate "you have
  * unmatched events that need manual assignment". Other AI drafts surface
- * inside their respective onboarding's Workflows tab.
+ * inside their respective onboarding's Actions tab.
  */
 
 import { NextResponse } from "next/server";

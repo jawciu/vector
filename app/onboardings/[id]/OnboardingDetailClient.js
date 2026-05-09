@@ -29,7 +29,8 @@ import PhaseHeader from "@/app/components/PhaseHeader";
 import OnboardingTabs from "@/app/components/OnboardingTabs";
 import DetailsTab from "@/app/components/DetailsTab";
 import MembersTab from "@/app/components/MembersTab";
-import WorkflowsTab from "@/app/components/WorkflowsTab";
+import ActionsTab from "@/app/components/ActionsTab";
+import MeetingsTab from "@/app/components/MeetingsTab";
 import InsightsPanel from "@/app/components/InsightsPanel";
 import TaskFilterMenu from "@/app/components/TaskFilterMenu";
 import { taskMatchesFilter } from "@/lib/taskFilters";
@@ -74,10 +75,11 @@ export default function OnboardingDetailClient({
   phases: initialPhases,
   magicLinks: initialMagicLinks,
   vendorUsers: initialVendorUsers,
-  workflowCount: initialWorkflowCount = 0,
+  actionCount: initialActionCount = 0,
   insightSnapshot,
   insightContextHash,
   cachedInsight,
+  meetings = [],
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -94,9 +96,9 @@ export default function OnboardingDetailClient({
   const [mounted, setMounted] = useState(false);
   const [drawerTask, setDrawerTask] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [workflowCount, setWorkflowCount] = useState(initialWorkflowCount);
+  const [actionCount, setActionCount] = useState(initialActionCount);
 
-  // Live-update the Workflows tab badge. Server provides initial count;
+  // Live-update the Actions tab badge. Server provides initial count;
   // we refetch on any PendingAIChange change for this onboarding (insert,
   // approve, reject), and on window focus as a fallback.
   useEffect(() => {
@@ -112,7 +114,7 @@ export default function OnboardingDetailClient({
         );
         if (!res.ok) return;
         const json = await res.json();
-        if (!cancelled) setWorkflowCount(json.pendingCount ?? 0);
+        if (!cancelled) setActionCount(json.pendingCount ?? 0);
       } catch {
         // Silent — badge is best-effort.
       }
@@ -126,7 +128,7 @@ export default function OnboardingDetailClient({
       if (cancelled || !supabase) return;
       client = supabase;
       channel = supabase
-        .channel(`onboarding-${onboarding.id}-workflow-count`)
+        .channel(`onboarding-${onboarding.id}-action-count`)
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "PendingAIChange" },
@@ -475,7 +477,7 @@ export default function OnboardingDetailClient({
       <OnboardingTabs
         activeTab={activeTab}
         onTabChange={setTab}
-        badges={{ workflows: workflowCount }}
+        badges={{ actions: actionCount }}
       />
 
       {error && (
@@ -794,15 +796,21 @@ export default function OnboardingDetailClient({
         </div>
       )}
 
-      {activeTab === "workflows" && (
+      {activeTab === "actions" && (
         <div className="flex-1 overflow-y-auto" style={{ padding: "0 24px" }}>
-          <WorkflowsTab
+          <ActionsTab
             onboardingId={onboarding.id}
             vendorUsers={vendorUsers}
             contacts={contacts}
             phases={phases}
             openTasks={tasks.filter((t) => t.status !== "Done")}
           />
+        </div>
+      )}
+
+      {activeTab === "meetings" && (
+        <div className="flex-1 overflow-y-auto" style={{ padding: "0 24px" }}>
+          <MeetingsTab meetings={meetings} />
         </div>
       )}
 
