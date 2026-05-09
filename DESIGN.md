@@ -257,13 +257,25 @@ Honors `prefers-reduced-motion: reduce` — the spin pauses, the fade still play
 
 ### AI sparkle twinkle — `.ai-sparkle-twinkle`
 
-Apply to the Vector sparkle SVG (or any small element) for a friendly "thinking" indicator: 1.6s opacity pulse (0.55 → 1) + soft scale (1 → 1.18) + tiny rotation (-6° → +6°). Used in place of a spinning loader during AI generating states (e.g. `InlineEventDrafts` while the orchestrator runs). Calmer + more on-brand than a generic spinner.
+Apply to the Vector sparkle SVG while Vector is thinking. The icon spins 360° on its own axis with an ease-in (slow start, fast finish), pauses for a beat at the end of the rotation, then loops. A lilac drop-shadow halo travels with it (1px → 5px → 2px). Used in place of a spinning loader during AI generating states (e.g. `InlineEventDrafts` while the orchestrator runs). More on-brand than a generic spinner.
 
 ```jsx
 <span className="ai-sparkle-twinkle" style={{ display: "inline-flex" }}>
   <VectorSparkleSvg />
 </span>
 ```
+
+### AI text shimmer — `.ai-text-shimmer`
+
+Apply to a text node next to `.ai-sparkle-twinkle` while Vector is generating. The text itself is painted in `textSecondary` and stays visible at all times; a `::after` overlay (filled from `data-text` so it stacks the same characters on top) carries a bright lilac highlight band that sweeps left → right via `background-clip: text`. The label never disappears, the lilac just glides across it.
+
+```jsx
+<span className="ai-text-shimmer" data-text="Generating action draft…">
+  Generating action draft…
+</span>
+```
+
+The `data-text` attribute must mirror the text content. Honors `prefers-reduced-motion: reduce` — the overlay is hidden so the text just sits at flat `textSecondary`.
 
 ### TabBar — `app/ui/TabBar.js`
 

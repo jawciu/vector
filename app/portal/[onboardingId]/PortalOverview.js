@@ -331,9 +331,9 @@ export default function PortalOverview({ data, tasks = [], snapshot, contextHash
           </div>
         )}
 
-        {/* Top row: Summary | Wins */}
-        <div className="oi-row oi-row--bottom">
-          <InsightSection title="Summary" className="oi-section oi-section--focus">
+        {/* Single grid: 3-up at >1100px, 2-up + full at >640px, stacked below */}
+        <div className="oi-row oi-row--portal">
+          <InsightSection title="Summary" className="oi-section oi-section--summary-portal">
             <div className="oi-section-body">
               <p style={{ fontSize: 14, lineHeight: "20px", color: "var(--text)", margin: 0 }}>
                 <InlineProse text={summary} />
@@ -341,7 +341,7 @@ export default function PortalOverview({ data, tasks = [], snapshot, contextHash
             </div>
           </InsightSection>
 
-          <InsightSection title="Wins" className="oi-section oi-section--week">
+          <InsightSection title="Wins" className="oi-section oi-section--wins-portal">
             <div className="oi-section-body">
               {wins.length === 0 ? (
                 <EmptyMessage>{payload ? "No wins to celebrate this week." : "Generating…"}</EmptyMessage>
@@ -361,14 +361,9 @@ export default function PortalOverview({ data, tasks = [], snapshot, contextHash
               )}
             </div>
           </InsightSection>
-        </div>
 
-        <hr style={{ height: 1, width: "100%", border: 0, background: "var(--border-subtle)", margin: 0 }} />
-
-        {/* Bottom row: Focus this week, full width */}
-        <div style={{ padding: 16 }}>
-          <InsightSection title="Focus this week" className="">
-            <div style={{ marginTop: 16, display: "flex", flexDirection: "column", flex: 1 }}>
+          <InsightSection title="Focus this week" className="oi-section oi-section--focus-portal">
+            <div className="oi-section-body">
               {focusThisWeek.length === 0 ? (
                 <EmptyMessage>{payload ? "Quiet week ahead." : "Generating…"}</EmptyMessage>
               ) : (

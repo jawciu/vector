@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import InlineEventDrafts from "./InlineEventDrafts";
 import { MetaDot, ChevronRight, FollowupSparkleIcon as MinitiSparkleIcon } from "./AIDraftInbox";
+import { MenuList, MenuOption } from "./Menu";
+import { AttendeeChip } from "./MeetingsTab";
 
 /**
  * "Unmatched meetings" panel — shown above the drafts list when Miniti
@@ -15,6 +17,11 @@ import { MetaDot, ChevronRight, FollowupSparkleIcon as MinitiSparkleIcon } from 
  * renders them with the same Approve / Edit / Dismiss controls as the
  * Actions tab. Once all inline drafts are handled (option a per
  * Caroline) the unmatched card auto-collapses.
+ *
+ * Streaming-state border: the AI gradient ring shows from Assign click
+ * until the first draft lands. Once drafts arrive the inline panel
+ * carries the visual signal — the parent ring fades out (2s) so the
+ * card doesn't look like it's still working.
  *
  * Props:
  *   initialEvents — ExternalEvent rows where matchAmbiguous=true
@@ -29,6 +36,9 @@ export default function UnmatchedEvents({ initialEvents, onboardings }) {
   // stays in the list (we removed it from `events` only when the inline
   // drafts have all been handled).
   const [assigned, setAssigned] = useState({});
+  // eventId → true once at least one draft has landed in the inline panel.
+  // Used to fade the AI gradient border on the parent card.
+  const [draftsArrived, setDraftsArrived] = useState({});
 
   function setBusy(id, busy) {
     setBusyIds((prev) => {
@@ -94,7 +104,11 @@ export default function UnmatchedEvents({ initialEvents, onboardings }) {
             ? onboardings.find((ob) => ob.id === assignedOnboardingId)?.companyName ?? `#${assignedOnboardingId}`
             : null;
 
-          const isProcessing = assignedOnboardingId != null;
+          // Streaming border lights up between Assign click and the
+          // first draft landing in the inline panel — after that the
+          // inline cards carry the AI signal so the parent ring fades.
+          const isProcessing =
+            assignedOnboardingId != null && !draftsArrived[event.id];
           return (
             <div
               key={event.id}
@@ -136,19 +150,32 @@ export default function UnmatchedEvents({ initialEvents, onboardings }) {
               {/* Body — attendees + raw action items */}
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {attendees.length > 0 && (
-                  <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Attendees: </span>
-                    {attendees.map((a) => `${a.name ?? a.email} (${a.domain ?? "?"})`).join(", ")}
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {attendees.map((a, i) => (
+                      <AttendeeChip key={i} name={a.name} email={a.email} />
+                    ))}
                   </div>
                 )}
 
                 {actionItems.length > 0 && (
-                  <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>
+                  <ul
+                    style={{
+                      margin: 0,
+                      padding: 0,
+                      listStyle: "none",
+                      fontSize: 13,
+                      color: "var(--text-secondary)",
+                      lineHeight: 1.5,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 4,
+                    }}
+                  >
                     {actionItems.slice(0, 3).map((item, i) => (
                       <li key={i}>{item}</li>
                     ))}
                     {actionItems.length > 3 && (
-                      <li style={{ color: "var(--text-muted)", listStyle: "none" }}>
+                      <li style={{ color: "var(--text-muted)" }}>
                         …and {actionItems.length - 3} more
                       </li>
                     )}
@@ -172,28 +199,13 @@ export default function UnmatchedEvents({ initialEvents, onboardings }) {
               )}
 
               {assignedOnboardingId == null ? (
-                <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", alignItems: "center" }}>
-                  <select
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <OnboardingPicker
                     value={onboardingId ?? ""}
-                    onChange={(e) => setSelections((s) => ({ ...s, [event.id]: e.target.value }))}
+                    onChange={(v) => setSelections((s) => ({ ...s, [event.id]: v }))}
+                    onboardings={onboardings}
                     disabled={busy}
-                    className="rounded-lg"
-                    style={{
-                      padding: "4px 10px",
-                      fontSize: 13,
-                      background: "var(--bg-elevated)",
-                      color: "var(--text)",
-                      border: "1px solid var(--border)",
-                      minWidth: 200,
-                    }}
-                  >
-                    <option value="">Pick onboarding…</option>
-                    {onboardings.map((ob) => (
-                      <option key={ob.id} value={ob.id}>
-                        {ob.companyName}
-                      </option>
-                    ))}
-                  </select>
+                  />
                   <button
                     onClick={() => handleAssign(event.id)}
                     disabled={busy || !onboardingId}
@@ -230,6 +242,11 @@ export default function UnmatchedEvents({ initialEvents, onboardings }) {
                   <InlineEventDrafts
                     eventId={event.id}
                     onboardingId={assignedOnboardingId}
+                    onDraftsArrived={() =>
+                      setDraftsArrived((prev) =>
+                        prev[event.id] ? prev : { ...prev, [event.id]: true }
+                      )
+                    }
                     onAllHandled={() =>
                       setEvents((prev) => prev.filter((e) => e.id !== event.id))
                     }
@@ -241,6 +258,118 @@ export default function UnmatchedEvents({ initialEvents, onboardings }) {
         })}
       </div>
     </section>
+  );
+}
+
+/** Onboarding picker — Menu-primitive dropdown matching the rest of
+ *  the app's filter pills. Replaces the native <select> which Safari /
+ *  Chrome render with a clashing blue focus ring. */
+function OnboardingPicker({ value, onChange, onboardings, disabled }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handle(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, [open]);
+
+  const selected = onboardings.find((ob) => String(ob.id) === String(value));
+  const label = selected ? selected.companyName : "Pick onboarding…";
+
+  return (
+    <div ref={ref} className="relative" style={{ minWidth: 220 }}>
+      <button
+        type="button"
+        onClick={() => !disabled && setOpen((o) => !o)}
+        disabled={disabled}
+        className="field-pill flex items-center gap-2 rounded-lg"
+        data-active={open ? "true" : undefined}
+        style={{
+          width: "100%",
+          border: "1px solid var(--button-secondary-border)",
+          padding: "4px 10px",
+          minHeight: 30,
+          background: "var(--bg)",
+          color: selected ? "var(--text)" : "var(--text-muted)",
+          fontSize: 13,
+          textAlign: "left",
+          cursor: disabled ? "not-allowed" : "pointer",
+        }}
+      >
+        <span
+          style={{
+            flex: 1,
+            textAlign: "left",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {label}
+        </span>
+        <PickerChevron open={open} />
+      </button>
+      {open && (
+        <MenuList
+          style={{
+            width: "100%",
+            maxHeight: 240,
+            overflowY: "auto",
+            left: "auto",
+            right: 0,
+          }}
+        >
+          {onboardings.length === 0 ? (
+            <div style={{ padding: "4px 8px", fontSize: 12, color: "var(--text-muted)" }}>
+              No onboardings
+            </div>
+          ) : (
+            onboardings.map((ob) => (
+              <MenuOption
+                key={ob.id}
+                active={String(ob.id) === String(value)}
+                onClick={() => {
+                  onChange(String(ob.id));
+                  setOpen(false);
+                }}
+              >
+                {ob.companyName}
+              </MenuOption>
+            ))
+          )}
+        </MenuList>
+      )}
+    </div>
+  );
+}
+
+function PickerChevron({ open }) {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 10 10"
+      fill="none"
+      aria-hidden
+      style={{
+        flexShrink: 0,
+        color: "var(--text-muted)",
+        transform: open ? "rotate(180deg)" : "none",
+        transition: "transform 0.15s ease",
+      }}
+    >
+      <path
+        d="M2 3.5L5 6.5L8 3.5"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 

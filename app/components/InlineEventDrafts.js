@@ -14,7 +14,7 @@ import { CreateTaskCard, FollowupCard, DraftCard, FollowupSparkleIcon } from "./
  * Drafts ALSO appear on the onboarding's Actions tab — this surface
  * is just a convenience preview, the source of truth is /api/ai-drafts.
  */
-export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled }) {
+export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled, onDraftsArrived }) {
   const [options, setOptions] = useState(null);
   const [drafts, setDrafts] = useState(null); // null = loading, [] = none yet
   const [busyIds, setBusyIds] = useState(new Set());
@@ -62,8 +62,11 @@ export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled 
           // Only the drafts produced by THIS event (sourceEventId match).
           const mine = all.filter((d) => d.sourceEventId === eventId);
           setDrafts(mine);
-          if (mine.length > 0) {
+          if (mine.length > 0 && !seenAtLeastOne.current) {
             seenAtLeastOne.current = true;
+            // Tell the parent the streaming border can fade — the
+            // inline draft cards now carry the AI signal.
+            onDraftsArrived?.();
           }
           if (seenAtLeastOne.current && mine.length === 0) {
             // All inline drafts handled.
@@ -171,7 +174,9 @@ export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled 
         <span className="ai-sparkle-twinkle" style={{ display: "inline-flex" }}>
           <FollowupSparkleIcon />
         </span>
-        <span>Generating action draft…</span>
+        <span className="ai-text-shimmer" data-text="Generating action draft…">
+          Generating action draft…
+        </span>
       </div>
     );
   }

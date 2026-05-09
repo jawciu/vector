@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import TabBar from "../../ui/TabBar";
+import CompanyAvatar from "../../ui/CompanyAvatar";
 import PortalOverview from "./PortalOverview";
 import PortalTasks from "./PortalTasks";
 
@@ -53,19 +54,32 @@ export default function PortalShell({
 
   return (
     <div className="w-full flex flex-col h-full">
-      {/* Header */}
+      {/* Header — welcome on the left, company chip in the top-right corner */}
       <header
         style={{
           padding: "20px 16px 16px",
           borderBottom: "1px solid var(--border)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
         }}
       >
-        <div className="text-xs" style={{ color: "var(--text-muted)", marginBottom: 2 }}>
+        <h1 className="text-lg font-semibold" style={{ color: "var(--text)", margin: 0 }}>
           Welcome, {contactName}
-        </div>
-        <h1 className="text-lg font-semibold" style={{ color: "var(--text)" }}>
-          {data.companyName}
         </h1>
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            color: "var(--text-muted)",
+            fontSize: 12,
+          }}
+        >
+          <CompanyAvatar name={data.companyName} size={20} />
+          <span>{data.companyName}</span>
+        </div>
       </header>
 
       {/* Desktop tabs — matches kanban board tab style */}

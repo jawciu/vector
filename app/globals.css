@@ -530,24 +530,70 @@ a {
   to { --ai-spin: 360deg; }
 }
 
-/* Cute sparkle twinkle — apply `.ai-sparkle-twinkle` to the Vector
-   sparkle SVG (or any element you want to "blink"). Combined opacity
-   pulse + soft scale + tiny rotation gives a star-twinkling feel
-   that's calmer than a spinning loader. */
+/* Sparkle spin — apply `.ai-sparkle-twinkle` to the Vector sparkle
+   SVG while Vector is thinking. Spins 360° on its own axis with an
+   ease-in (slow start, fast finish), pauses for a beat at the end of
+   the rotation, then loops. Lilac drop-shadow halo travels with it. */
 @keyframes ai-sparkle-twinkle {
-  0%, 100% {
-    opacity: 0.55;
-    transform: scale(1) rotate(-6deg);
+  0% {
+    transform: rotate(0deg);
+    filter: drop-shadow(0 0 1px rgba(192, 152, 255, 0.35));
+    animation-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
   }
-  50% {
-    opacity: 1;
-    transform: scale(1.18) rotate(6deg);
+  65% {
+    transform: rotate(360deg);
+    filter: drop-shadow(0 0 5px rgba(168, 127, 255, 0.85));
+    animation-timing-function: ease-out;
+  }
+  100% {
+    transform: rotate(360deg);
+    filter: drop-shadow(0 0 2px rgba(192, 152, 255, 0.5));
   }
 }
 
 .ai-sparkle-twinkle {
-  animation: ai-sparkle-twinkle 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: ai-sparkle-twinkle 2s linear infinite;
   transform-origin: center;
+}
+
+/* Text shimmer — apply `.ai-text-shimmer` to a text node while Vector
+   is generating. The text itself stays painted in `--text-secondary`;
+   a `::after` overlay (filled from `data-text` so it stacks on top of
+   the same characters) carries a bright lilac highlight band that
+   sweeps left → right via `background-clip: text`. Result: the label
+   never disappears, the lilac just glides across it. */
+@keyframes ai-text-shimmer {
+  0%   { background-position: -60% 0; }
+  100% { background-position: 160% 0; }
+}
+
+.ai-text-shimmer {
+  position: relative;
+  display: inline-block;
+  color: var(--text-secondary);
+}
+
+.ai-text-shimmer::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  white-space: pre;
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    var(--ai-gradient-from) 50%,
+    transparent
+  );
+  background-size: 60% 100%;
+  background-repeat: no-repeat;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: ai-text-shimmer 2.4s linear infinite;
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -558,7 +604,10 @@ a {
   }
   .ai-sparkle-twinkle {
     animation: none;
-    opacity: 1;
+  }
+  .ai-text-shimmer::after {
+    animation: none;
+    display: none;
   }
 }
 
@@ -660,6 +709,54 @@ a {
   .oi-section--week {
     padding-left: 0;
     border-top: 1px solid var(--border-subtle);
+  }
+}
+
+/* Portal insight card — single grid with three sections (Summary | Wins |
+   Focus). Reflows in two steps:
+     wide   (>1100px): all 3 columns side-by-side
+     medium (>640px) : Summary | Wins on top, Focus full-width below
+     narrow          : everything stacked
+   Vertical / horizontal separators are borders on the sections, repositioned
+   per-breakpoint. */
+.oi-row--portal {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.4fr);
+  grid-template-areas: "summary wins focus";
+}
+.oi-section--summary-portal { grid-area: summary; padding-left: 0;  border-right: 1px solid var(--border-subtle); }
+.oi-section--wins-portal    { grid-area: wins;                       border-right: 1px solid var(--border-subtle); }
+.oi-section--focus-portal   { grid-area: focus;   padding-right: 0; }
+
+@container (max-width: 1100px) {
+  .oi-row--portal {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    grid-template-areas:
+      "summary wins"
+      "focus   focus";
+  }
+  .oi-section--wins-portal {
+    border-right: none;
+    padding-right: 0;
+  }
+  .oi-section--focus-portal {
+    border-top: 1px solid var(--border-subtle);
+    padding-left: 0;
+  }
+}
+
+@container (max-width: 640px) {
+  .oi-row--portal {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "summary" "wins" "focus";
+  }
+  .oi-section--summary-portal {
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-right: 0;
+  }
+  .oi-section--wins-portal {
+    border-bottom: 1px solid var(--border-subtle);
+    padding-left: 0;
   }
 }
 

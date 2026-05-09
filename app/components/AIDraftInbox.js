@@ -877,7 +877,10 @@ export function FollowupSparkleIcon() {
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
       <defs>
         <linearGradient id="aidraft-sparkle" x1="7" y1="-3" x2="7" y2="15" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#C098FF" />
+          {/* Lilac-dominant: two purple stops carry most of the icon,
+              peach only kisses the very tip. */}
+          <stop offset="0" stopColor="#D9B8FF" />
+          <stop offset="0.55" stopColor="#A87FFF" />
           <stop offset="1" stopColor="#FF9C7D" />
         </linearGradient>
       </defs>
