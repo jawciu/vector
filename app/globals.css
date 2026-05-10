@@ -387,6 +387,85 @@ a {
 }
 
 /* Task completion animation */
+/* Actions tab — two-column timeline grid */
+.actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Actions tab — date-section header (timeline divider) */
+.actions-date-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+.actions-date-header::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+/* Actions tab — meeting pill (calendar icon + meeting title) */
+.meeting-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--surface-hover);
+  color: var(--text);
+  font-family: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.meeting-pill:hover {
+  background: var(--bg-elevated-hover);
+}
+
+.meeting-pill__icon {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+/* Actions tab — outer draft card, with hover that lightens the inner
+   preview (`.draft-card-preview`) and the outer border */
+.draft-card {
+  background: var(--bg);
+  border: 1px solid var(--button-secondary-border);
+  transition: border-color 0.15s ease;
+}
+
+.draft-card:hover {
+  border-color: var(--text-muted);
+}
+
+.draft-card-preview {
+  background: var(--bg-elevated);
+  transition: background-color 0.15s ease;
+}
+
+.draft-card:hover .draft-card-preview {
+  background: var(--bg-elevated-hover);
+}
+
 .task-completing {
   animation: taskComplete 0.8s ease forwards;
 }

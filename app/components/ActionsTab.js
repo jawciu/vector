@@ -131,10 +131,9 @@ export default function ActionsTab({
         flexDirection: "column",
         gap: 16,
         padding: "16px 0",
-        // Cap the review column so paragraph prose in follow-up drafts stays
-        // in the readable measure (~70-90 chars). The status filter,
-        // search bar, and draft cards all inherit this width.
-        maxWidth: 720,
+        // Two-column layout (Follow-ups | Actions) needs more width than
+        // the old single-column 720px cap.
+        maxWidth: 1200,
         width: "100%",
         marginLeft: "auto",
         marginRight: "auto",
@@ -212,13 +211,12 @@ export default function ActionsTab({
 function SearchInput({ value, onChange }) {
   return (
     <div
+      className="search-input"
       style={{
         display: "flex",
         alignItems: "center",
         gap: 8,
         padding: "6px 10px",
-        background: "var(--bg)",
-        border: "1px solid var(--border)",
         borderRadius: 10,
         width: 300,
         maxWidth: "100%",

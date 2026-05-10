@@ -22,7 +22,12 @@
  */
 
 import { NextResponse, after } from "next/server";
-import { validateMinitiPayload, matchMeetingToOnboarding, processMinitiEvent } from "@/lib/integrations/miniti";
+import {
+  validateMinitiPayload,
+  matchMeetingToOnboarding,
+  processMinitiEvent,
+  runMeetingExtractionOnly,
+} from "@/lib/integrations/miniti";
 import { createExternalEvent, markExternalEventProcessed } from "@/lib/db";
 
 export const maxDuration = 60;
@@ -81,7 +86,14 @@ export async function POST(request) {
     return NextResponse.json({ ok: true, deduped: true });
   }
 
-  // 5. If matched (and not ambiguous), schedule orchestrator after response.
+  // 5. Schedule background work after response.
+  //
+  //   - Confident match → full orchestrator (Pass 1 + Pass 2 + drafts).
+  //   - Ambiguous match → standalone Pass 1 (transcript extraction) so
+  //     the pipeline timeline immediately shows what Vector saw in the
+  //     meeting. Pass 2 still has to wait for manual assignment because
+  //     it needs the onboarding's tasks/contacts/phases as context, but
+  //     processMinitiEvent will reuse the cached extraction at that point.
   if (match.onboardingId && !match.ambiguous) {
     after(async () => {
       try {
@@ -90,6 +102,17 @@ export async function POST(request) {
       } catch (err) {
         console.error("[miniti orchestrator]", err);
         await markExternalEventProcessed(externalEvent.id, { error: String(err.message ?? err) }).catch(() => {});
+      }
+    });
+  } else if (match.ambiguous) {
+    after(async () => {
+      try {
+        const { extraction } = await runMeetingExtractionOnly(externalEvent.id, meeting);
+        console.log(
+          `[miniti] event ${externalEvent.id} ambiguous: pass 1 ${extraction ? "ok" : "failed"}`
+        );
+      } catch (err) {
+        console.error("[miniti standalone extraction]", err);
       }
     });
   }

@@ -21,6 +21,11 @@ export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled,
   const [errors, setErrors] = useState({});
   const [error, setError] = useState(null);
   const [timedOut, setTimedOut] = useState(false);
+  // Most recent server-side view of the event row — `processedAt` and
+  // `error` come from /api/admin/event-debug. Lets us surface the
+  // orchestrator's failure reason as soon as it's persisted instead of
+  // waiting for the 90s polling deadline.
+  const [eventStatus, setEventStatus] = useState(null);
   const pollTimer = useRef(null);
   const pollDeadline = useRef(0);
   const startedAt = useRef(Date.now());
@@ -53,28 +58,57 @@ export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled,
     pollDeadline.current = Date.now() + 90_000;
     const tick = async () => {
       try {
-        const res = await fetch(
-          `/api/ai-drafts?status=pending&onboardingId=${onboardingId}&limit=100`,
-          { cache: "no-store" }
-        );
-        if (res.ok) {
-          const body = await res.json();
+        // Fetch the drafts list AND the event row's orchestrator status
+        // in parallel so we can surface a concrete error string the
+        // moment the assign-route catch-handler persists it (instead of
+        // waiting 90s for the spinner to give up).
+        const [draftsRes, statusRes] = await Promise.all([
+          fetch(
+            `/api/ai-drafts?status=pending&onboardingId=${onboardingId}&limit=100`,
+            { cache: "no-store" }
+          ),
+          fetch(`/api/admin/event-debug/${eventId}`, { cache: "no-store" }),
+        ]);
+
+        let mine = [];
+        if (draftsRes.ok) {
+          const body = await draftsRes.json();
           const all = body.drafts ?? [];
-          // Only the drafts produced by THIS event (sourceEventId match).
-          const mine = all.filter((d) => d.sourceEventId === eventId);
+          mine = all.filter((d) => d.sourceEventId === eventId);
           setDrafts(mine);
-          if (mine.length > 0 && !seenAtLeastOne.current) {
-            seenAtLeastOne.current = true;
-            // Tell the parent the streaming border can fade — the
-            // inline draft cards now carry the AI signal.
-            onDraftsArrived?.();
-          }
-          if (seenAtLeastOne.current && mine.length === 0) {
-            // All inline drafts handled.
-            stopPolling();
-            onAllHandled?.();
-            return;
-          }
+        }
+
+        let status = null;
+        if (statusRes.ok) {
+          status = await statusRes.json();
+          setEventStatus(status);
+        }
+
+        if (mine.length > 0 && !seenAtLeastOne.current) {
+          seenAtLeastOne.current = true;
+          // Tell the parent the streaming border can fade — the
+          // inline draft cards now carry the AI signal.
+          onDraftsArrived?.();
+        }
+        if (seenAtLeastOne.current && mine.length === 0) {
+          // All inline drafts handled.
+          stopPolling();
+          onAllHandled?.();
+          return;
+        }
+
+        // Orchestrator persisted an error (catch-handler in the assign
+        // route), or finished cleanly with zero drafts. Both terminal,
+        // both worth surfacing immediately rather than waiting 90s.
+        if (status?.error) {
+          stopPolling();
+          onDraftsArrived?.();
+          return;
+        }
+        if (status?.processedAt && mine.length === 0) {
+          stopPolling();
+          onDraftsArrived?.();
+          return;
         }
       } catch {
         // swallow + retry
@@ -161,6 +195,65 @@ export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled,
     return (
       <div style={{ fontSize: 12, color: "var(--danger)", padding: 10 }}>
         Couldn&rsquo;t load draft options: {error}
+      </div>
+    );
+  }
+
+  // Orchestrator threw and the assign route's catch-handler persisted
+  // the message onto ExternalEvent.error — surface it verbatim so the
+  // user can see the actual cause instead of the generic timeout.
+  if (eventStatus?.error && !seenAtLeastOne.current) {
+    return (
+      <div
+        style={{
+          fontSize: 13,
+          color: "var(--danger)",
+          background: "rgba(255, 137, 155, 0.08)",
+          border: "1px solid var(--danger)",
+          padding: "10px 14px",
+          borderRadius: 8,
+          lineHeight: 1.5,
+          wordBreak: "break-word",
+          display: "flex",
+          flexDirection: "column",
+          gap: 6,
+        }}
+      >
+        <strong style={{ fontWeight: 600 }}>Orchestrator error</strong>
+        <span>{eventStatus.error}</span>
+        <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+          Full Pass 1 / Pass 2 trace at{" "}
+          <a
+            href={`/admin/ai?tab=pipeline`}
+            style={{ color: "var(--action)" }}
+          >
+            /admin/ai → Pipeline
+          </a>
+          .
+        </span>
+      </div>
+    );
+  }
+
+  // Orchestrator finished cleanly but had nothing actionable — Pass 2
+  // returned zero tool calls. Don't make the user wait 90s for this.
+  if (
+    eventStatus?.processedAt &&
+    !eventStatus.error &&
+    !seenAtLeastOne.current &&
+    drafts != null &&
+    drafts.length === 0
+  ) {
+    return (
+      <div
+        style={{
+          fontSize: 13,
+          color: "var(--text-secondary)",
+          padding: "12px 0",
+          lineHeight: 1.5,
+        }}
+      >
+        Vector finished but didn&rsquo;t find any concrete actions in this meeting.
       </div>
     );
   }

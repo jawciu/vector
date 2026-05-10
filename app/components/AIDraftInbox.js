@@ -80,9 +80,17 @@ export default function AIDraftInbox({
     });
   }, [drafts, query]);
 
-  // Group drafts by sourceEventId so we can show a "reject all from meeting"
-  // header when 2+ drafts came from the same Miniti transcript.
-  const groups = useMemo(() => groupDraftsByEvent(filteredDrafts), [filteredDrafts]);
+  // Two-column timeline split:
+  //   - Follow-ups column: `draft_followup`, meeting-agnostic, just date sections
+  //   - Actions column: everything else, date sections with meeting groups inside
+  const followupBuckets = useMemo(
+    () => buildDateBuckets(filteredDrafts.filter((d) => d.action === "draft_followup")),
+    [filteredDrafts]
+  );
+  const actionBuckets = useMemo(
+    () => buildDateBuckets(filteredDrafts.filter((d) => d.action !== "draft_followup")),
+    [filteredDrafts]
+  );
 
   function setBusy(id, busy) {
     setBusyIds((prev) => {
@@ -195,10 +203,11 @@ export default function AIDraftInbox({
         </div>
       )}
 
-      {groups.map((group) => (
-        <DraftGroup
-          key={group.key}
-          group={group}
+      <div className="actions-grid">
+        <DraftColumn
+          title="Follow-ups"
+          buckets={followupBuckets}
+          variant="followup"
           mode={mode}
           busyIds={busyIds}
           errors={errors}
@@ -212,7 +221,24 @@ export default function AIDraftInbox({
           openTasks={openTasks}
           onMeetingClick={setDrawerEventId}
         />
-      ))}
+        <DraftColumn
+          title="Actions"
+          buckets={actionBuckets}
+          variant="action"
+          mode={mode}
+          busyIds={busyIds}
+          errors={errors}
+          selectedIds={selectedIds}
+          onToggleSelect={toggleSelected}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          vendorUsers={vendorUsers}
+          contacts={contacts}
+          phases={phases}
+          openTasks={openTasks}
+          onMeetingClick={setDrawerEventId}
+        />
+      </div>
 
       <MeetingDrawer
         eventId={drawerEventId}
@@ -220,6 +246,67 @@ export default function AIDraftInbox({
       />
     </div>
   );
+}
+
+/** Bucket a draft's createdAt into Today / Yesterday / older (YYYY-MM-DD). */
+function getDateBucket(iso) {
+  if (!iso) return "older";
+  const date = new Date(iso);
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const startOfDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const dayDiff = Math.round((startOfToday.getTime() - startOfDate.getTime()) / 86400000);
+  if (dayDiff === 0) return "today";
+  if (dayDiff === 1) return "yesterday";
+  return startOfDate.toISOString().slice(0, 10);
+}
+
+function bucketLabel(bucket) {
+  if (bucket === "today") return "Today";
+  if (bucket === "yesterday") return "Yesterday";
+  if (bucket === "older") return "Older";
+  return new Date(bucket).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
+function bucketSortKey(bucket) {
+  if (bucket === "today") return Number.MAX_SAFE_INTEGER;
+  if (bucket === "yesterday") return Number.MAX_SAFE_INTEGER - 1;
+  if (bucket === "older") return Number.MIN_SAFE_INTEGER;
+  return new Date(bucket).getTime();
+}
+
+/** Group a flat draft list into [{ bucket, drafts }] sorted newest-first. */
+function buildDateBuckets(drafts) {
+  const buckets = new Map();
+  for (const d of drafts) {
+    const bucket = getDateBucket(d.createdAt);
+    const list = buckets.get(bucket) ?? [];
+    list.push(d);
+    buckets.set(bucket, list);
+  }
+  return [...buckets.entries()]
+    .sort((a, b) => bucketSortKey(b[0]) - bucketSortKey(a[0]))
+    .map(([bucket, drafts]) => ({ bucket, drafts }));
+}
+
+/** Within a date bucket, split action drafts into per-meeting groups
+ *  (drafts with sourceEventId) and a "no meeting" tail. */
+function groupBucketByMeeting(drafts) {
+  const byEvent = new Map();
+  const looseDrafts = [];
+  for (const d of drafts) {
+    if (d.sourceEventId == null) {
+      looseDrafts.push(d);
+      continue;
+    }
+    const list = byEvent.get(d.sourceEventId) ?? [];
+    list.push(d);
+    byEvent.set(d.sourceEventId, list);
+  }
+  const meetingGroups = [...byEvent.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([eventId, drafts]) => ({ eventId, drafts }));
+  return { meetingGroups, looseDrafts };
 }
 
 /** Group drafts by sourceEventId. Drafts without an event id form one
@@ -243,6 +330,166 @@ function groupDraftsByEvent(drafts) {
   // Render order: single drafts, then event groups (by event id desc for newest first).
   grouped.sort((a, b) => b.eventId - a.eventId);
   return [...singles, ...grouped];
+}
+
+/** One column of the two-column timeline.
+ *
+ *  Renders date sections (Today / Yesterday / DD MMM) stacked vertically.
+ *  - variant="followup": drafts (FollowupCard) listed directly under each
+ *    date label — no meeting grouping (follow-ups are meeting-agnostic).
+ *  - variant="action": each date section further groups drafts by
+ *    sourceEventId, with a `MeetingPill` above each group; loose drafts
+ *    (no sourceEventId, e.g. stale-task scanner) appear below the groups.
+ */
+function DraftColumn({
+  title,
+  buckets,
+  variant,
+  mode,
+  busyIds,
+  errors,
+  selectedIds,
+  onToggleSelect,
+  onApprove,
+  onReject,
+  vendorUsers,
+  contacts,
+  phases,
+  openTasks,
+  onMeetingClick,
+}) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24, minWidth: 0 }}>
+      <h2 style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.6 }}>
+        {title}
+      </h2>
+      {buckets.length === 0 && (
+        <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0 }}>Nothing here.</p>
+      )}
+      {buckets.map(({ bucket, drafts }) => (
+        <section key={bucket} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <h3 className="actions-date-header">{bucketLabel(bucket)}</h3>
+          {variant === "followup"
+            ? drafts.map((draft) => (
+                <FollowupCard
+                  key={draft.id}
+                  draft={draft}
+                  mode={mode}
+                  busy={busyIds.has(draft.id)}
+                  error={errors[draft.id]}
+                  onApprove={(overrides) => onApprove(draft, overrides)}
+                  onReject={() => onReject(draft, null)}
+                  onMeetingClick={onMeetingClick}
+                />
+              ))
+            : (() => {
+                const { meetingGroups, looseDrafts } = groupBucketByMeeting(drafts);
+                return (
+                  <>
+                    {meetingGroups.map((group) => {
+                      const meetingTitle =
+                        group.drafts.find((d) => d.meetingTitle)?.meetingTitle ?? "Meeting";
+                      return (
+                        <div key={group.eventId} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                          <MeetingPill title={meetingTitle} onClick={() => onMeetingClick?.(group.eventId)} />
+                          {group.drafts.map((draft) =>
+                            renderActionCard(draft, {
+                              mode,
+                              busyIds,
+                              errors,
+                              selectedIds,
+                              onToggleSelect,
+                              onApprove,
+                              onReject,
+                              vendorUsers,
+                              contacts,
+                              phases,
+                              openTasks,
+                              onMeetingClick,
+                            })
+                          )}
+                        </div>
+                      );
+                    })}
+                    {looseDrafts.map((draft) =>
+                      renderActionCard(draft, {
+                        mode,
+                        busyIds,
+                        errors,
+                        selectedIds,
+                        onToggleSelect,
+                        onApprove,
+                        onReject,
+                        vendorUsers,
+                        contacts,
+                        phases,
+                        openTasks,
+                        onMeetingClick,
+                      })
+                    )}
+                  </>
+                );
+              })()}
+        </section>
+      ))}
+    </div>
+  );
+}
+
+/** Bigger meeting pill — calendar icon + meeting title in a code-block-feel
+ *  pill. Clicking opens the MeetingDrawer. Replaces the old "From meeting:"
+ *  text + small task-ref pill. */
+function MeetingPill({ title, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="meeting-pill"
+      title="Open meeting transcript"
+    >
+      <span className="meeting-pill__icon">
+        <CalendarIcon />
+      </span>
+      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        {title}
+      </span>
+    </button>
+  );
+}
+
+/** Pick the right card component for an action-column draft. */
+function renderActionCard(draft, ctx) {
+  if (draft.action === "create_task") {
+    return (
+      <CreateTaskCard
+        key={draft.id}
+        draft={draft}
+        mode={ctx.mode}
+        busy={ctx.busyIds.has(draft.id)}
+        error={ctx.errors[draft.id]}
+        onApprove={(overrides) => ctx.onApprove(draft, overrides)}
+        onReject={() => ctx.onReject(draft, null)}
+        vendorUsers={ctx.vendorUsers}
+        contacts={ctx.contacts}
+        phases={ctx.phases}
+        openTasks={ctx.openTasks}
+        onMeetingClick={ctx.onMeetingClick}
+      />
+    );
+  }
+  return (
+    <DraftCard
+      key={draft.id}
+      draft={draft}
+      mode={ctx.mode}
+      busy={ctx.busyIds.has(draft.id)}
+      error={ctx.errors[draft.id]}
+      selected={ctx.selectedIds.has(draft.id)}
+      onToggleSelect={() => ctx.onToggleSelect(draft.id)}
+      onApprove={(overrides) => ctx.onApprove(draft, overrides)}
+      onReject={() => ctx.onReject(draft, null)}
+    />
+  );
 }
 
 function DraftGroup({
@@ -1028,25 +1275,26 @@ export function CreateTaskCard({
 
   return (
     <div
+      className="draft-card"
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 32,
+        gap: 24,
         padding: 24,
         borderRadius: 20,
-        border: "1px solid var(--button-secondary-border)",
-        background: "var(--bg)",
       }}
     >
-      <CreateTaskHeader draft={draft} taskTitle={taskTitle} generatedDate={generatedDate} isPending={isPending} />
-
-      {cardMode === "edit" && (
-        <div style={{ height: 1, background: "var(--border-subtle)", margin: "-16px 0" }} aria-hidden />
+      {cardMode === "compact" ? (
+        <CreateTaskCompact draft={draft} taskTitle={taskTitle} payload={savedPayload} isPending={isPending} />
+      ) : (
+        <CreateTaskHeader draft={draft} taskTitle={taskTitle} generatedDate={generatedDate} isPending={isPending} />
       )}
 
-      {cardMode === "compact" ? (
-        <CreateTaskPreview payload={savedPayload} />
-      ) : (
+      {cardMode === "edit" && (
+        <div style={{ height: 1, background: "var(--border-subtle)", margin: "-12px 0" }} aria-hidden />
+      )}
+
+      {cardMode === "compact" ? null : (
         <CreateTaskEditForm
           edits={edits}
           onChange={patchEdits}
@@ -1160,6 +1408,44 @@ function payloadsEqual(a, b) {
 }
 
 /** Header — breadcrumb + meta rows (shared by compact and edit). */
+/** Two-column compact view per Figma 140:9165.
+ *  Left: heading (✓ Create task) + task-name code block + meta (✨ miniti · confidence).
+ *  Right: task-card-style preview, lightens on outer-card hover. */
+function CreateTaskCompact({ draft, taskTitle, payload, isPending }) {
+  return (
+    <div style={{ display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }}>
+      <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <TasksBreadcrumbIcon />
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>Create task</span>
+        </div>
+        <div>
+          <span className="task-ref" style={{ fontSize: 14, padding: "4px 10px", borderRadius: 6 }}>
+            {taskTitle}
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", fontSize: 12 }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--text-secondary)" }}>
+            <FollowupSparkleIcon />
+            From miniti
+          </span>
+          <MetaDot />
+          <ConfidencePill confidence={draft.confidence} />
+          {!isPending && (
+            <>
+              <MetaDot />
+              <StatusPill status={draft.status} />
+            </>
+          )}
+        </div>
+      </div>
+      <div style={{ flex: "1 1 240px", minWidth: 0 }}>
+        <CreateTaskPreview payload={payload} />
+      </div>
+    </div>
+  );
+}
+
 function CreateTaskHeader({ draft, taskTitle, generatedDate, isPending }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -1201,13 +1487,13 @@ function CreateTaskPreview({ payload }) {
 
   return (
     <div
+      className="draft-card-preview"
       style={{
         display: "flex",
         flexDirection: "column",
         gap: 12,
         padding: "12px 16px",
         borderRadius: 8,
-        background: "var(--bg-elevated)",
       }}
     >
       <div style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.4 }}>
