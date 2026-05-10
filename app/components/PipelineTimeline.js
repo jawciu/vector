@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 /**
  * Admin /admin/ai → Pipeline tab. Full timeline of every Miniti event
@@ -23,6 +24,8 @@ const FILTERS = [
 export default function PipelineTimeline({ events = [] }) {
   const [filter, setFilter] = useState("all");
   const [openIds, setOpenIds] = useState(new Set());
+  const router = useRouter();
+  const [isRefreshing, startRefresh] = useTransition();
 
   const filtered = useMemo(() => {
     if (filter === "all") return events;
@@ -38,33 +41,60 @@ export default function PipelineTimeline({ events = [] }) {
     });
   }
 
+  function handleRefresh() {
+    startRefresh(() => {
+      router.refresh();
+    });
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-        {FILTERS.map((f) => {
-          const count = f.id === "all"
-            ? events.length
-            : events.filter((e) => matchesFilter(e, f.id)).length;
-          const active = filter === f.id;
-          return (
-            <button
-              key={f.id}
-              type="button"
-              onClick={() => setFilter(f.id)}
-              style={{
-                padding: "4px 10px",
-                fontSize: 12,
-                color: active ? "var(--text)" : "var(--text-muted)",
-                background: active ? "var(--surface-hover)" : "transparent",
-                border: `1px solid ${active ? "var(--button-secondary-border)" : "var(--border-subtle)"}`,
-                borderRadius: 999,
-                cursor: "pointer",
-              }}
-            >
-              {f.label} <span style={{ color: "var(--text-muted)", marginLeft: 4 }}>{count}</span>
-            </button>
-          );
-        })}
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", flex: 1 }}>
+          {FILTERS.map((f) => {
+            const count = f.id === "all"
+              ? events.length
+              : events.filter((e) => matchesFilter(e, f.id)).length;
+            const active = filter === f.id;
+            return (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setFilter(f.id)}
+                style={{
+                  padding: "4px 10px",
+                  fontSize: 12,
+                  color: active ? "var(--text)" : "var(--text-muted)",
+                  background: active ? "var(--surface-hover)" : "transparent",
+                  border: `1px solid ${active ? "var(--button-secondary-border)" : "var(--border-subtle)"}`,
+                  borderRadius: 999,
+                  cursor: "pointer",
+                }}
+              >
+                {f.label} <span style={{ color: "var(--text-muted)", marginLeft: 4 }}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
+        <button
+          type="button"
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+          className="btn-secondary text-sm rounded-lg"
+          style={{
+            padding: "4px 10px",
+            fontSize: 12,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            opacity: isRefreshing ? 0.5 : 1,
+            cursor: isRefreshing ? "wait" : "pointer",
+          }}
+          aria-label="Refresh pipeline"
+        >
+          <RefreshIcon spinning={isRefreshing} />
+          {isRefreshing ? "Refreshing…" : "Refresh"}
+        </button>
       </div>
 
       {filtered.length === 0 && (
@@ -100,10 +130,11 @@ function matchesFilter(e, filter) {
 
 function PipelineRow({ event, isOpen, onToggle }) {
   const state = describeState(event);
+  const hasError = Boolean(event.error);
   return (
     <li
       style={{
-        border: "1px solid var(--border-subtle)",
+        border: `1px solid ${hasError ? "var(--danger)" : "var(--border-subtle)"}`,
         borderRadius: 8,
         background: "var(--bg)",
         display: "flex",
@@ -118,24 +149,42 @@ function PipelineRow({ event, isOpen, onToggle }) {
           cursor: "pointer",
           padding: "10px 14px",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12,
+          flexDirection: "column",
+          gap: 4,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flex: 1 }}>
-          <span style={{ color: "var(--text-muted)", fontSize: 11 }}>{isOpen ? "▾" : "▸"}</span>
-          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {event.meetingTitle}
-          </span>
-          {event.isTestRun && <TestRunBadge />}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flex: 1 }}>
+            <span style={{ color: "var(--text-muted)", fontSize: 11 }}>{isOpen ? "▾" : "▸"}</span>
+            <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {event.meetingTitle}
+            </span>
+            {event.isTestRun && <TestRunBadge />}
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
+            <StateBadge {...state} />
+            <span
+              style={{ fontSize: 11, color: "var(--text-muted)" }}
+              title={`Meeting date: ${formatDate(event.occurredAt)}`}
+            >
+              {formatDate(event.receivedAt)}
+            </span>
+          </div>
         </div>
-        <div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
-          <StateBadge {...state} />
-          <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
-            {formatDate(event.occurredAt)}
-          </span>
-        </div>
+        {hasError && (
+          <div
+            style={{
+              fontSize: 11,
+              color: "var(--danger)",
+              paddingLeft: 18,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {event.error}
+          </div>
+        )}
       </button>
       {isOpen && <PipelineRowDetail event={event} />}
     </li>
@@ -167,13 +216,29 @@ function PipelineRowDetail({ event }) {
         ) : (
           <span>(unassigned)</span>
         )}
+        <span>received {formatDate(event.receivedAt)}</span>
+        <span>meeting date {formatDate(event.occurredAt)}</span>
         {event.processedAt && (
           <span>processed {formatDate(event.processedAt)}</span>
         )}
-        {event.error && (
-          <span style={{ color: "var(--danger)" }}>error: {event.error}</span>
-        )}
       </div>
+
+      {event.error && (
+        <div
+          style={{
+            fontSize: 12,
+            color: "var(--danger)",
+            background: "rgba(255, 137, 155, 0.08)",
+            border: "1px solid var(--danger)",
+            padding: "8px 12px",
+            borderRadius: 6,
+            lineHeight: 1.5,
+            wordBreak: "break-word",
+          }}
+        >
+          <strong style={{ fontWeight: 600 }}>Orchestrator error:</strong> {event.error}
+        </div>
+      )}
 
       {event.attendees.length > 0 && (
         <DetailSection label="Attendees">
@@ -409,6 +474,30 @@ export function TestRunBadge() {
       <FlaskIcon />
       Test
     </span>
+  );
+}
+
+function RefreshIcon({ spinning }) {
+  return (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 14 14"
+      fill="none"
+      aria-hidden
+      style={{
+        flexShrink: 0,
+        animation: spinning ? "pipeline-refresh-spin 0.8s linear infinite" : "none",
+      }}
+    >
+      <path
+        d="M2 7a5 5 0 0 1 8.5-3.5L12 5M12 2v3h-3M12 7a5 5 0 0 1-8.5 3.5L2 9m0 3V9h3"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 

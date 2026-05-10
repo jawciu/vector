@@ -217,6 +217,49 @@ To be migrated to `app/ui/dropdown/` when DS formalises.
 
 **Every dropdown / popover MUST use `MenuList` + `MenuOption`.** This guarantees the consistent 4px container padding, 4px row gap, hover/active states, and border.
 
+### Search input — `.search-input`
+
+Text-search field. Apply the class to the wrapper that holds the magnifier icon + `<input>`; the inner `<input>` stays border-less / background-transparent so the wrapper drives all visual states.
+
+| State           | Background    | Border                       |
+|-----------------|---------------|------------------------------|
+| default         | `bg`          | `border`                     |
+| hover           | `bg-hover`    | `buttonSecondaryBorder`      |
+| focus (within)  | `bg`          | `action`                     |
+
+```jsx
+<div className="search-input" style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 10 }}>
+  <SearchIcon />
+  <input style={{ border: "none", background: "transparent", outline: "none", flex: 1 }} />
+</div>
+```
+
+### Filter pill — `.filter-pill`
+
+Pill-shaped trigger that opens a popover (date picker, status filter, etc.). The class drives default/hover/focus and two data-attribute states.
+
+| State / attribute       | Background       | Border                       | Text       |
+|-------------------------|------------------|------------------------------|------------|
+| default                 | `bg`             | `border`                     | —          |
+| hover                   | `bg-hover`       | `buttonSecondaryBorder`      | —          |
+| focus-visible           | unchanged        | `action`                     | —          |
+| `data-open="true"`      | `surfaceHover`   | `buttonSecondaryBorder`      | `text`     |
+| `data-active="true"`    | unchanged        | `action`                     | —          |
+
+`data-open` is the *popover is open* state (matches `.menu-trigger-pill` active look). `data-active` is the *a value is picked* state — they're independent and can stack.
+
+```jsx
+<button
+  className="rounded-lg filter-pill"
+  data-open={open ? "true" : undefined}
+  data-active={value ? "true" : undefined}
+  onClick={() => setOpen((o) => !o)}
+>
+  <CalendarIcon />
+  <span>{label ?? "Any date"}</span>
+</button>
+```
+
 ### Status pill — `.status-pill`, `.status-pill--filled`
 
 Small uppercase-or-cased label communicating state. Two variants:

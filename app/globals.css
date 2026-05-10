@@ -269,6 +269,11 @@ a {
   justify-content: center;
 }
 
+/* Pipeline timeline — refresh button spin */
+@keyframes pipeline-refresh-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Members tab — portal cell flash on re-failure */
 @keyframes portalFlash {
   0%   { color: var(--text-muted); }
@@ -324,38 +329,60 @@ a {
   border-color: var(--button-secondary-border);
 }
 
-/* Meetings tab — search input */
-.meetings-search {
-  border: 1px solid var(--border);
-  transition: border-color 0.15s ease, background-color 0.15s ease;
-}
-
-.meetings-search:hover {
-  border-color: var(--button-secondary-border);
-}
-
-.meetings-search:focus-within {
-  border-color: var(--action);
-}
-
-/* Meetings tab — date filter pill */
-.meetings-date-pill {
+/* DS: search input
+ * Wrap an `<input>` and an icon. Apply `.search-input` to the wrapper, leave
+ * the inner `<input>` border-less / background-transparent.
+ *   default → `border` border on `bg`
+ *   hover   → `bg-hover` + `buttonSecondaryBorder`
+ *   focus   → `action` border (focus-within so it works on the wrapper) */
+.search-input {
   border: 1px solid var(--border);
   background: var(--bg);
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.meetings-date-pill:hover {
+.search-input:hover {
   background: var(--bg-hover);
   border-color: var(--button-secondary-border);
 }
 
-.meetings-date-pill:focus-visible {
+.search-input:focus-within {
+  background: var(--bg);
+  border-color: var(--action);
+}
+
+/* DS: filter pill
+ * Pill-shaped trigger that opens a popover (date picker, etc).
+ *   default            → `border` on `bg`
+ *   hover              → `bg-hover` + `buttonSecondaryBorder`
+ *   focus-visible      → `action` border
+ *   [data-open=true]   → persistent open state, matches `.menu-trigger-pill`
+ *                        active look (`surface-hover` bg, brighter text)
+ *   [data-active=true] → a value is picked, `action` border for "filter set" */
+.filter-pill {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.filter-pill:hover {
+  background: var(--bg-hover);
+  border-color: var(--button-secondary-border);
+}
+
+.filter-pill:focus-visible {
   outline: none;
   border-color: var(--action);
 }
 
-.meetings-date-pill[data-active="true"] {
+.filter-pill[data-open="true"],
+.filter-pill[data-open="true"]:hover {
+  background: var(--surface-hover);
+  border-color: var(--button-secondary-border);
+  color: var(--text);
+}
+
+.filter-pill[data-active="true"] {
   border-color: var(--action);
 }
 
