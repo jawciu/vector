@@ -417,54 +417,98 @@ a {
   content: "";
   flex: 1;
   height: 1px;
-  background: var(--border-subtle);
+  background: var(--action);
+  opacity: 0.6;
 }
 
-/* Actions tab — meeting pill (calendar icon + meeting title) */
-.meeting-pill {
+/* Actions tab — meeting separator
+   Layout: 📅 From <code-block hugging the title>
+   Followed by an AI-gradient hairline divider. */
+.meeting-separator {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meeting-separator__row {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: var(--surface-hover);
-  color: var(--text);
-  font-family: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
-  font-size: 13px;
+  gap: 10px;
+  background: none;
   border: none;
+  padding: 0;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  color: var(--text-secondary);
+  font-size: 15px;
 }
 
-.meeting-pill:hover {
-  background: var(--bg-elevated-hover);
-}
-
-.meeting-pill__icon {
+.meeting-separator__icon {
   flex-shrink: 0;
   color: var(--text-secondary);
 }
 
-/* Actions tab — outer draft card, with hover that lightens the inner
-   preview (`.draft-card-preview`) and the outer border */
+.meeting-separator__title {
+  font-family: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: var(--surface-hover);
+  color: var(--text);
+  transition: background-color 0.15s ease;
+}
+
+.meeting-separator__row:hover .meeting-separator__title {
+  background: var(--bg-elevated-hover);
+}
+
+.meeting-separator__divider {
+  height: 1px;
+  background: linear-gradient(90deg, var(--ai-gradient-from), var(--ai-gradient-to));
+  border: none;
+  margin: 0;
+}
+
+/* Actions tab — outer draft card.
+   Default: a `--deeper-bg` (#14141A) overlay at 80% opacity sits on top of
+   the inner preview to dim it (the "AI suggestion" overlay). On outer-card
+   hover the overlay fades out, the preview lightens, the border brightens. */
 .draft-card {
   background: var(--bg);
   border: 1px solid var(--button-secondary-border);
-  transition: border-color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .draft-card:hover {
-  border-color: var(--text-muted);
+  background: var(--deeper-bg);
+  border-color: var(--icon-tertiary);
 }
 
 .draft-card-preview {
+  position: relative;
   background: var(--bg-elevated);
   transition: background-color 0.15s ease;
+}
+
+.draft-card-preview::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--deeper-bg);
+  opacity: 0.8;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.draft-card:hover .draft-card-preview::after {
+  opacity: 0;
 }
 
 .draft-card:hover .draft-card-preview {
   background: var(--bg-elevated-hover);
 }
+
 
 .task-completing {
   animation: taskComplete 0.8s ease forwards;
@@ -530,10 +574,11 @@ a {
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.field-row:hover:not([data-active="true"]) {
+.field-row:hover:not([data-active="true"]):not(:focus-within) {
   background: var(--bg-hover);
 }
 
+.field-row:focus-within,
 .field-row[data-active="true"] {
   background: var(--surface-hover);
   border-color: var(--button-secondary-border);

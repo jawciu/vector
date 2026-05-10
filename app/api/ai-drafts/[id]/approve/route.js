@@ -103,9 +103,7 @@ export async function POST(request, { params }) {
       const check = await assertTaskBelongs(targetId);
       if (!check.ok) return NextResponse.json({ error: check.error }, { status: check.status });
 
-      if (merged.action === "comment_only" && merged.commentBody) {
-        await createComment(targetId, vu.name, merged.commentBody, { actor });
-      } else if (merged.action === "reprioritise" && merged.newPriority) {
+      if (merged.action === "reprioritise" && merged.newPriority) {
         await updateTask(targetId, { priority: merged.newPriority }, { actor });
       } else if (merged.action === "update_due_date" && merged.newDueDate) {
         await updateTask(targetId, { due: merged.newDueDate }, { actor });

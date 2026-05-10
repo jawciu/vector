@@ -66,9 +66,14 @@ export default function AIDraftInbox({
   // create_task title, meeting title, and onboarding name. Plain
   // case-insensitive substring match — list is small.
   const filteredDrafts = useMemo(() => {
+    // Hide retired draft types — `comment_only` was removed from the
+    // orchestrator schema, but legacy rows linger in the DB.
+    const live = drafts.filter(
+      (d) => !(d.action === "match_existing" && d.payload?.action === "comment_only")
+    );
     const q = query.trim().toLowerCase();
-    if (!q) return drafts;
-    return drafts.filter((d) => {
+    if (!q) return live;
+    return live.filter((d) => {
       const haystacks = [
         d.taskTitle,
         d.payload?.subject,
@@ -359,7 +364,7 @@ function DraftColumn({
   onMeetingClick,
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 24, minWidth: 0 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 40, minWidth: 0 }}>
       <h2 style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.6 }}>
         {title}
       </h2>
@@ -367,7 +372,7 @@ function DraftColumn({
         <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0 }}>Nothing here.</p>
       )}
       {buckets.map(({ bucket, drafts }) => (
-        <section key={bucket} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <section key={bucket} style={{ display: "flex", flexDirection: "column", gap: 36 }}>
           <h3 className="actions-date-header">{bucketLabel(bucket)}</h3>
           {variant === "followup"
             ? drafts.map((draft) => (
@@ -386,11 +391,19 @@ function DraftColumn({
                 const { meetingGroups, looseDrafts } = groupBucketByMeeting(drafts);
                 return (
                   <>
-                    {meetingGroups.map((group) => {
+                    {meetingGroups.map((group, idx) => {
                       const meetingTitle =
                         group.drafts.find((d) => d.meetingTitle)?.meetingTitle ?? "Meeting";
                       return (
-                        <div key={group.eventId} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                        <div
+                          key={group.eventId}
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 24,
+                            marginTop: idx === 0 ? 0 : 24,
+                          }}
+                        >
                           <MeetingPill title={meetingTitle} onClick={() => onMeetingClick?.(group.eventId)} />
                           {group.drafts.map((draft) =>
                             renderActionCard(draft, {
@@ -436,24 +449,26 @@ function DraftColumn({
   );
 }
 
-/** Bigger meeting pill — calendar icon + meeting title in a code-block-feel
- *  pill. Clicking opens the MeetingDrawer. Replaces the old "From meeting:"
- *  text + small task-ref pill. */
+/** Meeting separator — `📅 From <title>` row with an AI-gradient hairline
+ *  divider underneath. The code-block background hugs only the title.
+ *  Clicking the row opens the MeetingDrawer. */
 function MeetingPill({ title, onClick }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="meeting-pill"
-      title="Open meeting transcript"
-    >
-      <span className="meeting-pill__icon">
-        <CalendarIcon />
-      </span>
-      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-        {title}
-      </span>
-    </button>
+    <div className="meeting-separator">
+      <button
+        type="button"
+        onClick={onClick}
+        className="meeting-separator__row"
+        title="Open meeting transcript"
+      >
+        <span className="meeting-separator__icon">
+          <CalendarIcon />
+        </span>
+        <span>From</span>
+        <span className="meeting-separator__title">{title}</span>
+      </button>
+      <hr className="meeting-separator__divider" />
+    </div>
   );
 }
 
@@ -488,6 +503,7 @@ function renderActionCard(draft, ctx) {
       onToggleSelect={() => ctx.onToggleSelect(draft.id)}
       onApprove={(overrides) => ctx.onApprove(draft, overrides)}
       onReject={() => ctx.onReject(draft, null)}
+      openTasks={ctx.openTasks}
     />
   );
 }
@@ -666,98 +682,71 @@ export function DraftCard({
   onToggleSelect,
   onApprove,
   onReject,
+  openTasks = [],
 }) {
-  const { action, payload, sourceQuote, sourceUrl, confidence, onboardingId, onboardingName, source, status, rejectedReason, resolvedAt } = draft;
+  const { action, payload, confidence, source, status, rejectedReason } = draft;
   const isPending = mode === "pending";
-  const heading = describeAction(action, payload);
-  const meta = describeMeta(action, payload);
+  const verb = describeActionVerb(action, payload);
+  const taskTitle = lookupTaskTitle(openTasks, payload?.taskId) ?? `Task #${payload?.taskId ?? ""}`;
+  const matchedTask = openTasks.find((t) => Number(t.id) === Number(payload?.taskId));
 
   return (
     <div
+      className="draft-card"
       style={{
-        padding: "14px 18px",
-        borderRadius: 10,
-        background: "var(--surface)",
-        border: `1px solid ${selected ? "var(--action)" : "var(--border)"}`,
+        padding: 24,
+        borderRadius: 20,
         display: "flex",
         flexDirection: "column",
-        gap: 10,
+        gap: 24,
+        outline: selected ? "2px solid var(--action)" : "none",
       }}
     >
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-        {isPending && (
-          <input
-            type="checkbox"
-            checked={selected}
-            onChange={onToggleSelect}
-            disabled={busy}
-            aria-label="Select this draft"
-            style={{ marginTop: 4, accentColor: "var(--action)" }}
-          />
-        )}
-        <ActionIcon action={action} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, color: "var(--text)", fontWeight: 500, lineHeight: 1.4 }}>
-            {heading}
+      <div style={{ display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }}>
+        <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {isPending && (
+              <input
+                type="checkbox"
+                checked={selected}
+                onChange={onToggleSelect}
+                disabled={busy}
+                aria-label="Select this draft"
+                style={{ accentColor: "var(--action)" }}
+              />
+            )}
+            <ActionIcon action={action} />
+            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-muted)" }}>{verb}</span>
           </div>
-          <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-            <Link href={`/onboardings/${onboardingId}`} style={{ color: "var(--text-muted)" }}>
-              {onboardingName ?? `Onboarding #${onboardingId}`}
-            </Link>
-            <span>·</span>
-            <span>From {source}</span>
-            <span>·</span>
+          <div>
+            <span className="task-ref" style={{ fontSize: 14, padding: "4px 10px", borderRadius: 6 }}>
+              {taskTitle}
+            </span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", fontSize: 12 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--text-muted)" }}>
+              <FollowupSparkleIcon />
+              From {source}
+            </span>
+            <MetaDot />
             <ConfidencePill confidence={confidence} />
             {!isPending && (
               <>
-                <span>·</span>
+                <MetaDot />
                 <StatusPill status={status} />
-                {resolvedAt && (
-                  <span style={{ color: "var(--text-muted)" }}>
-                    {new Date(resolvedAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
-                  </span>
-                )}
               </>
             )}
           </div>
-          {meta && (
-            <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>
-              {meta}
-            </div>
-          )}
           {!isPending && rejectedReason && (
-            <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4, fontStyle: "italic" }}>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>
               Reason: {rejectedReason}
             </div>
           )}
         </div>
+        <div style={{ flex: "1 1 240px", minWidth: 0 }}>
+          <DraftCardTaskPreview task={matchedTask} fallbackTitle={taskTitle} />
+        </div>
       </div>
-
-      {sourceQuote && (
-        <blockquote
-          style={{
-            margin: 0,
-            padding: "8px 12px",
-            borderLeft: "2px solid var(--border)",
-            background: "var(--bg)",
-            borderRadius: 4,
-            fontSize: 12,
-            color: "var(--text-secondary)",
-            lineHeight: 1.5,
-            fontStyle: "italic",
-          }}
-        >
-          &ldquo;{sourceQuote}&rdquo;
-          {sourceUrl && (
-            <>
-              {" "}
-              <a href={sourceUrl} target="_blank" rel="noreferrer" style={{ color: "var(--action)", fontStyle: "normal" }}>
-                ↗
-              </a>
-            </>
-          )}
-        </blockquote>
-      )}
 
       {error && (
         <div
@@ -774,25 +763,96 @@ export function DraftCard({
       )}
 
       {isPending && (
-        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button
+            type="button"
             onClick={onReject}
             disabled={busy}
-            className="btn-secondary text-sm rounded-lg"
-            style={{ padding: "4px 12px", opacity: busy ? 0.5 : 1, fontSize: 13 }}
+            className="text-btn"
+            style={{ padding: "4px 8px", fontSize: 14, color: "var(--text)", opacity: busy ? 0.5 : 1 }}
           >
-            Reject
+            Dismiss
           </button>
           <button
+            type="button"
             onClick={() => onApprove({})}
             disabled={busy}
             className="btn-primary text-sm rounded-lg"
-            style={{ padding: "4px 14px", opacity: busy ? 0.5 : 1, fontSize: 13, fontWeight: 600 }}
+            style={{ padding: "4px 14px", fontSize: 14, fontWeight: 600, opacity: busy ? 0.5 : 1 }}
           >
-            {busy ? "…" : "Approve →"}
+            {busy ? "…" : "Approve"}
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+/** Verb-only label for an action draft — kept short so the left column
+ *  stays compact. Full payload details live on the right (task preview). */
+function describeActionVerb(action, payload) {
+  if (action === "match_existing") {
+    const sub = payload?.action;
+    if (sub === "reassign") return "Reassign";
+    if (sub === "reprioritise") return "Re-prioritise";
+    if (sub === "update_due_date") return "Update due date";
+    return "Update task";
+  }
+  if (action === "update_status") return `Mark as ${payload?.newStatus ?? "—"}`;
+  if (action === "draft_followup") return "Follow up";
+  if (action === "create_task") return "Create task";
+  return action;
+}
+
+function lookupTaskTitle(openTasks, taskId) {
+  if (taskId == null) return null;
+  const t = openTasks.find((x) => Number(x.id) === Number(taskId));
+  return t?.title ?? null;
+}
+
+/** Right-column preview for an existing-task draft. Renders a compact
+ *  task summary using the data we have (looked up from `openTasks`).
+ *  Falls back to a title-only stub if the task isn't in the list. */
+function DraftCardTaskPreview({ task, fallbackTitle }) {
+  const due = task?.due ? new Date(task.due) : null;
+  const dueLabel = due
+    ? due.toLocaleDateString("en-GB", { day: "numeric", month: "short" })
+    : null;
+
+  return (
+    <div
+      className="draft-card-preview"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+        padding: "12px 16px",
+        borderRadius: 8,
+      }}
+    >
+      <div style={{ fontSize: 14, lineHeight: 1.4 }}>{task?.title ?? fallbackTitle}</div>
+      {dueLabel && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
+          <CalendarIcon />
+          <span>{dueLabel}</span>
+        </div>
+      )}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <span
+          className="status-pill"
+          style={{
+            border: "1px solid var(--border-subtle)",
+            padding: "2px 6px",
+            borderRadius: 6,
+            fontSize: 11,
+          }}
+        >
+          {task?.status ?? "Not started"}
+        </span>
+        {task?.priority && (
+          <PriorityIcon priority={task.priority} />
+        )}
+      </div>
     </div>
   );
 }
@@ -854,13 +914,6 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
   const mailto = buildMailto({ to: initial.to, subject, body });
   const canSend = !busy && subject.trim().length > 0;
   const taskLabel = draft.taskTitle ?? `Task #${initial.taskId ?? ""}`.trim();
-  const generatedDate = draft.createdAt
-    ? new Date(draft.createdAt).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
-    : null;
 
   // Copies only the body (per Caroline's UX call — subject lives in mail).
   async function handleCopyBody() {
@@ -876,75 +929,53 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
 
   return (
     <div
+      className="draft-card"
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 32,
+        gap: 24,
         padding: 24,
         borderRadius: 20,
-        border: "1px solid var(--button-secondary-border)",
-        background: "var(--bg)",
       }}
     >
-      {/* Header — breadcrumb + meta rows */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Header — icon + label / task pill / single meta row */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <DependenciesIcon style={{ color: "var(--text-secondary)" }} />
-          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>Follow up</span>
-          <ChevronRight />
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-muted)" }}>Follow up</span>
+        </div>
+        <div>
           {draft.onboardingId && taskLabel ? (
-            <Link
-              href={`/onboardings/${draft.onboardingId}`}
-              style={{ textDecoration: "none" }}
-            >
-              <span className="task-ref">{taskLabel}</span>
+            <Link href={`/onboardings/${draft.onboardingId}`} style={{ textDecoration: "none" }}>
+              <span className="task-ref" style={{ fontSize: 14, padding: "4px 10px", borderRadius: 6 }}>
+                {taskLabel}
+              </span>
             </Link>
           ) : (
-            <span className="task-ref">{taskLabel}</span>
+            <span className="task-ref" style={{ fontSize: 14, padding: "4px 10px", borderRadius: 6 }}>
+              {taskLabel}
+            </span>
           )}
         </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--text-secondary)", fontSize: 12 }}>
-              <FollowupSparkleIcon />
-              From vector
-            </span>
-            {generatedDate && <MetaDot />}
-            {generatedDate && <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{generatedDate}</span>}
-            <MetaDot />
-            <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>Tone: {initial.tone ?? "friendly"}</span>
-            {!isPending && (
-              <>
-                <MetaDot />
-                <StatusPill status={draft.status} />
-              </>
-            )}
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            {draft.sourceQuote && (
-              <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{draft.sourceQuote}</span>
-            )}
-            {draft.sourceQuote && <MetaDot />}
-            <ConfidencePill confidence={draft.confidence} />
-            {draft.meetingTitle && draft.sourceEventId != null && (
-              <>
-                <MetaDot />
-                <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-                  From meeting:{" "}
-                  <button
-                    type="button"
-                    onClick={() => onMeetingClick?.(draft.sourceEventId)}
-                    className="task-ref"
-                    style={{ border: "none", cursor: "pointer" }}
-                    title="Open meeting transcript"
-                  >
-                    {draft.meetingTitle}
-                  </button>
-                </span>
-              </>
-            )}
-          </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", fontSize: 12 }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--text-muted)" }}>
+            <FollowupSparkleIcon />
+            From vector
+          </span>
+          {draft.sourceQuote && (
+            <>
+              <MetaDot />
+              <span style={{ color: "var(--text-secondary)" }}>{draft.sourceQuote}</span>
+            </>
+          )}
+          <MetaDot />
+          <ConfidencePill confidence={draft.confidence} />
+          {!isPending && (
+            <>
+              <MetaDot />
+              <StatusPill status={draft.status} />
+            </>
+          )}
         </div>
       </div>
 
@@ -1417,7 +1448,7 @@ function CreateTaskCompact({ draft, taskTitle, payload, isPending }) {
       <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <TasksBreadcrumbIcon />
-          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>Create task</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-muted)" }}>Create task</span>
         </div>
         <div>
           <span className="task-ref" style={{ fontSize: 14, padding: "4px 10px", borderRadius: 6 }}>
@@ -1425,7 +1456,7 @@ function CreateTaskCompact({ draft, taskTitle, payload, isPending }) {
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", fontSize: 12 }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--text-secondary)" }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--text-muted)" }}>
             <FollowupSparkleIcon />
             From miniti
           </span>
@@ -1451,12 +1482,12 @@ function CreateTaskHeader({ draft, taskTitle, generatedDate, isPending }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <TasksBreadcrumbIcon />
-        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>Create task</span>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-muted)" }}>Create task</span>
         <ChevronRight />
         <span className="task-ref">{taskTitle}</span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--text-secondary)", fontSize: 12 }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--text-muted)", fontSize: 12 }}>
           <FollowupSparkleIcon />
           From miniti
         </span>
@@ -1496,21 +1527,20 @@ function CreateTaskPreview({ payload }) {
         borderRadius: 8,
       }}
     >
-      <div style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.4 }}>
+      <div style={{ fontSize: 14, lineHeight: 1.4 }}>
         {payload.title || "Untitled task"}
       </div>
       {dueLabel && (
-        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--text-secondary)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
           <CalendarIcon />
           <span>{dueLabel}</span>
-          {dueAgo && <span style={{ color: "var(--text-muted)" }}>· {dueAgo}</span>}
+          {dueAgo && <span>· {dueAgo}</span>}
         </div>
       )}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
         <span
           className="status-pill"
           style={{
-            color: "var(--text-muted)",
             border: "1px solid var(--border-subtle)",
             padding: "2px 6px",
             borderRadius: 6,
@@ -1519,7 +1549,7 @@ function CreateTaskPreview({ payload }) {
         >
           Not started
         </span>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, color: "var(--text-muted)", fontSize: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 12 }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }} title="Notes">
             <NotesIcon />
             {noteCount}
@@ -1563,24 +1593,28 @@ function CreateTaskEditForm({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      <input
-        type="text"
-        value={edits.title}
-        onChange={(e) => onChange({ title: e.target.value })}
-        disabled={disabled}
-        placeholder="Task title"
-        aria-label="Title"
-        style={ghostTitleStyle}
-      />
-      <textarea
-        value={edits.description}
-        onChange={(e) => onChange({ description: e.target.value })}
-        disabled={disabled}
-        rows={3}
-        placeholder="Description"
-        aria-label="Description"
-        style={ghostDescriptionStyle}
-      />
+      <div className="field-row rounded-lg" style={{ padding: "6px 10px" }}>
+        <input
+          type="text"
+          value={edits.title}
+          onChange={(e) => onChange({ title: e.target.value })}
+          disabled={disabled}
+          placeholder="Task title"
+          aria-label="Title"
+          style={ghostTitleStyle}
+        />
+      </div>
+      <div className="field-row rounded-lg" style={{ padding: "6px 10px" }}>
+        <textarea
+          value={edits.description}
+          onChange={(e) => onChange({ description: e.target.value })}
+          disabled={disabled}
+          rows={3}
+          placeholder="Description"
+          aria-label="Description"
+          style={ghostDescriptionStyle}
+        />
+      </div>
 
       <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
         <DueDatePill
@@ -1652,14 +1686,16 @@ function CreateTaskEditForm({
           <NotesIcon />
           <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>Notes</span>
         </div>
-        <textarea
-          value={edits.notes}
-          onChange={(e) => onChange({ notes: e.target.value })}
-          disabled={disabled}
-          placeholder="Verbatim notes from the source meeting (optional)"
-          aria-label="Notes"
-          style={{ ...ghostDescriptionStyle, height: 86, resize: "vertical" }}
-        />
+        <div className="field-row rounded-lg" style={{ padding: "6px 10px" }}>
+          <textarea
+            value={edits.notes}
+            onChange={(e) => onChange({ notes: e.target.value })}
+            disabled={disabled}
+            placeholder="Verbatim notes from the source meeting (optional)"
+            aria-label="Notes"
+            style={{ ...ghostDescriptionStyle, height: 86, resize: "vertical" }}
+          />
+        </div>
       </div>
     </div>
   );
@@ -1667,7 +1703,7 @@ function CreateTaskEditForm({
 
 const ghostTitleStyle = {
   width: "100%",
-  padding: "4px 0",
+  padding: 0,
   fontSize: 16,
   background: "transparent",
   color: "var(--text)",
@@ -1678,7 +1714,7 @@ const ghostTitleStyle = {
 
 const ghostDescriptionStyle = {
   width: "100%",
-  padding: "4px 0",
+  padding: 0,
   fontSize: 14,
   background: "transparent",
   color: "var(--text-secondary)",
@@ -1951,7 +1987,6 @@ function describeAction(action, payload) {
       return `Create task: "${payload.title ?? "(untitled)"}"`;
     case "match_existing": {
       const sub = payload.action;
-      if (sub === "comment_only") return `Add comment to task #${payload.taskId}`;
       if (sub === "reassign") return `Reassign task #${payload.taskId}`;
       if (sub === "reprioritise") return `Re-prioritise task #${payload.taskId} → ${payload.newPriority}`;
       if (sub === "update_due_date") return `Update due date on task #${payload.taskId} → ${payload.newDueDate}`;
