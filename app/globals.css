@@ -324,6 +324,41 @@ a {
   border-color: var(--button-secondary-border);
 }
 
+/* Meetings tab — search input */
+.meetings-search {
+  border: 1px solid var(--border);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.meetings-search:hover {
+  border-color: var(--button-secondary-border);
+}
+
+.meetings-search:focus-within {
+  border-color: var(--action);
+}
+
+/* Meetings tab — date filter pill */
+.meetings-date-pill {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.meetings-date-pill:hover {
+  background: var(--bg-hover);
+  border-color: var(--button-secondary-border);
+}
+
+.meetings-date-pill:focus-visible {
+  outline: none;
+  border-color: var(--action);
+}
+
+.meetings-date-pill[data-active="true"] {
+  border-color: var(--action);
+}
+
 /* Task completion animation */
 .task-completing {
   animation: taskComplete 0.8s ease forwards;

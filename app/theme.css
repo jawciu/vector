@@ -2,6 +2,7 @@
 /* To change tokens, edit DESIGN.md and run `npm run build:ds`. */
 
 :root {
+  --deeper-bg: #14141a;
   --bg: #18181e;
   --bg-elevated: #1d1c24;
   --bg-elevated-hover: #232028;

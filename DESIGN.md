@@ -9,6 +9,7 @@ colors:
   tertiary: "{colors.accent}"       # Cyan accent (used sparingly)
 
   # Surfaces — vertical stacking by elevation
+  deeperBg: "#14141A"           # Recessed surface — slightly darker than bg (drawers, etc.)
   bg: "#18181E"                 # Page / app background (lowest)
   bgElevated: "#1D1C24"         # Elevated surfaces — cards, modals, kanban task cards
   bgElevatedHover: "#232028"    # Hover on bg-elevated surfaces

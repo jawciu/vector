@@ -45,7 +45,7 @@ const Drawer = forwardRef(function Drawer(
     useClickOutside = true,
     closeButton = true,
     className = "",
-    background = "var(--bg)",
+    background = "var(--deeper-bg)",
     children,
     ...rest
   },

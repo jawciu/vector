@@ -245,7 +245,8 @@ function DateFilterPill({ value, onChange }) {
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="dialog"
         aria-expanded={open}
-        className="rounded-lg"
+        data-active={value ? "true" : "false"}
+        className="rounded-lg meetings-date-pill"
         style={{
           display: "flex",
           alignItems: "center",
@@ -253,8 +254,6 @@ function DateFilterPill({ value, onChange }) {
           padding: "6px 10px",
           fontSize: 13,
           color: label ? "var(--text)" : "var(--text-muted)",
-          background: "var(--bg)",
-          border: "1px solid var(--border)",
           cursor: "pointer",
         }}
       >
@@ -284,13 +283,13 @@ function DateFilterPill({ value, onChange }) {
 function SearchInput({ value, onChange }) {
   return (
     <div
+      className="meetings-search"
       style={{
         display: "flex",
         alignItems: "center",
         gap: 8,
         padding: "6px 10px",
         background: "var(--bg)",
-        border: "1px solid var(--border)",
         borderRadius: 10,
         width: 300,
         maxWidth: "100%",

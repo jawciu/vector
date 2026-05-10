@@ -53,27 +53,8 @@ export default function MeetingDrawer({ eventId, onClose }) {
   }, [eventId, open]);
 
   return (
-    <Drawer
-      open={open}
-      onClose={onClose}
-      background="color-mix(in srgb, var(--bg) 70%, black)"
-      aria-label="Meeting details"
-    >
-      {/* Header — close button lives in the Drawer primitive (top-right). */}
-      <div
-        style={{
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          padding: "16px 20px 12px",
-          paddingRight: 32,
-          borderBottom: "1px solid var(--border-subtle)",
-        }}
-      >
-        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>Meeting</span>
-      </div>
-
-      {/* Body */}
+    <Drawer open={open} onClose={onClose} aria-label="Meeting details">
+      {/* Body — close button lives in the Drawer primitive (top-right). */}
       <div
         style={{
           flex: 1,
@@ -94,8 +75,9 @@ export default function MeetingDrawer({ eventId, onClose }) {
         )}
         {meeting && (
           <>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <h2 style={{ margin: 0, fontSize: 16 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4, paddingRight: 24 }}>
+              <h2 style={{ margin: 0, fontSize: 16, display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>Meeting</span>
                 <span className="task-ref">{meeting.meetingTitle}</span>
               </h2>
               <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
