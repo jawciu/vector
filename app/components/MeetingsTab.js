@@ -139,28 +139,39 @@ function MeetingRow({ meeting, onClick }) {
           padding: "14px 16px",
           borderRadius: 12,
           border: "1px solid var(--border)",
-          display: "flex",
-          flexDirection: "column",
-          gap: 6,
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.4fr)",
+          gap: 16,
           cursor: "pointer",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>
-            {meeting.meetingTitle}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6, minWidth: 0 }}>
+          <span style={{ display: "inline-flex", maxWidth: "100%" }}>
+            <code className="task-ref" style={{ fontSize: 13 }}>
+              {meeting.meetingTitle}
+            </code>
           </span>
-          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>· {dateLabel}</span>
+          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{dateLabel}</span>
+          {meeting.attendees.map((a, i) => (
+            <AttendeeChip key={i} name={a.name} email={a.email} />
+          ))}
         </div>
         {meeting.summary && (
-          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.45, color: "var(--text-secondary)" }}>
-            {meeting.summary}
-          </p>
-        )}
-        {meeting.attendees.length > 0 && (
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {meeting.attendees.map((a, i) => (
-              <AttendeeChip key={i} name={a.name} email={a.email} />
-            ))}
+          <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
+                color: "var(--text-muted)",
+              }}
+            >
+              Summary
+            </span>
+            <p style={{ margin: 0, fontSize: 13, lineHeight: 1.45, color: "var(--text-secondary)" }}>
+              {meeting.summary}
+            </p>
           </div>
         )}
       </button>

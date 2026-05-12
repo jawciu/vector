@@ -318,15 +318,20 @@ a {
   background: var(--bg-elevated-hover);
 }
 
-/* Meetings tab — clickable meeting card */
+/* Meetings tab — clickable meeting card.
+   Background mirrors the menu-option pattern: bg → bg-hover → surface-hover. */
 .meeting-card {
-  background: var(--bg-elevated);
+  background: var(--bg);
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .meeting-card:hover {
-  background: var(--bg-elevated-hover);
+  background: var(--bg-hover);
   border-color: var(--button-secondary-border);
+}
+
+.meeting-card:active {
+  background: var(--surface-hover);
 }
 
 /* DS: search input
