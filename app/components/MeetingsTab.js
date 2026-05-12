@@ -118,6 +118,7 @@ export default function MeetingsTab({ meetings = [] }) {
 
       <MeetingDrawer
         eventId={drawerEventId}
+        seed={meetings.find((m) => m.id === drawerEventId) ?? null}
         onClose={() => setDrawerEventId(null)}
       />
     </div>

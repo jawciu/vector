@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Drawer from "@/app/ui/Drawer";
 import { AttendeeChip } from "./MeetingsTab";
@@ -11,12 +11,24 @@ import { AttendeeChip } from "./MeetingsTab";
  * 520px right-edge panel, no dimmed backdrop) — Caroline wants the
  * two surfaces visually consistent.
  *
- * Triggered by clicking the meeting title pill in any draft card.
- * Always mounted by the parent (`AIDraftInbox`); `eventId` controls
- * the open state. ESC + outside-click close via the Drawer primitive.
+ * Triggered by clicking a meeting row or a draft's meeting pill.
+ * Always mounted by the parent; `eventId` controls the open state.
+ *
+ * Speed:
+ *   - In-component cache (id → fetched body) so re-opening the same
+ *     meeting is instant.
+ *   - Optional `seed` prop: when the caller already has the meeting
+ *     payload (MeetingsTab does), pass it through and the drawer paints
+ *     immediately. A background fetch still runs to fill the richer
+ *     fields (`extractionActionItems`, `siblingDrafts`, `onboardingId`).
+ *
+ * ESC + outside-click close via the Drawer primitive.
  */
-export default function MeetingDrawer({ eventId, onClose }) {
-  const [meeting, setMeeting] = useState(null);
+export default function MeetingDrawer({ eventId, seed, onClose }) {
+  const cacheRef = useRef(new Map());
+  const seedFor = seed && seed.id === eventId ? seed : null;
+  const cached = eventId != null ? cacheRef.current.get(eventId) : null;
+  const [meeting, setMeeting] = useState(cached ?? seedFor ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -24,13 +36,20 @@ export default function MeetingDrawer({ eventId, onClose }) {
 
   useEffect(() => {
     if (!open) {
-      // Clear state when the drawer closes so re-opening fetches fresh.
-      setMeeting(null);
       setError(null);
       return;
     }
+    // Paint immediately from cache or seed; fetch in background.
+    const cached = cacheRef.current.get(eventId);
+    if (cached) {
+      setMeeting(cached);
+    } else if (seedFor) {
+      setMeeting(seedFor);
+    } else {
+      setMeeting(null);
+    }
     let cancelled = false;
-    setLoading(true);
+    setLoading(!cached);
     setError(null);
     (async () => {
       try {
@@ -40,7 +59,9 @@ export default function MeetingDrawer({ eventId, onClose }) {
           throw new Error(body.error || `Failed (${res.status})`);
         }
         const body = await res.json();
-        if (!cancelled) setMeeting(body);
+        if (cancelled) return;
+        cacheRef.current.set(eventId, body);
+        setMeeting(body);
       } catch (err) {
         if (!cancelled) setError(err.message);
       } finally {
@@ -50,7 +71,10 @@ export default function MeetingDrawer({ eventId, onClose }) {
     return () => {
       cancelled = true;
     };
-  }, [eventId, open]);
+    // seedFor is derived from props; including `seed` covers it without
+    // adding a new identity per render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventId, open, seed]);
 
   return (
     <Drawer open={open} onClose={onClose} aria-label="Meeting details">
@@ -65,7 +89,7 @@ export default function MeetingDrawer({ eventId, onClose }) {
           gap: 14,
         }}
       >
-        {loading && (
+        {loading && !meeting && (
           <p style={{ fontSize: 13, color: "var(--text-muted)", margin: 0 }}>Loading transcript…</p>
         )}
         {error && (
