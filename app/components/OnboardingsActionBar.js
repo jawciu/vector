@@ -86,7 +86,7 @@ export default function OnboardingsActionBar() {
           )}
         </div>
         <Button variant="primary" size="sm" onClick={() => setModalOpen(true)}>
-          + Add onboarding
+          + Add workspace
         </Button>
       </div>
       <CreateOnboardingModal

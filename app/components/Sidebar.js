@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
-  { href: "/", label: "Onboardings", icon: OnboardingsIcon },
+  { href: "/", label: "Workspace", icon: OnboardingsIcon },
   { href: "/ai-drafts", label: "Actions", icon: SparkleIcon },
   { href: "/settings", label: "Settings", icon: SettingsIcon },
 ];

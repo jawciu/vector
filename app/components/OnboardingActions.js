@@ -106,7 +106,7 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
 
   async function handleDelete() {
     setMenuOpen(false);
-    if (!confirm("Delete this onboarding and all its tasks? This cannot be undone.")) return;
+    if (!confirm("Delete this workspace and all its tasks? This cannot be undone.")) return;
 
     try {
       const res = await fetch(`/api/onboardings/${onboarding.id}`, {
@@ -154,7 +154,7 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
         <IconButton
           onClick={() => setMenuOpen((o) => !o)}
           isActive={menuOpen}
-          aria-label="Onboarding actions"
+          aria-label="Workspace actions"
         >
           <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
             <circle cx="8" cy="3" r="1.5" />

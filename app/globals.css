@@ -197,22 +197,6 @@ a {
   background-color: var(--surface-hover);
 }
 
-/* Company cell hover styles */
-.company-cell-link {
-  transition: background-color 0.15s ease;
-}
-
-.company-cell-link:hover {
-  background-color: var(--bg-hover);
-  cursor: pointer;
-}.company-name {
-  transition: color 0.15s ease;
-}
-
-.company-cell-link:hover .company-name {
-  color: var(--action);
-}
-
 /* Inline text buttons (e.g. Copy / Revoke / Generate) */
 .text-btn {
   background: none;

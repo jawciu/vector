@@ -158,7 +158,7 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Failed to create onboarding");
+        throw new Error(err.error || "Failed to create workspace");
       }
 
       const onboarding = await res.json();
@@ -193,7 +193,7 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
         {/* Header */}
         <div className="flex items-center justify-between">
           <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-            New onboarding
+            New workspace
           </span>
           <button
             type="button"
