@@ -17,7 +17,10 @@ model Company {
   id          Int           @id @default(autoincrement())
   name        String
   domain      String?       // Email domain (e.g. "acme.com"). Used to match Miniti meeting attendees → company.
+  prefix      String?       @unique
+  taskCounter Int           @default(0)
   onboardings Onboarding[]
+  tasks       Task[]
 }
 
 model VendorUser {
@@ -149,6 +152,12 @@ model Task {
   assigneeContact    Contact? @relation(fields: [assigneeContactId], references: [id], onDelete: SetNull)
   comments           Comment[]
   files              File[]
+  number      Int?
+  companyId   Int?
+  company     Company?   @relation(fields: [companyId], references: [id], onDelete: NoAction)
+  createdAt   DateTime   @default(now())
+
+  @@index([companyId, number])
 }
 
 model Comment {

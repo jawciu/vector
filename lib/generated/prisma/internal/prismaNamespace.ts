@@ -1645,7 +1645,9 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const CompanyScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  domain: 'domain'
+  domain: 'domain',
+  prefix: 'prefix',
+  taskCounter: 'taskCounter'
 } as const
 
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
@@ -1752,7 +1754,10 @@ export const TaskScalarFieldEnum = {
   commentCount: 'commentCount',
   previousStatus: 'previousStatus',
   blockedByTaskId: 'blockedByTaskId',
-  assigneeContactId: 'assigneeContactId'
+  assigneeContactId: 'assigneeContactId',
+  number: 'number',
+  companyId: 'companyId',
+  createdAt: 'createdAt'
 } as const
 
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
