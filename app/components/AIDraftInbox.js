@@ -483,6 +483,8 @@ function renderActionCard(draft, ctx) {
         mode={ctx.mode}
         busy={ctx.busyIds.has(draft.id)}
         error={ctx.errors[draft.id]}
+        selected={ctx.selectedIds.has(draft.id)}
+        onToggleSelect={() => ctx.onToggleSelect(draft.id)}
         onApprove={(overrides) => ctx.onApprove(draft, overrides)}
         onReject={() => ctx.onReject(draft, null)}
         vendorUsers={ctx.vendorUsers}
@@ -691,6 +693,27 @@ export function DraftCard({
   const taskTitle = lookupTaskTitle(openTasks, payload?.taskId) ?? `Task #${payload?.taskId ?? ""}`;
   const matchedTask = openTasks.find((t) => Number(t.id) === Number(payload?.taskId));
 
+  // Edit-before-approve. Local overrides start blank; when the user opens
+  // the editor each variant pre-fills from `payload`. Approve passes the
+  // overrides object through to /approve so the backend merges them.
+  const [editing, setEditing] = useState(false);
+  const [overrides, setOverrides] = useState({});
+  const editable = isEditableAction(action, payload);
+
+  function openEdit() {
+    setOverrides(initialOverridesFor(action, payload));
+    setEditing(true);
+  }
+
+  function cancelEdit() {
+    setEditing(false);
+    setOverrides({});
+  }
+
+  function patchOverrides(patch) {
+    setOverrides((prev) => ({ ...prev, ...patch }));
+  }
+
   return (
     <div
       className="draft-card"
@@ -716,7 +739,7 @@ export function DraftCard({
                 style={{ accentColor: "var(--action)" }}
               />
             )}
-            <ActionIcon action={action} />
+            <ActionIcon action={action} payload={payload} />
             <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-muted)" }}>{verb}</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
@@ -746,7 +769,17 @@ export function DraftCard({
           )}
         </div>
         <div style={{ flex: "1 1 240px", minWidth: 0 }}>
-          <DraftCardTaskPreview task={matchedTask} fallbackTitle={taskTitle} />
+          {editing ? (
+            <DraftEditPanel
+              action={action}
+              payload={payload}
+              overrides={overrides}
+              onChange={patchOverrides}
+              disabled={busy}
+            />
+          ) : (
+            <DraftCardTaskPreview task={matchedTask} fallbackTitle={taskTitle} />
+          )}
         </div>
       </div>
 
@@ -768,27 +801,259 @@ export function DraftCard({
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button
             type="button"
-            onClick={onReject}
+            onClick={editing ? cancelEdit : onReject}
             disabled={busy}
             className="text-btn"
             style={{ padding: "4px 8px", fontSize: 14, color: "var(--text)", opacity: busy ? 0.5 : 1 }}
           >
-            Dismiss
+            {editing ? "Cancel" : "Dismiss"}
           </button>
-          <button
-            type="button"
-            onClick={() => onApprove({})}
-            disabled={busy}
-            className="btn-primary text-sm rounded-lg"
-            style={{ padding: "4px 14px", fontSize: 14, fontWeight: 600, opacity: busy ? 0.5 : 1 }}
-          >
-            {busy ? "…" : "Approve"}
-          </button>
+          <div style={{ display: "flex", gap: 8 }}>
+            {editable && !editing && (
+              <button
+                type="button"
+                onClick={openEdit}
+                disabled={busy}
+                className="btn-secondary text-sm rounded-lg"
+                style={{ padding: "4px 10px", fontSize: 14, opacity: busy ? 0.5 : 1 }}
+              >
+                Edit
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                onApprove(editing ? overrides : {});
+                if (editing) setEditing(false);
+              }}
+              disabled={busy || selected}
+              aria-disabled={busy || selected}
+              aria-label={selected ? "Unselect to approve individually" : undefined}
+              title={selected ? "Unselect to approve individually" : undefined}
+              className="btn-primary text-sm rounded-lg"
+              style={{ padding: "4px 14px", fontSize: 14, fontWeight: 600, opacity: busy || selected ? 0.5 : 1 }}
+            >
+              {busy ? "…" : "Approve"}
+            </button>
+          </div>
         </div>
       )}
     </div>
   );
 }
+
+/** Whether the given draft has a known edit-before-approve form.
+ *  Defer reassign (no payload override field) and comment_only (filtered
+ *  out as retired). */
+function isEditableAction(action, payload) {
+  if (action === "update_status") return true;
+  if (action === "match_existing") {
+    const sub = payload?.action;
+    return sub === "update_due_date" || sub === "reprioritise";
+  }
+  return false;
+}
+
+/** Pre-fill the overrides object from the draft's payload so the editor
+ *  opens with the AI's suggestion as the starting point. */
+function initialOverridesFor(action, payload) {
+  if (action === "update_status") {
+    return { newStatus: payload?.newStatus ?? "Not started" };
+  }
+  if (action === "match_existing") {
+    const sub = payload?.action;
+    if (sub === "update_due_date") return { newDueDate: payload?.newDueDate ?? "" };
+    if (sub === "reprioritise") return { newPriority: payload?.newPriority ?? "medium" };
+  }
+  return {};
+}
+
+/** Inline editor for a DraftCard. Replaces the right-column preview while
+ *  the user is editing. Sub-action-aware. */
+function DraftEditPanel({ action, payload, overrides, onChange, disabled }) {
+  return (
+    <div
+      className="draft-card-preview"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+        padding: "12px 16px",
+        borderRadius: 8,
+      }}
+    >
+      {action === "update_status" && (
+        <StatusOverrideEditor
+          value={overrides.newStatus}
+          onChange={(newStatus) => onChange({ newStatus })}
+          disabled={disabled}
+        />
+      )}
+      {action === "match_existing" && payload?.action === "update_due_date" && (
+        <DueDateOverrideEditor
+          value={overrides.newDueDate}
+          onChange={(newDueDate) => onChange({ newDueDate })}
+          disabled={disabled}
+        />
+      )}
+      {action === "match_existing" && payload?.action === "reprioritise" && (
+        <PriorityOverrideEditor
+          value={overrides.newPriority}
+          onChange={(newPriority) => onChange({ newPriority })}
+          disabled={disabled}
+        />
+      )}
+    </div>
+  );
+}
+
+function StatusOverrideEditor({ value, onChange, disabled }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    function handle(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, [open]);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>New status</span>
+      <div ref={ref} className="relative" style={{ width: "100%" }}>
+        <button
+          type="button"
+          onClick={() => !disabled && setOpen((o) => !o)}
+          disabled={disabled}
+          className="field-pill flex items-center gap-2 rounded-lg"
+          data-active={open ? "true" : undefined}
+          style={{
+            width: "100%",
+            border: "1px solid var(--button-secondary-border)",
+            padding: "6px 10px",
+            minHeight: 30,
+            background: "var(--bg)",
+            color: "var(--text)",
+            fontSize: 14,
+            textAlign: "left",
+            cursor: disabled ? "not-allowed" : "pointer",
+          }}
+        >
+          <span style={{ flex: 1, textAlign: "left" }}>{value || "Pick status"}</span>
+        </button>
+        {open && (
+          <MenuList style={{ width: "100%" }}>
+            {TASK_STATUS_OPTIONS.map((s) => (
+              <MenuOption
+                key={s}
+                active={s === value}
+                onClick={() => {
+                  onChange(s);
+                  setOpen(false);
+                }}
+              >
+                {s}
+              </MenuOption>
+            ))}
+          </MenuList>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DueDateOverrideEditor({ value, onChange, disabled }) {
+  // Normalise the payload value (which may be a full ISO timestamp) down
+  // to a YYYY-MM-DD string so the native date input renders it.
+  const dateOnly = typeof value === "string" ? value.slice(0, 10) : "";
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>New due date</span>
+      <input
+        type="date"
+        value={dateOnly}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        aria-label="New due date"
+        style={{
+          width: "100%",
+          padding: "6px 10px",
+          fontSize: 14,
+          background: "var(--bg)",
+          color: "var(--text)",
+          border: "1px solid var(--button-secondary-border)",
+          borderRadius: 8,
+          outline: "none",
+          minHeight: 30,
+          fontFamily: "inherit",
+        }}
+      />
+    </div>
+  );
+}
+
+function PriorityOverrideEditor({ value, onChange, disabled }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    function handle(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, [open]);
+
+  const labelMap = { low: "Low", medium: "Medium", high: "High" };
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>New priority</span>
+      <div ref={ref} className="relative" style={{ width: "100%" }}>
+        <button
+          type="button"
+          onClick={() => !disabled && setOpen((o) => !o)}
+          disabled={disabled}
+          className="field-pill flex items-center gap-2 rounded-lg"
+          data-active={open ? "true" : undefined}
+          style={{
+            width: "100%",
+            border: "1px solid var(--button-secondary-border)",
+            padding: "6px 10px",
+            minHeight: 30,
+            background: "var(--bg)",
+            color: "var(--text)",
+            fontSize: 14,
+            textAlign: "left",
+            cursor: disabled ? "not-allowed" : "pointer",
+          }}
+        >
+          <PriorityIcon priority={value} />
+          <span style={{ flex: 1, textAlign: "left" }}>{labelMap[value] || "Pick priority"}</span>
+        </button>
+        {open && (
+          <MenuList style={{ width: "100%" }}>
+            {["low", "medium", "high"].map((p) => (
+              <MenuOption
+                key={p}
+                active={p === value}
+                onClick={() => {
+                  onChange(p);
+                  setOpen(false);
+                }}
+              >
+                {labelMap[p]}
+              </MenuOption>
+            ))}
+          </MenuList>
+        )}
+      </div>
+    </div>
+  );
+}
+
+const TASK_STATUS_OPTIONS = ["Not started", "In progress", "Under investigation", "Blocked", "Done"];
 
 /** Verb-only label for an action draft — kept short so the left column
  *  stays compact. Full payload details live on the right (task preview). */
@@ -1225,6 +1490,8 @@ export function CreateTaskCard({
   mode,
   busy,
   error,
+  selected = false,
+  onToggleSelect,
   onApprove,
   onReject,
   vendorUsers = [],
@@ -1318,10 +1585,19 @@ export function CreateTaskCard({
         gap: 24,
         padding: 24,
         borderRadius: 20,
+        outline: selected ? "2px solid var(--action)" : "none",
       }}
     >
       {cardMode === "compact" ? (
-        <CreateTaskCompact draft={draft} taskTitle={taskTitle} payload={savedPayload} isPending={isPending} />
+        <CreateTaskCompact
+          draft={draft}
+          taskTitle={taskTitle}
+          payload={savedPayload}
+          isPending={isPending}
+          selected={selected}
+          onToggleSelect={onToggleSelect}
+          busy={busy}
+        />
       ) : (
         <CreateTaskHeader draft={draft} taskTitle={taskTitle} generatedDate={generatedDate} isPending={isPending} />
       )}
@@ -1398,9 +1674,12 @@ export function CreateTaskCard({
             <button
               type="button"
               onClick={handleCreate}
-              disabled={busy || saving}
+              disabled={busy || saving || selected}
+              aria-disabled={busy || saving || selected}
+              aria-label={selected ? "Unselect to approve individually" : undefined}
+              title={selected ? "Unselect to approve individually" : undefined}
               className="btn-primary text-sm rounded-lg"
-              style={{ padding: "4px 10px", fontSize: 14, fontWeight: 600, opacity: busy ? 0.5 : 1 }}
+              style={{ padding: "4px 10px", fontSize: 14, fontWeight: 600, opacity: busy || selected ? 0.5 : 1 }}
             >
               {busy ? "…" : "Create task"}
             </button>
@@ -1447,12 +1726,22 @@ function payloadsEqual(a, b) {
 /** Two-column compact view per Figma 140:9165.
  *  Left: heading (✓ Create task) + task-name code block + meta (✨ miniti · confidence).
  *  Right: task-card-style preview, lightens on outer-card hover. */
-function CreateTaskCompact({ draft, taskTitle, payload, isPending }) {
+function CreateTaskCompact({ draft, taskTitle, payload, isPending, selected, onToggleSelect, busy }) {
   return (
     <div style={{ display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }}>
       <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <TasksBreadcrumbIcon />
+          {isPending && onToggleSelect && (
+            <input
+              type="checkbox"
+              checked={!!selected}
+              onChange={onToggleSelect}
+              disabled={busy}
+              aria-label="Select this draft"
+              style={{ accentColor: "var(--action)" }}
+            />
+          )}
+          <ActionIcon action="create_task" />
           <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-muted)" }}>Create task</span>
         </div>
         <div>
@@ -2029,33 +2318,122 @@ function describeMeta(action, payload) {
   return null;
 }
 
-function ActionIcon({ action }) {
-  const map = {
-    create_task: "+",
-    match_existing: "≡",
-    update_status: "↻",
-    draft_followup: "✉",
-  };
-  const symbol = map[action] || "•";
+/** Inline SVG action icon, 14×14, no background, `var(--icon-tertiary)`.
+ *  For `match_existing`, branches on `payload.action` so the icon matches
+ *  the sub-action. For `create_task`, uses the same "not done" circle+check
+ *  shape as the Kanban CheckboxButton so the card reads as an unfinished
+ *  task. */
+function ActionIcon({ action, payload }) {
+  let icon;
+  if (action === "create_task") {
+    icon = <NotDoneCheckIcon />;
+  } else if (action === "match_existing") {
+    const sub = payload?.action;
+    if (sub === "update_due_date") icon = <ActionCalendarIcon />;
+    else if (sub === "reassign") icon = <ActionPersonIcon />;
+    else if (sub === "reprioritise") icon = <ActionFlagIcon />;
+    else if (sub === "comment_only") icon = <ActionCommentIcon />;
+    else icon = <ActionGridIcon />;
+  } else if (action === "update_status") {
+    icon = <ActionCycleIcon />;
+  } else if (action === "draft_followup") {
+    icon = <ActionEnvelopeIcon />;
+  } else {
+    icon = <ActionGridIcon />;
+  }
   return (
     <span
       aria-hidden
       style={{
-        width: 24,
-        height: 24,
         flexShrink: 0,
-        borderRadius: 6,
-        background: "var(--bg-elevated)",
-        color: "var(--action)",
+        color: "var(--icon-tertiary)",
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: 14,
-        fontWeight: 600,
       }}
     >
-      {symbol}
+      {icon}
     </span>
+  );
+}
+
+/** Same "not done" circle+ghost-check as TaskCardView CheckboxButton.
+ *  Used by ActionIcon for `create_task` and by CreateTaskCompact as the
+ *  breadcrumb-row glyph so the create card visually reads as a task that
+ *  hasn't been created yet. */
+function NotDoneCheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden xmlns="http://www.w3.org/2000/svg">
+      <circle cx="7" cy="7" r="6.5" stroke="currentColor" />
+      <path d="M3.5 7L6.5 9.5L10.5 4.5" stroke="currentColor" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ActionCalendarIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <rect x="2" y="3" width="10" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.1" />
+      <path d="M2 6h10" stroke="currentColor" strokeWidth="1.1" />
+      <path d="M5 1.5v2M9 1.5v2" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ActionPersonIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <circle cx="7" cy="5" r="2.25" stroke="currentColor" strokeWidth="1.1" />
+      <path d="M2.5 12.25c.6-2.1 2.4-3.25 4.5-3.25s3.9 1.15 4.5 3.25" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ActionFlagIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <path d="M3.5 1.5v11" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+      <path d="M3.5 2h7l-1.5 2.25L10.5 6.5h-7" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ActionCommentIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <path d="M2 4a1.5 1.5 0 0 1 1.5-1.5h7A1.5 1.5 0 0 1 12 4v4a1.5 1.5 0 0 1-1.5 1.5H6.5L4 12V9.5h-.5A1.5 1.5 0 0 1 2 8V4Z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ActionGridIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <rect x="2" y="2" width="4" height="4" rx="0.75" stroke="currentColor" strokeWidth="1.1" />
+      <rect x="8" y="2" width="4" height="4" rx="0.75" stroke="currentColor" strokeWidth="1.1" />
+      <rect x="2" y="8" width="4" height="4" rx="0.75" stroke="currentColor" strokeWidth="1.1" />
+      <rect x="8" y="8" width="4" height="4" rx="0.75" stroke="currentColor" strokeWidth="1.1" />
+    </svg>
+  );
+}
+
+function ActionCycleIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <path d="M2.5 7a4.5 4.5 0 0 1 7.7-3.2L12 5.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 2v3.5h-3.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M11.5 7a4.5 4.5 0 0 1-7.7 3.2L2 8.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M2 12V8.5h3.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ActionEnvelopeIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <rect x="1.5" y="3" width="11" height="8" rx="1.25" stroke="currentColor" strokeWidth="1.1" />
+      <path d="M2 4l5 4 5-4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 
