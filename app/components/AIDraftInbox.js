@@ -2399,7 +2399,9 @@ function ActionIcon({ action, payload }) {
       aria-hidden
       style={{
         flexShrink: 0,
-        color: "var(--icon-tertiary)",
+        // Match the create-task breadcrumb icon (TasksBreadcrumbIcon) so all
+        // draft-card action icons read at the same colour + size.
+        color: "var(--text-secondary)",
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
