@@ -507,6 +507,8 @@ function renderActionCard(draft, ctx) {
       onApprove={(overrides) => ctx.onApprove(draft, overrides)}
       onReject={() => ctx.onReject(draft, null)}
       openTasks={ctx.openTasks}
+      vendorUsers={ctx.vendorUsers}
+      contacts={ctx.contacts}
     />
   );
 }
@@ -686,6 +688,8 @@ export function DraftCard({
   onApprove,
   onReject,
   openTasks = [],
+  vendorUsers = [],
+  contacts = [],
 }) {
   const { action, payload, confidence, source, status, rejectedReason } = draft;
   const isPending = mode === "pending";
@@ -776,6 +780,8 @@ export function DraftCard({
               overrides={overrides}
               onChange={patchOverrides}
               disabled={busy}
+              vendorUsers={vendorUsers}
+              contacts={contacts}
             />
           ) : (
             <DraftCardTaskPreview task={matchedTask} fallbackTitle={taskTitle} />
@@ -849,7 +855,7 @@ function isEditableAction(action, payload) {
   if (action === "update_status") return true;
   if (action === "match_existing") {
     const sub = payload?.action;
-    return sub === "update_due_date" || sub === "reprioritise";
+    return sub === "update_due_date" || sub === "reprioritise" || sub === "reassign";
   }
   return false;
 }
@@ -864,13 +870,19 @@ function initialOverridesFor(action, payload) {
     const sub = payload?.action;
     if (sub === "update_due_date") return { newDueDate: payload?.newDueDate ?? "" };
     if (sub === "reprioritise") return { newPriority: payload?.newPriority ?? "medium" };
+    // Vector doesn't supply a target owner for reassigns — Caroline picks one.
+    // Start with NO keys so an un-touched field is never sent: the backend
+    // only patches owner/assignee for keys actually present in overrides, so
+    // editing just the owner won't clobber an existing assignee (and vice
+    // versa). Explicitly choosing "None" sets the key to null on purpose.
+    if (sub === "reassign") return {};
   }
   return {};
 }
 
 /** Inline editor for a DraftCard. Replaces the right-column preview while
  *  the user is editing. Sub-action-aware. */
-function DraftEditPanel({ action, payload, overrides, onChange, disabled }) {
+function DraftEditPanel({ action, payload, overrides, onChange, disabled, vendorUsers = [], contacts = [] }) {
   return (
     <div
       className="draft-card-preview"
@@ -903,6 +915,61 @@ function DraftEditPanel({ action, payload, overrides, onChange, disabled }) {
           disabled={disabled}
         />
       )}
+      {action === "match_existing" && payload?.action === "reassign" && (
+        <ReassignOverrideEditor
+          ownerId={overrides.newOwnerId}
+          assigneeContactId={overrides.newAssigneeContactId}
+          onChangeOwner={(newOwnerId) => onChange({ newOwnerId })}
+          onChangeAssignee={(newAssigneeContactId) => onChange({ newAssigneeContactId })}
+          vendorUsers={vendorUsers}
+          contacts={contacts}
+          disabled={disabled}
+        />
+      )}
+    </div>
+  );
+}
+
+/** Reassign editor: pick a new owner (vendor) and/or assignee (contact).
+ *  Vector flags the reassignment but never the target, so both start unset
+ *  and are populated entirely by Caroline's selection. Reuses SelectPill. */
+function ReassignOverrideEditor({
+  ownerId,
+  assigneeContactId,
+  onChangeOwner,
+  onChangeAssignee,
+  vendorUsers,
+  contacts,
+  disabled,
+}) {
+  const ownerName = vendorUsers.find((u) => u.id === ownerId)?.name || null;
+  const assigneeName = contacts.find((c) => c.id === assigneeContactId)?.name || null;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <SelectPill
+        icon={<OwnerIcon />}
+        label="Owner"
+        valueLabel={ownerName}
+        options={[
+          { id: null, label: "None" },
+          ...vendorUsers.map((u) => ({ id: u.id, label: u.name || u.email })),
+        ]}
+        selected={ownerId}
+        onSelect={onChangeOwner}
+        disabled={disabled}
+      />
+      <SelectPill
+        icon={<AssigneeIcon />}
+        label="Assignee"
+        valueLabel={assigneeName}
+        options={[
+          { id: null, label: "None" },
+          ...contacts.map((c) => ({ id: c.id, label: c.name || c.email })),
+        ]}
+        selected={assigneeContactId}
+        onSelect={onChangeAssignee}
+        disabled={disabled}
+      />
     </div>
   );
 }

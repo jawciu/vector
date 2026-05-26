@@ -108,6 +108,22 @@ export async function POST(request, { params }) {
       } else if (merged.action === "update_due_date" && merged.newDueDate) {
         await updateTask(targetId, { due: merged.newDueDate }, { actor });
       } else if (merged.action === "reassign") {
+        // Vector flags that a reassignment was discussed but doesn't know the
+        // team's user/contact ids, so the new owner/assignee only arrive when
+        // Caroline edits the draft before approving (overrides). When present,
+        // apply the ownership change; otherwise fall back to the audit-comment
+        // behaviour so an un-edited approve still records the flag.
+        const patch = {};
+        if (merged.newOwnerId !== undefined) {
+          patch.ownerId = merged.newOwnerId === null ? null : Number(merged.newOwnerId);
+        }
+        if (merged.newAssigneeContactId !== undefined) {
+          patch.assigneeContactId =
+            merged.newAssigneeContactId === null ? null : Number(merged.newAssigneeContactId);
+        }
+        if (Object.keys(patch).length > 0) {
+          await updateTask(targetId, patch, { actor });
+        }
         await createComment(
           targetId,
           vu.name,
