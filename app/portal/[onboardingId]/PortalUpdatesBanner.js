@@ -46,13 +46,19 @@ function timeAgo(iso) {
 
 function eventPhrase(e) {
   const md = e.metadata || {};
+  // `md.taskId` is the human-readable "AC-12" string (only present on
+  // entries written post Phase 4c — older rows fall back to title-only).
+  // Note: for "uploaded" entries, md.taskId is the NUMERIC task row id
+  // (legacy field) — skip prefixing there.
+  const code = e.entityType === "task" && typeof md.taskId === "string" ? md.taskId : null;
+  const codePrefix = code ? `${code} ` : "";
   switch (e.verb) {
-    case "created": return `created "${md.title ?? "a task"}"`;
-    case "completed": return `completed "${md.title ?? "a task"}"`;
-    case "status_changed": return `moved "${md.title ?? "a task"}" → ${md.to ?? "—"}`;
-    case "commented": return `commented on "${md.taskTitle ?? "a task"}"`;
+    case "created": return `created ${codePrefix}"${md.title ?? "a task"}"`;
+    case "completed": return `completed ${codePrefix}"${md.title ?? "a task"}"`;
+    case "status_changed": return `moved ${codePrefix}"${md.title ?? "a task"}" → ${md.to ?? "—"}`;
+    case "commented": return `commented on ${codePrefix}"${md.taskTitle ?? "a task"}"`;
     case "uploaded": return `uploaded ${md.fileName ?? "a file"}${md.taskTitle ? ` to "${md.taskTitle}"` : ""}`;
-    case "assigned": return `assigned "${md.title ?? "a task"}" to ${md.assigneeName ?? "someone"}`;
+    case "assigned": return `assigned ${codePrefix}"${md.title ?? "a task"}" to ${md.assigneeName ?? "someone"}`;
     default: return e.verb;
   }
 }

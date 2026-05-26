@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Sparkle from "@/app/ui/Sparkle";
+import TaskIdChip from "@/app/ui/TaskIdChip";
 
 /**
  * "Draft follow-up with Vector" modal — opens from the task drawer.
@@ -10,13 +11,20 @@ import Sparkle from "@/app/ui/Sparkle";
  *
  * Vector NEVER auto-sends. The modal is purely a drafting helper.
  *
+ * Naming note (Phase 4c): `taskId` here is the NUMERIC DB primary key —
+ * load-bearing for the API call. The human-readable identifier (e.g.
+ * "AC-12") comes through as a separate `taskCode` prop so the header can
+ * render a TaskIdChip. We kept the existing `taskId` name to avoid churn
+ * across callers; only the new code prop is added.
+ *
  * Props:
  *   open        — whether the modal is visible
  *   onClose     — callback to close
- *   taskId      — required to call the API
+ *   taskId      — required to call the API (numeric DB id)
  *   taskTitle   — for the modal header (purely cosmetic)
+ *   taskCode    — optional human-readable taskId (e.g. "AC-12"), rendered as a chip
  */
-export default function FollowUpModal({ open, onClose, taskId, taskTitle }) {
+export default function FollowUpModal({ open, onClose, taskId, taskTitle, taskCode = null }) {
   const [tone, setTone] = useState("friendly");
   const [streaming, setStreaming] = useState(false);
   const [subject, setSubject] = useState("");
@@ -194,6 +202,7 @@ export default function FollowUpModal({ open, onClose, taskId, taskTitle }) {
               </span>
             </div>
             <h2 style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {taskCode && <TaskIdChip task={{ taskId: taskCode }} />}
               {taskTitle ?? "Follow-up"}
             </h2>
           </div>

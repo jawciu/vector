@@ -1338,6 +1338,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
         onClose={() => setFollowUpOpen(false)}
         taskId={localTask?.id}
         taskTitle={localTask?.title}
+        taskCode={localTask?.taskId ?? null}
       />
     </Drawer>
   );
