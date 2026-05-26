@@ -3,11 +3,45 @@ console.log("Seed script starting...");
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../lib/generated/prisma/client";
+import { derivePrefix } from "../lib/companies.js";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) throw new Error("DATABASE_URL is not set in .env");
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
+
+// Hardcoded company list with the prefixes derivePrefix would produce.
+// The self-check in main() catches drift if anyone renames a company without
+// updating its prefix here (or vice versa).
+const HARDCODED_COMPANIES = [
+  { name: "Acme Co",            prefix: "AC" },
+  { name: "TechCorp",           prefix: "TE" },
+  { name: "Globex Industries",  prefix: "GL" },
+  { name: "Initech",            prefix: "IN" },
+  { name: "Umbrella Corp",      prefix: "UM" },
+  { name: "Stark Enterprises",  prefix: "ST" },
+  { name: "Wayne Industries",   prefix: "WA" },
+  { name: "Cyberdyne Systems",  prefix: "CY" },
+  { name: "Soylent Corp",       prefix: "SO" },
+  { name: "Wonka Industries",   prefix: "WO" },
+];
+
+/** Helper: insert tasks for one company, assigning sequential per-company
+ *  numbers + denormalized companyId, then bump Company.taskCounter so future
+ *  createTask calls continue where we left off. */
+async function seedTasksForCompany(companyId, rows) {
+  const numbered = rows.map((row, i) => ({
+    ...row,
+    companyId,
+    number: i + 1,
+  }));
+  if (numbered.length === 0) return;
+  await prisma.task.createMany({ data: numbered });
+  await prisma.company.update({
+    where: { id: companyId },
+    data: { taskCounter: numbered.length },
+  });
+}
 
 // Dates relative to today (Feb 21, 2026)
 const D = {
@@ -43,6 +77,25 @@ async function main() {
     );
     process.exit(1);
   }
+
+  // Sanity check: hardcoded prefixes must agree with derivePrefix output.
+  // If anyone renames a company in HARDCODED_COMPANIES without updating its
+  // prefix (or adds one in a different order), this throws before any DB
+  // writes happen so we don't silently seed inconsistent data.
+  {
+    const seenPrefixes = new Set();
+    for (const c of HARDCODED_COMPANIES) {
+      const derived = derivePrefix(c.name, seenPrefixes);
+      if (derived !== c.prefix) {
+        throw new Error(
+          `Prefix drift: seed has "${c.name}" → "${c.prefix}" but derivePrefix would produce "${derived}". ` +
+            `Update HARDCODED_COMPANIES in prisma/seed.js or rename the company.`
+        );
+      }
+      seenPrefixes.add(c.prefix);
+    }
+  }
+
   await prisma.activityLog.deleteMany();
   await prisma.task.deleteMany();
   await prisma.phase.deleteMany();
@@ -65,18 +118,21 @@ async function main() {
   });
 
   // --- Companies ---
+  // Order here must match HARDCODED_COMPANIES so destructuring lines up
+  // with the prefix order verified above.
+  const prefixByName = Object.fromEntries(HARDCODED_COMPANIES.map((c) => [c.name, c.prefix]));
   const [acme, techcorp, globex, initech, umbrella, stark, wayne, cyberdyne, soylent, wonka] =
     await Promise.all([
-      prisma.company.create({ data: { name: "Acme Co" } }),
-      prisma.company.create({ data: { name: "TechCorp" } }),
-      prisma.company.create({ data: { name: "Globex Industries" } }),
-      prisma.company.create({ data: { name: "Initech" } }),
-      prisma.company.create({ data: { name: "Umbrella Corp" } }),
-      prisma.company.create({ data: { name: "Stark Enterprises" } }),
-      prisma.company.create({ data: { name: "Wayne Industries" } }),
-      prisma.company.create({ data: { name: "Cyberdyne Systems" } }),
-      prisma.company.create({ data: { name: "Soylent Corp" } }),
-      prisma.company.create({ data: { name: "Wonka Industries" } }),
+      prisma.company.create({ data: { name: "Acme Co",            prefix: prefixByName["Acme Co"] } }),
+      prisma.company.create({ data: { name: "TechCorp",           prefix: prefixByName["TechCorp"] } }),
+      prisma.company.create({ data: { name: "Globex Industries",  prefix: prefixByName["Globex Industries"] } }),
+      prisma.company.create({ data: { name: "Initech",            prefix: prefixByName["Initech"] } }),
+      prisma.company.create({ data: { name: "Umbrella Corp",      prefix: prefixByName["Umbrella Corp"] } }),
+      prisma.company.create({ data: { name: "Stark Enterprises",  prefix: prefixByName["Stark Enterprises"] } }),
+      prisma.company.create({ data: { name: "Wayne Industries",   prefix: prefixByName["Wayne Industries"] } }),
+      prisma.company.create({ data: { name: "Cyberdyne Systems",  prefix: prefixByName["Cyberdyne Systems"] } }),
+      prisma.company.create({ data: { name: "Soylent Corp",       prefix: prefixByName["Soylent Corp"] } }),
+      prisma.company.create({ data: { name: "Wonka Industries",   prefix: prefixByName["Wonka Industries"] } }),
     ]);
 
   // --- Onboardings ---
@@ -104,7 +160,7 @@ async function main() {
 
   // ── Acme Co (Active, at-risk) ──────────────────────────────────────────────
   const [a0, a1, a2, a3] = await createPhases(ob1.id);
-  await prisma.task.createMany({ data: [
+  await seedTasksForCompany(acme.id, [
     // Discovery
     { onboardingId: ob1.id, phaseId: a0.id, title: "Kickoff call with stakeholders",      status: "Done",                 due: D.overdue2w,  owner: "Lena Marsh",  priority: "high",   notes: "Covered scope, timeline and key contacts.", commentCount: 3 },
     { onboardingId: ob1.id, phaseId: a0.id, title: "Document current workflow",            status: "Done",                 due: D.overdue1w,  owner: "Jordan Cole", priority: "medium", notes: "",            commentCount: 1 },
@@ -124,11 +180,11 @@ async function main() {
     { onboardingId: ob1.id, phaseId: a3.id, title: "Production cutover",                  status: "Not started",          due: D.in3w,       owner: "Lena Marsh",  priority: "high",   notes: "",            commentCount: 0 },
     { onboardingId: ob1.id, phaseId: a3.id, title: "Notify users of go-live",             status: "Not started",          due: D.in3w,       owner: "Dana Fox",    priority: "low",    notes: "",            commentCount: 0 },
     { onboardingId: ob1.id, phaseId: a3.id, title: "Hypercare support window",            status: "Not started",          due: D.in1m,       owner: "Iris Blanc",  priority: "medium", notes: "",            commentCount: 0 },
-  ]});
+  ]);
 
   // ── TechCorp (Completed — all Done) ───────────────────────────────────────
   const [t0, t1, t2, t3] = await createPhases(ob2.id);
-  await prisma.task.createMany({ data: [
+  await seedTasksForCompany(techcorp.id, [
     { onboardingId: ob2.id, phaseId: t0.id, title: "Requirements workshop",               status: "Done", due: D.overdue3w,  owner: "Jordan Cole", priority: "high",   notes: "3 sessions completed.", commentCount: 2 },
     { onboardingId: ob2.id, phaseId: t0.id, title: "Security review",                    status: "Done", due: D.overdue2w,  owner: "Riku Sato",   priority: "high",   notes: "",                     commentCount: 1 },
     { onboardingId: ob2.id, phaseId: t1.id, title: "API key generation",                 status: "Done", due: D.overdue2w,  owner: "Jordan Cole", priority: "medium", notes: "",                     commentCount: 0 },
@@ -138,11 +194,11 @@ async function main() {
     { onboardingId: ob2.id, phaseId: t2.id, title: "Performance benchmarks",             status: "Done", due: D.overdue3d,  owner: "Jordan Cole", priority: "low",    notes: "",                     commentCount: 0 },
     { onboardingId: ob2.id, phaseId: t3.id, title: "Production migration",               status: "Done", due: D.overdue1w,  owner: "Riku Sato",   priority: "high",   notes: "",                     commentCount: 2 },
     { onboardingId: ob2.id, phaseId: t3.id, title: "Handoff to CS team",                 status: "Done", due: D.overdue3d,  owner: "Jordan Cole", priority: "medium", notes: "",                     commentCount: 0 },
-  ]});
+  ]);
 
   // ── Globex Industries (Active, on track) ──────────────────────────────────
   const [g0, g1, g2, g3] = await createPhases(ob3.id);
-  await prisma.task.createMany({ data: [
+  await seedTasksForCompany(globex.id, [
     { onboardingId: ob3.id, phaseId: g0.id, title: "Stakeholder alignment session",      status: "Done",           due: D.overdue1w,  owner: "Priya Nair",  priority: "high",   notes: "",                      commentCount: 1 },
     { onboardingId: ob3.id, phaseId: g0.id, title: "Define success metrics",             status: "Done",           due: D.overdue3d,  owner: "Sam Torres",  priority: "medium", notes: "",                      commentCount: 0 },
     { onboardingId: ob3.id, phaseId: g0.id, title: "Agree project timeline",             status: "In progress",    due: D.today,      owner: "Priya Nair",  priority: "high",   notes: "Waiting for sign-off.",  commentCount: 2 },
@@ -154,11 +210,11 @@ async function main() {
     { onboardingId: ob3.id, phaseId: g2.id, title: "End-to-end regression test",         status: "Not started",    due: D.in3w,       owner: "Priya Nair",  priority: "high",   notes: "",                      commentCount: 0 },
     { onboardingId: ob3.id, phaseId: g3.id, title: "Cutover plan review",                status: "Not started",    due: D.in3w,       owner: "Sam Torres",  priority: "medium", notes: "",                      commentCount: 0 },
     { onboardingId: ob3.id, phaseId: g3.id, title: "Go-live announcement",               status: "Not started",    due: D.in1m,       owner: "Priya Nair",  priority: "low",    notes: "",                      commentCount: 0 },
-  ]});
+  ]);
 
   // ── Initech (Active, blocked) ─────────────────────────────────────────────
   const [i0, i1, i2, i3] = await createPhases(ob4.id);
-  await prisma.task.createMany({ data: [
+  await seedTasksForCompany(initech.id, [
     { onboardingId: ob4.id, phaseId: i0.id, title: "Initial discovery call",             status: "Done",                 due: D.overdue2w,  owner: "Tom Okafor",  priority: "medium", notes: "",                            commentCount: 0 },
     { onboardingId: ob4.id, phaseId: i0.id, title: "Data privacy impact assessment",     status: "Blocked",              due: D.overdue3d,  owner: "Tom Okafor",  priority: "high",   notes: "DPA needs executive sign-off.", commentCount: 3 },
     { onboardingId: ob4.id, phaseId: i0.id, title: "Executive sponsor confirmation",     status: "Under investigation",  due: D.today,      owner: "Dana Fox",    priority: "high",   notes: "Escalated to account director.", commentCount: 2 },
@@ -168,11 +224,11 @@ async function main() {
     { onboardingId: ob4.id, phaseId: i2.id, title: "Extract historical records",         status: "Not started",          due: D.in2w,       owner: "Dana Fox",    priority: "medium", notes: "",                            commentCount: 0 },
     { onboardingId: ob4.id, phaseId: i2.id, title: "Validation with finance team",       status: "Not started",          due: D.in3w,       owner: "Tom Okafor",  priority: "low",    notes: "",                            commentCount: 0 },
     { onboardingId: ob4.id, phaseId: i3.id, title: "Cutover sign-off",                   status: "Not started",          due: D.in1m,       owner: "Dana Fox",    priority: "high",   notes: "",                            commentCount: 0 },
-  ]});
+  ]);
 
   // ── Umbrella Corp (Paused) ────────────────────────────────────────────────
   const [u0, u1, u2, u3] = await createPhases(ob5.id);
-  await prisma.task.createMany({ data: [
+  await seedTasksForCompany(umbrella.id, [
     { onboardingId: ob5.id, phaseId: u0.id, title: "Project kickoff",                    status: "Done",        due: D.overdue3w,  owner: "Dana Fox",    priority: "medium", notes: "",                    commentCount: 1 },
     { onboardingId: ob5.id, phaseId: u0.id, title: "Scope documentation",               status: "Done",        due: D.overdue2w,  owner: "Sam Torres",  priority: "low",    notes: "",                    commentCount: 0 },
     { onboardingId: ob5.id, phaseId: u0.id, title: "Budget approval",                   status: "In progress", due: D.overdue1w,  owner: "Dana Fox",    priority: "high",   notes: "On hold pending budget freeze.", commentCount: 3 },
@@ -180,11 +236,11 @@ async function main() {
     { onboardingId: ob5.id, phaseId: u1.id, title: "Security questionnaire",             status: "Not started", due: D.in2w,       owner: "Dana Fox",    priority: "high",  notes: "",                    commentCount: 0 },
     { onboardingId: ob5.id, phaseId: u2.id, title: "Data classification review",         status: "Not started", due: D.in3w,       owner: "Sam Torres",  priority: "medium", notes: "",                    commentCount: 0 },
     { onboardingId: ob5.id, phaseId: u3.id, title: "Pilot group selection",              status: "Not started", due: D.in1m,       owner: "Dana Fox",    priority: "low",    notes: "",                    commentCount: 0 },
-  ]});
+  ]);
 
   // ── Stark Enterprises (Completed) ─────────────────────────────────────────
   const [s0, s1, s2, s3] = await createPhases(ob6.id);
-  await prisma.task.createMany({ data: [
+  await seedTasksForCompany(stark.id, [
     { onboardingId: ob6.id, phaseId: s0.id, title: "Executive kickoff",                  status: "Done", due: D.overdue3w,  owner: "Riku Sato",   priority: "high",   notes: "Tony attended personally.", commentCount: 4 },
     { onboardingId: ob6.id, phaseId: s0.id, title: "Technical requirements doc",         status: "Done", due: D.overdue2w,  owner: "Iris Blanc",  priority: "high",   notes: "",                         commentCount: 1 },
     { onboardingId: ob6.id, phaseId: s1.id, title: "Arc reactor API integration",        status: "Done", due: D.overdue2w,  owner: "Riku Sato",   priority: "high",   notes: "Custom endpoint required.", commentCount: 2 },
@@ -195,11 +251,11 @@ async function main() {
     { onboardingId: ob6.id, phaseId: s3.id, title: "Production deploy",                  status: "Done", due: D.overdue1w,  owner: "Iris Blanc",  priority: "high",   notes: "Zero-downtime deploy.",     commentCount: 3 },
     { onboardingId: ob6.id, phaseId: s3.id, title: "Hypercare monitoring",               status: "Done", due: D.overdue3d,  owner: "Riku Sato",   priority: "medium", notes: "",                         commentCount: 1 },
     { onboardingId: ob6.id, phaseId: s3.id, title: "CS handoff & close-out",             status: "Done", due: D.overdue1w,  owner: "Iris Blanc",  priority: "low",    notes: "",                         commentCount: 0 },
-  ]});
+  ]);
 
   // ── Wayne Industries (Active, mixed) ──────────────────────────────────────
   const [w0, w1, w2, w3] = await createPhases(ob7.id);
-  await prisma.task.createMany({ data: [
+  await seedTasksForCompany(wayne.id, [
     { onboardingId: ob7.id, phaseId: w0.id, title: "Discovery workshop",                 status: "Done",                 due: D.overdue1w,  owner: "Iris Blanc",  priority: "high",   notes: "",                         commentCount: 2 },
     { onboardingId: ob7.id, phaseId: w0.id, title: "Identify admin users",               status: "Done",                 due: D.overdue3d,  owner: "Lena Marsh",  priority: "low",    notes: "",                         commentCount: 0 },
     { onboardingId: ob7.id, phaseId: w0.id, title: "Data residency requirements",        status: "In progress",          due: D.yesterday,  owner: "Iris Blanc",  priority: "high",   notes: "EU GDPR compliance check.", commentCount: 1 },
@@ -212,11 +268,11 @@ async function main() {
     { onboardingId: ob7.id, phaseId: w2.id, title: "UAT with 5 pilot users",             status: "Not started",          due: D.in2w,       owner: "Lena Marsh",  priority: "high",   notes: "",                         commentCount: 0 },
     { onboardingId: ob7.id, phaseId: w3.id, title: "Cutover weekend planning",           status: "Not started",          due: D.in3w,       owner: "Iris Blanc",  priority: "high",   notes: "",                         commentCount: 0 },
     { onboardingId: ob7.id, phaseId: w3.id, title: "Comms to all staff",                 status: "Not started",          due: D.in3w,       owner: "Lena Marsh",  priority: "low",    notes: "",                         commentCount: 0 },
-  ]});
+  ]);
 
   // ── Cyberdyne (Active, early stage) ───────────────────────────────────────
   const [c0, c1, c2, c3] = await createPhases(ob8.id);
-  await prisma.task.createMany({ data: [
+  await seedTasksForCompany(cyberdyne.id, [
     { onboardingId: ob8.id, phaseId: c0.id, title: "Technical discovery",                status: "Done",                 due: D.overdue3d,  owner: "Lena Marsh",  priority: "medium", notes: "",                           commentCount: 1 },
     { onboardingId: ob8.id, phaseId: c0.id, title: "Map existing automations",           status: "In progress",          due: D.today,      owner: "Sam Torres",  priority: "high",   notes: "Mapping 12 automation flows.", commentCount: 2 },
     { onboardingId: ob8.id, phaseId: c0.id, title: "Agree integration priority list",    status: "Not started",          due: D.in3d,       owner: "Lena Marsh",  priority: "high",   notes: "",                           commentCount: 0 },
@@ -228,22 +284,22 @@ async function main() {
     { onboardingId: ob8.id, phaseId: c2.id, title: "Regression suite run",               status: "Not started",          due: D.in2w,       owner: "Lena Marsh",  priority: "medium", notes: "",                           commentCount: 0 },
     { onboardingId: ob8.id, phaseId: c3.id, title: "Phased rollout plan",                status: "Not started",          due: D.in3w,       owner: "Sam Torres",  priority: "medium", notes: "",                           commentCount: 0 },
     { onboardingId: ob8.id, phaseId: c3.id, title: "Rollback procedure documented",      status: "Not started",          due: D.in3w,       owner: "Lena Marsh",  priority: "medium", notes: "",                           commentCount: 0 },
-  ]});
+  ]);
 
   // ── Soylent Corp (Paused) ─────────────────────────────────────────────────
   const [so0, so1, so2, so3] = await createPhases(ob9.id);
-  await prisma.task.createMany({ data: [
+  await seedTasksForCompany(soylent.id, [
     { onboardingId: ob9.id, phaseId: so0.id, title: "Kickoff meeting",                   status: "Done",        due: D.overdue2w,  owner: "Sam Torres",  priority: "medium", notes: "",                       commentCount: 0 },
     { onboardingId: ob9.id, phaseId: so0.id, title: "Legal & compliance review",         status: "In progress", due: D.overdue1w,  owner: "Dana Fox",    priority: "high",   notes: "Stalled on NDA review.", commentCount: 2 },
     { onboardingId: ob9.id, phaseId: so0.id, title: "Data residency check",              status: "Not started", due: D.in1w,       owner: "Sam Torres",  priority: "high",   notes: "",                       commentCount: 0 },
     { onboardingId: ob9.id, phaseId: so1.id, title: "IT readiness assessment",           status: "Not started", due: D.in2w,       owner: "Dana Fox",    priority: "medium", notes: "",                       commentCount: 0 },
     { onboardingId: ob9.id, phaseId: so2.id, title: "Pilot scope definition",            status: "Not started", due: D.in3w,       owner: "Sam Torres",  priority: "medium", notes: "",                       commentCount: 0 },
     { onboardingId: ob9.id, phaseId: so3.id, title: "Full rollout planning",             status: "Not started", due: D.in1m,       owner: "Dana Fox",    priority: "low",    notes: "",                       commentCount: 0 },
-  ]});
+  ]);
 
   // ── Wonka Industries (Completed) ──────────────────────────────────────────
   const [wo0, wo1, wo2, wo3] = await createPhases(ob10.id);
-  await prisma.task.createMany({ data: [
+  await seedTasksForCompany(wonka.id, [
     { onboardingId: ob10.id, phaseId: wo0.id, title: "Chocolate factory tour / kickoff", status: "Done", due: D.overdue3w,  owner: "Jordan Cole", priority: "medium", notes: "Surprisingly productive.", commentCount: 5 },
     { onboardingId: ob10.id, phaseId: wo0.id, title: "Define custom branding assets",   status: "Done", due: D.overdue2w,  owner: "Jordan Cole", priority: "low",    notes: "",                        commentCount: 1 },
     { onboardingId: ob10.id, phaseId: wo1.id, title: "Apply brand theme",               status: "Done", due: D.overdue2w,  owner: "Jordan Cole", priority: "medium", notes: "",                        commentCount: 0 },
@@ -252,7 +308,7 @@ async function main() {
     { onboardingId: ob10.id, phaseId: wo2.id, title: "Admin onboarding call",           status: "Done", due: D.overdue3d,  owner: "Jordan Cole", priority: "medium", notes: "",                        commentCount: 0 },
     { onboardingId: ob10.id, phaseId: wo3.id, title: "Go-live & golden ticket launch",  status: "Done", due: D.overdue1w,  owner: "Jordan Cole", priority: "high",   notes: "Client very happy.",       commentCount: 3 },
     { onboardingId: ob10.id, phaseId: wo3.id, title: "Post-launch retrospective",       status: "Done", due: D.overdue3d,  owner: "Jordan Cole", priority: "low",    notes: "",                        commentCount: 0 },
-  ]});
+  ]);
 
   // Recent completion activity — gives the portfolio insights "wins" section
   // real events to anchor on (last 7 days). Backdated createdAt so the same
