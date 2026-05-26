@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { CalendarIcon, PriorityIcon, DependenciesIcon } from "../ui/Icons";
+import TaskIdChip from "../ui/TaskIdChip";
 import { AVATAR_IMAGES, avatarColor, avatarInitials } from "@/lib/avatar";
 import { STATUS_COLORS } from "@/lib/constants";
 
@@ -157,6 +158,7 @@ export default function TaskCardView({
             transition: "color 0.25s ease",
           }}
         >
+          <TaskIdChip task={task} />
           {task.title}
         </span>
       </div>
@@ -205,6 +207,7 @@ export default function TaskCardView({
         <div className="flex items-center gap-1.5">
           <DependenciesIcon style={{ flexShrink: 0 }} />
           <span className="text-sm truncate" style={{ color: "var(--text-secondary)" }}>
+            <TaskIdChip task={task.blockedByTask} />
             {task.blockedByTask.title}
           </span>
         </div>

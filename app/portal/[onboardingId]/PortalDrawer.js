@@ -5,6 +5,7 @@ import Button from "@/app/ui/Button";
 import IconButton from "@/app/ui/IconButton";
 import { CalendarIcon, StatusIcon, OwnerIcon, PriorityIcon } from "@/app/ui/Icons";
 import FieldRow from "@/app/ui/FieldRow";
+import TaskIdChip from "@/app/ui/TaskIdChip";
 import { STATUS_COLORS, TASK_STATUSES } from "@/lib/constants";
 import { MenuList, MenuOption } from "@/app/components/Menu";
 
@@ -345,6 +346,7 @@ const PortalDrawer = forwardRef(function PortalDrawer({
             lineHeight: 1.3,
           }}
         >
+          <TaskIdChip task={localTask} />
           {localTask.title}
         </h2>
       </div>

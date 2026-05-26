@@ -14,6 +14,7 @@ import {
 import { MenuList, MenuOption } from "./Menu";
 import CalendarDropdown from "@/app/ui/CalendarDropdown";
 import Sparkle from "@/app/ui/Sparkle";
+import TaskIdChip from "@/app/ui/TaskIdChip";
 import MeetingDrawer from "./MeetingDrawer";
 
 /**
@@ -718,7 +719,8 @@ export function DraftCard({
             <ActionIcon action={action} />
             <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-muted)" }}>{verb}</span>
           </div>
-          <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+            {matchedTask && <TaskIdChip task={matchedTask} />}
             <span className="task-ref" style={{ fontSize: 14, padding: "4px 10px", borderRadius: 6 }}>
               {taskTitle}
             </span>
@@ -830,7 +832,10 @@ function DraftCardTaskPreview({ task, fallbackTitle }) {
         borderRadius: 8,
       }}
     >
-      <div style={{ fontSize: 14, lineHeight: 1.4 }}>{task?.title ?? fallbackTitle}</div>
+      <div style={{ fontSize: 14, lineHeight: 1.4 }}>
+        {task && <TaskIdChip task={task} />}
+        {task?.title ?? fallbackTitle}
+      </div>
       {dueLabel && (
         <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
           <CalendarIcon />

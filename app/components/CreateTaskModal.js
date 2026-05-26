@@ -6,6 +6,7 @@ import FieldPill from "../ui/FieldPill";
 import FieldRow from "../ui/FieldRow";
 import CalendarDropdown from "../ui/CalendarDropdown";
 import { CalendarIcon, PriorityIcon, StatusIcon, OwnerIcon, AssigneeIcon, MembersIcon, DependenciesIcon } from "../ui/Icons";
+import TaskIdChip from "../ui/TaskIdChip";
 import { MenuList, MenuOption } from "./Menu";
 import { TASK_STATUSES, PRIORITIES, STATUS_COLORS } from "@/lib/constants";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
@@ -666,14 +667,18 @@ export default function CreateTaskModal({
               active={dependenciesOpen}
               onClick={() => toggleDropdown("dependencies", dependenciesOpen, setDependenciesOpen)}
             >
-              {formData.blockedByTaskId ? (
-                <div className="flex items-center justify-between flex-1">
-                  <span className="text-sm truncate" style={{ color: "var(--text)" }}>
-                    {allTasks.find((t) => t.id === formData.blockedByTaskId)?.title || "Task"}
-                  </span>
-                  <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("blockedByTaskId", null); }} />
-                </div>
-              ) : (
+              {formData.blockedByTaskId ? (() => {
+                const dep = allTasks.find((t) => t.id === formData.blockedByTaskId);
+                return (
+                  <div className="flex items-center justify-between flex-1">
+                    <span className="text-sm truncate" style={{ color: "var(--text)" }}>
+                      {dep && <TaskIdChip task={dep} />}
+                      {dep?.title || "Task"}
+                    </span>
+                    <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("blockedByTaskId", null); }} />
+                  </div>
+                );
+              })() : (
                 <span className="text-sm" style={{ color: dependenciesOpen ? "var(--text)" : "var(--text-muted)" }}>Dependencies</span>
               )}
             </FieldPill>
@@ -691,6 +696,7 @@ export default function CreateTaskModal({
                         setDependenciesOpen(false);
                       }}
                     >
+                      <TaskIdChip task={t} />
                       {t.title}
                     </MenuOption>
                   ))

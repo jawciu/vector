@@ -8,6 +8,7 @@ import FieldPill from "@/app/ui/FieldPill";
 import FieldRow from "@/app/ui/FieldRow";
 import CalendarDropdown from "@/app/ui/CalendarDropdown";
 import Drawer from "@/app/ui/Drawer";
+import TaskIdChip from "@/app/ui/TaskIdChip";
 import { FollowupSparkleIcon } from "./AIDraftInbox";
 import {
   CalendarIcon,
@@ -719,6 +720,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
               lineHeight: 1.3,
             }}
           >
+            <TaskIdChip task={localTask} />
             {localTask.title}
           </h2>
         )}
@@ -1114,14 +1116,18 @@ const TaskDrawer = forwardRef(function TaskDrawer({
               onClick={() => toggleDropdown(depsOpen, setDepsOpen)}
             >
               <span className="text-sm" style={{ color: "var(--text-muted)" }}>Dependencies</span>
-              {localTask.blockedByTaskId && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm" style={{ color: "var(--text)" }}>
-                    {allTasks.find((t) => t.id === localTask.blockedByTaskId)?.title || "Task"}
-                  </span>
-                  {(depsHovered || depsOpen) && <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ blockedByTaskId: null }); setDepsOpen(false); }} />}
-                </div>
-              )}
+              {localTask.blockedByTaskId && (() => {
+                const dep = allTasks.find((t) => t.id === localTask.blockedByTaskId);
+                return (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm" style={{ color: "var(--text)" }}>
+                      {dep && <TaskIdChip task={dep} />}
+                      {dep?.title || "Task"}
+                    </span>
+                    {(depsHovered || depsOpen) && <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ blockedByTaskId: null }); setDepsOpen(false); }} />}
+                  </div>
+                );
+              })()}
             </FieldRow>
             {depsOpen && (
               <MenuList style={{ width: "max-content", minWidth: "100%", maxWidth: 360, maxHeight: 160, overflowY: "auto" }}>
@@ -1139,7 +1145,10 @@ const TaskDrawer = forwardRef(function TaskDrawer({
                           setDepsOpen(false);
                         }}
                       >
-                        <span>{t.title}</span>
+                        <span>
+                          <TaskIdChip task={t} />
+                          {t.title}
+                        </span>
                       </MenuOption>
                     ))
                 )}

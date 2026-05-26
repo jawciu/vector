@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CalendarIcon, PriorityIcon } from "@/app/ui/Icons";
+import TaskIdChip from "@/app/ui/TaskIdChip";
 import { STATUS_COLORS } from "@/lib/constants";
 
 function parseLocalDate(dateStr) {
@@ -152,6 +153,7 @@ export default function PortalTaskCard({ task, onTaskUpdated, onCardClick, onSes
             transition: "color 0.25s ease",
           }}
         >
+          <TaskIdChip task={task} />
           {task.title}
         </span>
       </div>

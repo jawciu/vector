@@ -794,6 +794,21 @@ a {
   background: var(--bg-elevated-hover);
 }
 
+/* Task ID chip — small muted prefix shown before a task title across
+   every task display site (kanban card, drawer header, blocked-by row,
+   AI draft references, portal task card, etc.). Source of the string is
+   `task.taskId` (composed in lib/db.js from company.prefix + task.number).
+   Inline-only: no background, no border, monospace, slightly smaller and
+   muted vs. the title it sits beside. Used by `app/ui/TaskIdChip.js`. */
+.task-id {
+  font-family: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-right: 6px;
+  white-space: nowrap;
+}
+
 /* Inline code-style chip for AI prose. The model wraps task title
    references in backticks; <InlineProse> splits and renders them as
    monospace pills with a subtle bg, similar to inline code in markdown. */
