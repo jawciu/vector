@@ -736,8 +736,10 @@ export function DraftCard({
             {isPending && (
               <SelectCheckbox selected={selected} onToggle={onToggleSelect} disabled={busy} />
             )}
-            <ActionIcon action={action} payload={payload} />
-            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-muted)" }}>{verb}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <ActionIcon action={action} payload={payload} />
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-muted)" }}>{verb}</span>
+            </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
             {matchedTask && <TaskIdChip task={matchedTask} />}
@@ -1794,8 +1796,10 @@ function CreateTaskCompact({ draft, taskTitle, payload, isPending, selected, onT
           {isPending && onToggleSelect && (
             <SelectCheckbox selected={!!selected} onToggle={onToggleSelect} disabled={busy} />
           )}
-          <TasksBreadcrumbIcon />
-          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-muted)" }}>Create task</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <TasksBreadcrumbIcon />
+            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-muted)" }}>Create task</span>
+          </div>
         </div>
         <div>
           <span className="task-ref" style={{ fontSize: 14, padding: "4px 10px", borderRadius: 6 }}>
