@@ -732,7 +732,7 @@ export function DraftCard({
     >
       <div style={{ display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }}>
         <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {isPending && (
               <SelectCheckbox selected={selected} onToggle={onToggleSelect} disabled={busy} />
             )}
@@ -1792,7 +1792,7 @@ function CreateTaskCompact({ draft, taskTitle, payload, isPending, selected, onT
   return (
     <div style={{ display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }}>
       <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {isPending && onToggleSelect && (
             <SelectCheckbox selected={!!selected} onToggle={onToggleSelect} disabled={busy} />
           )}
