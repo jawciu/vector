@@ -187,7 +187,7 @@ export type CompanyGroupByOutputType = {
   id: number
   name: string
   domain: string | null
-  prefix: string | null
+  prefix: string
   taskCounter: number
   _count: CompanyCountAggregateOutputType | null
   _avg: CompanyAvgAggregateOutputType | null
@@ -218,7 +218,7 @@ export type CompanyWhereInput = {
   id?: Prisma.IntFilter<"Company"> | number
   name?: Prisma.StringFilter<"Company"> | string
   domain?: Prisma.StringNullableFilter<"Company"> | string | null
-  prefix?: Prisma.StringNullableFilter<"Company"> | string | null
+  prefix?: Prisma.StringFilter<"Company"> | string
   taskCounter?: Prisma.IntFilter<"Company"> | number
   onboardings?: Prisma.OnboardingListRelationFilter
   tasks?: Prisma.TaskListRelationFilter
@@ -228,7 +228,7 @@ export type CompanyOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   domain?: Prisma.SortOrderInput | Prisma.SortOrder
-  prefix?: Prisma.SortOrderInput | Prisma.SortOrder
+  prefix?: Prisma.SortOrder
   taskCounter?: Prisma.SortOrder
   onboardings?: Prisma.OnboardingOrderByRelationAggregateInput
   tasks?: Prisma.TaskOrderByRelationAggregateInput
@@ -251,7 +251,7 @@ export type CompanyOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   domain?: Prisma.SortOrderInput | Prisma.SortOrder
-  prefix?: Prisma.SortOrderInput | Prisma.SortOrder
+  prefix?: Prisma.SortOrder
   taskCounter?: Prisma.SortOrder
   _count?: Prisma.CompanyCountOrderByAggregateInput
   _avg?: Prisma.CompanyAvgOrderByAggregateInput
@@ -267,14 +267,14 @@ export type CompanyScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Company"> | number
   name?: Prisma.StringWithAggregatesFilter<"Company"> | string
   domain?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
-  prefix?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
+  prefix?: Prisma.StringWithAggregatesFilter<"Company"> | string
   taskCounter?: Prisma.IntWithAggregatesFilter<"Company"> | number
 }
 
 export type CompanyCreateInput = {
   name: string
   domain?: string | null
-  prefix?: string | null
+  prefix: string
   taskCounter?: number
   onboardings?: Prisma.OnboardingCreateNestedManyWithoutCompanyInput
   tasks?: Prisma.TaskCreateNestedManyWithoutCompanyInput
@@ -284,7 +284,7 @@ export type CompanyUncheckedCreateInput = {
   id?: number
   name: string
   domain?: string | null
-  prefix?: string | null
+  prefix: string
   taskCounter?: number
   onboardings?: Prisma.OnboardingUncheckedCreateNestedManyWithoutCompanyInput
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCompanyInput
@@ -293,7 +293,7 @@ export type CompanyUncheckedCreateInput = {
 export type CompanyUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  prefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
   onboardings?: Prisma.OnboardingUpdateManyWithoutCompanyNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutCompanyNestedInput
@@ -303,7 +303,7 @@ export type CompanyUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  prefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
   onboardings?: Prisma.OnboardingUncheckedUpdateManyWithoutCompanyNestedInput
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutCompanyNestedInput
@@ -313,14 +313,14 @@ export type CompanyCreateManyInput = {
   id?: number
   name: string
   domain?: string | null
-  prefix?: string | null
+  prefix: string
   taskCounter?: number
 }
 
 export type CompanyUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  prefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -328,7 +328,7 @@ export type CompanyUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  prefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -371,11 +371,6 @@ export type CompanyScalarRelationFilter = {
   isNot?: Prisma.CompanyWhereInput
 }
 
-export type CompanyNullableScalarRelationFilter = {
-  is?: Prisma.CompanyWhereInput | null
-  isNot?: Prisma.CompanyWhereInput | null
-}
-
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -412,12 +407,10 @@ export type CompanyCreateNestedOneWithoutTasksInput = {
   connect?: Prisma.CompanyWhereUniqueInput
 }
 
-export type CompanyUpdateOneWithoutTasksNestedInput = {
+export type CompanyUpdateOneRequiredWithoutTasksNestedInput = {
   create?: Prisma.XOR<Prisma.CompanyCreateWithoutTasksInput, Prisma.CompanyUncheckedCreateWithoutTasksInput>
   connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutTasksInput
   upsert?: Prisma.CompanyUpsertWithoutTasksInput
-  disconnect?: Prisma.CompanyWhereInput | boolean
-  delete?: Prisma.CompanyWhereInput | boolean
   connect?: Prisma.CompanyWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutTasksInput, Prisma.CompanyUpdateWithoutTasksInput>, Prisma.CompanyUncheckedUpdateWithoutTasksInput>
 }
@@ -425,7 +418,7 @@ export type CompanyUpdateOneWithoutTasksNestedInput = {
 export type CompanyCreateWithoutOnboardingsInput = {
   name: string
   domain?: string | null
-  prefix?: string | null
+  prefix: string
   taskCounter?: number
   tasks?: Prisma.TaskCreateNestedManyWithoutCompanyInput
 }
@@ -434,7 +427,7 @@ export type CompanyUncheckedCreateWithoutOnboardingsInput = {
   id?: number
   name: string
   domain?: string | null
-  prefix?: string | null
+  prefix: string
   taskCounter?: number
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCompanyInput
 }
@@ -458,7 +451,7 @@ export type CompanyUpdateToOneWithWhereWithoutOnboardingsInput = {
 export type CompanyUpdateWithoutOnboardingsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  prefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
   tasks?: Prisma.TaskUpdateManyWithoutCompanyNestedInput
 }
@@ -467,7 +460,7 @@ export type CompanyUncheckedUpdateWithoutOnboardingsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  prefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutCompanyNestedInput
 }
@@ -475,7 +468,7 @@ export type CompanyUncheckedUpdateWithoutOnboardingsInput = {
 export type CompanyCreateWithoutTasksInput = {
   name: string
   domain?: string | null
-  prefix?: string | null
+  prefix: string
   taskCounter?: number
   onboardings?: Prisma.OnboardingCreateNestedManyWithoutCompanyInput
 }
@@ -484,7 +477,7 @@ export type CompanyUncheckedCreateWithoutTasksInput = {
   id?: number
   name: string
   domain?: string | null
-  prefix?: string | null
+  prefix: string
   taskCounter?: number
   onboardings?: Prisma.OnboardingUncheckedCreateNestedManyWithoutCompanyInput
 }
@@ -508,7 +501,7 @@ export type CompanyUpdateToOneWithWhereWithoutTasksInput = {
 export type CompanyUpdateWithoutTasksInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  prefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
   onboardings?: Prisma.OnboardingUpdateManyWithoutCompanyNestedInput
 }
@@ -517,7 +510,7 @@ export type CompanyUncheckedUpdateWithoutTasksInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  prefix?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
   onboardings?: Prisma.OnboardingUncheckedUpdateManyWithoutCompanyNestedInput
 }
@@ -616,7 +609,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id: number
     name: string
     domain: string | null
-    prefix: string | null
+    prefix: string
     taskCounter: number
   }, ExtArgs["result"]["company"]>
   composites: {}

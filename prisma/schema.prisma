@@ -17,7 +17,7 @@ model Company {
   id          Int           @id @default(autoincrement())
   name        String
   domain      String?       // Email domain (e.g. "acme.com"). Used to match Miniti meeting attendees → company.
-  prefix      String?       @unique
+  prefix      String        @unique
   taskCounter Int           @default(0)
   onboardings Onboarding[]
   tasks       Task[]
@@ -152,12 +152,17 @@ model Task {
   assigneeContact    Contact? @relation(fields: [assigneeContactId], references: [id], onDelete: SetNull)
   comments           Comment[]
   files              File[]
-  number      Int?
-  companyId   Int?
-  company     Company?   @relation(fields: [companyId], references: [id], onDelete: NoAction)
+  number      Int
+  companyId   Int
+  company     Company    @relation(fields: [companyId], references: [id], onDelete: NoAction)
   createdAt   DateTime   @default(now())
 
-  @@index([companyId, number])
+  // Note: a CHECK constraint enforces Company.prefix ~ '^[A-Z][A-Z0-9]{1,4}$',
+  // a CHECK constraint enforces Task.number > 0, and a Postgres trigger
+  // (task_company_consistency) enforces Task.companyId = Onboarding.companyId.
+  // These cannot be expressed in Prisma — see migration
+  // 20260526164238_tighten_task_id_constraints.
+  @@unique([companyId, number])
 }
 
 model Comment {
