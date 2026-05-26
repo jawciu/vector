@@ -2282,7 +2282,7 @@ function StatusPillTrigger() {
 /** Tasks (checkmark-square) icon — for the "Create task" breadcrumb. */
 function TasksBreadcrumbIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "var(--text-secondary)", flexShrink: 0 }}>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "var(--text-muted)", flexShrink: 0 }}>
       <g clipPath="url(#cta-tasks-clip)">
         <path
           fillRule="evenodd"
@@ -2403,9 +2403,9 @@ function ActionIcon({ action, payload }) {
       aria-hidden
       style={{
         flexShrink: 0,
-        // Match the create-task breadcrumb icon (TasksBreadcrumbIcon) so all
-        // draft-card action icons read at the same colour + size.
-        color: "var(--text-secondary)",
+        // Match the card-type title (the verb span uses --text-muted) so the
+        // icon and its label read as one unit.
+        color: "var(--text-muted)",
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
