@@ -734,14 +734,7 @@ export function DraftCard({
         <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {isPending && (
-              <input
-                type="checkbox"
-                checked={selected}
-                onChange={onToggleSelect}
-                disabled={busy}
-                aria-label="Select this draft"
-                style={{ accentColor: "var(--action)" }}
-              />
+              <SelectCheckbox selected={selected} onToggle={onToggleSelect} disabled={busy} />
             )}
             <ActionIcon action={action} payload={payload} />
             <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-muted)" }}>{verb}</span>
@@ -1799,16 +1792,9 @@ function CreateTaskCompact({ draft, taskTitle, payload, isPending, selected, onT
       <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {isPending && onToggleSelect && (
-            <input
-              type="checkbox"
-              checked={!!selected}
-              onChange={onToggleSelect}
-              disabled={busy}
-              aria-label="Select this draft"
-              style={{ accentColor: "var(--action)" }}
-            />
+            <SelectCheckbox selected={!!selected} onToggle={onToggleSelect} disabled={busy} />
           )}
-          <ActionIcon action="create_task" />
+          <TasksBreadcrumbIcon />
           <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-muted)" }}>Create task</span>
         </div>
         <div>
@@ -2424,10 +2410,45 @@ function ActionIcon({ action, payload }) {
   );
 }
 
+/** Bulk-selection toggle, styled like the Kanban board's done-checkbox:
+ *  an empty circle when unselected, a filled green circle-check when
+ *  selected. Replaces the plain HTML checkbox so the inbox's selection
+ *  affordance matches the rest of the app. */
+function SelectCheckbox({ selected, onToggle, disabled }) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={selected}
+      aria-label={selected ? "Unselect this draft" : "Select this draft"}
+      onClick={onToggle}
+      disabled={disabled}
+      className="flex-shrink-0"
+      style={{
+        background: "none",
+        border: "none",
+        padding: 0,
+        cursor: disabled ? "default" : "pointer",
+        display: "flex",
+        color: "var(--icon-tertiary)",
+      }}
+    >
+      {selected ? (
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M7 0C10.866 0 14 3.13401 14 7C14 10.866 10.866 14 7 14C3.13401 14 0 10.866 0 7C0 3.13401 3.13401 0 7 0ZM10.8125 4.10938C10.5969 3.93687 10.2819 3.97187 10.1094 4.1875L6.42773 8.78906L3.82031 6.61621C3.60827 6.43951 3.29304 6.46781 3.11621 6.67969C2.93951 6.89173 2.96781 7.20696 3.17969 7.38379L6.17969 9.88379L6.57129 10.2109L6.89062 9.8125L10.8906 4.8125C11.0631 4.59687 11.0281 4.28188 10.8125 4.10938Z"
+            fill="var(--success)"
+          />
+        </svg>
+      ) : (
+        <NotDoneCheckIcon />
+      )}
+    </button>
+  );
+}
+
 /** Same "not done" circle+ghost-check as TaskCardView CheckboxButton.
- *  Used by ActionIcon for `create_task` and by CreateTaskCompact as the
- *  breadcrumb-row glyph so the create card visually reads as a task that
- *  hasn't been created yet. */
+ *  Used by SelectCheckbox for the unselected state. */
 function NotDoneCheckIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden xmlns="http://www.w3.org/2000/svg">
