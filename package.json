@@ -12,7 +12,10 @@
     "lint:ds": "design.md lint DESIGN.md",
     "build:ds": "node scripts/build-theme.mjs",
     "seed": "npx tsx prisma/seed.js",
-    "seed:activity": "npx tsx prisma/seed-recent-activity.js"
+    "seed:activity": "npx tsx prisma/seed-recent-activity.js",
+    "seed:ai-fixtures": "npx tsx prisma/seed-ai-test-fixtures.js",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.91.1",
@@ -31,6 +34,7 @@
   },
   "devDependencies": {
     "@google/design.md": "^0.1.1",
+    "@playwright/test": "^1.60.0",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@tailwindcss/postcss": "^4.1.18",
