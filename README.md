@@ -17,14 +17,17 @@ _Designed and built solo by Caroline Jaworsky: product, data model, AI orchestra
 
 ## A look inside
 
+AI Insights
 
-| Review queue |
 <img width="1642" height="892" alt="insights" src="https://github.com/user-attachments/assets/c5ac06f5-a2d4-48c1-a678-d8641b3d935b" />
 
-| AI Insights | 
+
+Review queue
+
 <img width="1645" height="848" alt="ai-drafts" src="https://github.com/user-attachments/assets/50527f42-7efc-4dc7-9eef-7208e02e73ea" />
 
-| Kanban board |
+Kanban board
+
 <img width="1642" height="805" alt="board" src="https://github.com/user-attachments/assets/4404affd-a90b-40a6-8407-303a324b411c" />
 
 ## Why it exists
