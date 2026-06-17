@@ -21,9 +21,8 @@ _Designed and built solo by Caroline Jaworsky: product, data model, AI orchestra
 |---|---|---|
 | ![Onboarding Kanban board](docs/board.png) | ![Streaming AI insights](docs/insights.png) | ![AI draft review queue](docs/ai-drafts.png) |
 
-> _Replace the images in `docs/` with real captures. See [Adding screenshots](#adding-screenshots)._
+<img width="1645" height="848" alt="ai-drafts" src="https://github.com/user-attachments/assets/50527f42-7efc-4dc7-9eef-7208e02e73ea" />
 
----
 
 ## Why it exists
 
