@@ -157,3 +157,11 @@ proxy.js                  # Next.js middleware entry point (Supabase session)
 - Run `npm run dev` (uses `next dev --webpack`).
 - Run `npm run build` (uses `next build --webpack`).
 - Lint with `npx eslint`.
+
+## Testing
+
+- **Unit tests: Vitest** — `npm test` (one-shot) or `npm run test:watch`. Config in `vitest.config.mjs`.
+  - Unit tests are `*.test.js` colocated with the code (e.g. `lib/health.test.js`); config excludes `e2e/` so Vitest never picks up Playwright specs.
+  - Tests that depend on "today" must freeze the clock with `vi.useFakeTimers()` + `vi.setSystemTime()`.
+  - Good targets: pure logic in `lib/` (health scoring, AI match heuristics). Don't unit-test `lib/db.js` Prisma calls — e2e covers those.
+- **E2e tests: Playwright** — `npm run test:e2e`, specs are `e2e/*.spec.js`.
