@@ -10,11 +10,16 @@
  *   npx tsx prisma/seed-ai-test-fixtures.js          # clean old fixtures, then seed fresh
  *   npx tsx prisma/seed-ai-test-fixtures.js --clean  # remove fixtures + fixture-created tasks only
  *
- * Targets the Acme Co onboarding (prefix AC). Resolved by prefix, not a
- * hardcoded id, so it survives a reseed.
+ * Target resolution is dynamic: the first Active onboarding (lowest id) that
+ * has at least one phase and one task. The resolved target is written to
+ * e2e/.auth/target.json so the Playwright specs assert against the same
+ * company. Override with E2E_TARGET_PREFIX=XX to pin a specific company.
+ * Dynamic so archiving an onboarding (e.g. the original Acme corpus) retargets
+ * the tests automatically instead of breaking them.
  */
 
 import "dotenv/config";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../lib/generated/prisma/client";
 
@@ -34,24 +39,43 @@ export const TITLES = {
 };
 
 async function resolveTarget() {
-  const company = await prisma.company.findFirst({
-    where: { prefix: "AC" },
-    include: { onboardings: { include: { phases: { orderBy: { sortOrder: "asc" } } }, take: 1 } },
+  const pinnedPrefix = process.env.E2E_TARGET_PREFIX;
+  const onboarding = await prisma.onboarding.findFirst({
+    where: {
+      status: "Active",
+      phases: { some: {} },
+      tasks: { some: {} },
+      ...(pinnedPrefix ? { company: { prefix: pinnedPrefix } } : {}),
+    },
+    orderBy: { id: "asc" },
+    include: { company: true, phases: { orderBy: { sortOrder: "asc" }, take: 1 } },
   });
-  if (!company) throw new Error("Acme Co (prefix AC) not found — run `npm run seed` first.");
-  const onboarding = company.onboardings[0];
-  if (!onboarding) throw new Error("Acme Co has no onboarding.");
-  const phase = onboarding.phases[0];
-  if (!phase) throw new Error("Acme onboarding has no phases.");
-  return { companyId: company.id, onboardingId: onboarding.id, phaseId: phase.id };
+  if (!onboarding) {
+    throw new Error(
+      pinnedPrefix
+        ? `No Active onboarding with phases + tasks for prefix ${pinnedPrefix}.`
+        : "No Active onboarding with phases + tasks found — run `npm run seed` first."
+    );
+  }
+  const target = {
+    companyId: onboarding.companyId,
+    prefix: onboarding.company.prefix,
+    onboardingId: onboarding.id,
+    phaseId: onboarding.phases[0].id,
+  };
+  mkdirSync("e2e/.auth", { recursive: true });
+  writeFileSync("e2e/.auth/target.json", JSON.stringify(target, null, 2));
+  return target;
 }
 
-async function clean(onboardingId) {
+async function clean() {
   // Delete fixture drafts (tagged via sourceUrl).
   const delDrafts = await prisma.pendingAIChange.deleteMany({ where: { sourceUrl: FIXTURE_TAG } });
-  // Delete any tasks an approve test created (tagged via MARKER title prefix).
+  // Delete any tasks an approve test created (tagged via MARKER title prefix) —
+  // across ALL onboardings, so leftovers on a previously-targeted onboarding
+  // still get removed after a retarget.
   const delTasks = await prisma.task.deleteMany({
-    where: { onboardingId, title: { startsWith: MARKER } },
+    where: { title: { startsWith: MARKER } },
   });
   return { drafts: delDrafts.count, tasks: delTasks.count };
 }
@@ -80,7 +104,7 @@ async function main() {
   const mode = process.argv.includes("--clean") ? "clean" : "seed";
   const { onboardingId, phaseId } = await resolveTarget();
 
-  const cleaned = await clean(onboardingId);
+  const cleaned = await clean();
 
   if (mode === "clean") {
     console.log(JSON.stringify({ mode, onboardingId, cleaned }, null, 2));

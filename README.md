@@ -3,7 +3,7 @@
 **An AI-native onboarding platform for B2B SaaS.** Vector helps vendors cut time-to-value
 and stop first-90-day churn. It's a shared vendor/customer workspace with an AI layer that
 does the tedious work: drafting follow-ups, turning meeting transcripts into tasks, and
-surfacing risk before an onboarding goes dark.
+surfacing risk before an onboarding goes sideways.
 
 🔗 **[vector.quest](https://vector.quest)** · built with Next.js 16, Prisma, Supabase, and the Anthropic Claude API.
 

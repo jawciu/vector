@@ -1,13 +1,14 @@
 import { test, expect } from "@playwright/test";
+import { loadTarget } from "./target.js";
 
 /**
  * AI draft inbox — edit-before-approve + bulk select/reject.
  *
- * Runs against tagged fixtures seeded onto the Acme Co onboarding (id 11) by
- * prisma/seed-ai-test-fixtures.js. All fixtures are create_task drafts, so
- * they render as CreateTaskCards in the "Actions" column.
+ * Runs against tagged fixtures seeded by prisma/seed-ai-test-fixtures.js onto
+ * the onboarding it resolved (see e2e/target.js). All fixtures are create_task
+ * drafts, so they render as CreateTaskCards in the "Actions" column.
  */
-const ONBOARDING_ID = 11;
+const { onboardingId: ONBOARDING_ID, prefix: PREFIX } = loadTarget();
 const ACTIONS_URL = `/onboardings/${ONBOARDING_ID}?tab=actions`;
 
 const T = {
@@ -55,7 +56,7 @@ test.describe("AI draft inbox", () => {
     await page.goto(`/onboardings/${ONBOARDING_ID}?tab=tasks`);
     const createdCard = page.locator("[data-task-card]", { hasText: T.edited });
     await expect(createdCard).toBeVisible();
-    await expect(createdCard.locator(".task-id").first()).toHaveText(/^AC-\d+$/);
+    await expect(createdCard.locator(".task-id").first()).toHaveText(new RegExp(`^${PREFIX}-\\d+$`));
   });
 
   test("bulk select + reject removes exactly the selected drafts", async ({ page }) => {

@@ -144,6 +144,8 @@ proxy.js                  # Next.js middleware entry point (Supabase session)
 | File | Purpose |
 |------|---------|
 | `AI_PLAN.md` | **AI features implementation plan — current state + architecture + open work.** Read this first when picking up AI work. |
+| `REALISM_PLAN.md` | Plan for growing demo data into a real-looking book of business (real companies + logos, lifecycle mix, meetings through the real pipeline). Planned 2026-07-09, not yet executed. |
+| `EVALS_PLAN.md` | Plan for AI evals — golden dataset + deterministic replay, LLM-as-judge, EvalRun table + /admin/ai Evals tab (in-app, no external tool; Opik kept as escape hatch), GitHub Actions autonomous runs. Planned 2026-07-09, not yet executed. |
 | `DESIGN.md` | **Design system source of truth** — tokens, components, do's and don'ts |
 | `PLAN.md` | Product vision, feature phases, tech stack, build priority |
 | `DECISIONS.md` | All major decisions with rationale |
@@ -166,3 +168,4 @@ proxy.js                  # Next.js middleware entry point (Supabase session)
   - Good targets: pure logic in `lib/` (health scoring, AI match heuristics). Don't unit-test `lib/db.js` Prisma calls — e2e covers those.
   - Modules that import `@/lib/db` or the AI client must mock them (`vi.mock`) so tests run without a DB or API key — see `lib/integrations/miniti.test.js`. The `@/` alias is mirrored in `vitest.config.mjs`.
 - **E2e tests: Playwright** — `npm run test:e2e`, specs are `e2e/*.spec.js`.
+- **CI**: `.github/workflows/unit-tests.yml` runs `npm test` on every push to main and every PR. Unit tests only — e2e is not in CI (needs live DB + server).

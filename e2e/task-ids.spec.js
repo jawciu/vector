@@ -1,12 +1,12 @@
 import { test, expect } from "@playwright/test";
+import { loadTarget } from "./target.js";
 
 /**
  * Task ID integrity + "chips render everywhere".
  *
- * Acme Co onboarding (id 11, prefix AC) — resolved by the fixture seed,
- * which prints `onboardingId` if it ever drifts.
+ * Runs against the onboarding resolved by the fixture seed (see e2e/target.js).
  */
-const ONBOARDING_ID = 11;
+const { onboardingId: ONBOARDING_ID, prefix: PREFIX } = loadTarget();
 const ID_RE = /^[A-Z][A-Z0-9]{1,4}-\d+$/;
 
 test.describe("Task ID chips", () => {
@@ -26,7 +26,7 @@ test.describe("Task ID chips", () => {
       await expect(chip).toBeVisible();
       const text = (await chip.innerText()).trim();
       expect(text, `card ${i} chip "${text}" should match ${ID_RE}`).toMatch(ID_RE);
-      expect(text.startsWith("AC-"), `card ${i} should be an AC- id`).toBeTruthy();
+      expect(text.startsWith(`${PREFIX}-`), `card ${i} should be a ${PREFIX}- id`).toBeTruthy();
       ids.push(text);
     }
 
