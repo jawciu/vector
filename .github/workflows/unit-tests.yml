@@ -1,0 +1,26 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Vitest unit tests only — no database, Supabase, or API keys needed.
+      # Playwright e2e tests are NOT run here (they need a live DB + dev server).
+      - name: Run unit tests
+        run: npm test
