@@ -55,9 +55,10 @@ function SortableColumn({ id, children }) {
     opacity: isDragging ? 0.4 : 1,
     // Fixed width, not just a minimum: without maxWidth a long task title makes
     // the column (and its cards) stretch, so columns end up different widths.
-    width: 240,
-    minWidth: 240,
-    maxWidth: 240,
+    // 264 content + 24px marginRight = 288px total footprint per column.
+    width: 264,
+    minWidth: 264,
+    maxWidth: 264,
     flexShrink: 0,
     display: "flex",
     flexDirection: "column",
@@ -632,7 +633,7 @@ export default function OnboardingDetailClient({
                   style={{
                     display: "flex",
                     gap: 0,
-                    minWidth: phases.length * 264,
+                    minWidth: phases.length * 288,
                     padding: "12px 16px",
                     alignItems: "stretch",
                     height: "100%",
@@ -766,7 +767,7 @@ export default function OnboardingDetailClient({
                   {activePhase ? (
                     <div
                       style={{
-                        minWidth: 240,
+                        minWidth: 264,
                         background: "var(--bg)",
                         borderRadius: 8,
                         padding: "8px 0",
