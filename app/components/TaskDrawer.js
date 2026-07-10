@@ -624,7 +624,24 @@ const TaskDrawer = forwardRef(function TaskDrawer({
     }
   }
 
-  if (!localTask) return null;
+  // Keep the Drawer shell mounted even before a task is selected, so the
+  // panel already exists offscreen at translateX(100%). Without this, the
+  // very first card click mounts the panel already carrying
+  // `.task-drawer--open`, so it appears instead of sliding in (there is no
+  // prior closed frame to transition from). Every later open worked because
+  // the panel stays mounted once localTask is set. See globals.css .task-drawer.
+  if (!localTask) {
+    return (
+      <Drawer
+        ref={ref}
+        open={false}
+        onClose={onClose}
+        width={520}
+        topOffset={44}
+        useClickOutside={false}
+      />
+    );
+  }
 
   const isDone = localTask.status === "Done";
   const statusColor = STATUS_COLORS[localTask.status] || "var(--text-muted)";

@@ -135,7 +135,7 @@ model Task {
   phase           Phase   @relation(fields: [phaseId], references: [id], onDelete: Cascade)
   title           String
   description     String  @default("")
-  status          String  // Not started | In progress | Under investigation | Blocked | Done
+  status          String  // Not started | In progress | Under investigation | On hold | Blocked | Done
   due             String  // e.g. "2026-03-01"
   owner           String  @default("")
   ownerId         Int?

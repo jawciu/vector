@@ -16,6 +16,7 @@ import CalendarDropdown from "@/app/ui/CalendarDropdown";
 import Sparkle from "@/app/ui/Sparkle";
 import TaskIdChip from "@/app/ui/TaskIdChip";
 import MeetingDrawer from "./MeetingDrawer";
+import { TASK_STATUSES } from "@/lib/constants";
 
 /**
  * "Vector suggests" inbox — list of PendingAIChange rows.
@@ -1115,7 +1116,7 @@ function PriorityOverrideEditor({ value, onChange, disabled }) {
   );
 }
 
-const TASK_STATUS_OPTIONS = ["Not started", "In progress", "Under investigation", "Blocked", "Done"];
+const TASK_STATUS_OPTIONS = TASK_STATUSES;
 
 /** Verb-only label for an action draft — kept short so the left column
  *  stays compact. Full payload details live on the right (task preview). */
