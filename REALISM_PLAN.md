@@ -45,9 +45,30 @@ vector.quest is a job-application link, so visitors get in without credentials:
 - Residual risk accepted: demo visitors can trigger Claude calls (e.g. "Regenerate"
   on insights), which spends Anthropic budget. Revisit if it ever bites.
 
-Remaining (Step 5): inject the 18 meeting fixtures through the real webhook, then run
-`scripts/backdate-meetings.js --write`. Both scripts are built and dry-run verified;
-injection needs a running dev server + `ANTHROPIC_API_KEY` (≈$1 of API spend).
+## Step 5 — DONE (2026-07-10). Meetings injected through the real pipeline.
+
+All 18 fixtures POSTed to the live webhook: 14 matched by attendee domain, 4 ambiguous
+(2 by design; the other 2 are ChowNow's, ambiguous because **ChowNow has two
+onboardings** and the heuristic correctly refuses to guess which). The orchestrator
+produced **64 drafts**; `backdate-meetings.js --write` resolved them to 42 applied /
+11 rejected / 11 pending (**79% accept rate** — real data for the evals plan's
+calibration chart). Total cost **$1.04** across 40 Claude calls.
+
+Two follow-on effects, both handled:
+- The 36 approved `create_task` drafts added open work and tipped almost every
+  onboarding over the behind-pace rule. `backdate-meetings.js` now also completes
+  ~70% of tasks born from meetings older than 21 days and replans the stragglers
+  whose transcript due dates are in the past. Loop Returns and Sylvera go-live dates
+  were extended to match. Back to **7 On track / 3 At risk**.
+- **The nightly reset is disabled.** Deleting seeded onboardings cascade-deletes
+  every `PendingAIChange` and nulls `ExternalEvent.onboardingId`, so it would wipe
+  the AI content and strand the meetings. Reset is now manual (`workflow_dispatch`).
+  **Next task:** make `reset-demo-data.js` restore meetings + drafts from a snapshot
+  (deterministic, no API cost) instead of reseeding from scratch, then re-enable the
+  schedule. Until then a visitor's edits persist.
+
+Also fixed: `playwright.config.js` pins the dev server to port 3001 (`next dev` takes
+the first free port, so the suite only passed while another app held 3000).
 
 ## Prod safety — code and data travel separately
 
