@@ -37,13 +37,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # prisma.config.ts resolves DIRECT_DATABASE_URL eagerly and throws if it is
+      # missing, so both names are mapped to the one secret that exists. Nothing
+      # connects through DIRECT here (generate is offline; the seed uses the
+      # pooler via DATABASE_URL), so pointing them at the same URL is safe.
       - name: Generate Prisma client
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: npx prisma generate
 
       - name: Reset and reseed demo portfolio
-        # Only DATABASE_URL: the seed talks to the pooler through the Prisma
-        # adapter. Passing an unset DIRECT_DATABASE_URL would hand prisma.config.ts
-        # an empty string, which its `??` fallback does not catch.
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: npx tsx prisma/reset-demo-data.js --write
