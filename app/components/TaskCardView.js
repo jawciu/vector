@@ -224,20 +224,24 @@ export default function TaskCardView({
       {/* Row 5: Notes + comments + priority + owner */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {task.notes && task.notes.trim() && (
-            <div className="flex items-center gap-1">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-secondary)" }}>
-                <g clipPath="url(#tcv-notes-clip)">
-                  <path d="M3.45675 3.89835H8.94754M3.45675 7.26357H10.6029M3.45675 10.494H7.72288M11.8948 2.83855L9.9266 0.85352C9.8046 0.731724 9.6598 0.635161 9.50047 0.56935C9.34114 0.503539 9.1704 0.46977 8.99801 0.469972H2.43732C2.26179 0.474361 2.09493 0.547188 1.97235 0.672907C1.84978 0.798626 1.7812 0.967278 1.78125 1.14286V12.9521C1.7812 13.1277 1.84978 13.2963 1.97235 13.4221C2.09493 13.5478 2.26179 13.6206 2.43732 13.625H11.6223C11.8007 13.625 11.9719 13.5541 12.0981 13.4279C12.2243 13.3017 12.2952 13.1306 12.2952 12.9521V3.76714C12.2932 3.59357 12.2568 3.42212 12.188 3.26273C12.1193 3.10333 12.0196 2.95915 11.8948 2.83855Z" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" />
-                </g>
-                <defs>
-                  <clipPath id="tcv-notes-clip">
-                    <rect width="14" height="14" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-            </div>
-          )}
+          {/* Notes and comments always render, showing 0 when empty, so every
+              card has the same meta row. `notes` is a single text field, so its
+              count is 0 or 1. */}
+          <div className="flex items-center gap-1">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-secondary)" }}>
+              <g clipPath="url(#tcv-notes-clip)">
+                <path d="M3.45675 3.89835H8.94754M3.45675 7.26357H10.6029M3.45675 10.494H7.72288M11.8948 2.83855L9.9266 0.85352C9.8046 0.731724 9.6598 0.635161 9.50047 0.56935C9.34114 0.503539 9.1704 0.46977 8.99801 0.469972H2.43732C2.26179 0.474361 2.09493 0.547188 1.97235 0.672907C1.84978 0.798626 1.7812 0.967278 1.78125 1.14286V12.9521C1.7812 13.1277 1.84978 13.2963 1.97235 13.4221C2.09493 13.5478 2.26179 13.6206 2.43732 13.625H11.6223C11.8007 13.625 11.9719 13.5541 12.0981 13.4279C12.2243 13.3017 12.2952 13.1306 12.2952 12.9521V3.76714C12.2932 3.59357 12.2568 3.42212 12.188 3.26273C12.1193 3.10333 12.0196 2.95915 11.8948 2.83855Z" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" />
+              </g>
+              <defs>
+                <clipPath id="tcv-notes-clip">
+                  <rect width="14" height="14" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+            <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
+              {task.notes && task.notes.trim() ? 1 : 0}
+            </span>
+          </div>
           {task.files && task.files.length > 0 && (
             <div className="flex items-center gap-1">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-secondary)" }}>
@@ -249,9 +253,8 @@ export default function TaskCardView({
               </span>
             </div>
           )}
-          {task.commentCount > 0 && (
-            <div className="flex items-center gap-1">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-secondary)" }}>
+          <div className="flex items-center gap-1">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text-secondary)" }}>
                 <g clipPath="url(#tcv-comment-clip)">
                   <path d="M1.83778 1.24799C1.88502 1.24523 1.93284 1.24385 1.98125 1.24385H10.5418C11.2073 1.24385 11.8455 1.50821 12.316 1.97876C12.7866 2.44931 13.0509 3.08752 13.0509 3.75298V9.36163C13.0509 9.41004 13.0496 9.45806 13.0468 9.50569C13.3195 9.3324 13.544 9.09307 13.6996 8.80986C13.8551 8.52666 13.9366 8.20877 13.9365 7.88567V3.75298C13.9365 3.30718 13.8487 2.86575 13.6781 2.45389C13.5075 2.04202 13.2575 1.66779 12.9422 1.35256C12.627 1.03734 12.2528 0.787283 11.8409 0.616683C11.429 0.446083 10.9876 0.358276 10.5418 0.358276H3.45721C3.13421 0.358284 2.81644 0.439831 2.53335 0.59536C2.25026 0.750889 2.01101 0.975366 1.83778 1.24799ZM2.8314 13.5652C2.93767 13.6183 3.04984 13.6419 3.16202 13.6419H3.16792C3.32142 13.6419 3.47492 13.5947 3.6048 13.4943L6.58034 11.2804H10.5418C11.5986 11.2804 12.4606 10.4184 12.4606 9.36163V3.75298C12.4606 2.6962 11.5986 1.83424 10.5418 1.83424H1.98125C0.924461 1.83424 0.0625 2.6962 0.0625 3.75298V9.36163C0.0625 10.4184 0.924461 11.2804 1.98125 11.2804H2.42404V12.9039C2.42404 13.1873 2.57754 13.4412 2.8314 13.5652ZM0.948076 3.75298C0.948076 3.18622 1.41448 2.71981 1.98125 2.71981H10.5418C11.1086 2.71981 11.575 3.18622 11.575 3.75298V9.36163C11.575 9.9284 11.1086 10.3948 10.5418 10.3948H6.28515L3.30961 12.6087V10.3948H1.98125C1.41448 10.3948 0.948076 9.9284 0.948076 9.36163V3.75298Z" fill="currentColor" />
                 </g>
@@ -260,12 +263,11 @@ export default function TaskCardView({
                     <rect width="14" height="14" fill="white" />
                   </clipPath>
                 </defs>
-              </svg>
-              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                {task.commentCount}
-              </span>
-            </div>
-          )}
+            </svg>
+            <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
+              {task.commentCount || 0}
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-1.5">
