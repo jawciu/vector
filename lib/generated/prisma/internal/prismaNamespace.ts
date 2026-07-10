@@ -1646,6 +1646,7 @@ export const CompanyScalarFieldEnum = {
   id: 'id',
   name: 'name',
   domain: 'domain',
+  logoUrl: 'logoUrl',
   prefix: 'prefix',
   taskCounter: 'taskCounter'
 } as const

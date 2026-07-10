@@ -4,7 +4,22 @@ Living plan for evaluating the AI features (Miniti draft orchestrator, follow-up
 drafts, Insights). Companion plan: [REALISM_PLAN.md](REALISM_PLAN.md) — its meetings
 and resolution history are this plan's raw data.
 
-**Status: PLANNED — nothing executed yet.**
+**Status (2026-07-10): BUILT, NOT YET RUN.** All artifacts exist on branch `evals`
+(worktree `../onboarding-evals`), uncommitted. The `EvalRun` migration is **written but
+deliberately unapplied** — verified absent from the shared DB, along with
+`PendingAIChange.overrides`.
+
+Done: `EvalRun` model + hand-written migration SQL; `overrides` column + approve-route
+persistence; `lib/db.js` helpers (`createEvalRun`, `listEvalRuns`,
+`getDraftResolutionStats`); `evals/scoring.js` + 33 unit tests (96 tests green);
+`evals/run-golden.js` (with a startup sweep for rows stranded by a cancelled CI run);
+the `/admin/ai` **Evals tab**; `.github/workflows/evals.yml`; and all **30 golden
+cases** (cast v2, 26 matched + 4 ambiguous, ids unique, every `sourceQuoteContains`
+verified literally present in its transcript).
+
+Remaining: **Caroline reviews the 30 golden labels** (the human-in-the-loop step that
+makes the dataset ground truth), then merge → apply the migration → first `run-golden`
+execution. Layer 2 (judge suite) not started.
 
 ---
 

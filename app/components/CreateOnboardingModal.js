@@ -7,7 +7,7 @@ import CalendarDropdown from "../ui/CalendarDropdown";
 import { CalendarIcon, OwnerIcon, MembersIcon } from "../ui/Icons";
 import { MenuList, MenuOption } from "./Menu";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
-import { avatarColor, avatarInitials } from "@/lib/avatar";
+import CompanyAvatar from "@/app/ui/CompanyAvatar";
 
 function CloseIcon({ size = 12 }) {
   return (
@@ -244,13 +244,13 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
               >
                 {selectedCompany ? (
                   <div className="flex items-center gap-1.5 flex-1">
-                    <span
-                      className="flex shrink-0 w-4 h-4 rounded-[3px] items-center justify-center text-[8px] font-semibold"
-                      style={{ background: avatarColor(selectedCompany.name), color: "var(--text-dark)" }}
-                      aria-hidden
-                    >
-                      {avatarInitials(selectedCompany.name)}
-                    </span>
+                    <CompanyAvatar
+                      name={selectedCompany.name}
+                      logoUrl={selectedCompany.logoUrl}
+                      size={16}
+                      radius={3}
+                      fontSize={8}
+                    />
                     <span className="text-sm" style={{ color: "var(--text)" }}>
                       {selectedCompany.name}
                     </span>
@@ -294,13 +294,13 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
                         }}
                       >
                         <div className="flex items-center gap-1.5">
-                          <span
-                            className="flex shrink-0 w-[18px] h-[18px] rounded-[3px] items-center justify-center text-[8px] font-semibold"
-                            style={{ background: avatarColor(c.name), color: "var(--text-dark)" }}
-                            aria-hidden
-                          >
-                            {avatarInitials(c.name)}
-                          </span>
+                          <CompanyAvatar
+                            name={c.name}
+                            logoUrl={c.logoUrl}
+                            size={18}
+                            radius={3}
+                            fontSize={8}
+                          />
                           {c.name}
                         </div>
                       </MenuOption>

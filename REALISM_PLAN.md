@@ -3,22 +3,47 @@
 Living plan for growing the demo data into a believable, living book of business.
 Companion plan: [EVALS_PLAN.md](EVALS_PLAN.md) (this plan feeds it — more meetings = more eval data).
 
-**Status: PLANNED — nothing executed yet. No data has been changed.**
+**Status (2026-07-10): BUILT, NOT YET RUN.** All artifacts exist on branch `realism`,
+uncommitted. **Zero database writes have happened** — the seed and backdate scripts are
+dry-run by default and have only ever been run in that mode. The only schema change
+applied to the shared DB is the additive `Company.logoUrl` column (invisible to
+deployed code).
+
+Done: `logoUrl` migration + `CompanyAvatar` logo support + 4 call sites; 12 logos in
+`/public/logos/`; `prisma/seed-portfolio-growth.js` (dry-run verified: 12 companies,
+14 onboardings, 322 tasks, 16 overdue = 10.6% of open, 34 contacts, 67 comments, 204
+activity rows); 18 meeting fixtures; `scripts/inject-meetings.js` +
+`scripts/backdate-meetings.js`. E2e fixture retarget done. Unit tests 63/63 green.
+
+Remaining: Steps 0 (archive stale onboardings), then run the seed with `--write`,
+inject meetings, backdate. **Order matters — merge + push the code first** (see
+"Prod safety" below), then run the data scripts.
+
+## Prod safety — code and data travel separately
+
+The deployed app and local dev share one Supabase database. Code changes are invisible
+to prod until `main` is pushed; **data changes are live the instant a script writes**.
+Therefore: merge and push the `realism` branch (avatar + `logoUrl` plumbing) *first*,
+then run the seed. Otherwise new companies appear in prod rendering as initials until
+the deploy lands. Adding nullable columns is always safe for deployed code; nothing in
+this plan removes or renames anything.
 
 ---
 
 ## The fiction (agreed 2026-07-09)
 
-**Vector** is a ~40-person company selling an **agentic analytics platform** (think
-Lightdash: BI built on dbt, with an AI analyst layer). This app is Vector's internal
-onboarding tool. Every company in the DB is a customer being onboarded onto the
+**Vector** is a ~40-person company selling an **agentic analytics platform** (BI
+built on dbt, with an AI analyst layer). No real vendor is named anywhere in the
+fiction — Vector is its own product. This app is Vector's internal onboarding tool. Every company in the DB is a customer being onboarded onto the
 analytics platform; every task is implementation work (warehouse connection, dbt
 project setup, semantic layer, dashboards, SSO, training, go-live); every meeting is
 an implementation call.
 
 This story was chosen because:
-- The customers are researched **real startups/scale-ups** — several are literally
-  Lightdash/Omni customers in real life, so the cast is maximally plausible.
+- The customers are researched **real startups/scale-ups**, each actively verified
+  as **NOT publicly associated with any real BI-on-dbt vendor** (no NDA/affiliation
+  risk — hard constraint from Caroline, 2026-07-09). Publicly-known Looker/Power
+  BI/Tableau/dbt users are fine and preferred.
 - Implementation work for BI-on-dbt has rich natural dependencies (can't define
   metrics before the project compiles; can't compile before the repo is connected;
   can't connect before the service account exists) — perfect for `blockedByTaskId`.
@@ -72,9 +97,8 @@ Schema: add `Company.logoUrl String?` (nullable, no tightening needed — one mi
 `npx prisma generate`, restart dev server).
 
 Assets: download each company's real logo once → `/public/logos/<slug>.png` (or .svg),
-committed to the repo. Sourcing gotchas found in research: **patch.io** not patch.com,
-**loopreturns.com** not loop.com, **helloalma.com** (several Almas),
-**generationhome.com** for Gen H. JustWatch and Raycast have proper press/brand pages.
+committed to the repo. Sourcing gotchas found in research: **patch.io** not patch.com
+(the local-news site), **loopreturns.com** not loop.com (a different fintech).
 
 > Note: real trademarks in a public portfolio repo is standard for demo projects
 > (nominative use), but it's Caroline's name on it — flagging once, then proceeding.
@@ -93,28 +117,42 @@ no schema change needed for people).
 
 ## Step 2 — The cast: 12 real companies
 
-Chosen from researched candidates (1–8 are real Lightdash/Omni customers in real
-life). Prefixes are set **explicitly** in the seed — `derivePrefix` would produce
-different/colliding values (e.g. Sylvera→SY, The Rounds→TH). None collide with the
-existing set (AC, TE, GL, IN, UM, ST, WA, CY, SO, WO); all match the CHECK regex.
+Cast finalized 2026-07-09 (v2 — the original cast was scrapped because it was drawn
+from real BI vendors' public customer lists; every company below was actively
+verified against those lists and is clean). Prefixes are set **explicitly** in the
+seed — `derivePrefix` would produce different/colliding values. None collide with
+the existing set (AC, TE, GL, IN, UM, ST, WA, CY, SO, WO); all match the CHECK regex.
 
 | Company | Domain | Vertical | Prefix | Lifecycle role (Step 4) |
 |---|---|---|---|---|
-| fal | fal.ai | AI infra / devtools | FAL | Mid-flight, healthy |
-| Gen H | generationhome.com | Fintech (UK mortgages) | GENH | Mid-flight, **at-risk** (security review stalled) |
-| JustWatch | justwatch.com | Media / consumer | JW | Near go-live |
-| Qargo | qargo.com | Logistics SaaS | QRG | Mid-flight, healthy (embedded-analytics use case) |
-| Ubie | ubiehealth.com | Health tech | UB | Completed (history) |
-| The Rounds | therounds.co | E-comm / climate DTC | TR | Fresh (kicked off last week) |
-| Ordermentum | ordermentum.com | B2B marketplace | ORD | Completed (history) |
-| Standard Metrics | standardmetrics.io | Fintech / VC tooling | SM | Mid-flight, **at-risk** (champion gone quiet) |
-| Sylvera | sylvera.com | Climate data | SYL | Near go-live |
+| Raycast | raycast.com | Devtools | RAY | Fresh (kicked off last week) |
+| beehiiv | beehiiv.com | Media / creator economy | BEE | Fresh (kickoff scheduled) |
+| Modal | modal.com | AI infra / devtools | MDL | Mid-flight, healthy |
 | Loop Returns | loopreturns.com | E-commerce infra | LOOP | Mid-flight, healthy |
-| Alma | helloalma.com | Health (mental health) | ALM | Completed (history) |
-| Raycast | raycast.com | Devtools | RAY | Fresh (kickoff scheduled) |
+| Huel | huel.com | DTC / CPG | HUEL | Mid-flight, healthy |
+| Function Health | functionhealth.com | Health tech | FN | Mid-flight, **at-risk** (security/compliance review stalled — health data) |
+| Flock Freight | flockfreight.com | Logistics (publicly uses dbt + Looker) | FLK | Mid-flight, **at-risk** (champion gone quiet) |
+| Sylvera | sylvera.com | Climate data | SYL | Near go-live |
+| ChowNow | chownow.com | Food / hospitality tech (publicly uses Looker/Tableau) | CHOW | Near go-live |
+| Ashby | ashbyhq.com | B2B SaaS / HR tech | ASH | Completed (history) |
+| Peerspace | peerspace.com | Marketplace (venue rental) | PEER | Completed (history) |
+| Patch | patch.io | Climate (carbon procurement) | PAT | Completed (history) |
 
-Alternates if any logo/name proves awkward: Peerspace (PEER), Huel (HUEL),
-Tatango (TAT), Neo Financial (NEO), Patch (PAT).
+Verified-clean alternates if anyone needs swapping: SevenRooms, Midi Health,
+Shippo, Maven Clinic.
+
+**AVOID LIST (verified real customers of BI-on-dbt vendors — never cast these):**
+fal, Gen H/Generation Home, JustWatch, Qargo, Ubie, Ordermentum, Standard Metrics,
+Neo Financial, Tatango, Collectors, Stake, Hypebeast, Morning Brew, Beauty Pie,
+Workday, The Rounds, Lyka, and the Omni public wall: BuzzFeed, Guitar Center,
+BambooHR, Caraway, Checkr, Photoroom, Feeld, Cribl, Brevo, ActiveProspect,
+Aviatrix, Uscreen, Incident.io, Fundrise, Sifflet, Ascend, Trint, Zapnito,
+Condé Nast, Perplexity, Mercury, dbt Labs, TripAdvisor, Synthesia, Heidi, SWBC,
+Hightouch, Ilia, Ritual, Zip, Game Lounge, Ogury.
+
+Logo status (✓ redone 2026-07-09 for cast v2): all 12 in `/public/logos/<slug>.png`
+(slugs: raycast, beehiiv, modal, loopreturns, huel, functionhealth, flockfreight,
+sylvera, chownow, ashby, peerspace, patch), sourced via Google's favicon service.
 
 Every company gets `domain` set — this is what the Miniti attendee-matching heuristic
 keys on, so seeded meeting payloads with `attendees[].domain` auto-match correctly.
@@ -147,16 +185,16 @@ adapter like `seed.js`; tag via a marker in a known field or check-before-create
 company name). All dates as `daysAgo(n)` / `daysFromNow(n)` helpers.
 
 **Lifecycle mix** (~15 onboardings across the 12 companies — one company can have two,
-e.g. Qargo "Pilot" completed + "Embedded analytics rollout" active):
+e.g. Ashby "Pilot" completed + "Embedded analytics rollout" active):
 
 - **2 fresh** (created 3–10 days ago): Kickoff phase mostly done, everything else
   Not started. Near-term due dates, nothing overdue.
 - **6 mid-flight**: the busy middle. Phases 1–2 complete, phase 3–4 in progress.
   In-progress and blocked tasks, recent comments, dependencies visible on the board.
-  Two of these are **at-risk**: Gen H (infosec questionnaire sitting 3 weeks →
-  blocked chain: security review → service account → repo connection) and
-  Standard Metrics (champion quiet: `lastSeenPortalAt` 14 days, stale tasks,
-  overdue follow-ups). These two carry most of the overdue budget.
+  Two of these are **at-risk**: Function Health (health-data infosec review
+  sitting 3 weeks → blocked chain: security review → service account → repo
+  connection) and Flock Freight (champion quiet: `lastSeenPortalAt` 14 days,
+  stale tasks, overdue follow-ups). These two carry most of the overdue budget.
 - **2 near go-live** (`targetGoLive` 1–3 weeks out): phases 1–4 complete, training +
   go-live review in flight. One has a genuine crunch (parity sign-off pending).
 - **3–4 completed** (finished 2–14 weeks ago, `status: "Completed"`): all tasks Done
@@ -169,7 +207,7 @@ concentrated in the two at-risk onboardings. Everything else due in the future.
 Kickoff & Discovery → Technical Setup & Connectivity → Semantic Layer & Modeling →
 Content Build & Migration → Security, Governance & Access → Training, Rollout &
 Go-live. Real titles ("Provision Snowflake service account with read-only access to
-ANALYTICS schema", "Add Lightdash static IPs to warehouse network policy", "Define
+ANALYTICS schema", "Add Vector Cloud static IPs to warehouse network policy", "Define
 first 10 metrics in dbt .yml", "Configure Okta SAML SSO", "Validate migrated numbers
 against Looker (parity sign-off)", "Run developer training: metrics-as-code
 workflow"), plus 1–2 agentic-flavor tasks per onboarding ("Enable AI analyst for

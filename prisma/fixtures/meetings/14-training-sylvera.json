@@ -1,0 +1,55 @@
+{
+  "daysAgo": 11,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "A11F2F7E-B3EC-4801-8899-A1761FF0797C",
+      "title": "Sylvera developer training — metrics-as-code workflow",
+      "duration_seconds": 3540,
+      "language": "en",
+      "summary": "Ran the developer training session for Sylvera's analytics engineering team — 8 attendees. Covered the metrics-as-code workflow end to end: defining metrics in dbt .yml, the review and CI gate, and how the semantic layer surfaces them in Vector. Team is comfortable; the main open question was how to handle the AI analyst guardrails for the ratings mart. Agreed to record the session and share the sandbox project so engineers can practise before go-live.",
+      "action_items": [
+        "Theo to share the recording and the training sandbox dbt project with the Sylvera team",
+        "James to have each analytics engineer add one practice metric to the sandbox before go-live",
+        "Ines to schedule a follow-up office-hours slot the week of go-live for live questions"
+      ],
+      "key_decisions": [
+        "Analytics engineers own metric definitions going forward; Vector reviews via PR",
+        "AI analyst will be scoped to the ratings mart for the initial launch"
+      ],
+      "topics": ["training", "metrics-as-code", "dbt yml", "ci gate", "ai analyst guardrails"],
+      "discussion_flow": ["workflow overview", "live metric definition demo", "ci and review gate", "semantic layer walkthrough", "ai analyst guardrails q&a", "practice assignment"],
+      "notes": "Engaged group. James is clearly the internal champion — he answered half the questions before Theo could. The guardrails discussion showed they take the AI analyst seriously and want it constrained at launch, which is the right instinct.",
+      "speaker_count": 3,
+      "speaker_names": { "-1": "You", "0": "Freya Nilsson", "1": "James Whitmore" },
+      "training": {
+        "talk_ratio_you": 0.58,
+        "speakers": [
+          { "speaker": "You", "is_you": true, "word_count": 4120, "fillers_per_minute": 1.1 },
+          { "speaker": "James Whitmore", "is_you": false, "word_count": 1640 },
+          { "speaker": "Freya Nilsson", "is_you": false, "word_count": 720 }
+        ]
+      },
+      "transcript": [
+        { "speaker": "You", "text": "Welcome everyone. By the end of this hour you'll have defined a metric, put it through review, and seen it show up live in the platform. Let's start with the mental model: metrics are code, they live in your dbt project, they get reviewed like code.", "timestamp": 5.0 },
+        { "speaker": "James Whitmore", "text": "That's the part I like — no more spreadsheet of 'official' definitions that nobody trusts.", "timestamp": 38.4 },
+        { "speaker": "You", "text": "Exactly. Let me define one live. Here's the ratings-coverage metric in the .yml — name, description, the aggregation, and the dimensions it can be sliced by. I commit, CI runs the tests, and on merge it's in the semantic layer.", "timestamp": 61.7 },
+        { "speaker": "Freya Nilsson", "text": "And if someone defines it wrong, the CI catches it before it reaches anyone?", "timestamp": 112.9 },
+        { "speaker": "You", "text": "Right — a bad definition fails the tests and never merges. The review gate is where a second engineer sanity-checks the business logic.", "timestamp": 128.3 },
+        { "speaker": "James Whitmore", "text": "Question on the AI analyst — when we turn it on, can it query any metric, or can we fence it?", "timestamp": 166.1 },
+        { "speaker": "You", "text": "You fence it. For launch I'd scope it to the ratings mart only — a tight, well-tested surface — then widen once you trust the answers.", "timestamp": 184.8 },
+        { "speaker": "James Whitmore", "text": "Let's do that. Ratings mart only for launch.", "timestamp": 214.2 },
+        { "speaker": "You", "text": "I'll share the recording and a sandbox project so everyone can practise. Homework: each of you adds one practice metric before go-live. James, can you nudge the team on that?", "timestamp": 231.5 },
+        { "speaker": "James Whitmore", "text": "Consider it nudged.", "timestamp": 260.0 },
+        { "speaker": "Freya Nilsson", "text": "This was genuinely useful. Can we get one more office-hours slot near go-live for the inevitable last-minute questions?", "timestamp": 271.6 },
+        { "speaker": "You", "text": "Ines will put an office-hours slot on the calendar for go-live week. Thanks all — great session.", "timestamp": 298.9 }
+      ],
+      "attendees": [
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "ines@vector.test", "name": "Ines Ferreira", "domain": "vector.test" },
+        { "email": "freya@sylvera.com", "name": "Freya Nilsson", "domain": "sylvera.com" },
+        { "email": "james@sylvera.com", "name": "James Whitmore", "domain": "sylvera.com" }
+      ]
+    }
+  }
+}

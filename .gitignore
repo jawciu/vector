@@ -51,3 +51,6 @@ next-env.d.ts
 
 # claude code worktrees (created by Agent runs with isolation: worktree)
 .claude/worktrees/
+
+# Playwright MCP scratch output
+.playwright-mcp/

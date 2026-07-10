@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
+import CompanyAvatar from "@/app/ui/CompanyAvatar";
 import Tooltip from "@/app/ui/Tooltip";
 
 function statusBadge(ob) {
@@ -73,16 +74,7 @@ export default function WorkspacesTable({ onboardings }) {
               className="flex items-center gap-2 no-underline"
               style={cellStyle(0)}
             >
-              <span
-                className="flex shrink-0 w-4 h-4 rounded items-center justify-center text-[10px] font-semibold"
-                style={{
-                  background: avatarColor(ob.companyName),
-                  color: "var(--text-dark)",
-                }}
-                aria-hidden
-              >
-                {avatarInitials(ob.companyName)}
-              </span>
+              <CompanyAvatar name={ob.companyName} logoUrl={ob.companyLogoUrl} size={16} />
               <span
                 className="font-medium"
                 style={{ color: isHovered ? "var(--action)" : "var(--text)", transition: "color 0.15s ease" }}

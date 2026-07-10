@@ -1,0 +1,51 @@
+{
+  "daysAgo": 40,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "9706A55A-C0FF-46D1-A7C8-72AF5D05F540",
+      "title": "Modal technical working session — warehouse + repo connection",
+      "duration_seconds": 3480,
+      "language": "en",
+      "summary": "Working session with Modal to complete the technical setup. Snowflake connection verified live on the call using the service account Erin provisioned; first full compile of the dbt project succeeded after fixing one env var default. Jonas and Theo scaffolded the first metrics block on fct_compute_usage.yml. Remaining setup item is the network policy entry for the EU failover IP range.",
+      "action_items": [
+        "Erin to add the EU failover IP range to the Snowflake network policy",
+        "Jonas to merge the metrics block PR for fct_compute_usage.yml after CI passes",
+        "Theo to enable scheduled hourly refresh once the failover IPs are allowed",
+        "Theo to document the env var default fix in the shared runbook"
+      ],
+      "key_decisions": [
+        "Metric definitions live in the dbt repo as .yml, owned by Modal — Vector reads, never writes",
+        "Hourly refresh schedule for compute usage models, daily for the rest"
+      ],
+      "topics": ["snowflake connection", "dbt compile", "metrics block", "network policy"],
+      "discussion_flow": ["connection test", "compile troubleshooting", "metrics block pairing", "refresh scheduling", "wrap-up"],
+      "notes": "Compile initially failed on a missing env var default (SNOWFLAKE_WAREHOUSE fallback) — fixed in dbt_project.yml on the call. Jonas is very fast; pairing sessions with him are high-leverage.",
+      "speaker_count": 3,
+      "speaker_names": { "-1": "You", "0": "Jonas Beck", "1": "Erin Castillo" },
+      "transcript": [
+        { "speaker": "You", "text": "Let's do this live — Erin, the service account credentials landed safely, so I'm going to run the connection test now.", "timestamp": 3.9 },
+        { "speaker": "Erin Castillo", "text": "Fingers crossed. Network policy has your primary IP range since Monday.", "timestamp": 16.2 },
+        { "speaker": "You", "text": "Connection is green. Warehouse, database, schema all resolve. Now pulling the repo and running the first compile.", "timestamp": 41.7 },
+        { "speaker": "Jonas Beck", "text": "This is the moment of truth for a hundred and forty models.", "timestamp": 68.0 },
+        { "speaker": "You", "text": "Compile error — it can't resolve SNOWFLAKE_WAREHOUSE. Your profiles rely on an env var we don't inject.", "timestamp": 95.5 },
+        { "speaker": "Jonas Beck", "text": "Ah right, CI sets that. Give it a default in dbt_project.yml — one line. Pushing now.", "timestamp": 118.3 },
+        { "speaker": "You", "text": "Re-running... and that's a clean compile. A hundred and forty-two models, zero errors. Nice project, honestly.", "timestamp": 176.9 },
+        { "speaker": "Jonas Beck", "text": "It's had love. OK, metrics next?", "timestamp": 204.4 },
+        { "speaker": "You", "text": "Yes — let's scaffold the first metrics block on fct_compute_usage. I'll share my screen and we'll write the .yml together so your team owns the pattern.", "timestamp": 213.0 },
+        { "speaker": "Jonas Beck", "text": "So gpu_hours as a sum measure, active_workspaces as count distinct, and compute_revenue with the filter on billable is true. That maps cleanly.", "timestamp": 258.6 },
+        { "speaker": "You", "text": "Exactly. Open a PR with this block, and once CI passes and it merges, those three metrics show up in Vector automatically on the next sync.", "timestamp": 301.2 },
+        { "speaker": "Jonas Beck", "text": "PR is up. I love that the definition lives in our repo — that was a selling point internally.", "timestamp": 340.8 },
+        { "speaker": "Erin Castillo", "text": "One thing from me before we wrap — your connection doc mentions an EU failover IP range that I haven't added yet. Do I need to?", "timestamp": 371.5 },
+        { "speaker": "You", "text": "Yes please, otherwise refreshes will fail whenever we route through the EU region. Same policy, second CIDR entry. I'll hold off enabling the hourly schedule until that's in.", "timestamp": 392.0 },
+        { "speaker": "Erin Castillo", "text": "I'll do it tomorrow morning and confirm in the channel.", "timestamp": 428.7 },
+        { "speaker": "You", "text": "Then we're basically done with technical setup a week early. I'll write up the env var fix in the runbook. Great session, both.", "timestamp": 441.3 }
+      ],
+      "attendees": [
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "jonas@modal.com", "name": "Jonas Beck", "domain": "modal.com" },
+        { "email": "erin@modal.com", "name": "Erin Castillo", "domain": "modal.com" }
+      ]
+    }
+  }
+}

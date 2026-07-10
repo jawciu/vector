@@ -1,0 +1,47 @@
+{
+  "daysAgo": 14,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "01173C33-57B6-4489-90E5-AB0DB1407047",
+      "title": "Loop Returns weekly sync",
+      "duration_seconds": 1988,
+      "language": "en",
+      "summary": "Weekly sync with Loop Returns. Semantic layer is in good shape — return-rate signed off, refund-latency still under debate with finance. The dashboard inventory slipped and is now the long pole because the exec KPI rebuild depends on it. Agreed Derek gets the top-20 Looker inventory over to Vector by Thursday so Sam can start the migration batches. Infosec review is moving; Priya has the SSO metadata request in flight.",
+      "action_items": [
+        "Derek to send the top-20 Looker dashboard inventory to Vector by Thursday",
+        "Sofia to close out the refund-latency metric definition with finance this week",
+        "Sam to start migration batch 1 once the inventory lands",
+        "Priya to confirm the Okta SAML metadata is ready for the SSO configuration"
+      ],
+      "key_decisions": [
+        "Dashboard inventory is the current critical-path blocker for the exec KPI rebuild",
+        "Refund-latency metric stays out of the go-live set until finance signs the definition"
+      ],
+      "topics": ["semantic layer", "dashboard inventory", "migration batches", "sso"],
+      "discussion_flow": ["action-item review", "metric sign-off status", "dashboard inventory blocker", "sso progress", "next steps"],
+      "notes": "Healthy engagement from all three. Derek is the workhorse; Sofia unblocks decisions fast. Refund-latency is the only definitional debate left and it's a finance question, not a data one.",
+      "speaker_count": 4,
+      "speaker_names": { "-1": "You", "0": "Sofia Marchetti", "1": "Derek Huang", "2": "Priya Shah" },
+      "transcript": [
+        { "speaker": "You", "text": "Morning all. Quick action-item pass first, then I want to talk about the dashboard inventory because it's starting to block the rebuild.", "timestamp": 3.1 },
+        { "speaker": "Sofia Marchetti", "text": "Good news on metrics — return-rate is signed off. Refund-latency is still going back and forth with finance over whether we count business days or calendar days.", "timestamp": 24.7 },
+        { "speaker": "You", "text": "Let's keep refund-latency out of the go-live set until that's settled — no point migrating a number two teams disagree on. Can you close it this week?", "timestamp": 51.2 },
+        { "speaker": "Sofia Marchetti", "text": "Yes, I'll force the decision in Thursday's finance review.", "timestamp": 78.0 },
+        { "speaker": "You", "text": "Derek, the exec KPI rebuild is waiting on your dashboard inventory — the top 20 we're migrating first. Where's that?", "timestamp": 92.5 },
+        { "speaker": "Derek Huang", "text": "Fair. It slipped because I was heads-down on the CI checks. I can get the top-20 list over by Thursday — I've already got usage stats on which Looker dashboards actually get opened.", "timestamp": 108.3 },
+        { "speaker": "You", "text": "Perfect, usage-ranked is exactly right. The day that lands I'll start migration batch one.", "timestamp": 141.9 },
+        { "speaker": "Priya Shah", "text": "On SSO — I've got the Okta SAML metadata request in with our identity team. Should have it back early next week.", "timestamp": 163.4 },
+        { "speaker": "You", "text": "Great, that keeps SSO off the critical path. Anything blocking any of you from our side?", "timestamp": 188.1 },
+        { "speaker": "Derek Huang", "text": "No, staging access is working well. The compile is clean now.", "timestamp": 202.6 },
+        { "speaker": "You", "text": "Then we're in good shape. Recap and actions to follow — thanks everyone.", "timestamp": 219.0 }
+      ],
+      "attendees": [
+        { "email": "sam@vector.test", "name": "Sam Whitfield", "domain": "vector.test" },
+        { "email": "sofia@loopreturns.com", "name": "Sofia Marchetti", "domain": "loopreturns.com" },
+        { "email": "derek@loopreturns.com", "name": "Derek Huang", "domain": "loopreturns.com" },
+        { "email": "priya@loopreturns.com", "name": "Priya Shah", "domain": "loopreturns.com" }
+      ]
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "daysAgo": 3,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "35B03403-9C7D-43C5-B22C-8CBC64B49123",
+      "title": "Weekly check-in",
+      "duration_seconds": 1425,
+      "language": "en",
+      "summary": "Short status call. Warehouse service account is now provisioned and the project compiles clean in staging. Agreed to define the first batch of metrics next week and to book a working session to review naming conventions. One open item on the network policy change is with their platform team.",
+      "action_items": [
+        "Send over the first-batch metric list for review",
+        "Book a working session to agree naming conventions",
+        "Chase the platform team on the network policy change"
+      ],
+      "key_decisions": [
+        "First metric batch scoped to the core fact table for next week"
+      ],
+      "topics": ["warehouse connection", "metrics", "naming conventions", "network policy"],
+      "discussion_flow": ["status update", "compile confirmation", "next steps"],
+      "notes": "Meeting was started ad hoc without a calendar invite. Speaker labels are unresolved. No customer named on the call — mostly a quick internal-feeling status sync.",
+      "speaker_count": 2,
+      "transcript": [
+        { "speaker": "You", "text": "Quick one today — mainly want to confirm the connection is stable before we start on metrics.", "timestamp": 2.4 },
+        { "speaker": "Speaker 1", "text": "It's stable. The service account got provisioned yesterday and the project compiled clean on the first try in staging.", "timestamp": 19.1 },
+        { "speaker": "You", "text": "That's the milestone I wanted. Next week let's define the first batch of metrics against the core fact table and then do a working session on naming.", "timestamp": 41.7 },
+        { "speaker": "Speaker 1", "text": "Works for me. One thing still open — the network policy change is sitting with our platform team, I'll chase it.", "timestamp": 68.3 },
+        { "speaker": "You", "text": "Great. I'll send the first-batch metric list over for you to review and we'll book the naming session. Short and sweet — thanks.", "timestamp": 89.9 }
+      ]
+    }
+  }
+}

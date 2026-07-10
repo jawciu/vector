@@ -1,0 +1,48 @@
+{
+  "daysAgo": 30,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "85B5A1F4-6E70-46DB-8D28-B6832664C6A8",
+      "title": "Loop Returns — semantic layer working session",
+      "duration_seconds": 3620,
+      "language": "en",
+      "summary": "Working session with Marcus on the Loop Returns semantic layer. Added the metrics block to fct_orders.yml and fct_returns.yml: refund_rate, return_rate, exchange_rate, and net_revenue_retained, each with a single canonical definition. The refund_rate definition surfaced the exact discrepancy that plagued the Tableau workbooks — whether to count exchanges in the denominator — and the group resolved it pending finance sign-off. Draft dashboard wired to the new metrics for the finance review.",
+      "action_items": [
+        "Marcus to merge the fct_orders.yml and fct_returns.yml metrics PR after CI",
+        "Sam to build the definition comparison sheet (old workbook logic vs new canonical) for the finance sign-off meeting",
+        "Dana to book the finance sign-off meeting for next week"
+      ],
+      "key_decisions": [
+        "refund_rate excludes exchanges from the numerator; exchange_rate is its own metric — pending finance ratification",
+        "net_revenue_retained becomes the headline retention metric on the merchant dashboard"
+      ],
+      "topics": ["semantic layer", "metrics block", "refund rate", "fct_orders", "finance sign-off"],
+      "discussion_flow": ["metrics scaffolding", "refund rate definition debate", "exchange handling", "dashboard preview", "sign-off prep"],
+      "notes": "The exchanges-in-denominator question was the root cause of the three-workbooks problem all along. Great session — Marcus writes very clean yml.",
+      "speaker_count": 2,
+      "speaker_names": { "-1": "You", "0": "Marcus Oyelaran" },
+      "transcript": [
+        { "speaker": "You", "text": "Ready to make refund rate mean one thing? Screen is shared — we're starting in fct_orders.yml.", "timestamp": 4.4 },
+        { "speaker": "Marcus Oyelaran", "text": "Been ready for two years. Let's do it.", "timestamp": 15.0 },
+        { "speaker": "You", "text": "First the easy ones: total_orders as a count, gross_revenue as a sum on order_total. Then the interesting one — refund_rate. What goes in the numerator?", "timestamp": 24.7 },
+        { "speaker": "Marcus Oyelaran", "text": "And here's the whole war. Workbook A counts exchanges as refunds, workbook B doesn't, workbook C counts them at the item level. That's why the three numbers never matched.", "timestamp": 58.3 },
+        { "speaker": "You", "text": "So the discrepancy was never a data bug — it was three unstated definitions. What does the business actually want refund_rate to mean?", "timestamp": 96.8 },
+        { "speaker": "Marcus Oyelaran", "text": "Money out the door. An exchange keeps the revenue, so it shouldn't count as a refund. Exchanges deserve their own metric.", "timestamp": 121.4 },
+        { "speaker": "You", "text": "Agreed — so refund_rate is refunded orders excluding exchanges over completed orders, and we add exchange_rate as a separate measure. Writing both blocks now.", "timestamp": 149.0 },
+        { "speaker": "Marcus Oyelaran", "text": "Add a description field on each saying exactly that, please. The definition being readable in the repo is half the point.", "timestamp": 187.6 },
+        { "speaker": "You", "text": "Done, with the rationale in the description. Now fct_returns.yml — return_rate and net_revenue_retained. For NRR I'm doing revenue kept after refunds over gross, as a ratio metric.", "timestamp": 210.2 },
+        { "speaker": "Marcus Oyelaran", "text": "That one's the headline for the merchant dashboard. Dana will want it front and centre.", "timestamp": 256.9 },
+        { "speaker": "You", "text": "Compiling... clean. Metrics show up in the catalog. Let me wire a quick draft dashboard so finance reviews real numbers instead of yml.", "timestamp": 278.5 },
+        { "speaker": "Marcus Oyelaran", "text": "The refund_rate here reads 4.1 percent versus 5.3 in the old workbook A. That difference is exactly the exchanges. Finance is going to ask about that gap.", "timestamp": 324.0 },
+        { "speaker": "You", "text": "Good catch — I'll build a comparison sheet showing old logic versus new so the sign-off meeting has the reconciliation in front of them. Nothing kills trust like an unexplained delta.", "timestamp": 361.7 },
+        { "speaker": "Marcus Oyelaran", "text": "Perfect. I'll get the PR through CI today and ask Dana to book finance for next week.", "timestamp": 402.3 },
+        { "speaker": "You", "text": "Great session. One refund rate to rule them all.", "timestamp": 425.8 }
+      ],
+      "attendees": [
+        { "email": "sam@vector.test", "name": "Sam Whitfield", "domain": "vector.test" },
+        { "email": "marcus@loopreturns.com", "name": "Marcus Oyelaran", "domain": "loopreturns.com" }
+      ]
+    }
+  }
+}

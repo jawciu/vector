@@ -10,6 +10,7 @@ import TaskIdChip from "../ui/TaskIdChip";
 import { MenuList, MenuOption } from "./Menu";
 import { TASK_STATUSES, PRIORITIES, STATUS_COLORS } from "@/lib/constants";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
+import CompanyAvatar from "@/app/ui/CompanyAvatar";
 
 function ChevronIcon() {
   return (
@@ -57,6 +58,7 @@ export default function CreateTaskModal({
   phaseId,
   phaseName,
   companyName,
+  companyLogoUrl,
   onTaskCreated,
   people = [],
   vendorUsers = [],
@@ -251,13 +253,13 @@ export default function CreateTaskModal({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
-              <span
-                className="flex shrink-0 w-3.5 h-3.5 rounded-[3px] items-center justify-center text-[8px] font-semibold"
-                style={{ background: avatarColor(companyName), color: "var(--text-dark)" }}
-                aria-hidden
-              >
-                {avatarInitials(companyName)}
-              </span>
+              <CompanyAvatar
+                name={companyName}
+                logoUrl={companyLogoUrl}
+                size={14}
+                radius={3}
+                fontSize={8}
+              />
               <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
                 {companyName}
               </span>

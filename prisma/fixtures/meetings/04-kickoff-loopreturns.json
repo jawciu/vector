@@ -1,0 +1,51 @@
+{
+  "daysAgo": 45,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "E62C0740-9D9A-443C-BF0F-9B0D8956519E",
+      "title": "Loop Returns implementation kickoff",
+      "duration_seconds": 2705,
+      "language": "en",
+      "summary": "Kickoff with Loop Returns. Snowflake plus dbt Cloud, currently reporting out of Tableau workbooks the merchants team doesn't trust because numbers drift between workbooks. Primary goal is a single governed source of truth for merchant retention and refund metrics, with self-serve exploration for the merchant success team. Dana sponsors; Marcus is hands-on with dbt.",
+      "action_items": [
+        "Marcus to provision the Snowflake read-only service account against the ANALYTICS database",
+        "Marcus to invite Vector's GitHub app to the dbt repo",
+        "Sam to send the semantic layer workshop agenda for next week",
+        "Dana to nominate 3 pilot users from the merchant success team"
+      ],
+      "key_decisions": [
+        "Success metric for the project: merchant success team self-serves weekly reporting without analyst involvement",
+        "Refund and retention metric definitions must be signed off by finance before dashboards ship",
+        "Weekly sync on Wednesdays"
+      ],
+      "topics": ["kickoff", "snowflake", "dbt cloud", "tableau", "metric governance"],
+      "discussion_flow": ["intros", "why now", "stack overview", "governance requirements", "pilot group", "next steps"],
+      "notes": "The trust problem is the story here: three Tableau workbooks compute refund rate three different ways. Finance sign-off on definitions is a hard requirement from Dana.",
+      "speaker_count": 4,
+      "speaker_names": { "-1": "You", "0": "Dana Whitmore", "1": "Marcus Oyelaran", "2": "Caroline Jaworsky" },
+      "transcript": [
+        { "speaker": "You", "text": "Thanks for making time, both. Dana, you said something in the sales cycle that stuck with me — 'we have three versions of refund rate and they're all wrong'. Start there?", "timestamp": 7.8 },
+        { "speaker": "Dana Whitmore", "text": "Ha, painfully accurate. Three Tableau workbooks, three different refund rate calculations, and the merchant success team has stopped trusting all of them. Every QBR starts with an argument about whose number is right.", "timestamp": 22.4 },
+        { "speaker": "Marcus Oyelaran", "text": "The dbt side is actually solid — fct_orders and fct_returns are well tested. The drift happens downstream where each workbook re-implements the logic on top.", "timestamp": 61.0 },
+        { "speaker": "You", "text": "Which is exactly what a semantic layer kills. Define refund rate once in the dbt project, every surface reads the same definition. That's the core of what we'll build in week one and two.", "timestamp": 94.7 },
+        { "speaker": "Dana Whitmore", "text": "One hard requirement: finance signs off on the definitions before anything ships to the merchant success team. I'm not relitigating refund rate a fourth time.", "timestamp": 133.2 },
+        { "speaker": "You", "text": "Completely reasonable — we'll build the sign-off into the plan as an explicit gate. Marcus, on access: read-only Snowflake service account and repo access for our GitHub app.", "timestamp": 160.5 },
+        { "speaker": "Marcus Oyelaran", "text": "Both easy. I'll do the service account against the ANALYTICS database today and the GitHub invite right after this call.", "timestamp": 190.9 },
+        { "speaker": "Caroline Jaworsky", "text": "That would make you the fastest-provisioning customer this quarter, for the record.", "timestamp": 214.3 },
+        { "speaker": "Marcus Oyelaran", "text": "Challenge accepted.", "timestamp": 222.0 },
+        { "speaker": "You", "text": "Dana, for the pilot — who actually explores data day-to-day on the merchant success side?", "timestamp": 228.6 },
+        { "speaker": "Dana Whitmore", "text": "I'll nominate three of the senior MS folks. If they can answer their own retention questions without filing an analyst ticket, this project pays for itself.", "timestamp": 244.1 },
+        { "speaker": "You", "text": "That's our success metric then — MS self-serves weekly reporting, zero analyst tickets. Sam will send the semantic layer workshop agenda; proposing Wednesdays for the weekly sync.", "timestamp": 275.8 },
+        { "speaker": "Dana Whitmore", "text": "Wednesdays work. Good energy on this one — let's keep it.", "timestamp": 309.4 },
+        { "speaker": "You", "text": "Recap and actions in your inbox shortly. Thanks all.", "timestamp": 318.9 }
+      ],
+      "attendees": [
+        { "email": "sam@vector.test", "name": "Sam Whitfield", "domain": "vector.test" },
+        { "email": "caroline@vector.test", "name": "Caroline Jaworsky", "domain": "vector.test" },
+        { "email": "dana@loopreturns.com", "name": "Dana Whitmore", "domain": "loopreturns.com" },
+        { "email": "marcus@loopreturns.com", "name": "Marcus Oyelaran", "domain": "loopreturns.com" }
+      ]
+    }
+  }
+}

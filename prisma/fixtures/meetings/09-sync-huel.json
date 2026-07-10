@@ -1,0 +1,49 @@
+{
+  "daysAgo": 27,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "F0B36F65-6F5B-4D27-B3E1-1511476CF3FC",
+      "title": "Huel weekly sync — subscription metrics + SSO",
+      "duration_seconds": 1820,
+      "language": "en",
+      "summary": "Weekly sync with Huel. Subscription metrics (active subscribers, churn rate, reactivation rate, AOV) are merged and validated against last month's board pack — numbers reconcile. Dashboard build for the DTC team is 70% done. Okta SAML SSO config started but stuck on an attribute mapping mismatch; Oliver and Theo will pair on it Thursday. Freya raised early interest in the AI analyst for the CX team's ad-hoc questions.",
+      "action_items": [
+        "Oliver and Theo to pair on the Okta SAML attribute mapping Thursday",
+        "Ines to share the AI analyst pilot one-pager with Freya",
+        "Freya to review the draft DTC dashboard and comment by Friday",
+        "Oliver to add the subscription cohort model to the nightly job"
+      ],
+      "key_decisions": [
+        "Subscription metric definitions validated against the board pack — signed off",
+        "SSO must be live before the DTC team rollout; password logins are a no-go for wider release"
+      ],
+      "topics": ["weekly sync", "subscription metrics", "okta sso", "dashboard build", "ai analyst"],
+      "discussion_flow": ["metrics validation", "dashboard progress", "sso blocker", "ai analyst interest", "actions"],
+      "notes": "Healthy account. The SSO attribute mismatch is the only open technical issue — NameID format on the Okta side. Freya pulling the AI analyst conversation forward herself is a good sign.",
+      "speaker_count": 3,
+      "speaker_names": { "-1": "You", "0": "Freya Dalton", "1": "Oliver Nash" },
+      "transcript": [
+        { "speaker": "You", "text": "Hello hello. Big week — the subscription metrics merged. Freya, did the validation against the board pack come out clean?", "timestamp": 5.1 },
+        { "speaker": "Freya Dalton", "text": "It did. Active subscribers, churn, reactivation — all within rounding of the January board numbers. I'm calling those definitions signed off.", "timestamp": 19.6 },
+        { "speaker": "You", "text": "Excellent. That unblocks the DTC dashboard, which is about seventy percent built. I'd love your comments on the draft by Friday if possible.", "timestamp": 52.3 },
+        { "speaker": "Freya Dalton", "text": "Will do. The cohort view is the one the team will live in, so I'll look hardest at that.", "timestamp": 78.9 },
+        { "speaker": "Oliver Nash", "text": "Related — the cohort model needs to go on the nightly job or that view will be stale by lunchtime. I'll sort the schedule this week.", "timestamp": 97.4 },
+        { "speaker": "You", "text": "Good. Now the less fun one: SSO. Where are we with Okta?", "timestamp": 121.0 },
+        { "speaker": "Oliver Nash", "text": "Stuck, mildly. The SAML assertion is coming through but Vector rejects it — I think the NameID format is set to unspecified when you expect email address. I've stared at the mapping screen long enough to want a second pair of eyes.", "timestamp": 133.7 },
+        { "speaker": "You", "text": "That's almost certainly it — we see that exact mismatch a lot with Okta defaults. Theo can pair with you Thursday and it should be a fifteen-minute fix.", "timestamp": 176.2 },
+        { "speaker": "Oliver Nash", "text": "Thursday works. Once it's green I'll switch off password logins per Freya's edict.", "timestamp": 204.5 },
+        { "speaker": "Freya Dalton", "text": "It's a firm edict — no wider rollout on passwords. Separate topic while I have you: the CX team keeps asking me one-off questions about subscriber behaviour. Is the AI analyst thing real enough for them yet?", "timestamp": 220.8 },
+        { "speaker": "You", "text": "It's real, and with your definitions now signed off you're actually a great candidate. Let me have Ines send you the pilot one-pager — the usual shape is a five-person pilot group with guardrails on which models it can query.", "timestamp": 251.4 },
+        { "speaker": "Freya Dalton", "text": "Send it over. If it saves my team the CX ticket queue, I'll be your loudest reference.", "timestamp": 292.0 },
+        { "speaker": "You", "text": "Noted and screenshotted. Recap: Thursday SSO pairing, dashboard comments Friday, cohort model on nightly, pilot one-pager to Freya. See you next week.", "timestamp": 310.6 }
+      ],
+      "attendees": [
+        { "email": "ines@vector.test", "name": "Ines Ferreira", "domain": "vector.test" },
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "freya@huel.com", "name": "Freya Dalton", "domain": "huel.com" },
+        { "email": "oliver@huel.com", "name": "Oliver Nash", "domain": "huel.com" }
+      ]
+    }
+  }
+}

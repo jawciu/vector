@@ -17,6 +17,7 @@ model Company {
   id          Int           @id @default(autoincrement())
   name        String
   domain      String?       // Email domain (e.g. "acme.com"). Used to match Miniti meeting attendees → company.
+  logoUrl     String?       // App-relative logo path (e.g. "/logos/fal.png"). Null → initials avatar fallback.
   prefix      String        @unique
   taskCounter Int           @default(0)
   onboardings Onboarding[]

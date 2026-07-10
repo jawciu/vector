@@ -1,0 +1,34 @@
+{
+  "daysAgo": 2,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "FAF26EEB-2ABE-42F4-BDDF-BD9721FD3ECA",
+      "title": "Implementation working session",
+      "duration_seconds": 2015,
+      "language": "en",
+      "summary": "Working session on the semantic layer. Reviewed the first dashboard rebuild against the existing report and found a small discrepancy in an aggregation that traces back to a duplicated join. Agreed to move the logic into a proper mart model with tests rather than patching the dashboard query. Next session will cover the executive dashboard once the mart lands.",
+      "action_items": [
+        "Split the aggregation logic into a staging model and a mart model with tests",
+        "Re-run the side-by-side comparison once the mart is in place",
+        "Schedule the next working session for the executive dashboard"
+      ],
+      "key_decisions": [
+        "Aggregation logic moves into a tested mart model instead of a dashboard-level fix"
+      ],
+      "topics": ["semantic layer", "dashboard rebuild", "mart model", "aggregation discrepancy"],
+      "discussion_flow": ["rebuild review", "discrepancy diagnosis", "mart model decision", "next session"],
+      "notes": "Ad hoc session, no calendar event attached, so attendees and speaker names didn't resolve. The customer isn't named anywhere on the recording — this one will need to be assigned manually.",
+      "speaker_count": 2,
+      "transcript": [
+        { "speaker": "You", "text": "Let's compare the rebuilt dashboard against your existing report side by side. Most tiles match, but this one aggregation is off by a bit.", "timestamp": 3.6 },
+        { "speaker": "Speaker 1", "text": "I see it. That number's been slightly weird for a while honestly. Any idea why?", "timestamp": 26.2 },
+        { "speaker": "You", "text": "Looks like a duplicated join fanning out the rows — the old query masks it with a distinct further down. I'd rather not carry that forward.", "timestamp": 44.9 },
+        { "speaker": "Speaker 1", "text": "Agreed, don't replicate the bug. Put it in a real model?", "timestamp": 71.0 },
+        { "speaker": "You", "text": "Exactly — a staging model plus a mart model with tests, and the dashboard becomes a thin view. Then we re-run the side-by-side and it should tie out cleanly.", "timestamp": 85.4 },
+        { "speaker": "Speaker 1", "text": "I'll build the staging and mart models this week. Next session we do the executive dashboard?", "timestamp": 118.7 },
+        { "speaker": "You", "text": "Perfect. I'll get the next working session on the calendar once the mart lands. Good progress today.", "timestamp": 141.3 }
+      ]
+    }
+  }
+}

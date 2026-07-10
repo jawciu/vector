@@ -1,0 +1,44 @@
+{
+  "daysAgo": 16,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "7B074087-7625-4B21-8769-1E02D6BB8D2E",
+      "title": "Flock Freight weekly sync",
+      "duration_seconds": 1130,
+      "language": "en",
+      "summary": "Thin sync. Colin no-showed for the second consecutive week — finance close ended but he hasn't resurfaced; Jess joined alone and couldn't speak to the migration decisions. The first-10 metric definitions Colin was drafting haven't appeared, the archive announcement hasn't gone out, and the top-20 migration is stalled without his dashboard-by-dashboard input. Jess suspects he's been pulled onto an internal carrier-pricing project. Agreed Ines will reach Colin directly and, failing that, ask Dana-level management who now owns the migration decisions.",
+      "action_items": [
+        "Ines to email Colin directly to re-confirm he still owns the migration shortlist and metric definitions",
+        "Jess to ask internally who is covering analytics decisions while Colin is on the pricing project",
+        "Ines to propose a shortened catch-up call with Colin rather than waiting for next week's sync",
+        "Hold the metrics workstream — do not draft definitions on Vector's side without customer ownership"
+      ],
+      "key_decisions": [
+        "No proxy decisions: dashboard migration choices wait for Colin or a named replacement, not Vector guesses"
+      ],
+      "topics": ["weekly sync", "stalled migration", "champion unavailable", "metric definitions"],
+      "discussion_flow": ["attendance", "blocked items review", "root cause discussion", "re-engagement plan"],
+      "notes": "Champion risk is now real: Colin unresponsive for 2+ weeks, portal untouched since before close week, and his two critical deliverables (metric definitions, archive announcement) are stalled. Jess is helpful but explicitly not empowered to make content decisions.",
+      "speaker_count": 2,
+      "speaker_names": { "-1": "You", "0": "Jess Ortega" },
+      "transcript": [
+        { "speaker": "You", "text": "Morning Jess. Just us again? I was hoping Colin would resurface now close week is over.", "timestamp": 4.1 },
+        { "speaker": "Jess Ortega", "text": "Just me, sorry. I pinged him an hour ago — nothing. Honestly I've barely seen him in the office channels either.", "timestamp": 14.8 },
+        { "speaker": "You", "text": "OK, let's be straight about impact. The first ten metric definitions were his; not started as far as we can tell. The archive announcement hasn't gone out. And the top-20 migration needs his call on each dashboard. All three are stalled.", "timestamp": 38.5 },
+        { "speaker": "Jess Ortega", "text": "That matches what I see. Between us — I think he got pulled onto the carrier pricing project after close. It's the CEO's pet initiative this quarter, so it eats people.", "timestamp": 79.3 },
+        { "speaker": "You", "text": "That would explain the silence. The thing is, this project's deadline is real too — the Looker contract non-renewal doesn't move just because attention did.", "timestamp": 114.6 },
+        { "speaker": "Jess Ortega", "text": "I know. I wish I could just make the calls, but I genuinely can't — I don't know which dashboards the ops team lives in. That's exactly the knowledge Colin has.", "timestamp": 140.2 },
+        { "speaker": "You", "text": "Understood, and we shouldn't guess on your behalf — wrong migrations are worse than late ones. Here's what I propose: Ines emails Colin directly today, warm but explicit about the three stalled items. If there's no response by Thursday, we ask his management who owns these decisions now.", "timestamp": 170.9 },
+        { "speaker": "Jess Ortega", "text": "Do that. And I'll quietly ask around about the pricing project staffing — if he's seconded for the quarter, better we all know now.", "timestamp": 221.5 },
+        { "speaker": "You", "text": "Agreed. Offer him a twenty-minute catch-up instead of the full sync too — lower the cost of re-engaging.", "timestamp": 248.0 },
+        { "speaker": "Jess Ortega", "text": "Good idea. Sorry this one's gone quiet — it started so well.", "timestamp": 271.4 },
+        { "speaker": "You", "text": "They usually come back. But two silent weeks is exactly when to act, not week six. Thanks for holding the fort, Jess.", "timestamp": 285.7 }
+      ],
+      "attendees": [
+        { "email": "ines@vector.test", "name": "Ines Ferreira", "domain": "vector.test" },
+        { "email": "jess@flockfreight.com", "name": "Jess Ortega", "domain": "flockfreight.com" }
+      ]
+    }
+  }
+}

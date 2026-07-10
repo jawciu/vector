@@ -1,0 +1,53 @@
+{
+  "daysAgo": 49,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "148658D8-1AB1-4ED5-A0C8-667AD1A844CC",
+      "title": "Flock Freight kickoff — Vector implementation",
+      "duration_seconds": 2870,
+      "language": "en",
+      "summary": "Kickoff with Flock Freight. They run dbt on BigQuery with Looker as the current BI layer and want to consolidate shipper-facing and internal reporting onto Vector, with Looker retired by end of quarter. Colin Marsh (Analytics Lead) is the internal champion and will drive the migration list. Main risks called out: Looker content sprawl (300+ saved Looks, most stale) and a finance close period in three weeks where the data team goes dark.",
+      "action_items": [
+        "Colin to export the Looker usage report and shortlist the 20 dashboards actually worth migrating",
+        "Jess to create the BigQuery service account for Vector with read access to the analytics dataset",
+        "Ines to schedule the recurring Thursday sync and share the migration workbook",
+        "Caroline to send the mutual go-live checklist template"
+      ],
+      "key_decisions": [
+        "Migrate top-20 dashboards only; everything else is archived, not migrated",
+        "Looker sunset target is end of quarter",
+        "Colin is the single point of contact for content decisions"
+      ],
+      "topics": ["kickoff", "bigquery", "looker migration", "dbt", "timeline"],
+      "discussion_flow": ["intros", "current reporting landscape", "migration scope debate", "risks", "roles", "next steps"],
+      "notes": "Colin is an enthusiastic champion — he pitched this internally for six months. Watch the finance close window in ~3 weeks; the data team will be unavailable for most of that week.",
+      "speaker_count": 4,
+      "speaker_names": { "-1": "You", "0": "Colin Marsh", "1": "Jess Ortega", "2": "Ines Ferreira" },
+      "transcript": [
+        { "speaker": "You", "text": "Welcome everyone. Colin, you've been championing this internally for a while — want to set the scene?", "timestamp": 6.1 },
+        { "speaker": "Colin Marsh", "text": "Happily. Short version: we've got dbt in good shape on BigQuery, but the BI layer on top is chaos. Three hundred plus saved Looks, nobody knows which ones are load-bearing.", "timestamp": 18.9 },
+        { "speaker": "You", "text": "Classic content sprawl. Our strong recommendation is to migrate the top twenty by usage and archive the rest — migrating everything just moves the mess.", "timestamp": 57.4 },
+        { "speaker": "Colin Marsh", "text": "Completely agree, and I've been saying the same thing. I'll pull the usage report this week and make the shortlist. I'm happy to be the bad guy on archiving.", "timestamp": 84.0 },
+        { "speaker": "Jess Ortega", "text": "From the platform side, what access do you need? Our BigQuery project has separate datasets for raw and analytics.", "timestamp": 112.7 },
+        { "speaker": "You", "text": "Read-only on the analytics dataset only — we never touch raw. A dedicated service account, and read access to the dbt repo so the semantic layer can import your metric definitions.", "timestamp": 129.3 },
+        { "speaker": "Jess Ortega", "text": "Fine. Service account is a same-day thing once I have your setup doc.", "timestamp": 164.8 },
+        { "speaker": "Ines Ferreira", "text": "I'll send the technical setup doc and a migration workbook today. Proposing Thursdays for the weekly sync?", "timestamp": 178.2 },
+        { "speaker": "Colin Marsh", "text": "Thursdays work. One thing to flag — finance close hits in about three weeks and my team basically disappears for that week. Plan around it.", "timestamp": 196.5 },
+        { "speaker": "You", "text": "Noted, we'll front-load the technical setup so that week is a natural pause. What's the appetite for the AI analyst features?", "timestamp": 224.9 },
+        { "speaker": "Colin Marsh", "text": "Curious but cautious. Shippers asking free-text questions about their own freight spend is the dream, but internal users first.", "timestamp": 248.0 },
+        { "speaker": "You", "text": "Sensible. We'll scope an internal pilot group once the semantic layer is validated. Target for Looker sunset?", "timestamp": 279.4 },
+        { "speaker": "Colin Marsh", "text": "End of quarter. Leadership already approved not renewing the contract, so there's a real deadline behind this one.", "timestamp": 301.8 },
+        { "speaker": "You", "text": "A real deadline is the best project manager. Let's recap actions: Colin owns the top-20 shortlist, Jess the service account, Ines sends the sync invite and workbook, and I'll get you our go-live checklist.", "timestamp": 330.2 },
+        { "speaker": "Jess Ortega", "text": "Sounds right.", "timestamp": 368.5 },
+        { "speaker": "Colin Marsh", "text": "Great to finally get this moving. Thanks all.", "timestamp": 374.1 }
+      ],
+      "attendees": [
+        { "email": "caroline@vector.test", "name": "Caroline Jaworsky", "domain": "vector.test" },
+        { "email": "ines@vector.test", "name": "Ines Ferreira", "domain": "vector.test" },
+        { "email": "colin@flockfreight.com", "name": "Colin Marsh", "domain": "flockfreight.com" },
+        { "email": "jess@flockfreight.com", "name": "Jess Ortega", "domain": "flockfreight.com" }
+      ]
+    }
+  }
+}

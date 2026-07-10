@@ -1,0 +1,46 @@
+{
+  "daysAgo": 5,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "A3E4BE10-7B82-4B8D-8DFF-FC5E0AD5D88C",
+      "title": "ChowNow go-live readiness review",
+      "duration_seconds": 2670,
+      "language": "en",
+      "summary": "Go-live readiness review for ChowNow's self-serve rollout. Walked the readiness checklist: SSO (Okta SAML) done and tested, role-based permissions mapped, AI analyst guardrails configured and scoped to the orders mart. Parity is the last open gate — two of the three timezone-cast dashboards now match after the staging fix; the third is being retested. Agreed a provisional go-live date one week out, firmly conditional on Lucia's parity sign-off. Set a rollback plan and a day-one support rota.",
+      "action_items": [
+        "Kevin to finish retesting the third dashboard and report parity numbers by Friday",
+        "Lucia to give final parity sign-off, which unblocks the readiness review completion",
+        "Caroline to lock the provisional go-live date once parity signs off",
+        "Sandra to confirm the day-one support rota and send rollout comms on go-live morning"
+      ],
+      "key_decisions": [
+        "Provisional go-live set for one week out, conditional on parity sign-off",
+        "Rollback plan: keep Tableau read-only for two weeks post-launch as a fallback",
+        "AI analyst launches scoped to the orders mart only; wider access is a fast-follow"
+      ],
+      "topics": ["go-live readiness", "parity sign-off", "sso", "permissions", "rollback plan"],
+      "discussion_flow": ["readiness checklist walkthrough", "sso and permissions sign-off", "parity status", "go-live date decision", "rollback and support plan"],
+      "notes": "Everything green except parity, and parity is on a short leash. The team is disciplined about not going live on an unexplained variance, which is exactly right for a self-serve launch where numbers will be trusted without a human in the loop. Keeping Tableau as a two-week fallback is cheap insurance.",
+      "speaker_count": 4,
+      "speaker_names": { "-1": "You", "0": "Lucia Herrera", "1": "Kevin O'Rourke", "2": "Sandra Kim" },
+      "transcript": [
+        { "speaker": "You", "text": "Readiness review. I'll walk the checklist top to bottom and we mark each item green, amber, or blocked. SSO first — Okta SAML is configured and I tested a login this morning. Green.", "timestamp": 4.5 },
+        { "speaker": "Sandra Kim", "text": "Confirmed on our side too — I logged in with a rollout-group account and landed in the right workspace.", "timestamp": 33.2 },
+        { "speaker": "You", "text": "Permissions — roles are mapped, ops team gets the self-serve dashboards, finance gets the restricted set. Green. Guardrails — AI analyst is scoped to the orders mart only for launch. Green. That leaves parity.", "timestamp": 58.9 },
+        { "speaker": "Kevin O'Rourke", "text": "Two of the three are matching now after your staging fix. The third I'm retesting — it's the same timezone family, I just want the numbers in front of me before I call it.", "timestamp": 96.4 },
+        { "speaker": "You", "text": "So parity is amber, not blocked — we have a known cause and a fix in flight. I'd set a provisional go-live one week out, hard-conditional on Lucia signing parity. Objections?", "timestamp": 131.7 },
+        { "speaker": "Lucia Herrera", "text": "None. I'll sign the moment Kevin's third dashboard matches. I'm not going to gate a launch on a variance we understand and have fixed.", "timestamp": 168.0 },
+        { "speaker": "You", "text": "Then let's talk safety. Rollback plan: we keep Tableau read-only for two weeks after launch. If anything looks wrong, people have a reference and we're not scrambling.", "timestamp": 194.3 },
+        { "speaker": "Sandra Kim", "text": "Sensible. I'll set up a day-one support rota — someone from data and someone from Vector on call for the first day.", "timestamp": 226.8 },
+        { "speaker": "You", "text": "Good. So: Kevin retests by Friday, Lucia signs, I lock the date, Sandra sends comms go-live morning. This was a clean review — we're one green checkbox from launch.", "timestamp": 251.0 }
+      ],
+      "attendees": [
+        { "email": "caroline@vector.test", "name": "Caroline Jaworsky", "domain": "vector.test" },
+        { "email": "lucia@chownow.com", "name": "Lucia Herrera", "domain": "chownow.com" },
+        { "email": "kevin@chownow.com", "name": "Kevin O'Rourke", "domain": "chownow.com" },
+        { "email": "sandra@chownow.com", "name": "Sandra Kim", "domain": "chownow.com" }
+      ]
+    }
+  }
+}

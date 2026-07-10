@@ -1,0 +1,55 @@
+{
+  "daysAgo": 47,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "5870711D-CE91-47F8-A227-05F41FF8796F",
+      "title": "Function Health × Vector — onboarding kickoff",
+      "duration_seconds": 3310,
+      "language": "en",
+      "summary": "Kickoff with Function Health. Their Snowflake instance holds lab-result-adjacent data, so nothing connects until their infosec team completes a vendor security review — Miriam Lowe owns that process and estimates two to three weeks. Agreed to run the security review and the non-connected setup (dbt repo walkthrough, metric definitions on sample data) in parallel so the timeline doesn't fully stall. Rachel wants member-growth and lab-operations dashboards as the first deliverable.",
+      "action_items": [
+        "Miriam to open the vendor security review ticket and send Vector the security questionnaire",
+        "Caroline to return the completed questionnaire with the SOC 2 Type II report attached",
+        "David to walk Theo through the dbt project structure in a working session next week",
+        "Maya to draft a phased plan that keeps non-connected workstreams moving during the review"
+      ],
+      "key_decisions": [
+        "No warehouse connection of any kind until the security review clears — hard gate from infosec",
+        "Semantic layer design will proceed on sample data in parallel with the review",
+        "First dashboard scope: member growth and lab operations"
+      ],
+      "topics": ["kickoff", "security review", "snowflake", "compliance", "dbt"],
+      "discussion_flow": ["intros", "goals", "data sensitivity and compliance gate", "parallel workstream plan", "next steps"],
+      "notes": "Health data means infosec is a hard gate here, not a formality. Miriam was clear that the review queue is deep and escalation goes through their CISO. Rachel is pragmatic and wants us to keep momentum on everything that doesn't touch the warehouse.",
+      "speaker_count": 5,
+      "speaker_names": { "-1": "You", "0": "Rachel Kim", "1": "David Osei", "2": "Miriam Lowe", "3": "Theo Okonkwo" },
+      "transcript": [
+        { "speaker": "You", "text": "Thanks for joining, everyone. We know health data raises the stakes here, so we've brought our security documentation to the kickoff rather than waiting to be asked.", "timestamp": 5.5 },
+        { "speaker": "Rachel Kim", "text": "Appreciated. Quick context: we run everything on Snowflake and dbt, and the analytics backlog is enormous — member growth, lab operations, panel utilisation. The team is drowning in ad-hoc requests.", "timestamp": 24.3 },
+        { "speaker": "Miriam Lowe", "text": "Before we get into any of that I need to set expectations. Any vendor touching our warehouse goes through a full security review. Lab results are in there. No connection happens before that clears — no exceptions.", "timestamp": 68.9 },
+        { "speaker": "You", "text": "Understood, and we'd expect nothing less. What does the review involve and what's the realistic timeline?", "timestamp": 102.4 },
+        { "speaker": "Miriam Lowe", "text": "Our questionnaire, your SOC 2 report, a data-flow diagram, and sign-off from our CISO. The queue is deep right now — I'd say two to three weeks if your responses are clean.", "timestamp": 116.0 },
+        { "speaker": "You", "text": "We'll turn the questionnaire around within two business days of receiving it, SOC 2 Type II attached. Theo, what can move in parallel without a connection?", "timestamp": 154.7 },
+        { "speaker": "Theo Okonkwo", "text": "Quite a lot. David can walk me through the dbt project — reading the repo doesn't touch the warehouse. We can design the semantic layer and even prototype metric definitions against sample data.", "timestamp": 175.2 },
+        { "speaker": "David Osei", "text": "Repo access I can grant today, that's just GitHub. The project is around ninety models, staging and marts split cleanly.", "timestamp": 213.6 },
+        { "speaker": "Miriam Lowe", "text": "Repo access is fine as long as no seed files contain real member data. Please verify that, David.", "timestamp": 239.1 },
+        { "speaker": "David Osei", "text": "They don't, but I'll double-check and strip anything questionable.", "timestamp": 254.8 },
+        { "speaker": "Rachel Kim", "text": "So the shape is: security review runs its course, and meanwhile you two design the semantic layer on sample data so we're ready to connect the moment Miriam signs off?", "timestamp": 270.3 },
+        { "speaker": "You", "text": "Exactly. The review becomes the critical path but not a dead stop. Maya will draft the phased plan reflecting that.", "timestamp": 296.9 },
+        { "speaker": "Rachel Kim", "text": "Good. On outcomes — the first thing leadership will ask for is the member growth dashboard. If we nail that, everything else gets easier internally.", "timestamp": 322.5 },
+        { "speaker": "You", "text": "Then that's our flagship deliverable. Miriam, can you open the review ticket this week and send us the questionnaire?", "timestamp": 351.0 },
+        { "speaker": "Miriam Lowe", "text": "I'll open it tomorrow. Fair warning — I have four other vendor reviews in the queue ahead of you.", "timestamp": 367.4 },
+        { "speaker": "You", "text": "Understood. We'll be the fastest questionnaire response you've ever seen. Thanks everyone — recap and plan to follow.", "timestamp": 384.2 }
+      ],
+      "attendees": [
+        { "email": "caroline@vector.test", "name": "Caroline Jaworsky", "domain": "vector.test" },
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "rachel@functionhealth.com", "name": "Rachel Kim", "domain": "functionhealth.com" },
+        { "email": "david@functionhealth.com", "name": "David Osei", "domain": "functionhealth.com" },
+        { "email": "miriam@functionhealth.com", "name": "Miriam Lowe", "domain": "functionhealth.com" }
+      ]
+    }
+  }
+}

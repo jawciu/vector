@@ -1,0 +1,50 @@
+{
+  "daysAgo": 24,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "95B7E943-052B-4784-8859-741338F6B4F9",
+      "title": "Sylvera dashboard migration — working session 3",
+      "duration_seconds": 3260,
+      "language": "en",
+      "summary": "Third migration working session with Sylvera. Rebuilt the carbon ratings coverage dashboard and the project pipeline dashboard on Vector; both now read from the semantic layer instead of bespoke Looker derived tables. Two Looker dashboards remain: portfolio exposure (complex, custom SQL) and the exec weekly. Agreed the portfolio exposure logic moves into dbt as a proper mart model rather than being ported as raw SQL. Parity checks against Looker are green for 7 of 9 dashboards.",
+      "action_items": [
+        "Tom to build stg_portfolio_exposure and the mart model in dbt to replace the Looker custom SQL",
+        "Theo to rebuild the exec weekly dashboard once the exposure mart lands",
+        "Amara to run the side-by-side parity review on the ratings coverage dashboard with her team",
+        "Theo to add the two remaining dashboards to the parity tracker"
+      ],
+      "key_decisions": [
+        "Portfolio exposure logic moves into dbt as a mart model — no raw SQL ports",
+        "Parity sign-off will be dashboard-by-dashboard, tracked in the shared checklist"
+      ],
+      "topics": ["dashboard migration", "parity checks", "dbt mart model", "looker sunset"],
+      "discussion_flow": ["migration status", "ratings coverage rebuild", "portfolio exposure SQL problem", "mart model decision", "parity tracking"],
+      "notes": "7 of 9 dashboards at parity. The portfolio exposure custom SQL was 400 lines of window functions — moving it into dbt is more work now but the right call. Go-live is realistically 3-4 weeks out.",
+      "speaker_count": 3,
+      "speaker_names": { "-1": "You", "0": "Amara Diallo", "1": "Tom Hale" },
+      "transcript": [
+        { "speaker": "You", "text": "Session three. Scoreboard first: seven of nine dashboards rebuilt and passing parity. Today I want to crack the two stragglers.", "timestamp": 4.6 },
+        { "speaker": "Amara Diallo", "text": "The ratings coverage rebuild looks great by the way — my team compared it against Looker on Friday and the numbers line up. I'll do the formal side-by-side this week so we can tick the sign-off box.", "timestamp": 22.9 },
+        { "speaker": "You", "text": "Perfect. Now, portfolio exposure. Tom, I opened the Looker dashboard and found four hundred lines of custom SQL with window functions inside a derived table. My condolences.", "timestamp": 58.7 },
+        { "speaker": "Tom Hale", "text": "Yeah, that's three years of accumulated 'just one more CTE'. It works, but nobody fully understands it anymore, including its author. Who is me.", "timestamp": 91.2 },
+        { "speaker": "You", "text": "The tempting move is to port the SQL as-is. I want to argue against that: this logic belongs in dbt as a proper mart model with tests, and the dashboard becomes a thin view on top.", "timestamp": 118.5 },
+        { "speaker": "Tom Hale", "text": "Agreed honestly — migrating it untested just relocates the risk. I can split it into a staging model and an exposure mart. Two days of work, maybe three with tests.", "timestamp": 157.0 },
+        { "speaker": "Amara Diallo", "text": "Does that delay go-live? The exec weekly depends on exposure numbers too.", "timestamp": 196.8 },
+        { "speaker": "You", "text": "It shifts the exec weekly rebuild behind the mart model, so roughly a week. But we skip a whole class of parity bugs — porting untestable SQL is how migrations go sideways late.", "timestamp": 211.3 },
+        { "speaker": "Amara Diallo", "text": "A predictable week now beats a mystery month later. Approved.", "timestamp": 248.9 },
+        { "speaker": "Tom Hale", "text": "I'll have stg_portfolio_exposure up for review by Thursday, mart and tests early next week.", "timestamp": 262.4 },
+        { "speaker": "You", "text": "And I'll rebuild the exec weekly the day the mart lands — most of the layout is reusable from the old one. That puts all nine dashboards on the parity tracker.", "timestamp": 285.0 },
+        { "speaker": "Amara Diallo", "text": "Which means go-live conversation soon. Can we get the checklist review on the calendar for a couple of weeks out?", "timestamp": 318.6 },
+        { "speaker": "You", "text": "Yes — I'll send a go-live review invite. If parity stays green we're looking at three to four weeks to switch off Looker.", "timestamp": 340.1 },
+        { "speaker": "Tom Hale", "text": "I've been waiting a year to write that decommission ticket.", "timestamp": 371.5 },
+        { "speaker": "You", "text": "Save it as a treat. Thanks both — actions in the recap.", "timestamp": 380.0 }
+      ],
+      "attendees": [
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "amara@sylvera.com", "name": "Amara Diallo", "domain": "sylvera.com" },
+        { "email": "tom@sylvera.com", "name": "Tom Hale", "domain": "sylvera.com" }
+      ]
+    }
+  }
+}

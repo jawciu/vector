@@ -1,0 +1,47 @@
+{
+  "daysAgo": 35,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "76EBBAEA-609B-4DB6-8A0C-2632ACB392CF",
+      "title": "Flock Freight weekly sync",
+      "duration_seconds": 1740,
+      "language": "en",
+      "summary": "Healthy weekly sync. BigQuery service account and dbt repo connection are done; first compile clean. Colin finished the Looker usage audit — top-20 shortlist is ready and leadership approved the archive-the-rest approach. Next up: define the first ten metrics in the dbt project, starting with shipment margin and carrier utilisation. Finance close starts next week, so the following sync is cancelled.",
+      "action_items": [
+        "Colin to draft the first 10 metric definitions in the dbt .yml with Theo's review",
+        "Ines to move the migration workbook items for the top-20 dashboards into the project plan",
+        "Colin to send the archive announcement to Looker users before close week",
+        "Skip next week's sync (finance close) — resume the week after"
+      ],
+      "key_decisions": [
+        "Top-20 dashboard shortlist approved by leadership; remaining Looker content will be archived with 30 days notice",
+        "Next week's sync cancelled for finance close"
+      ],
+      "topics": ["weekly sync", "looker audit", "metric definitions", "finance close"],
+      "discussion_flow": ["setup status", "audit results", "metrics planning", "close week logistics"],
+      "notes": "Colin remains highly engaged — he did the usage audit ahead of schedule. Watch for momentum loss during close week.",
+      "speaker_count": 3,
+      "speaker_names": { "-1": "You", "0": "Colin Marsh", "1": "Jess Ortega" },
+      "transcript": [
+        { "speaker": "You", "text": "Morning both. Status from our side: service account works, repo is connected, and the first compile came back clean on Friday. Technical setup is done.", "timestamp": 5.2 },
+        { "speaker": "Jess Ortega", "text": "Nice. That closes out my items for this phase, I think.", "timestamp": 28.8 },
+        { "speaker": "Colin Marsh", "text": "And I come bearing the Looker usage audit. Of the three hundred and twelve saved pieces of content, ninety-one percent haven't been opened in ninety days. The top twenty covers essentially all real usage.", "timestamp": 39.4 },
+        { "speaker": "You", "text": "That's even more concentrated than usual. Did leadership bless the archive plan?", "timestamp": 82.1 },
+        { "speaker": "Colin Marsh", "text": "Yes — approved in Monday's ops review. I'll send the archive announcement with thirty days notice, but I want it out before close week so it's not buried.", "timestamp": 94.6 },
+        { "speaker": "You", "text": "Good call. Next milestone is the metric definitions — the first ten in the dbt yml. Shipment margin and carrier utilisation are the obvious anchors. Colin, do you want to draft and have Theo review?", "timestamp": 130.9 },
+        { "speaker": "Colin Marsh", "text": "Yes, I want my fingerprints on those definitions. I'll draft this week; margin logic has some subtlety around shared truckload consolidation that I should write down properly anyway.", "timestamp": 168.3 },
+        { "speaker": "You", "text": "Perfect. Ines will fold the top-20 migration into the project plan as individual items so we can track dashboard-by-dashboard.", "timestamp": 209.7 },
+        { "speaker": "Colin Marsh", "text": "One admin thing — finance close starts Monday. The whole data team is on close support, so let's cancel next week's sync rather than have me stare at you apologetically.", "timestamp": 234.5 },
+        { "speaker": "You", "text": "Cancelled. We'll keep building on our side — the migration scaffolding doesn't need you until definitions land. Anything else?", "timestamp": 266.0 },
+        { "speaker": "Jess Ortega", "text": "Nothing from me.", "timestamp": 285.4 },
+        { "speaker": "Colin Marsh", "text": "All good. Talk in two weeks.", "timestamp": 289.9 }
+      ],
+      "attendees": [
+        { "email": "ines@vector.test", "name": "Ines Ferreira", "domain": "vector.test" },
+        { "email": "colin@flockfreight.com", "name": "Colin Marsh", "domain": "flockfreight.com" },
+        { "email": "jess@flockfreight.com", "name": "Jess Ortega", "domain": "flockfreight.com" }
+      ]
+    }
+  }
+}

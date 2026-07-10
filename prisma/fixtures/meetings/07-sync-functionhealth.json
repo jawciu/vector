@@ -1,0 +1,47 @@
+{
+  "daysAgo": 33,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "34F0DAC4-7E18-43CF-9FCB-831FD18AC18B",
+      "title": "Function Health weekly sync",
+      "duration_seconds": 1595,
+      "language": "en",
+      "summary": "Weekly sync with Function Health. Vector returned the security questionnaire in two days with the SOC 2 Type II report and a data-flow diagram; the review is now with Miriam's infosec queue awaiting CISO sign-off. Parallel workstream is going well — Theo and David finished the semantic layer design on sample data and drafted metric definitions for member growth. Everything downstream (service account, warehouse connection, live dashboards) remains gated on the review.",
+      "action_items": [
+        "Miriam to chase the review ticket in this week's infosec triage and report back",
+        "David to open the draft PR with the member growth metrics block so it's ready to merge on approval",
+        "Maya to prepare the connection runbook so cutover happens same-day when the review clears"
+      ],
+      "key_decisions": [
+        "Member growth metrics PR will be staged as a draft and merged the day the review clears"
+      ],
+      "topics": ["weekly sync", "security review", "semantic layer", "member growth metrics"],
+      "discussion_flow": ["review status", "parallel workstream progress", "staging plan", "next steps"],
+      "notes": "Review submitted and clean; now purely a queue problem on their side. Rachel is starting to feel timeline pressure from leadership.",
+      "speaker_count": 4,
+      "speaker_names": { "-1": "You", "0": "Rachel Kim", "1": "David Osei", "2": "Miriam Lowe" },
+      "transcript": [
+        { "speaker": "You", "text": "Hi all. Quick status from us: questionnaire went back to Miriam in two business days as promised, with SOC 2 and the data-flow diagram attached.", "timestamp": 4.8 },
+        { "speaker": "Miriam Lowe", "text": "Confirmed received, and honestly one of the cleaner submissions I've processed. It's in the queue for CISO review now. I can't commit to a date — there are three vendors ahead of you.", "timestamp": 27.5 },
+        { "speaker": "Rachel Kim", "text": "Is there anything that gets it moving faster? Leadership asked me twice this week when the member growth dashboard lands.", "timestamp": 63.0 },
+        { "speaker": "Miriam Lowe", "text": "I'll flag it in Thursday's triage as onboarding-blocking. That's the legitimate lever. Please don't go around the process — that resets the clock.", "timestamp": 84.2 },
+        { "speaker": "You", "text": "Understood, we won't. Meanwhile the parallel track is healthy — Theo, David, where did the working session land?", "timestamp": 112.9 },
+        { "speaker": "David Osei", "text": "Really good shape. Semantic layer design is done on sample data. I've got the member growth metrics drafted — new members, activation rate, retest bookings — as a metrics block ready to go.", "timestamp": 128.4 },
+        { "speaker": "You", "text": "Can you open that as a draft PR now? Then the day Miriam's review clears, we merge, connect, and the dashboard goes live the same day rather than starting a two-week build.", "timestamp": 170.6 },
+        { "speaker": "David Osei", "text": "Draft PR by tomorrow. I like the same-day cutover framing.", "timestamp": 204.1 },
+        { "speaker": "Rachel Kim", "text": "That framing helps me too — I can tell leadership everything is staged and the review is the only gate.", "timestamp": 218.8 },
+        { "speaker": "You", "text": "Exactly the message. Maya will prep the connection runbook so cutover day is boring. Miriam, we'll hear from you after Thursday triage?", "timestamp": 242.3 },
+        { "speaker": "Miriam Lowe", "text": "I'll post in the shared channel either way.", "timestamp": 268.0 },
+        { "speaker": "You", "text": "Perfect. Short and productive — see everyone next week.", "timestamp": 276.5 }
+      ],
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "rachel@functionhealth.com", "name": "Rachel Kim", "domain": "functionhealth.com" },
+        { "email": "david@functionhealth.com", "name": "David Osei", "domain": "functionhealth.com" },
+        { "email": "miriam@functionhealth.com", "name": "Miriam Lowe", "domain": "functionhealth.com" }
+      ]
+    }
+  }
+}

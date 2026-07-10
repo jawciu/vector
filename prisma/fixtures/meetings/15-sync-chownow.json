@@ -1,0 +1,45 @@
+{
+  "daysAgo": 9,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "B3E66796-9F00-4B68-B432-11C905DD428F",
+      "title": "ChowNow weekly sync — parity crunch",
+      "duration_seconds": 2210,
+      "language": "en",
+      "summary": "Weekly sync with ChowNow ahead of go-live in ~10 days. Down to the last 3 dashboards showing small variances against Tableau. Traced two of them to a timezone cast — order timestamps are stored UTC but the Tableau extracts were localised to Pacific, so day-boundary counts drift. Kevin will confirm the third is the same root cause. Once the fix is validated we can run the go-live readiness review. SSO and guardrails are already done; parity is the only open gate.",
+      "action_items": [
+        "Kevin to confirm the third dashboard variance is the same timezone-cast root cause by Wednesday",
+        "Caroline to push the timezone fix to staging and re-run the parity checks",
+        "Lucia to give final parity sign-off once all three dashboards match",
+        "Sandra to keep the go-live comms draft ready to send the moment parity signs off"
+      ],
+      "key_decisions": [
+        "Order-timestamp metrics standardise on UTC in the semantic layer; the dashboard localises for display",
+        "Go-live readiness review is gated only on parity sign-off — everything else is green"
+      ],
+      "topics": ["parity sign-off", "timezone cast", "go-live readiness", "self-serve rollout"],
+      "discussion_flow": ["parity status", "timezone-cast diagnosis", "remaining variance", "go-live gating", "comms readiness"],
+      "notes": "Genuine crunch but well-managed. Kevin is sharp — he'd already half-diagnosed the timezone issue before the call. Lucia is ready to sign the moment numbers match. The readiness review can't start until parity clears, so this is the single blocker.",
+      "speaker_count": 4,
+      "speaker_names": { "-1": "You", "0": "Lucia Herrera", "1": "Kevin O'Rourke", "2": "Sandra Kim" },
+      "transcript": [
+        { "speaker": "You", "text": "Ten days out. The only thing standing between us and the readiness review is parity, so let's spend the whole call there. Kevin, where are we?", "timestamp": 3.8 },
+        { "speaker": "Kevin O'Rourke", "text": "Three dashboards still off, all by tiny amounts on day-boundary counts. I think it's timezones — our order timestamps are UTC in the warehouse, but the old Tableau extracts were localised to Pacific, so an order at 11pm Pacific lands on the next day in ours.", "timestamp": 26.4 },
+        { "speaker": "You", "text": "That would do it exactly. The right fix is to standardise the metric on UTC in the semantic layer and localise only at display time — not to bend the model to match the old extract.", "timestamp": 63.1 },
+        { "speaker": "Kevin O'Rourke", "text": "Agreed. Two of the three are definitely this. Let me confirm the third is the same and not a separate bug — I'll have that by Wednesday.", "timestamp": 98.7 },
+        { "speaker": "You", "text": "I'll push the timezone fix to staging today and re-run the parity checks. If all three line up, Lucia, are you good to sign off?", "timestamp": 124.0 },
+        { "speaker": "Lucia Herrera", "text": "The second the numbers match I'll sign. I don't want to be the one holding up go-live over a rounding difference, but I also won't sign on a variance I can't explain — and now we can explain it.", "timestamp": 149.5 },
+        { "speaker": "You", "text": "That's the right bar. Sandra, keep the rollout comms drafted so we can send the moment parity clears — I don't want comms to be the new bottleneck.", "timestamp": 181.2 },
+        { "speaker": "Sandra Kim", "text": "Comms are drafted and scheduled as a draft — one click when you give the word.", "timestamp": 203.9 },
+        { "speaker": "You", "text": "Then the plan is: Kevin confirms Wednesday, I validate the fix, Lucia signs, we book the readiness review. Thanks all.", "timestamp": 218.0 }
+      ],
+      "attendees": [
+        { "email": "caroline@vector.test", "name": "Caroline Jaworsky", "domain": "vector.test" },
+        { "email": "lucia@chownow.com", "name": "Lucia Herrera", "domain": "chownow.com" },
+        { "email": "kevin@chownow.com", "name": "Kevin O'Rourke", "domain": "chownow.com" },
+        { "email": "sandra@chownow.com", "name": "Sandra Kim", "domain": "chownow.com" }
+      ]
+    }
+  }
+}

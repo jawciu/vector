@@ -1,0 +1,58 @@
+{
+  "daysAgo": 52,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "5323FBBB-B5CE-4FA1-A54E-AEDA0F7E211C",
+      "title": "Vector × Modal — implementation kickoff",
+      "duration_seconds": 3145,
+      "language": "en",
+      "summary": "Kickoff for the Modal implementation. Agreed an 8-week timeline to go-live with the analytics platform on top of their existing dbt Core project (GitHub, ~140 models on Snowflake). Priya wants self-serve dashboards for engineering leadership first; the AI analyst pilot comes after the semantic layer is trustworthy. Immediate blockers: read-only Snowflake service account and repo access for Vector.",
+      "action_items": [
+        "Erin to provision a read-only Snowflake service account scoped to the ANALYTICS schema by Wednesday",
+        "Theo to send the Vector Cloud static IP list for Modal's warehouse network policy",
+        "Jonas to grant Vector read access to the dbt repo on GitHub",
+        "Maya to share the 8-week implementation plan and weekly sync invite"
+      ],
+      "key_decisions": [
+        "Go-live target set at 8 weeks from today",
+        "Phase 1 audience is engineering leadership dashboards; AI analyst pilot deferred to phase 2",
+        "Weekly sync every Tuesday at 4pm CET"
+      ],
+      "topics": ["kickoff", "snowflake", "dbt project", "timeline", "service account"],
+      "discussion_flow": ["intros", "current stack walkthrough", "goals and success criteria", "timeline", "technical prerequisites", "next steps"],
+      "notes": "Strong data team — Jonas maintains the dbt project solo and knows it inside out. Erin owns Snowflake and Okta. Priya is the exec sponsor and wants weekly progress visibility.",
+      "speaker_count": 5,
+      "speaker_names": { "-1": "You", "0": "Priya Raman", "1": "Jonas Beck", "2": "Erin Castillo", "3": "Theo Okonkwo" },
+      "transcript": [
+        { "speaker": "You", "text": "Thanks everyone for making time. Goal for today is to align on what success looks like and unblock the technical setup so Theo can start this week.", "timestamp": 4.2 },
+        { "speaker": "Priya Raman", "text": "Great. From our side the headline is that engineering leadership is flying blind — every metrics question turns into a notebook someone runs by hand.", "timestamp": 21.8 },
+        { "speaker": "You", "text": "That's the exact pattern we see a lot. Can you walk us through the current stack?", "timestamp": 43.0 },
+        { "speaker": "Jonas Beck", "text": "Sure. Everything lands in Snowflake, dbt Core project on GitHub, about a hundred and forty models. CI runs on merge to main. It's healthy — tests pass, docs are decent.", "timestamp": 55.6 },
+        { "speaker": "Theo Okonkwo", "text": "That's a great starting point. If the project compiles clean we can have the semantic layer scaffolded within days of getting repo access.", "timestamp": 92.4 },
+        { "speaker": "Erin Castillo", "text": "What exactly do you need from the warehouse side?", "timestamp": 118.0 },
+        { "speaker": "Theo Okonkwo", "text": "A read-only service account scoped to your ANALYTICS schema, and our static egress IPs added to your network policy. I'll send the IP list right after this call.", "timestamp": 126.5 },
+        { "speaker": "Erin Castillo", "text": "Fine on both. I can have the service account done by Wednesday. Network policy change goes through a quick review but it's routine.", "timestamp": 158.3 },
+        { "speaker": "You", "text": "Perfect. Jonas, for the repo — read access for our GitHub app is enough, we never push to your repo.", "timestamp": 187.9 },
+        { "speaker": "Jonas Beck", "text": "Easy, I'll add it today. One question — do you build on top of our existing metrics definitions or do we redefine everything?", "timestamp": 201.2 },
+        { "speaker": "Theo Okonkwo", "text": "We read what you have. Where you already have .yml metric definitions we import them; the gaps we fill together in a working session.", "timestamp": 219.7 },
+        { "speaker": "Priya Raman", "text": "On scope — I want leadership dashboards first. Deployment velocity, GPU utilisation revenue, top customer accounts. The AI analyst thing is exciting but I don't want it answering questions off a semantic layer we don't trust yet.", "timestamp": 258.1 },
+        { "speaker": "You", "text": "Completely agree, that's our recommended order anyway. Semantic layer first, dashboards second, AI analyst pilot to a small group once parity is proven.", "timestamp": 297.5 },
+        { "speaker": "Priya Raman", "text": "Then let's say eight weeks to go-live for the dashboard tier. Is that realistic?", "timestamp": 330.0 },
+        { "speaker": "You", "text": "With a project in this shape, yes. The long pole is usually access provisioning, and Erin just volunteered to crush that this week.", "timestamp": 341.8 },
+        { "speaker": "Erin Castillo", "text": "No pressure.", "timestamp": 362.2 },
+        { "speaker": "You", "text": "Maya will send over the implementation plan and a weekly sync invite — proposing Tuesdays 4pm your time. Any objections?", "timestamp": 371.0 },
+        { "speaker": "Priya Raman", "text": "Tuesday works. Let's move.", "timestamp": 392.6 },
+        { "speaker": "You", "text": "Great kickoff, everyone. Summary and action items will be in your inbox within the hour.", "timestamp": 401.3 }
+      ],
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "caroline@vector.test", "name": "Caroline Jaworsky", "domain": "vector.test" },
+        { "email": "priya@modal.com", "name": "Priya Raman", "domain": "modal.com" },
+        { "email": "jonas@modal.com", "name": "Jonas Beck", "domain": "modal.com" },
+        { "email": "erin@modal.com", "name": "Erin Castillo", "domain": "modal.com" }
+      ]
+    }
+  }
+}

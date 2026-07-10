@@ -40,6 +40,7 @@ export type CompanyMinAggregateOutputType = {
   id: number | null
   name: string | null
   domain: string | null
+  logoUrl: string | null
   prefix: string | null
   taskCounter: number | null
 }
@@ -48,6 +49,7 @@ export type CompanyMaxAggregateOutputType = {
   id: number | null
   name: string | null
   domain: string | null
+  logoUrl: string | null
   prefix: string | null
   taskCounter: number | null
 }
@@ -56,6 +58,7 @@ export type CompanyCountAggregateOutputType = {
   id: number
   name: number
   domain: number
+  logoUrl: number
   prefix: number
   taskCounter: number
   _all: number
@@ -76,6 +79,7 @@ export type CompanyMinAggregateInputType = {
   id?: true
   name?: true
   domain?: true
+  logoUrl?: true
   prefix?: true
   taskCounter?: true
 }
@@ -84,6 +88,7 @@ export type CompanyMaxAggregateInputType = {
   id?: true
   name?: true
   domain?: true
+  logoUrl?: true
   prefix?: true
   taskCounter?: true
 }
@@ -92,6 +97,7 @@ export type CompanyCountAggregateInputType = {
   id?: true
   name?: true
   domain?: true
+  logoUrl?: true
   prefix?: true
   taskCounter?: true
   _all?: true
@@ -187,6 +193,7 @@ export type CompanyGroupByOutputType = {
   id: number
   name: string
   domain: string | null
+  logoUrl: string | null
   prefix: string
   taskCounter: number
   _count: CompanyCountAggregateOutputType | null
@@ -218,6 +225,7 @@ export type CompanyWhereInput = {
   id?: Prisma.IntFilter<"Company"> | number
   name?: Prisma.StringFilter<"Company"> | string
   domain?: Prisma.StringNullableFilter<"Company"> | string | null
+  logoUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   prefix?: Prisma.StringFilter<"Company"> | string
   taskCounter?: Prisma.IntFilter<"Company"> | number
   onboardings?: Prisma.OnboardingListRelationFilter
@@ -228,6 +236,7 @@ export type CompanyOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   domain?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   prefix?: Prisma.SortOrder
   taskCounter?: Prisma.SortOrder
   onboardings?: Prisma.OnboardingOrderByRelationAggregateInput
@@ -242,6 +251,7 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.CompanyWhereInput | Prisma.CompanyWhereInput[]
   name?: Prisma.StringFilter<"Company"> | string
   domain?: Prisma.StringNullableFilter<"Company"> | string | null
+  logoUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   taskCounter?: Prisma.IntFilter<"Company"> | number
   onboardings?: Prisma.OnboardingListRelationFilter
   tasks?: Prisma.TaskListRelationFilter
@@ -251,6 +261,7 @@ export type CompanyOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   domain?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   prefix?: Prisma.SortOrder
   taskCounter?: Prisma.SortOrder
   _count?: Prisma.CompanyCountOrderByAggregateInput
@@ -267,6 +278,7 @@ export type CompanyScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Company"> | number
   name?: Prisma.StringWithAggregatesFilter<"Company"> | string
   domain?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
+  logoUrl?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   prefix?: Prisma.StringWithAggregatesFilter<"Company"> | string
   taskCounter?: Prisma.IntWithAggregatesFilter<"Company"> | number
 }
@@ -274,6 +286,7 @@ export type CompanyScalarWhereWithAggregatesInput = {
 export type CompanyCreateInput = {
   name: string
   domain?: string | null
+  logoUrl?: string | null
   prefix: string
   taskCounter?: number
   onboardings?: Prisma.OnboardingCreateNestedManyWithoutCompanyInput
@@ -284,6 +297,7 @@ export type CompanyUncheckedCreateInput = {
   id?: number
   name: string
   domain?: string | null
+  logoUrl?: string | null
   prefix: string
   taskCounter?: number
   onboardings?: Prisma.OnboardingUncheckedCreateNestedManyWithoutCompanyInput
@@ -293,6 +307,7 @@ export type CompanyUncheckedCreateInput = {
 export type CompanyUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
   onboardings?: Prisma.OnboardingUpdateManyWithoutCompanyNestedInput
@@ -303,6 +318,7 @@ export type CompanyUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
   onboardings?: Prisma.OnboardingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -313,6 +329,7 @@ export type CompanyCreateManyInput = {
   id?: number
   name: string
   domain?: string | null
+  logoUrl?: string | null
   prefix: string
   taskCounter?: number
 }
@@ -320,6 +337,7 @@ export type CompanyCreateManyInput = {
 export type CompanyUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
 }
@@ -328,6 +346,7 @@ export type CompanyUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
 }
@@ -336,6 +355,7 @@ export type CompanyCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   domain?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrder
   prefix?: Prisma.SortOrder
   taskCounter?: Prisma.SortOrder
 }
@@ -349,6 +369,7 @@ export type CompanyMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   domain?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrder
   prefix?: Prisma.SortOrder
   taskCounter?: Prisma.SortOrder
 }
@@ -357,6 +378,7 @@ export type CompanyMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   domain?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrder
   prefix?: Prisma.SortOrder
   taskCounter?: Prisma.SortOrder
 }
@@ -418,6 +440,7 @@ export type CompanyUpdateOneRequiredWithoutTasksNestedInput = {
 export type CompanyCreateWithoutOnboardingsInput = {
   name: string
   domain?: string | null
+  logoUrl?: string | null
   prefix: string
   taskCounter?: number
   tasks?: Prisma.TaskCreateNestedManyWithoutCompanyInput
@@ -427,6 +450,7 @@ export type CompanyUncheckedCreateWithoutOnboardingsInput = {
   id?: number
   name: string
   domain?: string | null
+  logoUrl?: string | null
   prefix: string
   taskCounter?: number
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCompanyInput
@@ -451,6 +475,7 @@ export type CompanyUpdateToOneWithWhereWithoutOnboardingsInput = {
 export type CompanyUpdateWithoutOnboardingsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
   tasks?: Prisma.TaskUpdateManyWithoutCompanyNestedInput
@@ -460,6 +485,7 @@ export type CompanyUncheckedUpdateWithoutOnboardingsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutCompanyNestedInput
@@ -468,6 +494,7 @@ export type CompanyUncheckedUpdateWithoutOnboardingsInput = {
 export type CompanyCreateWithoutTasksInput = {
   name: string
   domain?: string | null
+  logoUrl?: string | null
   prefix: string
   taskCounter?: number
   onboardings?: Prisma.OnboardingCreateNestedManyWithoutCompanyInput
@@ -477,6 +504,7 @@ export type CompanyUncheckedCreateWithoutTasksInput = {
   id?: number
   name: string
   domain?: string | null
+  logoUrl?: string | null
   prefix: string
   taskCounter?: number
   onboardings?: Prisma.OnboardingUncheckedCreateNestedManyWithoutCompanyInput
@@ -501,6 +529,7 @@ export type CompanyUpdateToOneWithWhereWithoutTasksInput = {
 export type CompanyUpdateWithoutTasksInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
   onboardings?: Prisma.OnboardingUpdateManyWithoutCompanyNestedInput
@@ -510,6 +539,7 @@ export type CompanyUncheckedUpdateWithoutTasksInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   domain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prefix?: Prisma.StringFieldUpdateOperationsInput | string
   taskCounter?: Prisma.IntFieldUpdateOperationsInput | number
   onboardings?: Prisma.OnboardingUncheckedUpdateManyWithoutCompanyNestedInput
@@ -559,6 +589,7 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   name?: boolean
   domain?: boolean
+  logoUrl?: boolean
   prefix?: boolean
   taskCounter?: boolean
   onboardings?: boolean | Prisma.Company$onboardingsArgs<ExtArgs>
@@ -570,6 +601,7 @@ export type CompanySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   name?: boolean
   domain?: boolean
+  logoUrl?: boolean
   prefix?: boolean
   taskCounter?: boolean
 }, ExtArgs["result"]["company"]>
@@ -578,6 +610,7 @@ export type CompanySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   name?: boolean
   domain?: boolean
+  logoUrl?: boolean
   prefix?: boolean
   taskCounter?: boolean
 }, ExtArgs["result"]["company"]>
@@ -586,11 +619,12 @@ export type CompanySelectScalar = {
   id?: boolean
   name?: boolean
   domain?: boolean
+  logoUrl?: boolean
   prefix?: boolean
   taskCounter?: boolean
 }
 
-export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "domain" | "prefix" | "taskCounter", ExtArgs["result"]["company"]>
+export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "domain" | "logoUrl" | "prefix" | "taskCounter", ExtArgs["result"]["company"]>
 export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   onboardings?: boolean | Prisma.Company$onboardingsArgs<ExtArgs>
   tasks?: boolean | Prisma.Company$tasksArgs<ExtArgs>
@@ -609,6 +643,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id: number
     name: string
     domain: string | null
+    logoUrl: string | null
     prefix: string
     taskCounter: number
   }, ExtArgs["result"]["company"]>
@@ -1039,6 +1074,7 @@ export interface CompanyFieldRefs {
   readonly id: Prisma.FieldRef<"Company", 'Int'>
   readonly name: Prisma.FieldRef<"Company", 'String'>
   readonly domain: Prisma.FieldRef<"Company", 'String'>
+  readonly logoUrl: Prisma.FieldRef<"Company", 'String'>
   readonly prefix: Prisma.FieldRef<"Company", 'String'>
   readonly taskCounter: Prisma.FieldRef<"Company", 'Int'>
 }

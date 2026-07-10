@@ -23,6 +23,7 @@ import { computeHealth } from "@/lib/health";
 import Button from "@/app/ui/Button";
 import TaskCard from "@/app/components/TaskCard";
 import CreateTaskModal from "@/app/components/CreateTaskModal";
+import CompanyAvatar from "@/app/ui/CompanyAvatar";
 import TaskDrawer from "@/app/components/TaskDrawer";
 import OnboardingActions from "@/app/components/OnboardingActions";
 import PhaseHeader from "@/app/components/PhaseHeader";
@@ -458,13 +459,12 @@ export default function OnboardingDetailClient({
           </Link>
           <span style={{ color: "var(--text-muted)" }}>›</span>
           <div className="flex items-center gap-2">
-            <span
-              className="flex shrink-0 w-5 h-5 rounded items-center justify-center text-[10px] font-semibold"
-              style={{ background: avatarColor(onboarding.companyName), color: "var(--text-dark)" }}
-              aria-hidden
-            >
-              {avatarInitials(onboarding.companyName)}
-            </span>
+            <CompanyAvatar
+              name={onboarding.companyName}
+              logoUrl={onboarding.companyLogoUrl}
+              size={20}
+              fontSize={10}
+            />
             <span className="font-medium" style={{ color: "var(--text)" }}>
               {onboarding.companyName}
             </span>
@@ -822,6 +822,7 @@ export default function OnboardingDetailClient({
         phaseId={addingInPhase}
         phaseName={phases.find((p) => p.id === addingInPhase)?.name || ""}
         companyName={onboarding.companyName}
+        companyLogoUrl={onboarding.companyLogoUrl}
         onTaskCreated={handleTaskCreated}
         people={people}
         vendorUsers={vendorUsers}

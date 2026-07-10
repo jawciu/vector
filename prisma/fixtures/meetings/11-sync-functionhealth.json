@@ -1,0 +1,48 @@
+{
+  "daysAgo": 19,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "1D816D0F-B837-4FA9-B3EC-953F20A38786",
+      "title": "Function Health weekly sync — security review escalation",
+      "duration_seconds": 1470,
+      "language": "en",
+      "summary": "Difficult sync. The security review has now been sitting with Function Health's infosec queue for nearly three weeks with no CISO sign-off; the flag in triage didn't move it. Everything downstream is still blocked: no service account, no warehouse connection, no live dashboards. Rachel committed to a direct escalation to the CISO with the exec sponsor CC'd. Vector offered a 30-minute architecture Q&A with the CISO to shortcut written back-and-forth. Timeline slips at least two weeks even in the best case.",
+      "action_items": [
+        "Rachel to escalate the security review directly to the CISO with the exec sponsor copied",
+        "Miriam to send the CISO's open questions to Vector in writing today",
+        "Caroline to offer two slots this week for the 30-minute CISO architecture Q&A",
+        "Maya to revise the project plan with a two-week slip and share it before Friday"
+      ],
+      "key_decisions": [
+        "Escalation goes exec-to-CISO rather than waiting another triage cycle",
+        "Project plan officially slips two weeks; revised go-live to be confirmed after the review clears"
+      ],
+      "topics": ["security review", "escalation", "timeline slip", "blocked"],
+      "discussion_flow": ["review status", "impact on timeline", "escalation options", "revised plan"],
+      "notes": "Three weeks stuck. Nothing wrong with our submission — the CISO simply hasn't gotten to it and had two clarifying questions nobody forwarded to us. Rachel is frustrated but constructive. This account is at risk of losing exec momentum.",
+      "speaker_count": 3,
+      "speaker_names": { "-1": "You", "0": "Rachel Kim", "1": "Miriam Lowe" },
+      "transcript": [
+        { "speaker": "You", "text": "Let's talk about the elephant. The review has been in the queue for nearly three weeks. Miriam, where does it actually stand?", "timestamp": 5.9 },
+        { "speaker": "Miriam Lowe", "text": "It's with the CISO for final sign-off and has been for eight days. He had two clarifying questions on your data-flow diagram — retention of query results, and where the metadata cache lives.", "timestamp": 21.4 },
+        { "speaker": "You", "text": "Those questions never reached us. We could have answered both the same day — query results aren't retained, and the metadata cache is region-pinned to your Snowflake region.", "timestamp": 59.8 },
+        { "speaker": "Miriam Lowe", "text": "That's fair criticism. They sat in his notes rather than coming back through the ticket. I'll send them to you in writing today.", "timestamp": 88.2 },
+        { "speaker": "Rachel Kim", "text": "Meanwhile I've had the member growth dashboard on 'next two weeks' for a month and my exec sponsor is asking whether this project is real. I need this unstuck.", "timestamp": 110.7 },
+        { "speaker": "You", "text": "Two suggestions. One: an exec-to-CISO escalation tends to move these queues more than another triage flag. Two: we offer your CISO a thirty-minute live architecture Q&A — verbal answers close loops that written rounds drag out.", "timestamp": 141.3 },
+        { "speaker": "Rachel Kim", "text": "I'll do the escalation today and copy our sponsor. Miriam, no offence to the process, but I'm going over it.", "timestamp": 189.6 },
+        { "speaker": "Miriam Lowe", "text": "None taken — escalation through the sponsor is part of the process. And the Q&A offer will help; he prefers talking to reading.", "timestamp": 208.0 },
+        { "speaker": "You", "text": "Then Caroline will send two slots for this week. Being honest about the plan: even if sign-off lands this week, we've lost enough runway that go-live slips about two weeks.", "timestamp": 232.5 },
+        { "speaker": "Rachel Kim", "text": "Understood. Give me the revised plan in writing before Friday — a real date I can defend beats an optimistic one I can't.", "timestamp": 264.9 },
+        { "speaker": "You", "text": "You'll have it. For what it's worth, everything on our side stays staged — the day this clears, connection and the metrics merge happen same-day.", "timestamp": 286.4 },
+        { "speaker": "Rachel Kim", "text": "That staging is the only reason I'm still calm. Let's get it done.", "timestamp": 311.8 }
+      ],
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "caroline@vector.test", "name": "Caroline Jaworsky", "domain": "vector.test" },
+        { "email": "rachel@functionhealth.com", "name": "Rachel Kim", "domain": "functionhealth.com" },
+        { "email": "miriam@functionhealth.com", "name": "Miriam Lowe", "domain": "functionhealth.com" }
+      ]
+    }
+  }
+}
