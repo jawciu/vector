@@ -163,9 +163,14 @@ async function main() {
   const vendorUsers = await prisma.vendorUser.findMany();
   const activeVendor = vendorUsers.find((u) => u.role === "admin" || u.role === "member") ?? vendorUsers[0];
 
+  // Scope every mutation to the seeded portfolio (companies carry a logoUrl).
+  // The legacy corpus (Acme Co and friends) predates this script and must stay
+  // exactly as it is — its drafts and events are never touched.
+  const SEEDED_ONLY = { onboarding: { company: { logoUrl: { not: null } } } };
+
   // ── Step 1: backdate ExternalEvent receivedAt / processedAt ────────────────
   const events = await prisma.externalEvent.findMany({
-    where: { source: "miniti" },
+    where: { source: "miniti", ...SEEDED_ONLY },
     orderBy: { occurredAt: "desc" },
     include: { onboarding: { select: { id: true, ownerId: true, companyId: true } } },
   });

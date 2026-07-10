@@ -12,8 +12,19 @@
 name: Reset Demo Data
 
 on:
-  schedule:
-    - cron: "0 3 * * *" # every day at 03:00 UTC
+  # SCHEDULE DISABLED (2026-07-10). Deleting the seeded onboardings cascade-deletes
+  # every PendingAIChange and sets ExternalEvent.onboardingId to NULL, so a nightly
+  # reset would destroy the AI drafts generated from the 18 injected meetings and
+  # leave the meeting events stranded. Regenerating them costs ~$1 of Anthropic
+  # usage per run, which is not acceptable nightly.
+  #
+  # Re-enable once reset-demo-data.js restores the meetings + drafts from a
+  # snapshot instead of reseeding from scratch. Until then the reset is manual:
+  # run it from the Actions tab if a visitor makes a mess (it will drop the
+  # meetings, which then need `node scripts/inject-meetings.js` to rebuild).
+  #
+  # schedule:
+  #   - cron: "0 3 * * *" # every day at 03:00 UTC
   workflow_dispatch:
 
 # Never let two resets overlap — a half-deleted portfolio racing a reseed would
