@@ -41,7 +41,9 @@ jobs:
         run: npx prisma generate
 
       - name: Reset and reseed demo portfolio
+        # Only DATABASE_URL: the seed talks to the pooler through the Prisma
+        # adapter. Passing an unset DIRECT_DATABASE_URL would hand prisma.config.ts
+        # an empty string, which its `??` fallback does not catch.
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL }}
         run: npx tsx prisma/reset-demo-data.js --write
