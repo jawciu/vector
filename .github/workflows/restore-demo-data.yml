@@ -1,0 +1,70 @@
+# Restore anything a visitor deleted from the public demo at vector.quest.
+#
+# Manual only. Re-creates the companies, onboardings, phases, tasks, and contacts
+# that are present in prisma/fixtures/demo-snapshot.json but missing from the live
+# database. It NEVER deletes and never overwrites a row that still exists, so a
+# visitor's edits (ticked tasks, moved cards) survive.
+#
+# Run it after "Demo Drift Check" fails. Costs nothing — no Anthropic calls.
+#
+# Caveat: AI drafts are not restored. If a whole onboarding was deleted, its
+# PendingAIChange rows cascaded away with it and its ExternalEvents were orphaned.
+# Rebuild those with `node scripts/inject-meetings.js` (≈$1 of Anthropic usage).
+
+name: Restore Demo Data
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Report what would be restored, without writing"
+        type: boolean
+        default: true
+
+concurrency:
+  group: demo-restore
+  cancel-in-progress: false
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npx prisma generate
+
+      - name: Restore missing rows
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -o pipefail
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            npx tsx scripts/demo-snapshot.js --restore | tee restore-report.txt
+          else
+            npx tsx scripts/demo-snapshot.js --restore --write | tee restore-report.txt
+          fi
+
+      - name: Publish report to the run summary
+        if: always()
+        run: |
+          {
+            echo "## Demo restore (${{ inputs.dry_run == true && 'dry run' || 'applied' }})"
+            echo ""
+            echo '```'
+            cat restore-report.txt || echo "(no report)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

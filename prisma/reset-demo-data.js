@@ -1,5 +1,16 @@
 /**
- * DEMO DATA ONLY — nightly reset for the public demo at vector.quest.
+ * DEMO DATA ONLY — full wipe-and-reseed of the demo portfolio.
+ *
+ * ⚠️  DESTRUCTIVE, AND NO LONGER THE ROUTINE PATH. Deleting the seeded
+ * onboardings cascade-deletes every PendingAIChange and orphans the injected
+ * meetings (ExternalEvent.onboardingId → NULL), so running this throws away the
+ * AI drafts and costs ~$1 of Anthropic usage to rebuild via inject-meetings.js.
+ *
+ * For day-to-day demo upkeep use scripts/demo-snapshot.js instead: `--check`
+ * reports what a visitor changed, `--restore --write` re-creates only what was
+ * deleted and preserves everything else. This script is kept for the rare case
+ * where you want the portfolio rebuilt from scratch (e.g. after changing the
+ * seed's shape).
  *
  * vector.quest auto-signs visitors into a shared demo account with full write
  * access, so anyone can drag cards, edit tasks, and approve AI drafts. This

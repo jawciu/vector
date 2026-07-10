@@ -1,0 +1,86 @@
+# Nightly drift check for the public demo at vector.quest.
+#
+# vector.quest is writable by anyone, so visitors will tick tasks and drag cards.
+# That's fine — it's a demo, and a moved card is not worth fixing. What matters is
+# structural loss: a deleted company, onboarding, task, or contact.
+#
+# This job compares the live database against prisma/fixtures/demo-snapshot.json
+# and REPORTS. It never deletes and never writes. The run summary lists what was
+# edited, added, and deleted. The job FAILS (→ GitHub emails Caroline) only when
+# something was deleted, which is the signal to run a restore.
+#
+# To repair:  Actions → "Restore Demo Data" → Run workflow.
+#             (Or locally: node scripts/demo-snapshot.js --restore --write)
+# To rebaseline after deliberate changes:
+#             node scripts/demo-snapshot.js --capture && commit the JSON.
+#
+# Costs nothing — no Anthropic calls, read-only against Postgres.
+
+name: Demo Drift Check
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # every day at 03:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: demo-drift-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # prisma.config.ts resolves DIRECT_DATABASE_URL eagerly and throws if it is
+      # missing, so both names map to the one secret that exists.
+      - name: Generate Prisma client
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npx prisma generate
+
+      - name: Compare live data against the snapshot
+        id: drift
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -o pipefail
+          # Capture the report for the summary, then re-raise the exit code:
+          # 0 = nothing deleted, 1 = structural loss.
+          npx tsx scripts/demo-snapshot.js --check | tee drift-report.txt
+        continue-on-error: true
+
+      - name: Publish report to the run summary
+        run: |
+          {
+            echo "## Demo drift report"
+            echo ""
+            echo '```'
+            cat drift-report.txt
+            echo '```'
+            echo ""
+            if [ "${{ steps.drift.outcome }}" = "failure" ]; then
+              echo "**Something was deleted.** Run the *Restore Demo Data* workflow to put it back."
+              echo "Restoring only re-creates what is missing — visitor edits are preserved."
+            else
+              echo "No structural loss. Any edits above are visitors poking at the demo; no action needed."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail if anything was deleted
+        if: steps.drift.outcome == 'failure'
+        run: |
+          echo "::error::Structural loss detected in the demo portfolio — see the run summary."
+          exit 1
