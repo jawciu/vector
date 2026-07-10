@@ -184,7 +184,7 @@ const ONBOARDING_SPECS = [
   },
   {
     company: "Loop Returns", stage: "mid", owner: "sam", status: "Active",
-    ageDays: 56, goLiveInDays: 42, donePhases: 4, openBase: 3, openStep: 2.5,
+    ageDays: 56, goLiveInDays: 52, donePhases: 4, openBase: 3, openStep: 2.5,
     overrides: { c4: "In progress", g1: "In progress", g2: "In progress" },
     overdue: { g1: 2 },
     contacts: [
@@ -275,7 +275,7 @@ const ONBOARDING_SPECS = [
   // ── 2 near go-live ──
   {
     company: "Sylvera", stage: "near", owner: "ines", status: "Active",
-    ageDays: 77, goLiveInDays: 18, donePhases: 5, openBase: 2, openStep: 2,
+    ageDays: 77, goLiveInDays: 28, donePhases: 5, openBase: 2, openStep: 2,
     overrides: { r1: "In progress", r2: "In progress" },
     overdue: {},
     contacts: [

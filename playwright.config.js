@@ -41,7 +41,10 @@ export default defineConfig({
   // listening on the base URL (e.g. CI). Avoids the .next/dev lock conflict
   // with Caroline's running `next dev`.
   webServer: {
-    command: "npm run dev",
+    // Pin the port. `next dev` takes the first free port, so it only landed on
+    // 3001 while another app happened to hold 3000 — when that moved, the suite
+    // timed out waiting on a server that had bound 3000 instead.
+    command: "npm run dev -- --port 3001",
     url: (process.env.E2E_BASE_URL || "http://localhost:3001") + "/login",
     reuseExistingServer: true,
     timeout: 180_000,

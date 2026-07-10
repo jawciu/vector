@@ -52,6 +52,7 @@ const WRITE = process.argv.includes("--write");
 
 // Tuning knobs.
 const CUTOFF_DAYS = 14;        // only resolve drafts from meetings older than this
+const STALE_TASK_DAYS = 21;    // AI tasks from meetings older than this get completed (~70%)
 const NEWEST_PENDING = 3;      // ...and never the newest N meetings, whatever their age
 const REJECT_EVERY = 5;        // draft.id % 5 === 0 → reject (~20%); else approve (~80%)
 const OVERRIDE_EVERY = 4;      // among approvals, id % 4 === 0 → edited-then-approved
@@ -459,7 +460,55 @@ async function main() {
     }
   }
 
+  // ── Step 3: age the approved work ─────────────────────────────────────────
+  // A task the AI created from a meeting six weeks ago would not still read
+  // "Not started". Complete a deterministic ~70% of tasks born from meetings
+  // older than STALE_TASK_DAYS. Without this the approved drafts pile up as
+  // open work and every onboarding trips lib/health.js's behind-pace rule.
+  const applied = await prisma.pendingAIChange.findMany({
+    where: { source: "miniti", status: "applied", appliedTaskId: { not: null }, ...SEEDED_ONLY },
+    select: { appliedTaskId: true, sourceEventId: true },
+  });
+  let completed = 0;
+  for (const d of applied) {
+    const ev = eventById.get(d.sourceEventId);
+    if (!ev) continue;
+    if (daysBetween(now, ev.occurredAt) <= STALE_TASK_DAYS) continue;
+    if (d.appliedTaskId % 10 >= 7) continue; // ~70%, deterministic
+    const task = await prisma.task.findUnique({ where: { id: d.appliedTaskId }, select: { status: true } });
+    if (!task || task.status === "Done") continue;
+    completed++;
+    if (WRITE) {
+      await prisma.task.update({ where: { id: d.appliedTaskId }, data: { status: "Done", previousStatus: task.status } });
+    }
+  }
+
+  // ── Step 4: replan the AI tasks that are still open ───────────────────────
+  // The orchestrator lifts due dates straight from the transcript ("by Friday"),
+  // which is in the past for meetings we backdated. An open task nobody has
+  // touched would have been rescheduled, not left months overdue. Push the
+  // stragglers to the next couple of weeks; the overdue budget stays where the
+  // seed put it (Function Health and Flock Freight).
+  const openAiTasks = await prisma.task.findMany({
+    where: {
+      id: { in: applied.map((d) => d.appliedTaskId) },
+      status: { not: "Done" },
+      due: { lt: iso(now).slice(0, 10) },
+    },
+    select: { id: true, due: true },
+  });
+  let replanned = 0;
+  for (const t of openAiTasks) {
+    replanned++;
+    if (WRITE) {
+      const due = iso(new Date(now.getTime() + ((t.id % 8) + 3) * DAY_MS)).slice(0, 10);
+      await prisma.task.update({ where: { id: t.id }, data: { due } });
+    }
+  }
+
   console.log("\n──────────────────────────────────────────");
+  console.log(`AI tasks completed:   ${completed} ${WRITE ? "" : "(would complete)"}`);
+  console.log(`AI tasks replanned:   ${replanned} ${WRITE ? "" : "(would replan)"}`);
   console.log(`Approved create_task: ${stats.approvedCreate} (of which edited: ${stats.edited})`);
   console.log(`Approved other:       ${stats.approvedOther}`);
   console.log(`Rejected:             ${stats.rejected}`);
