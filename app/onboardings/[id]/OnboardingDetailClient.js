@@ -53,7 +53,11 @@ function SortableColumn({ id, children }) {
     transform: CSS.Transform.toString(transform ? { ...transform, scaleX: 1, scaleY: 1 } : null),
     transition,
     opacity: isDragging ? 0.4 : 1,
+    // Fixed width, not just a minimum: without maxWidth a long task title makes
+    // the column (and its cards) stretch, so columns end up different widths.
+    width: 240,
     minWidth: 240,
+    maxWidth: 240,
     flexShrink: 0,
     display: "flex",
     flexDirection: "column",

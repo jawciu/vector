@@ -151,11 +151,19 @@ export default function TaskCardView({
           onClick={onToggleDone}
         />
         <span
-          className="text-sm flex-1 leading-snug"
+          className="text-sm flex-1 min-w-0 leading-snug"
+          title={task.title}
           style={{
             color: isDone ? "var(--text-secondary)" : "var(--text)",
             textDecoration: isDone ? "line-through" : "none",
             transition: "color 0.25s ease",
+            // Long titles wrap to a second line, then truncate — the card never
+            // grows horizontally.
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            overflowWrap: "anywhere",
           }}
         >
           <TaskIdChip task={task} />

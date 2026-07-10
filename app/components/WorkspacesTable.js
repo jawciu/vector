@@ -76,7 +76,7 @@ export default function WorkspacesTable({ onboardings }) {
             >
               <CompanyAvatar name={ob.companyName} logoUrl={ob.companyLogoUrl} size={16} />
               <span
-                className="font-medium"
+                className="font-medium whitespace-nowrap"
                 style={{ color: isHovered ? "var(--action)" : "var(--text)", transition: "color 0.15s ease" }}
               >
                 {ob.companyName}

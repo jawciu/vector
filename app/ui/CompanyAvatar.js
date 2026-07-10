@@ -20,7 +20,6 @@ export default function CompanyAvatar({ name, logoUrl, size = 16, radius = 4, fo
           width: size,
           height: size,
           borderRadius: radius,
-          background: "#fff",
           border: "1px solid var(--border)",
           display: "inline-flex",
           alignItems: "center",
@@ -37,8 +36,8 @@ export default function CompanyAvatar({ name, logoUrl, size = 16, radius = 4, fo
           style={{
             width: "100%",
             height: "100%",
-            objectFit: "contain",
-            padding: Math.max(1, Math.round(size * 0.08)),
+            objectFit: "cover",
+            display: "block",
           }}
         />
       </span>

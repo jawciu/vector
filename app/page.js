@@ -105,7 +105,7 @@ export default async function OnboardingsListPage({ searchParams }) {
             className="mt-2 text-sm"
             style={{ color: "var(--text-muted)" }}
           >
-            {rows.length} {rows.length === 1 ? "workspace" : "workspaces"}
+            {rows.length} {rows.length === 1 ? "onboarding" : "onboardings"}
           </p>
         </div>
       )}
