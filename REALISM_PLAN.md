@@ -3,21 +3,26 @@
 Living plan for growing the demo data into a believable, living book of business.
 Companion plan: [EVALS_PLAN.md](EVALS_PLAN.md) (this plan feeds it — more meetings = more eval data).
 
-**Status (2026-07-10): BUILT, NOT YET RUN.** All artifacts exist on branch `realism`,
-uncommitted. **Zero database writes have happened** — the seed and backdate scripts are
-dry-run by default and have only ever been run in that mode. The only schema change
-applied to the shared DB is the additive `Company.logoUrl` column (invisible to
-deployed code).
+**Status (2026-07-10): LIVE IN PRODUCTION.** Code pushed (commit `28a6451` on `main`,
+deployed) and the growth seed has been run with `--write` against the shared DB.
 
-Done: `logoUrl` migration + `CompanyAvatar` logo support + 4 call sites; 12 logos in
-`/public/logos/`; `prisma/seed-portfolio-growth.js` (dry-run verified: 12 companies,
-14 onboardings, 322 tasks, 16 overdue = 10.6% of open, 34 contacts, 67 comments, 204
-activity rows); 18 meeting fixtures; `scripts/inject-meetings.js` +
-`scripts/backdate-meetings.js`. E2e fixture retarget done. Unit tests 63/63 green.
+Done and verified live:
+- `Company.logoUrl` migration; `CompanyAvatar` renders logos with initials fallback;
+  4 call sites converted; 12 logos in `/public/logos/` (all serving 200 from prod).
+- `prisma/seed-portfolio-growth.js --write` → 12 companies, 14 onboardings, 322 tasks
+  (151 open, 16 overdue = 10.6%, concentrated on Function Health + Flock Freight),
+  34 contacts, 84 phases, 67 comments, 204 ActivityLog rows, 4 vendor users.
+- Step 0 archive: the 7 stale legacy onboardings (Acme, Globex, Initech, Cyberdyne,
+  Wayne, Umbrella, Soylent) set to `Archived`. The 3 legacy `Completed` kept as
+  history. Portfolio is now **10 Active / 7 Completed / 7 Archived**.
+- Post-write integrity: 0 `task_company_consistency` violations, 0 duplicate
+  `(companyId, number)` pairs, 0 stale `taskCounter`s, 0 cross-onboarding
+  `blockedByTaskId` references. Unit 63/63 green; e2e 5/5 green (fixtures auto-
+  retargeted from archived Acme → onboarding 21, proving the dynamic retarget works).
 
-Remaining: Steps 0 (archive stale onboardings), then run the seed with `--write`,
-inject meetings, backdate. **Order matters — merge + push the code first** (see
-"Prod safety" below), then run the data scripts.
+Remaining (Step 5): inject the 18 meeting fixtures through the real webhook, then run
+`scripts/backdate-meetings.js --write`. Both scripts are built and dry-run verified;
+injection needs a running dev server + `ANTHROPIC_API_KEY` (≈$1 of API spend).
 
 ## Prod safety — code and data travel separately
 

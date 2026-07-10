@@ -141,8 +141,8 @@ const ONBOARDING_SPECS = [
   // ── 2 fresh ──
   {
     company: "Raycast", stage: "fresh", owner: "maya", status: "Active",
-    ageDays: 7, goLiveInDays: 70, donePhases: 0, openBase: 4, openStep: 3,
-    overrides: { k1: "Done", k2: "In progress", k3: "In progress", t1: "In progress" },
+    ageDays: 7, goLiveInDays: 70, donePhases: 1, openBase: 4, openStep: 3,
+    overrides: { t1: "In progress" },
     overdue: {},
     contacts: [
       { slot: "sponsor", name: "Priya Raman", role: "Head of Data", lastSeenDaysAgo: 1 },
@@ -170,8 +170,8 @@ const ONBOARDING_SPECS = [
   // ── 6 mid-flight (Function Health + Flock Freight are the at-risk stories) ──
   {
     company: "Modal", stage: "mid", owner: "theo", status: "Active",
-    ageDays: 42, goLiveInDays: 38, donePhases: 2, openBase: 3, openStep: 2.5,
-    overrides: { s1: "In progress", s2: "In progress", s4: "Done", c1: "In progress", g1: "Done", g2: "In progress" },
+    ageDays: 42, goLiveInDays: 50, donePhases: 3, openBase: 3, openStep: 2.5,
+    overrides: { s2: "In progress", c1: "In progress", c2: "In progress", g1: "Done", g2: "In progress" },
     overdue: { s2: 3 },
     contacts: [
       { slot: "sponsor", name: "Elena Petrova", role: "Head of Data", lastSeenDaysAgo: 2 },
@@ -184,9 +184,9 @@ const ONBOARDING_SPECS = [
   },
   {
     company: "Loop Returns", stage: "mid", owner: "sam", status: "Active",
-    ageDays: 56, goLiveInDays: 35, donePhases: 2, openBase: 3, openStep: 2.5,
-    overrides: { s1: "Done", s2: "Done", s3: "In progress", s4: "In progress", c2: "In progress", g1: "In progress" },
-    overdue: { c1: 2 },
+    ageDays: 56, goLiveInDays: 42, donePhases: 4, openBase: 3, openStep: 2.5,
+    overrides: { c4: "In progress", g1: "In progress", g2: "In progress" },
+    overdue: { g1: 2 },
     contacts: [
       { slot: "sponsor", name: "Sofia Marchetti", role: "Analytics Lead", lastSeenDaysAgo: 3 },
       { slot: "champion", name: "Derek Huang", role: "Analytics Engineer", lastSeenDaysAgo: 1 },
@@ -199,9 +199,11 @@ const ONBOARDING_SPECS = [
   },
   {
     company: "Huel", stage: "mid", owner: "ines", status: "Active",
-    ageDays: 49, goLiveInDays: 42, donePhases: 2, openBase: 3, openStep: 2.5,
-    overrides: { s1: "Done", s2: "In progress", s3: "In progress", c1: "In progress", g1: "Done", g2: "Blocked" },
-    overdue: { s3: 2 },
+    ageDays: 49, goLiveInDays: 55, donePhases: 3, openBase: 3, openStep: 2.5,
+    // g2 is "Under investigation", not "Blocked": the bouncing-IdP-contact story
+    // still reads, without flagging an otherwise-healthy account as At risk.
+    overrides: { s2: "In progress", c1: "In progress", g1: "Done", g2: "Under investigation" },
+    overdue: { c2: 2 },
     notes: { g2: "Waiting on IdP metadata from Huel IT — Raj's email is bouncing, chasing via Oliver." },
     contacts: [
       { slot: "sponsor", name: "Oliver Bennett", role: "Head of Data", lastSeenDaysAgo: 2 },
@@ -259,8 +261,8 @@ const ONBOARDING_SPECS = [
   },
   {
     company: "Ashby", label: "Embedded analytics rollout", stage: "mid", owner: "caroline", status: "Active",
-    ageDays: 35, goLiveInDays: 45, donePhases: 2, openBase: 3, openStep: 2.5,
-    overrides: { s1: "In progress", s2: "In progress", c1: "In progress", g1: "Done" },
+    ageDays: 35, goLiveInDays: 45, donePhases: 3, openBase: 3, openStep: 2.5,
+    overrides: { s1: "In progress", c1: "In progress", g1: "Done" },
     overdue: {},
     contacts: [
       { slot: "sponsor", name: "Nate Coleman", role: "Head of Data", lastSeenDaysAgo: 1 },
@@ -273,8 +275,8 @@ const ONBOARDING_SPECS = [
   // ── 2 near go-live ──
   {
     company: "Sylvera", stage: "near", owner: "ines", status: "Active",
-    ageDays: 77, goLiveInDays: 16, donePhases: 4, openBase: 2, openStep: 2,
-    overrides: { g3: "In progress", g4: "In progress", r1: "In progress", r2: "In progress" },
+    ageDays: 77, goLiveInDays: 18, donePhases: 5, openBase: 2, openStep: 2,
+    overrides: { r1: "In progress", r2: "In progress" },
     overdue: {},
     contacts: [
       { slot: "sponsor", name: "Freya Nilsson", role: "Head of Data", lastSeenDaysAgo: 1 },
