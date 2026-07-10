@@ -20,6 +20,31 @@ Done and verified live:
   `blockedByTaskId` references. Unit 63/63 green; e2e 5/5 green (fixtures auto-
   retargeted from archived Acme → onboarding 21, proving the dynamic retarget works).
 
+Health calibration (2026-07-10): the first `--write` left 9 of 10 Active onboardings
+reading "At risk" — not from blocked or overdue tasks but from `lib/health.js`'s
+velocity rule (`daysNeeded = remaining / (done / elapsed)`). Mid-flight onboardings had
+only 7–9 of 23 tasks done. Fixed in the seed (not in health.js): raised `donePhases` so
+mid-flight accounts are genuinely mid-flight, aligned `goLiveInDays` with pace, moved
+`overdue` markers off tasks that are now Done, and turned Huel's blocked task into
+"Under investigation". Now **7 On track / 3 At risk** (Function Health, Flock Freight,
+and ChowNow's go-live crunch) — the shape this plan intended.
+
+## Public demo (2026-07-10)
+
+vector.quest is a job-application link, so visitors get in without credentials:
+- `lib/supabase/proxy.js` signs anonymous visitors into a shared demo account
+  (`demo@vector.test`) instead of redirecting to `/login`. Gated on
+  `DEMO_USER_EMAIL` + `DEMO_USER_PASSWORD` being set, so private deploys are
+  unaffected; `/login` still serves the real form for Caroline.
+- `prisma/reset-demo-data.js` + `.github/workflows/reset-demo-data.yml` restore the
+  seeded portfolio nightly (03:00 UTC), so visitor edits self-heal. Deletion is scoped
+  to seeded companies (`logoUrl IS NOT NULL`); the legacy corpus is never touched.
+  Onboardings are deleted before companies — `Task.companyId` is `ON DELETE NO ACTION`.
+  Verified by a manual `workflow_dispatch` run: green, and the portfolio came back at
+  7 On track / 3 At risk.
+- Residual risk accepted: demo visitors can trigger Claude calls (e.g. "Regenerate"
+  on insights), which spends Anthropic budget. Revisit if it ever bites.
+
 Remaining (Step 5): inject the 18 meeting fixtures through the real webhook, then run
 `scripts/backdate-meetings.js --write`. Both scripts are built and dry-run verified;
 injection needs a running dev server + `ANTHROPIC_API_KEY` (≈$1 of API spend).
