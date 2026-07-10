@@ -65,7 +65,10 @@ async function readLive() {
         include: {
           phases: { orderBy: { sortOrder: "asc" } },
           contacts: { orderBy: { email: "asc" } },
-          tasks: { orderBy: { number: "asc" }, include: { phase: { select: { name: true } } } },
+          tasks: {
+            orderBy: { number: "asc" },
+            include: { phase: { select: { name: true } }, blockedByTask: { select: { number: true } } },
+          },
         },
       },
     },
@@ -104,6 +107,9 @@ async function readLive() {
           description: t.description,
           notes: t.notes,
           sortOrder: t.sortOrder,
+          owner: t.owner || null,
+          // Dependency by task number, not id: ids churn when a task is restored.
+          blockedByNumber: t.blockedByTask?.number ?? null,
         })),
       })),
     })),
@@ -172,6 +178,8 @@ function diff(expected, actual) {
       if (e.title !== a.title) c.push("title edited");
       if (e.due !== a.due) c.push(`due ${e.due} → ${a.due}`);
       if (e.priority !== a.priority) c.push(`priority ${e.priority} → ${a.priority}`);
+      if (e.owner !== a.owner) c.push(`owner ${e.owner ?? "none"} → ${a.owner ?? "none"}`);
+      if (e.blockedByNumber !== a.blockedByNumber) c.push(`dependency ${e.blockedByNumber ?? "none"} → ${a.blockedByNumber ?? "none"}`);
       return c;
     });
   sweep("contact", E.contacts, A.contacts, (v) => `${v.name} <${v.email}>`);

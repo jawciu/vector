@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-07-10T13:19:51.482Z",
+  "capturedAt": "2026-07-10T13:37:36.023Z",
   "companies": [
     {
       "prefix": "ASH",
@@ -75,7 +75,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-2",
@@ -87,7 +89,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-3",
@@ -99,7 +103,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-4",
@@ -111,7 +117,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-5",
@@ -123,7 +131,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 4
             },
             {
               "key": "ASH-6",
@@ -135,7 +145,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 4
             },
             {
               "key": "ASH-7",
@@ -147,7 +159,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 6
             },
             {
               "key": "ASH-8",
@@ -159,7 +173,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": 7
             },
             {
               "key": "ASH-9",
@@ -171,7 +187,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-10",
@@ -183,7 +201,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 8
             },
             {
               "key": "ASH-11",
@@ -195,7 +215,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-12",
@@ -207,7 +229,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-13",
@@ -219,7 +243,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": 8
             },
             {
               "key": "ASH-14",
@@ -231,7 +257,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": 13
             },
             {
               "key": "ASH-15",
@@ -243,7 +271,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 14
             },
             {
               "key": "ASH-16",
@@ -255,7 +285,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-17",
@@ -267,7 +299,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-18",
@@ -279,7 +313,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-19",
@@ -291,7 +327,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-20",
@@ -303,7 +341,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-21",
@@ -315,7 +355,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-22",
@@ -327,7 +369,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-23",
@@ -339,7 +383,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": 15
             }
           ]
         },
@@ -410,7 +456,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-25",
@@ -422,7 +470,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-26",
@@ -434,7 +484,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-27",
@@ -446,7 +498,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-28",
@@ -458,7 +512,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 27
             },
             {
               "key": "ASH-29",
@@ -470,7 +526,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 27
             },
             {
               "key": "ASH-30",
@@ -482,7 +540,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 29
             },
             {
               "key": "ASH-31",
@@ -494,7 +554,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": 30
             },
             {
               "key": "ASH-32",
@@ -506,7 +568,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-33",
@@ -518,7 +582,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 31
             },
             {
               "key": "ASH-34",
@@ -530,7 +596,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-35",
@@ -542,7 +610,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-36",
@@ -554,7 +624,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": 31
             },
             {
               "key": "ASH-37",
@@ -566,7 +638,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": 36
             },
             {
               "key": "ASH-38",
@@ -578,7 +652,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 37
             },
             {
               "key": "ASH-39",
@@ -590,7 +666,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-40",
@@ -602,7 +680,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-41",
@@ -614,7 +694,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-42",
@@ -626,7 +708,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-43",
@@ -638,7 +722,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-44",
@@ -650,7 +736,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": null
             },
             {
               "key": "ASH-45",
@@ -662,7 +750,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "ASH-46",
@@ -674,7 +764,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": 38
             }
           ]
         }
@@ -754,7 +846,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": null
             },
             {
               "key": "BEE-2",
@@ -766,7 +860,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "BEE-3",
@@ -778,7 +874,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": null
             },
             {
               "key": "BEE-4",
@@ -790,7 +888,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "BEE-5",
@@ -802,7 +902,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 4
             },
             {
               "key": "BEE-6",
@@ -814,7 +916,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 4
             },
             {
               "key": "BEE-7",
@@ -826,7 +930,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 6
             },
             {
               "key": "BEE-8",
@@ -838,7 +944,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": 7
             },
             {
               "key": "BEE-9",
@@ -850,7 +958,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "BEE-10",
@@ -862,7 +972,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 8
             },
             {
               "key": "BEE-11",
@@ -874,7 +986,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "BEE-12",
@@ -886,7 +1000,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "BEE-13",
@@ -898,7 +1014,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": 8
             },
             {
               "key": "BEE-14",
@@ -910,7 +1028,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": 13
             },
             {
               "key": "BEE-15",
@@ -922,7 +1042,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 14
             },
             {
               "key": "BEE-16",
@@ -934,7 +1056,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "BEE-17",
@@ -946,7 +1070,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "BEE-18",
@@ -958,7 +1084,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "BEE-19",
@@ -970,7 +1098,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "BEE-20",
@@ -982,7 +1112,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": null
             },
             {
               "key": "BEE-21",
@@ -994,7 +1126,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": null
             },
             {
               "key": "BEE-22",
@@ -1006,7 +1140,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "BEE-23",
@@ -1018,7 +1154,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": 15
             }
           ]
         }
@@ -1098,7 +1236,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-2",
@@ -1110,7 +1250,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-3",
@@ -1122,7 +1264,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-4",
@@ -1134,7 +1278,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-5",
@@ -1146,7 +1292,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 4
             },
             {
               "key": "CHOW-6",
@@ -1158,7 +1306,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 4
             },
             {
               "key": "CHOW-7",
@@ -1170,7 +1320,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 6
             },
             {
               "key": "CHOW-8",
@@ -1182,7 +1334,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": 7
             },
             {
               "key": "CHOW-9",
@@ -1194,7 +1348,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-10",
@@ -1206,7 +1362,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 8
             },
             {
               "key": "CHOW-11",
@@ -1218,7 +1376,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-12",
@@ -1230,7 +1390,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-13",
@@ -1242,7 +1404,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": 8
             },
             {
               "key": "CHOW-14",
@@ -1254,7 +1418,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": 13
             },
             {
               "key": "CHOW-15",
@@ -1266,7 +1432,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 14
             },
             {
               "key": "CHOW-16",
@@ -1278,7 +1446,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-17",
@@ -1290,7 +1460,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-18",
@@ -1302,7 +1474,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-19",
@@ -1314,7 +1488,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-20",
@@ -1326,7 +1502,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-21",
@@ -1338,7 +1516,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-22",
@@ -1350,7 +1530,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-23",
@@ -1362,7 +1544,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": 15
             }
           ]
         },
@@ -1438,7 +1622,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-25",
@@ -1450,7 +1636,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-26",
@@ -1462,7 +1650,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-27",
@@ -1474,7 +1664,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-28",
@@ -1486,7 +1678,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 27
             },
             {
               "key": "CHOW-29",
@@ -1498,7 +1692,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 27
             },
             {
               "key": "CHOW-30",
@@ -1510,7 +1706,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 29
             },
             {
               "key": "CHOW-31",
@@ -1522,7 +1720,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": 30
             },
             {
               "key": "CHOW-32",
@@ -1534,7 +1734,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-33",
@@ -1546,7 +1748,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 31
             },
             {
               "key": "CHOW-34",
@@ -1558,7 +1762,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-35",
@@ -1570,7 +1776,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-36",
@@ -1582,7 +1790,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": 31
             },
             {
               "key": "CHOW-37",
@@ -1594,7 +1804,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": 36
             },
             {
               "key": "CHOW-38",
@@ -1606,7 +1818,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "Last 3 dashboards show small variances vs Tableau — tracing to a timezone cast.",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 37
             },
             {
               "key": "CHOW-39",
@@ -1618,7 +1832,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-40",
@@ -1630,7 +1846,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-41",
@@ -1642,7 +1860,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-42",
@@ -1654,7 +1874,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-43",
@@ -1666,7 +1888,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-44",
@@ -1678,7 +1902,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-45",
@@ -1690,7 +1916,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "CHOW-46",
@@ -1702,7 +1930,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "Can't run the readiness review until parity signs off.",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Caroline Jaworsky",
+              "blockedByNumber": 38
             }
           ]
         }
@@ -1787,7 +2017,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "FLK-2",
@@ -1799,7 +2031,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FLK-3",
@@ -1811,7 +2045,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "FLK-4",
@@ -1823,7 +2059,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FLK-5",
@@ -1835,7 +2073,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 4
             },
             {
               "key": "FLK-6",
@@ -1847,7 +2087,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 4
             },
             {
               "key": "FLK-7",
@@ -1859,7 +2101,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 6
             },
             {
               "key": "FLK-8",
@@ -1871,7 +2115,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 7
             },
             {
               "key": "FLK-9",
@@ -1883,7 +2129,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "No movement in two weeks — Tyler hasn't been in the portal since the working session.",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FLK-10",
@@ -1895,7 +2143,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 8
             },
             {
               "key": "FLK-11",
@@ -1907,7 +2157,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "FLK-12",
@@ -1919,7 +2171,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FLK-13",
@@ -1931,7 +2185,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "Blocked on inputs from Flock's side; can't finish the exec dashboard without shipment margin logic.",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 8
             },
             {
               "key": "FLK-14",
@@ -1943,7 +2199,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 13
             },
             {
               "key": "FLK-15",
@@ -1955,7 +2213,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 14
             },
             {
               "key": "FLK-16",
@@ -1967,7 +2227,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FLK-17",
@@ -1979,7 +2241,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FLK-18",
@@ -1991,7 +2255,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "FLK-19",
@@ -2003,7 +2269,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "FLK-20",
@@ -2015,7 +2283,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "FLK-21",
@@ -2027,7 +2297,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "FLK-22",
@@ -2039,7 +2311,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FLK-23",
@@ -2051,7 +2325,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 15
             },
             {
               "key": "FLK-24",
@@ -2063,7 +2339,9 @@
               "phaseName": "Content Build & Migration",
               "description": "Colin to send the archive announcement to all Looker users notifying them of the archive plan for non-top-20 content, with 30 days notice. Must go out before finance close week so it is not missed.",
               "notes": "I'll send the archive announcement with thirty days notice, but I want it out before close week so it's not buried. Note: due date is before finance close week (2026-06-08); this is likely already past or actioned.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FLK-25",
@@ -2075,7 +2353,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "Next weekly sync (week of 2026-06-08) is cancelled due to finance close. Vendor team to resume the following week. No customer action needed; vendor to send calendar update if required.",
               "notes": "finance close starts Monday. The whole data team is on close support, so let's cancel next week's sync rather than have me stare at you apologetically. Cancelled. We'll keep building on our side. External blocker: Finance close starts Monday, whole data team on close support.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FLK-26",
@@ -2087,7 +2367,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "Jess (Flock Freight) to provision a dedicated BigQuery service account with read-only access to the analytics dataset. Committed as same-day once the technical setup doc is received from Ines.",
               "notes": "Read-only on the analytics dataset only — we never touch raw. A dedicated service account, and read access to the dbt repo so the semantic layer can import your metric definitions. Fine. Service account is a same-day thing once I have your setup doc. External dependency: Jess is not in the vendor or customer contact list — vendor to confirm correct contact.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FLK-27",
@@ -2099,7 +2381,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "Ines to send the technical setup doc and migration workbook to Flock Freight on the day of the kickoff, and to schedule the recurring Thursday sync cadence.",
               "notes": "I'll send the technical setup doc and a migration workbook today. Proposing Thursdays for the weekly sync? Thursdays work. One thing to flag — finance close hits in about three weeks and my team basically disappears for that week. External blocker: finance close period in approximately three weeks where the Flock Freight data team will be unavailable.",
-              "sortOrder": 5
+              "sortOrder": 5,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FLK-28",
@@ -2111,7 +2395,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "Caroline to share the standard mutual go-live checklist template with Flock Freight. No explicit deadline set; committed verbally at kickoff recap.",
               "notes": "Let's recap actions: Colin owns the top-20 shortlist, Jess the service account, Ines sends the sync invite and workbook, and I'll get you our go-live checklist.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             }
           ]
         }
@@ -2196,7 +2482,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": null
             },
             {
               "key": "FN-2",
@@ -2208,7 +2496,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FN-3",
@@ -2220,7 +2510,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": null
             },
             {
               "key": "FN-4",
@@ -2232,7 +2524,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "Platform team won't provision until the infosec review clears.",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": 16
             },
             {
               "key": "FN-5",
@@ -2244,7 +2538,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 4
             },
             {
               "key": "FN-6",
@@ -2256,7 +2552,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 4
             },
             {
               "key": "FN-7",
@@ -2268,7 +2566,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 6
             },
             {
               "key": "FN-8",
@@ -2280,7 +2580,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": 7
             },
             {
               "key": "FN-9",
@@ -2292,7 +2594,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FN-10",
@@ -2304,7 +2608,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 8
             },
             {
               "key": "FN-11",
@@ -2316,7 +2622,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "FN-12",
@@ -2328,7 +2636,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FN-13",
@@ -2340,7 +2650,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": 8
             },
             {
               "key": "FN-14",
@@ -2352,7 +2664,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": 13
             },
             {
               "key": "FN-15",
@@ -2364,7 +2678,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 14
             },
             {
               "key": "FN-16",
@@ -2376,7 +2692,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "Health-data compliance review sitting with their security team for 3 weeks. SOC 2 Type II + subprocessor list sent; awaiting their counsel.",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FN-17",
@@ -2388,7 +2706,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FN-18",
@@ -2400,7 +2720,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "FN-19",
@@ -2412,7 +2734,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "FN-20",
@@ -2424,7 +2748,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": null
             },
             {
               "key": "FN-21",
@@ -2436,7 +2762,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": null
             },
             {
               "key": "FN-22",
@@ -2448,7 +2776,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FN-23",
@@ -2460,7 +2790,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": 15
             },
             {
               "key": "FN-24",
@@ -2472,7 +2804,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "Miriam (Function Health infosec) to open the vendor security review ticket and send Vector the security questionnaire so the review process can formally begin.",
               "notes": "Miriam, can you open the review ticket this week and send us the questionnaire? I'll open it tomorrow. Fair warning — I have four other vendor reviews in the queue ahead of you. External blocker: Miriam's infosec queue has four other vendor reviews ahead of Function Health; CISO sign-off required.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FN-25",
@@ -2484,7 +2818,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "Caroline to complete and return the security questionnaire with the SOC 2 Type II report attached, within two business days of receiving it from Miriam.",
               "notes": "We'll turn the questionnaire around within two business days of receiving it, SOC 2 Type II attached. Theo, what can move in parallel without a connection? Blocked on receiving the questionnaire from Miriam (external, no task id).",
-              "sortOrder": 5
+              "sortOrder": 5,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FN-26",
@@ -2496,7 +2832,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "Maya to produce a written phased plan that maps out all workstreams that can proceed in parallel with the infosec review (semantic layer design, dbt repo walkthrough, metric prototyping on sample data), so momentum is maintained while the warehouse connection is gated.",
               "notes": "Exactly. The review becomes the critical path but not a dead stop. Maya will draft the phased plan reflecting that. External blocker: no warehouse connection until infosec review clears (hard gate from Function Health infosec).",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FN-27",
@@ -2508,7 +2846,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FN-28",
@@ -2520,7 +2860,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "Miriam to post the outcome of Thursday's infosec triage in the shared channel, confirming whether the review ticket was escalated or advanced.",
               "notes": "Miriam, we'll hear from you after Thursday triage?\\nI'll post in the shared channel either way.\\nPerfect. Short and productive — see everyone next week.",
-              "sortOrder": 6
+              "sortOrder": 6,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FN-29",
@@ -2532,7 +2874,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "David to open a draft PR containing the member growth metrics block (new members, activation rate, retest bookings) so it is staged and ready to merge the same day the infosec review clears.",
               "notes": "Can you open that as a draft PR now? Then the day Miriam's review clears, we merge, connect, and the dashboard goes live the same day rather than starting a two-week build.\\nDraft PR by tomorrow. I like the same-day cutover framing.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": 16
             },
             {
               "key": "FN-30",
@@ -2544,7 +2888,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "Maya to prepare the connection runbook covering all steps needed to connect the warehouse and go live with dashboards, so that cutover can happen the same day the infosec review clears with no delays.",
               "notes": "Exactly the message. Maya will prep the connection runbook so cutover day is boring. Miriam, we'll hear from you after Thursday triage?\\nI'll post in the shared channel either way. External blocker: review clearance date unknown; three vendors ahead in CISO queue.",
-              "sortOrder": 5
+              "sortOrder": 5,
+              "owner": null,
+              "blockedByNumber": 16
             },
             {
               "key": "FN-31",
@@ -2556,7 +2902,9 @@
               "phaseName": "Content Build & Migration",
               "description": "On the day the infosec review clears: merge the staged draft PR, establish the warehouse connection, and publish the member growth dashboard live. Sequenced to happen same-day to avoid a two-week build delay.",
               "notes": "Can you open that as a draft PR now? Then the day Miriam's review clears, we merge, connect, and the dashboard goes live the same day rather than starting a two-week build.\\nDraft PR by tomorrow. External blocker: review clearance date unknown; three vendors ahead in CISO queue.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": 16
             },
             {
               "key": "FN-32",
@@ -2568,7 +2916,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "Rachel (customer exec) committed to escalating the stalled infosec review directly to the CISO, bypassing the triage queue, with the exec sponsor CC'd on the communication.",
               "notes": "I'll do the escalation today and copy our sponsor. Miriam, no offence to the process, but I'm going over it. External blocker: CISO has not signed off after nearly three weeks; had two clarifying questions never forwarded to Vector.",
-              "sortOrder": 7
+              "sortOrder": 7,
+              "owner": null,
+              "blockedByNumber": 16
             },
             {
               "key": "FN-33",
@@ -2580,7 +2930,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "Miriam (customer infosec) committed to forwarding the CISO's two clarifying questions on the data-flow diagram to Vector in writing. Questions concern retention of query results and metadata cache location.",
               "notes": "Those questions never reached us. We could have answered both the same day — query results aren't retained, and the metadata cache is region-pinned to your Snowflake region. That's fair criticism. They sat in his notes rather than coming back through the ticket. I'll send them to you in writing today. External blocker: clarifying questions sat in CISO's notes rather than being routed back through the ticket.",
-              "sortOrder": 8
+              "sortOrder": 8,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "FN-34",
@@ -2592,7 +2944,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "Caroline to identify and send two calendar slots this week for a 30-minute live architecture Q&A with the Function Health CISO. Verbal session intended to close the clarifying questions faster than written back-and-forth.",
               "notes": "Then Caroline will send two slots for this week. Being honest about the plan: even if sign-off lands this week, we've lost enough runway that go-live slips about two weeks.",
-              "sortOrder": 9
+              "sortOrder": 9,
+              "owner": null,
+              "blockedByNumber": null
             }
           ]
         }
@@ -2677,7 +3031,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-2",
@@ -2689,7 +3045,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-3",
@@ -2701,7 +3059,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-4",
@@ -2713,7 +3073,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-5",
@@ -2725,7 +3087,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 4
             },
             {
               "key": "HUEL-6",
@@ -2737,7 +3101,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 4
             },
             {
               "key": "HUEL-7",
@@ -2749,7 +3115,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 6
             },
             {
               "key": "HUEL-8",
@@ -2761,7 +3129,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": 7
             },
             {
               "key": "HUEL-9",
@@ -2773,7 +3143,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-10",
@@ -2785,7 +3157,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 8
             },
             {
               "key": "HUEL-11",
@@ -2797,7 +3171,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-12",
@@ -2809,7 +3185,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-13",
@@ -2821,7 +3199,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": 8
             },
             {
               "key": "HUEL-14",
@@ -2833,7 +3213,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": 13
             },
             {
               "key": "HUEL-15",
@@ -2845,7 +3227,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 14
             },
             {
               "key": "HUEL-16",
@@ -2857,7 +3241,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-17",
@@ -2869,7 +3255,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "Waiting on IdP metadata from Huel IT — Raj's email is bouncing, chasing via Oliver.",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-18",
@@ -2881,7 +3269,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-19",
@@ -2893,7 +3283,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-20",
@@ -2905,7 +3297,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-21",
@@ -2917,7 +3311,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-22",
@@ -2929,7 +3325,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-23",
@@ -2941,7 +3339,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": 15
             },
             {
               "key": "HUEL-24",
@@ -2953,7 +3353,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "Oliver to disable password-based logins for the Vector instance once SSO is verified working. Firm requirement from Freya: no wider rollout while password logins remain active.",
               "notes": "Theo can pair with you Thursday and it should be a fifteen-minute fix.\\nThursday works. Once it's green I'll switch off password logins per Freya's edict.\\nIt's a firm edict — no wider rollout on passwords. Blocked on HUEL-17 SSO resolution.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": 17
             },
             {
               "key": "HUEL-25",
@@ -2965,7 +3367,9 @@
               "phaseName": "Content Build & Migration",
               "description": "Freya to review the in-progress DTC dashboard (approx 70% built) and leave comments by Friday. Priority focus on the cohort view, which the DTC team will use most heavily.",
               "notes": "That unblocks the DTC dashboard, which is about seventy percent built. I'd love your comments on the draft by Friday if possible.\\nWill do. The cohort view is the one the team will live in, so I'll look hardest at that.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-26",
@@ -2977,7 +3381,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "Oliver to add the subscription cohort model to the nightly run schedule so the cohort view in the DTC dashboard stays current. Without this the data will be stale by midday.",
               "notes": "The cohort view is the one the team will live in, so I'll look hardest at that.\\nRelated — the cohort model needs to go on the nightly job or that view will be stale by lunchtime. I'll sort the schedule this week.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "HUEL-27",
@@ -2989,7 +3395,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "Ines to send Freya the AI analyst pilot one-pager. Typical pilot shape is a five-person group with guardrails on which models it can query. Freya's CX team is a strong candidate now that subscription metric definitions are signed off.",
               "notes": "Is the AI analyst thing real enough for them yet?\\nIt's real, and with your definitions now signed off you're actually a great candidate. Let me have Ines send you the pilot one-pager — the usual shape is a five-person pilot group with guardrails on which models it can query.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             }
           ]
         }
@@ -3074,7 +3482,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-2",
@@ -3086,7 +3496,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-3",
@@ -3098,7 +3510,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-4",
@@ -3110,7 +3524,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-5",
@@ -3122,7 +3538,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 4
             },
             {
               "key": "LOOP-6",
@@ -3134,7 +3552,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 4
             },
             {
               "key": "LOOP-7",
@@ -3146,7 +3566,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 6
             },
             {
               "key": "LOOP-8",
@@ -3158,7 +3580,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": 7
             },
             {
               "key": "LOOP-9",
@@ -3170,7 +3594,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-10",
@@ -3182,7 +3608,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 8
             },
             {
               "key": "LOOP-11",
@@ -3194,7 +3622,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-12",
@@ -3206,7 +3636,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-13",
@@ -3218,7 +3650,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": 8
             },
             {
               "key": "LOOP-14",
@@ -3230,7 +3664,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": 13
             },
             {
               "key": "LOOP-15",
@@ -3242,7 +3678,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 14
             },
             {
               "key": "LOOP-16",
@@ -3254,7 +3692,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-17",
@@ -3266,7 +3706,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-18",
@@ -3278,7 +3720,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-19",
@@ -3290,7 +3734,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-20",
@@ -3302,7 +3748,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-21",
@@ -3314,7 +3762,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-22",
@@ -3326,7 +3776,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-23",
@@ -3338,7 +3790,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Sam Whitfield",
+              "blockedByNumber": 15
             },
             {
               "key": "LOOP-24",
@@ -3350,7 +3804,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "Marcus committed to inviting the Vector GitHub app to the dbt repo immediately after the kickoff call.",
               "notes": "Marcus, on access: read-only Snowflake service account and repo access for our GitHub app. Both easy. I'll do the service account against the ANALYTICS database today and the GitHub invite right after this call. Note: Marcus is not in customerContacts; vendor to confirm correct contact for follow-up.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-25",
@@ -3362,7 +3818,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "Sam Whitfield to send the agenda for the semantic layer workshop scheduled for the week of 2026-06-02.",
               "notes": "That's our success metric then -- MS self-serves weekly reporting, zero analyst tickets. Sam will send the semantic layer workshop agenda; proposing Wednesdays for the weekly sync. Wednesdays work.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-26",
@@ -3374,7 +3832,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "Dana (sponsor) to nominate three senior merchant success team members as pilot users for self-serve exploration. No deadline was set. Dana is not in customerContacts; vendor to confirm identity.",
               "notes": "Dana, for the pilot -- who actually explores data day-to-day on the merchant success side? I'll nominate three of the senior MS folks. If they can answer their own retention questions without filing an analyst ticket, this project pays for itself. Note: Dana not found in customerContacts; verify and assign.",
-              "sortOrder": 5
+              "sortOrder": 5,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-27",
@@ -3386,7 +3846,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "Dana mandated that finance must formally sign off on refund and retention metric definitions before any dashboards are released to the merchant success team. This gate must be reflected in the project plan.",
               "notes": "",
-              "sortOrder": 5
+              "sortOrder": 5,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-28",
@@ -3398,7 +3860,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "Create a side-by-side reconciliation of old Tableau workbook logic (Workbooks A, B, C) versus the new canonical definitions for refund_rate, exchange_rate, return_rate, and net_revenue_retained. To be presented at the finance sign-off meeting.",
               "notes": "Good catch — I'll build a comparison sheet showing old logic versus new so the sign-off meeting has the reconciliation in front of them. Nothing kills trust like an unexplained delta.",
-              "sortOrder": 6
+              "sortOrder": 6,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-29",
@@ -3410,7 +3874,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "Dana to schedule the finance sign-off meeting for the week of 2026-06-17 to ratify the new refund_rate and exchange_rate definitions.",
               "notes": "Perfect. I'll get the PR through CI today and ask Dana to book finance for next week. Great session. One refund rate to rule them all. Note: Dana could not be matched to a known contact or vendor user.",
-              "sortOrder": 7
+              "sortOrder": 7,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-30",
@@ -3422,7 +3888,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "Ensure refund_rate and exchange_rate blocks in fct_orders.yml each have a description field explaining the definition and rationale (exchanges excluded from refund numerator, exchange_rate is its own metric). Appears to have been completed during the session.",
               "notes": "Add a description field on each saying exactly that, please. The definition being readable in the repo is half the point. Done, with the rationale in the description. Now fct_returns.yml — return_rate and net_revenue_retained. Note: transcript suggests this was completed in-session; vendor to confirm and close if so.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "LOOP-31",
@@ -3434,7 +3902,9 @@
               "phaseName": "Content Build & Migration",
               "description": "Connect a draft dashboard to the new metrics (refund_rate, exchange_rate, return_rate, net_revenue_retained) so finance can review real numbers at the sign-off meeting rather than raw yml definitions.",
               "notes": "Compiling... clean. Metrics show up in the catalog. Let me wire a quick draft dashboard so finance reviews real numbers instead of yml. The refund_rate here reads 4.1 percent versus 5.3 in the old workbook A. Note: transcript suggests this may have been completed in-session; vendor to confirm.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             }
           ]
         }
@@ -3514,7 +3984,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "MDL-2",
@@ -3526,7 +3998,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "MDL-3",
@@ -3538,7 +4012,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "MDL-4",
@@ -3550,7 +4026,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "MDL-5",
@@ -3562,7 +4040,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 4
             },
             {
               "key": "MDL-6",
@@ -3574,7 +4054,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 4
             },
             {
               "key": "MDL-7",
@@ -3586,7 +4068,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 6
             },
             {
               "key": "MDL-8",
@@ -3598,7 +4082,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 7
             },
             {
               "key": "MDL-9",
@@ -3610,7 +4096,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "MDL-10",
@@ -3622,7 +4110,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 8
             },
             {
               "key": "MDL-11",
@@ -3634,7 +4124,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "MDL-12",
@@ -3646,7 +4138,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "MDL-13",
@@ -3658,7 +4152,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 8
             },
             {
               "key": "MDL-14",
@@ -3670,7 +4166,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 13
             },
             {
               "key": "MDL-15",
@@ -3682,7 +4180,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 14
             },
             {
               "key": "MDL-16",
@@ -3694,7 +4194,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "MDL-17",
@@ -3706,7 +4208,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "MDL-18",
@@ -3718,7 +4222,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "MDL-19",
@@ -3730,7 +4236,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "MDL-20",
@@ -3742,7 +4250,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "MDL-21",
@@ -3754,7 +4264,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "MDL-22",
@@ -3766,7 +4278,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "MDL-23",
@@ -3778,7 +4292,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 15
             },
             {
               "key": "MDL-24",
@@ -3790,7 +4306,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "Add the EU failover CIDR as a second entry to the existing Snowflake network policy. Erin committed to doing this the morning after the call and confirming in the channel. Blocking hourly refresh for EU-routed traffic until complete.",
               "notes": "One thing from me before we wrap — your connection doc mentions an EU failover IP range that I haven't added yet. Do I need to? Yes please, otherwise refreshes will fail whenever we route through the EU region. Same policy, second CIDR entry. I'll hold off enabling the hourly schedule until that's in. I'll do it tomorrow morning and confirm in the channel. External blocker: EU failover IP range not yet added to Snowflake network policy, blocking hourly refresh for EU-routed traffic. Owner is Erin (customer-side, not in contacts list).",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "MDL-25",
@@ -3802,7 +4320,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "PR was opened on the call. Once CI passes, Jonas to merge so the three metrics (gpu_hours, active_workspaces, compute_revenue) appear in Vector on the next sync.",
               "notes": "Open a PR with this block, and once CI passes and it merges, those three metrics show up in Vector automatically on the next sync. PR is up. I love that the definition lives in our repo — that was a selling point internally. Owner is Jonas (not in contacts or vendor users list). Dependency: CI must pass before merge.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "MDL-26",
@@ -3814,7 +4334,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "Modal's Snowflake owner (Erin) to create a read-only service account scoped to the ANALYTICS schema. Committed for Wednesday after the kickoff call. Owner could not be matched to a known contact record.",
               "notes": "Erin to provision a read-only Snowflake service account scoped to the ANALYTICS schema by Wednesday. Note: \"Erin\" not matched to a known customerContact; vendor to verify and assign.",
-              "sortOrder": 5
+              "sortOrder": 5,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "MDL-27",
@@ -3826,7 +4348,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "Modal's dbt maintainer (Jonas) to add the Vector GitHub app with read-only access to the dbt Core repo. Vector confirmed they never push to the customer repo. Owner could not be matched to a known contact record.",
               "notes": "Easy, I'll add it today. One question -- do you build on top of our existing metrics definitions or do we redefine everything? Note: \"Jonas\" not matched to a known customerContact; vendor to verify and assign.",
-              "sortOrder": 6
+              "sortOrder": 6,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "MDL-28",
@@ -3838,7 +4362,9 @@
               "phaseName": "Content Build & Migration",
               "description": "Maya to distribute the 8-week implementation plan document and a recurring weekly sync calendar invite (Tuesdays 4pm CET) to all Modal stakeholders.",
               "notes": "Maya will send over the implementation plan and a weekly sync invite -- proposing Tuesdays 4pm your time. Any objections? Tuesday works. Let's move.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "MDL-29",
@@ -3850,7 +4376,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "Vector to scaffold the semantic layer on top of Modal's dbt Core project shortly after repo read access is granted. Depends on GitHub access task being completed first. Owner not explicitly named; vendor to assign.",
               "notes": "If the project compiles clean we can have the semantic layer scaffolded within days of getting repo access. What exactly do you need from the warehouse side? External dependency: blocked on GitHub repo access being granted by Jonas (Modal).",
-              "sortOrder": 5
+              "sortOrder": 5,
+              "owner": null,
+              "blockedByNumber": null
             }
           ]
         }
@@ -3930,7 +4458,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": null
             },
             {
               "key": "PAT-2",
@@ -3942,7 +4472,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PAT-3",
@@ -3954,7 +4486,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": null
             },
             {
               "key": "PAT-4",
@@ -3966,7 +4500,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PAT-5",
@@ -3978,7 +4514,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 4
             },
             {
               "key": "PAT-6",
@@ -3990,7 +4528,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 4
             },
             {
               "key": "PAT-7",
@@ -4002,7 +4542,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 6
             },
             {
               "key": "PAT-8",
@@ -4014,7 +4556,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": 7
             },
             {
               "key": "PAT-9",
@@ -4026,7 +4570,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PAT-10",
@@ -4038,7 +4584,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 8
             },
             {
               "key": "PAT-11",
@@ -4050,7 +4598,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "PAT-12",
@@ -4062,7 +4612,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PAT-13",
@@ -4074,7 +4626,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": 8
             },
             {
               "key": "PAT-14",
@@ -4086,7 +4640,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": 13
             },
             {
               "key": "PAT-15",
@@ -4098,7 +4654,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 14
             },
             {
               "key": "PAT-16",
@@ -4110,7 +4668,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PAT-17",
@@ -4122,7 +4682,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PAT-18",
@@ -4134,7 +4696,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "PAT-19",
@@ -4146,7 +4710,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "PAT-20",
@@ -4158,7 +4724,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": null
             },
             {
               "key": "PAT-21",
@@ -4170,7 +4738,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": null
             },
             {
               "key": "PAT-22",
@@ -4182,7 +4752,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PAT-23",
@@ -4194,7 +4766,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": 15
             }
           ]
         }
@@ -4274,7 +4848,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": null
             },
             {
               "key": "PEER-2",
@@ -4286,7 +4862,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PEER-3",
@@ -4298,7 +4876,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": null
             },
             {
               "key": "PEER-4",
@@ -4310,7 +4890,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PEER-5",
@@ -4322,7 +4904,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 4
             },
             {
               "key": "PEER-6",
@@ -4334,7 +4918,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 4
             },
             {
               "key": "PEER-7",
@@ -4346,7 +4932,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 6
             },
             {
               "key": "PEER-8",
@@ -4358,7 +4946,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": 7
             },
             {
               "key": "PEER-9",
@@ -4370,7 +4960,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PEER-10",
@@ -4382,7 +4974,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 8
             },
             {
               "key": "PEER-11",
@@ -4394,7 +4988,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "PEER-12",
@@ -4406,7 +5002,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PEER-13",
@@ -4418,7 +5016,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": 8
             },
             {
               "key": "PEER-14",
@@ -4430,7 +5030,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": 13
             },
             {
               "key": "PEER-15",
@@ -4442,7 +5044,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 14
             },
             {
               "key": "PEER-16",
@@ -4454,7 +5058,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PEER-17",
@@ -4466,7 +5072,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PEER-18",
@@ -4478,7 +5086,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "PEER-19",
@@ -4490,7 +5100,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "PEER-20",
@@ -4502,7 +5114,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": null
             },
             {
               "key": "PEER-21",
@@ -4514,7 +5128,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": null
             },
             {
               "key": "PEER-22",
@@ -4526,7 +5142,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "PEER-23",
@@ -4538,7 +5156,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": 15
             }
           ]
         }
@@ -4623,7 +5243,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": null
             },
             {
               "key": "RAY-2",
@@ -4635,7 +5257,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "RAY-3",
@@ -4647,7 +5271,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": null
             },
             {
               "key": "RAY-4",
@@ -4659,7 +5285,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "RAY-5",
@@ -4671,7 +5299,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 4
             },
             {
               "key": "RAY-6",
@@ -4683,7 +5313,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 4
             },
             {
               "key": "RAY-7",
@@ -4695,7 +5327,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 8
             },
             {
               "key": "RAY-8",
@@ -4707,7 +5341,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": 7
             },
             {
               "key": "RAY-9",
@@ -4719,7 +5355,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "RAY-10",
@@ -4731,7 +5369,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 8
             },
             {
               "key": "RAY-11",
@@ -4743,7 +5383,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "RAY-12",
@@ -4755,7 +5397,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "RAY-13",
@@ -4767,7 +5411,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": 8
             },
             {
               "key": "RAY-14",
@@ -4779,7 +5425,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": 13
             },
             {
               "key": "RAY-15",
@@ -4791,7 +5439,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 14
             },
             {
               "key": "RAY-16",
@@ -4803,7 +5453,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "RAY-17",
@@ -4815,7 +5467,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "RAY-18",
@@ -4827,7 +5481,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "RAY-19",
@@ -4839,7 +5495,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "RAY-20",
@@ -4851,7 +5509,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": null
             },
             {
               "key": "RAY-21",
@@ -4863,7 +5523,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": null
             },
             {
               "key": "RAY-22",
@@ -4875,7 +5537,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "RAY-23",
@@ -4887,7 +5551,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Maya Lindqvist",
+              "blockedByNumber": 15
             }
           ]
         }
@@ -4967,7 +5633,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": null
             },
             {
               "key": "SYL-2",
@@ -4979,7 +5647,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "SYL-3",
@@ -4991,7 +5661,9 @@
               "phaseName": "Kickoff & Discovery",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": null
             },
             {
               "key": "SYL-4",
@@ -5003,7 +5675,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "SYL-5",
@@ -5015,7 +5689,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": 4
             },
             {
               "key": "SYL-6",
@@ -5027,7 +5703,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 4
             },
             {
               "key": "SYL-7",
@@ -5039,7 +5717,9 @@
               "phaseName": "Technical Setup & Connectivity",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": 6
             },
             {
               "key": "SYL-8",
@@ -5051,7 +5731,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": 7
             },
             {
               "key": "SYL-9",
@@ -5063,7 +5745,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "SYL-10",
@@ -5075,7 +5759,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": 8
             },
             {
               "key": "SYL-11",
@@ -5087,7 +5773,9 @@
               "phaseName": "Semantic Layer & Modeling",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "SYL-12",
@@ -5099,7 +5787,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "SYL-13",
@@ -5111,7 +5801,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": 8
             },
             {
               "key": "SYL-14",
@@ -5123,7 +5815,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": 13
             },
             {
               "key": "SYL-15",
@@ -5135,7 +5829,9 @@
               "phaseName": "Content Build & Migration",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": null,
+              "blockedByNumber": 14
             },
             {
               "key": "SYL-16",
@@ -5147,7 +5843,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "SYL-17",
@@ -5159,7 +5857,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "SYL-18",
@@ -5171,7 +5871,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "SYL-19",
@@ -5183,7 +5885,9 @@
               "phaseName": "Security, Governance & Access",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Theo Okonkwo",
+              "blockedByNumber": null
             },
             {
               "key": "SYL-20",
@@ -5195,7 +5899,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 0
+              "sortOrder": 0,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": null
             },
             {
               "key": "SYL-21",
@@ -5207,7 +5913,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 1
+              "sortOrder": 1,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": null
             },
             {
               "key": "SYL-22",
@@ -5219,7 +5927,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 2
+              "sortOrder": 2,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "SYL-23",
@@ -5231,7 +5941,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "",
               "notes": "",
-              "sortOrder": 3
+              "sortOrder": 3,
+              "owner": "Ines Ferreira",
+              "blockedByNumber": 15
             },
             {
               "key": "SYL-24",
@@ -5243,7 +5955,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "Amara to run the formal side-by-side parity comparison between the rebuilt ratings coverage dashboard on Vector and the Looker original, and record sign-off in the shared parity checklist. Informal check by her team on 2026-06-12 already showed numbers align.",
               "notes": "The ratings coverage rebuild looks great by the way — my team compared it against Looker on Friday and the numbers line up. I'll do the formal side-by-side this week so we can tick the sign-off box. Owner \"Amara\" could not be matched to a known vendor user or customer contact — vendor to assign.",
-              "sortOrder": 4
+              "sortOrder": 4,
+              "owner": null,
+              "blockedByNumber": null
             },
             {
               "key": "SYL-25",
@@ -5255,7 +5969,9 @@
               "phaseName": "Training, Rollout & Go-live",
               "description": "Send a calendar invite for the go-live checklist review meeting, targeting approximately two weeks from the 2026-06-16 session. Parity staying green points to Looker switch-off in 3 to 4 weeks from that date.",
               "notes": "Can we get the checklist review on the calendar for a couple of weeks out? Yes — I'll send a go-live review invite. If parity stays green we're looking at three to four weeks to switch off Looker. Speaker was not identified by name — vendor to confirm owner.",
-              "sortOrder": 5
+              "sortOrder": 5,
+              "owner": null,
+              "blockedByNumber": null
             }
           ]
         }
