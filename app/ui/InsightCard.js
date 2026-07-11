@@ -131,7 +131,10 @@ export function InsightStatusPill({ status, audience = "vendor" }) {
   const map = audience === "customer" ? CUSTOMER_STATUS_COLORS : VENDOR_STATUS_COLORS;
   const bg = map[status] ?? "var(--text-muted)";
   return (
-    <span className="status-pill status-pill--filled" style={{ background: bg }}>
+    <span
+      className="status-pill status-pill--filled"
+      style={{ background: bg, fontSize: 14, lineHeight: "20px", fontWeight: 400, display: "inline" }}
+    >
       {status}
     </span>
   );
@@ -166,7 +169,7 @@ export function RiskCard({ severity, summary, position }) {
       }}
     >
       <div style={{ padding: "8px 12px", borderBottom: "1px solid var(--border)" }}>
-        <span className="status-pill" style={{ color: sevColor, fontSize: 12 }}>
+        <span className="status-pill" style={{ color: sevColor, fontSize: 14, lineHeight: "20px", fontWeight: 400, display: "inline" }}>
           {sevLabel}
         </span>
       </div>

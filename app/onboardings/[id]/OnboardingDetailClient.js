@@ -573,11 +573,17 @@ export default function OnboardingDetailClient({
                 </Tooltip>
               )}
               {blockedCount > 0 && (
-                <span
-                  className="text-sm rounded-md"
-                  style={{ color: "var(--danger)", border: "0.5px solid var(--danger)", padding: "2px 4px" }}
-                >
-                  {blockedCount} blocked
+                // Wrapper keeps the badge from being a direct flex child: as a
+                // flex item the span blockifies (display:block) and renders 2px
+                // taller than the inline card/health badges. The plain wrapper
+                // lets it flow inline so it matches their proportions exactly.
+                <span>
+                  <span
+                    className="text-sm rounded-md"
+                    style={{ color: "var(--danger)", border: "0.5px solid var(--danger)", padding: "2px 4px" }}
+                  >
+                    {blockedCount} blocked
+                  </span>
                 </span>
               )}
 
