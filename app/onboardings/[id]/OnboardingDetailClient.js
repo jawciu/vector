@@ -563,8 +563,9 @@ export default function OnboardingDetailClient({
                   <span
                     className="text-sm rounded-md health-pill"
                     style={{
-                      color: health === "Blocked" ? "var(--danger)" : "var(--alert)",
-                      border: `0.5px solid ${health === "Blocked" ? "var(--danger)" : "var(--alert)"}`,
+                      background: health === "Blocked" ? "var(--danger)" : "var(--alert)",
+                      color: "var(--text-dark)",
+                      border: "0.5px solid transparent",
                       padding: "2px 4px",
                     }}
                   >
@@ -580,7 +581,7 @@ export default function OnboardingDetailClient({
                 <span>
                   <span
                     className="text-sm rounded-md"
-                    style={{ color: "var(--danger)", border: "0.5px solid var(--danger)", padding: "2px 4px" }}
+                    style={{ background: "var(--danger)", color: "var(--text-dark)", border: "0.5px solid transparent", padding: "2px 4px" }}
                   >
                     {blockedCount} blocked
                   </span>
