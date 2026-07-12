@@ -302,6 +302,40 @@ a {
   background: var(--bg-elevated-hover);
 }
 
+/* Customer portal — "Your tasks" on Overview.
+   Mobile keeps the full-width stacked list. From md up the cards become fixed
+   264px tiles (same width as a kanban column) that flow left-to-right and wrap,
+   instead of one card stretching the whole viewport. */
+.portal-task-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .portal-task-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .portal-task-grid > * {
+    flex: 0 0 264px;
+    width: 264px;
+  }
+
+  /* Long titles wrap to a second line, then truncate — a portal card in a
+     fixed-width column must never grow horizontally. Mobile is full-width, so
+     it keeps wrapping freely. */
+  .portal-task-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+  }
+}
+
 /* Meetings tab — clickable meeting card.
    Background mirrors the menu-option pattern: bg → bg-hover → surface-hover. */
 .meeting-card {

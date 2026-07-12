@@ -14,17 +14,10 @@ import {
 } from "@/app/ui/InsightCard";
 import TaskFilterMenu from "@/app/components/TaskFilterMenu";
 import { taskMatchesFilter } from "@/lib/taskFilters";
+import { STATUS_COLORS } from "@/lib/constants";
 import PortalTaskCard from "./PortalTaskCard";
-import PortalUpdatesBanner from "./PortalUpdatesBanner";
 
 const SOFT_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
-
-const STATUS_TILE_COLORS = {
-  done: "var(--success)",
-  inProgress: "var(--action)",
-  blocked: "var(--danger)",
-  notStarted: "var(--text-muted)",
-};
 
 function formatGoLive(targetGoLive) {
   if (!targetGoLive) return null;
@@ -51,17 +44,51 @@ function formatGoLive(targetGoLive) {
 }
 
 /**
+ * Status count pill. Same proportions as the task-card status badge
+ * (14px / 20px line-height / rounded-md / 0.5px border, `inline` so it keeps the
+ * badge's ~23px height) — see the 2026-07-11 badge decision in CLAUDE.md.
+ */
+function StatusCountPill({ label, count, color }) {
+  return (
+    <span
+      className="text-sm rounded-md"
+      style={{
+        display: "inline",
+        color,
+        border: `0.5px solid ${color}`,
+        padding: "2px 6px",
+        lineHeight: "20px",
+        fontWeight: 400,
+        whiteSpace: "nowrap",
+      }}
+    >
+      <span style={{ fontWeight: 600 }}>{count}</span> {label}
+    </span>
+  );
+}
+
+/**
  * Deterministic header card. One pane card with go-live on the left, a
  * single-row task-summary breakdown on the right. Stacks on narrow widths.
+ *
+ * Counts are for the WHOLE onboarding, not just the viewing contact — the
+ * customer sees overall project health here, and their own slice in "Your tasks".
  */
 function SummaryHeaderCard({ data }) {
   const goLive = formatGoLive(data.targetGoLive);
   const summary = data.taskSummary;
+  // Colours come from STATUS_COLORS so these pills can never drift from the
+  // status badge on the task cards below. "In progress" buckets both
+  // "In progress" and "Under investigation", and takes the former's colour.
   const items = [
-    { label: "To do", count: summary.notStarted, color: STATUS_TILE_COLORS.notStarted },
-    { label: "In progress", count: summary.inProgress, color: STATUS_TILE_COLORS.inProgress },
-    { label: "Blocked", count: summary.blocked, color: STATUS_TILE_COLORS.blocked },
-    { label: "Done", count: summary.done, color: STATUS_TILE_COLORS.done },
+    { label: "To do", count: summary.notStarted, color: STATUS_COLORS["Not started"] },
+    { label: "In progress", count: summary.inProgress, color: STATUS_COLORS["In progress"] },
+    // Only surfaced when this onboarding actually has on-hold work.
+    ...(summary.onHold > 0
+      ? [{ label: "On hold", count: summary.onHold, color: STATUS_COLORS["On hold"] }]
+      : []),
+    { label: "Blocked", count: summary.blocked, color: STATUS_COLORS["Blocked"] },
+    { label: "Done", count: summary.done, color: STATUS_COLORS["Done"] },
   ];
 
   return (
@@ -91,18 +118,9 @@ function SummaryHeaderCard({ data }) {
         </div>
       )}
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center" }}>
-        {items.map(({ label, count, color }, i) => (
-          <div
-            key={label}
-            style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}
-          >
-            <span style={{ fontWeight: 600, color }}>{count}</span>
-            <span style={{ color: "var(--text-muted)" }}>{label}</span>
-            {i < items.length - 1 && (
-              <span aria-hidden style={{ color: "var(--border)", marginLeft: 10 }}>·</span>
-            )}
-          </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+        {items.map(({ label, count, color }) => (
+          <StatusCountPill key={label} label={label} count={count} color={color} />
         ))}
       </div>
     </div>
@@ -157,12 +175,15 @@ function YourTasksSection({ tasks, onSessionExpired }) {
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {/* Matches the InsightCardHeader title treatment (16px / 600 / uppercase)
+              so the two section headers on this page read as peers. */}
           <span
             style={{
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: 600,
-              letterSpacing: "0.5px",
-              color: "var(--text-muted)",
+              letterSpacing: "0.6px",
+              textTransform: "uppercase",
+              color: "var(--text)",
               lineHeight: "16.5px",
             }}
           >
@@ -179,7 +200,7 @@ function YourTasksSection({ tasks, onSessionExpired }) {
             : `No ${filter} tasks for you right now.`}
         </p>
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="portal-task-grid">
           {filtered.map((task) => (
             <PortalTaskCard
               key={task.id}
@@ -303,13 +324,15 @@ export default function PortalOverview({ data, tasks = [], snapshot, contextHash
 
   return (
     <div className="flex flex-col gap-4">
-      <PortalUpdatesBanner />
-
       <SummaryHeaderCard data={data} />
+
+      {/* "Your tasks" sits above the AI overview on purpose: a customer opening
+          the portal wants their own to-dos first, narrative second. */}
+      <YourTasksSection tasks={tasks} onSessionExpired={handleSessionExpired} />
 
       <InsightCard isStreaming={isStreaming}>
         <InsightCardHeader
-          title={data.companyName}
+          title="Overview"
           statusPill={aiStatus ? <InsightStatusPill status={aiStatus} audience="customer" /> : null}
           isStreaming={isStreaming}
           payload={payload}
@@ -390,8 +413,6 @@ export default function PortalOverview({ data, tasks = [], snapshot, contextHash
           </InsightSection>
         </div>
       </InsightCard>
-
-      <YourTasksSection tasks={tasks} onSessionExpired={handleSessionExpired} />
     </div>
   );
 }

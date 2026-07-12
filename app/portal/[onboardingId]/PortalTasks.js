@@ -205,7 +205,7 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
               style={{
                 display: "flex",
                 gap: 0,
-                minWidth: columns.length * 264,
+                minWidth: columns.length * 288,
                 padding: "12px 16px",
                 alignItems: "stretch",
               }}
@@ -214,7 +214,13 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
                 <div
                   key={phase.id}
                   style={{
-                    minWidth: 240,
+                    // Fixed width, not just a minimum — matches the vendor kanban
+                    // column. Without maxWidth a long task title stretches the
+                    // column and its cards, so columns end up different widths.
+                    // 264 content + 24px marginRight = 288px footprint per column.
+                    width: 264,
+                    minWidth: 264,
+                    maxWidth: 264,
                     flexShrink: 0,
                     display: "flex",
                     flexDirection: "column",

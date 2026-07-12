@@ -3,6 +3,7 @@
 import { useState } from "react";
 import TabBar from "../../ui/TabBar";
 import CompanyAvatar from "../../ui/CompanyAvatar";
+import PortalNotificationBell from "./PortalNotificationBell";
 import PortalOverview from "./PortalOverview";
 import PortalTasks from "./PortalTasks";
 
@@ -54,7 +55,9 @@ export default function PortalShell({
 
   return (
     <div className="w-full flex flex-col h-full">
-      {/* Header — welcome on the left, company chip in the top-right corner */}
+      {/* Header — company logo + welcome on the left, notification bell top-right.
+          The customer already knows who they are, so the company name is carried
+          by the logo alone. */}
       <header
         style={{
           padding: "20px 16px 16px",
@@ -65,21 +68,13 @@ export default function PortalShell({
           gap: 16,
         }}
       >
-        <h1 className="text-lg font-semibold" style={{ color: "var(--text)", margin: 0 }}>
-          Welcome, {contactName}
-        </h1>
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            color: "var(--text-muted)",
-            fontSize: 12,
-          }}
-        >
-          <CompanyAvatar name={data.companyName} size={20} />
-          <span>{data.companyName}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+          <CompanyAvatar name={data.companyName} logoUrl={data.companyLogoUrl} size={24} radius={6} />
+          <h1 className="text-lg font-semibold truncate" style={{ color: "var(--text)", margin: 0 }}>
+            Welcome, {contactName}
+          </h1>
         </div>
+        <PortalNotificationBell />
       </header>
 
       {/* Desktop tabs — matches kanban board tab style */}

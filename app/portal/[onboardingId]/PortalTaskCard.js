@@ -146,7 +146,8 @@ export default function PortalTaskCard({ task, onTaskUpdated, onCardClick, onSes
           onClick={handleToggleDone}
         />
         <span
-          className="text-sm flex-1 leading-snug"
+          className="portal-task-title text-sm flex-1 min-w-0 leading-snug"
+          title={task.title}
           style={{
             color: isDone ? "var(--text-secondary)" : "var(--text)",
             textDecoration: isDone ? "line-through" : "none",
