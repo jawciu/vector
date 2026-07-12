@@ -191,15 +191,20 @@ Depth is communicated by **background colour layering**, not shadows. The only s
 
 ### `Button` — `app/ui/Button.js`
 
-Variants: `primary` | `secondary` | `destructive` | `text`. Sizes: `xs` | `sm` (default). Solid variants share `rounded-lg` (8px) and `gap-2` (8px) between leading icon and label.
+Variants: `primary` | `secondary` | `tertiary` | `destructive` | `text`. Sizes: `xs` | `sm` (default). Solid variants share `rounded-lg` (8px) and `gap-2` (8px) between leading icon and label.
 - **Primary**: `font-semibold`, uses `.btn-primary` CSS class. Default `action`, hover `actionHover`, active `actionActive`, disabled `actionDisabled`. Text always `actionText`.
-- **Secondary**: `font-normal`, uses `.btn-secondary` CSS class. `surface` background, `border` border, `text` colour. Hover `bgHover`, active `surfaceHover`. Disabled keeps the border but text becomes `textMuted`.
+- **Secondary**: `font-normal`, uses `.btn-secondary` CSS class. `surface` background, `border` border, `text` colour. Hover `surfaceHover`, active `bgHover`. Disabled keeps the border but text becomes `textMuted`.
+- **Tertiary**: `font-normal`, uses `.btn-tertiary` CSS class. No fill and no visible border — the label alone. Rests at `textMuted` (the same tone as an inactive tab label) and brightens to `text` on hover. **It never takes a background, on hover or otherwise.** Carries a transparent 1px border so its box matches an adjacent secondary and a button row doesn't shift. Disabled stays `textMuted`.
 - **Destructive**: `font-semibold`, uses `.btn-destructive` CSS class. Default `danger`, hover `dangerHover`, active `dangerActive`, disabled `dangerDisabled`. Text always `textDark`. Use only for irreversible actions (delete, revoke).
-- **Text**: inline text-only button via `.text-btn`. Pair with `tone="action"` (default, `action` colour) or `tone="danger"` (`danger` colour). No padding, no background, no radius. Use sparingly for inline actions like Copy / Revoke.
+- **Text**: inline text-only button via `.text-btn`. Pair with `tone="action"` (default, `action` colour) or `tone="danger"` (`danger` colour). No padding, no background, no radius. Use sparingly for inline actions like Copy / Revoke. **This is not a fourth emphasis tier** — it's the base for coloured inline links, not a button weight.
 
-Cancel/dismiss buttons alongside a primary always use `variant="secondary"` at the same size.
+**Emphasis is a three-tier ladder: primary > secondary > tertiary.** There is no "ghost" — tertiary *is* the ghost. Cancel/dismiss alongside another button uses `variant="tertiary"` at the same size.
 
-All button variants share a `:focus-visible` outline (`2px solid focusRing`, `2px` offset).
+**Only one primary per page or page section.** A filled button that repeats — one per row down a list — carries no hierarchy, because if every row shouts, no row is louder. Worse, it steals the distinction from the page's real primary action. So for **repeated row-level actions in a list or table, use secondary for the accept action and tertiary for everything else**, and reserve the single primary for a page-level action (a header CTA, a bulk "Approve all"), or for the primary action inside a modal/drawer flow. The AI draft inbox (`AIDraftInbox.js`) is the reference implementation: zero primaries, `Create task` / `Comment` / `Approve` are secondary, `Dismiss` / `Edit task` / `Open in mail` are tertiary. This follows IBM Carbon ("only one primary button per page"; "for data lists… low emphasis buttons may be a better choice") and Atlassian ("primary buttons should only appear once per area").
+
+Don't hide row actions behind hover. Reveal *emphasis*, not *existence* — render them muted and strengthen on hover, so they stay discoverable by keyboard and on touch.
+
+All button variants share a `:focus-visible` outline (`2px solid focusRing`, `2px` offset). De-emphasising a button must never cost it a focus ring.
 
 ### `IconButton` — `app/ui/IconButton.js`
 
@@ -359,6 +364,9 @@ When extending: add a new `oi-section--<name>` class in `globals.css` to place a
 - **Don't pre-extract components into `app/ui/`** before they've earned it. Wait for the user to flag a pattern as worth formalising.
 - **Don't ship `rounded-full` on a square element.** It's reserved for circles.
 - **Don't add new top-level CSS custom properties without updating this file** — DESIGN.md is the source of truth. `globals.css` should match.
+- **Don't put a primary button on a repeated row.** One filled button per page section, max. A column of identical primaries conveys no hierarchy and drowns the page's real primary action. Rows get `secondary` (accept) + `tertiary` (everything else).
+- **Don't invent a fourth button tier.** The ladder is primary > secondary > tertiary. If a button feels "between" tiers, it's tertiary. There is no ghost/subtle/quiet variant — that's what tertiary is.
+- **Don't give a tertiary button a background on hover.** It brightens its label and nothing else, so it sits beside an inline `Dismiss` without the two looking like different components.
 
 ## Architecture
 

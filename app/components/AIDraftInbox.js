@@ -805,7 +805,7 @@ export function DraftCard({
             type="button"
             onClick={editing ? cancelEdit : onReject}
             disabled={busy}
-            className="text-btn text-btn-tertiary"
+            className="btn-tertiary"
             style={{ padding: "4px 8px", fontSize: 14, opacity: busy ? 0.5 : 1 }}
           >
             {editing ? "Cancel" : "Dismiss"}
@@ -816,7 +816,7 @@ export function DraftCard({
                 type="button"
                 onClick={openEdit}
                 disabled={busy}
-                className="btn-ghost text-sm rounded-lg"
+                className="btn-tertiary text-sm rounded-lg"
                 style={{ padding: "4px 10px", fontSize: 14, opacity: busy ? 0.5 : 1 }}
               >
                 Edit
@@ -832,8 +832,8 @@ export function DraftCard({
               aria-disabled={busy || selected}
               aria-label={selected ? "Unselect to approve individually" : undefined}
               title={selected ? "Unselect to approve individually" : undefined}
-              className="btn-primary text-sm rounded-lg"
-              style={{ padding: "4px 14px", fontSize: 14, fontWeight: 600, opacity: busy || selected ? 0.5 : 1 }}
+              className="btn-secondary text-sm rounded-lg"
+              style={{ padding: "4px 14px", fontSize: 14, opacity: busy || selected ? 0.5 : 1 }}
             >
               {busy ? "…" : "Approve"}
             </button>
@@ -1395,7 +1395,7 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
           <button
             onClick={onReject}
             disabled={busy}
-            className="text-btn text-btn-tertiary"
+            className="btn-tertiary"
             style={{
               padding: "4px 8px",
               fontSize: 14,
@@ -1407,7 +1407,7 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
           <div style={{ display: "flex", gap: 8 }}>
             <a
               href={mailto}
-              className="btn-ghost text-sm rounded-lg"
+              className="btn-tertiary text-sm rounded-lg"
               style={{ padding: "4px 10px", fontSize: 14, textDecoration: "none" }}
             >
               Open in mail
@@ -1415,11 +1415,10 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
             <button
               onClick={() => onApprove({ subject, body })}
               disabled={!canSend}
-              className="btn-primary text-sm rounded-lg"
+              className="btn-secondary text-sm rounded-lg"
               style={{
                 padding: "4px 10px",
                 fontSize: 14,
-                fontWeight: 600,
                 opacity: !canSend ? 0.5 : 1,
               }}
               title="Publishes the message body as a Comment visible in the customer portal."
@@ -1702,7 +1701,7 @@ export function CreateTaskCard({
             type="button"
             onClick={handleDismissOrExitEdit}
             disabled={busy || saving}
-            className="text-btn text-btn-tertiary"
+            className="btn-tertiary"
             style={{
               padding: "4px 8px",
               fontSize: 14,
@@ -1722,7 +1721,7 @@ export function CreateTaskCard({
                 type="button"
                 onClick={() => setCardMode("edit")}
                 disabled={busy}
-                className="btn-ghost text-sm rounded-lg"
+                className="btn-tertiary text-sm rounded-lg"
                 style={{ padding: "4px 10px", fontSize: 14 }}
               >
                 Edit task
@@ -1732,7 +1731,7 @@ export function CreateTaskCard({
                 type="button"
                 onClick={handleSaveDraft}
                 disabled={busy || saving || !dirty}
-                className="btn-ghost text-sm rounded-lg"
+                className="btn-tertiary text-sm rounded-lg"
                 style={{ padding: "4px 10px", fontSize: 14, opacity: !dirty || saving ? 0.5 : 1 }}
               >
                 {saving ? "…" : "Save draft"}

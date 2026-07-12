@@ -99,7 +99,7 @@ a {
 .icon-btn:focus-visible,
 .btn-primary:focus-visible,
 .btn-secondary:focus-visible,
-.btn-ghost:focus-visible,
+.btn-tertiary:focus-visible,
 .btn-destructive:focus-visible,
 .text-btn:focus-visible {
   outline: 2px solid var(--focus-ring);
@@ -153,23 +153,26 @@ a {
   cursor: not-allowed;
 }
 
-/* Ghost button — lowest-emphasis *button-shaped* action (Edit task / Save
-   draft / Open in mail). No fill and no background on hover: it brightens the
-   label only, so it behaves identically to the `.text-btn-tertiary` Dismiss
-   sitting beside it. The transparent border is purely to keep its box the same
-   size as an adjacent `.btn-secondary`, so the row doesn't shift. */
-.btn-ghost {
+/* Tertiary button — the lowest-emphasis action (Dismiss / Cancel / Edit task /
+   Save draft / Open in mail). No fill, ever: it brightens its label from the
+   muted "inactive nav" tone to full text colour on hover, and nothing else.
+   The transparent 1px border keeps its box the same height as an adjacent
+   .btn-secondary so a button row doesn't shift. This is the ONLY low-emphasis
+   button style — there is no separate "ghost". */
+.btn-tertiary {
   background-color: transparent;
   color: var(--text-muted);
   border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
   transition: color 0.15s ease;
 }
 
-.btn-ghost:hover:not(:disabled) {
+.btn-tertiary:hover:not(:disabled) {
   color: var(--text);
 }
 
-.btn-ghost:disabled {
+.btn-tertiary:disabled {
   color: var(--text-muted);
   cursor: not-allowed;
 }
@@ -252,17 +255,6 @@ a {
 
 .text-btn-danger:hover:not(:disabled) {
   color: var(--danger-hover);
-}
-
-/* Tertiary text button (Dismiss / Cancel / Exit edit) — the lowest-emphasis
-   action. Rests at the same muted tone as an inactive tab label, and lifts to
-   full text colour on hover. Never competes with the primary action. */
-.text-btn-tertiary {
-  color: var(--text-muted);
-}
-
-.text-btn-tertiary:hover:not(:disabled) {
-  color: var(--text);
 }
 
 /* Mode toggle (e.g. Existing / New in onboarding modal) */

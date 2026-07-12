@@ -5,7 +5,8 @@
  *
  * Variants:
  *   primary     — solid purple action button
- *   secondary   — bordered surface button (cancel, dismiss)
+ *   secondary   — bordered surface button
+ *   tertiary    — bare label, no fill or border (dismiss, cancel, edit)
  *   destructive — solid danger button (delete, revoke)
  *   text        — inline text-only button (use with `tone`)
  *
@@ -49,6 +50,18 @@ export default function Button({
       <button
         type="button"
         className={`btn-secondary ${SOLID_BASE} font-normal ${SIZE_CLASSES[size]} ${className}`}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  }
+
+  if (variant === "tertiary") {
+    return (
+      <button
+        type="button"
+        className={`btn-tertiary ${SOLID_BASE} font-normal ${SIZE_CLASSES[size]} ${className}`}
         {...props}
       >
         {children}
