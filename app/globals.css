@@ -99,6 +99,7 @@ a {
 .icon-btn:focus-visible,
 .btn-primary:focus-visible,
 .btn-secondary:focus-visible,
+.btn-ghost:focus-visible,
 .btn-destructive:focus-visible,
 .text-btn:focus-visible {
   outline: 2px solid var(--focus-ring);
@@ -135,15 +136,40 @@ a {
   transition: background-color 0.15s ease;
 }
 
+/* --bg-hover (#211F29) is only ~3 points lighter than the button's resting
+   --bg (#18181E), which is imperceptible when the button sits on an elevated
+   card (--bg-elevated #1D1C24). --surface-hover is the documented hover step
+   for elevated surfaces and reads clearly on both the page and a card. */
 .btn-secondary:hover:not(:disabled) {
-  background-color: var(--bg-hover);
-}
-
-.btn-secondary:active:not(:disabled) {
   background-color: var(--surface-hover);
 }
 
+.btn-secondary:active:not(:disabled) {
+  background-color: var(--bg-hover);
+}
+
 .btn-secondary:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+/* Ghost button — lowest-emphasis *button-shaped* action (Edit task / Save
+   draft / Open in mail). No fill and no background on hover: it brightens the
+   label only, so it behaves identically to the `.text-btn-tertiary` Dismiss
+   sitting beside it. The transparent border is purely to keep its box the same
+   size as an adjacent `.btn-secondary`, so the row doesn't shift. */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  transition: color 0.15s ease;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.btn-ghost:disabled {
   color: var(--text-muted);
   cursor: not-allowed;
 }
@@ -226,6 +252,17 @@ a {
 
 .text-btn-danger:hover:not(:disabled) {
   color: var(--danger-hover);
+}
+
+/* Tertiary text button (Dismiss / Cancel / Exit edit) — the lowest-emphasis
+   action. Rests at the same muted tone as an inactive tab label, and lifts to
+   full text colour on hover. Never competes with the primary action. */
+.text-btn-tertiary {
+  color: var(--text-muted);
+}
+
+.text-btn-tertiary:hover:not(:disabled) {
+  color: var(--text);
 }
 
 /* Mode toggle (e.g. Existing / New in onboarding modal) */
@@ -507,29 +544,19 @@ a {
   border-color: var(--icon-tertiary);
 }
 
+/* Second column on a draft row: the metadata the task would be created with
+   (due date, status, notes/comments, priority). Deliberately NOT a card — it
+   used to be a mini task-card that repeated the task title already shown on
+   the left. It's a quiet column that rests dim and lifts on row hover. */
 .draft-card-preview {
-  position: relative;
-  background: var(--bg-elevated);
-  transition: background-color 0.15s ease;
-}
-
-.draft-card-preview::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--deeper-bg);
-  opacity: 0.8;
-  border-radius: inherit;
-  pointer-events: none;
-  transition: opacity 0.15s ease;
-}
-
-.draft-card:hover .draft-card-preview::after {
-  opacity: 0;
+  color: var(--text-muted);
+  opacity: 0.65;
+  transition: opacity 0.15s ease, color 0.15s ease;
 }
 
 .draft-card:hover .draft-card-preview {
-  background: var(--bg-elevated-hover);
+  opacity: 1;
+  color: var(--text-secondary);
 }
 
 
@@ -859,6 +886,19 @@ a {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
   word-break: break-word;
+}
+
+/* Inside a draft row the task name rests at the same muted tone as the
+   "Create task" label above it, and only goes full-brightness on row hover —
+   so a scrolling inbox reads as one calm column, and hovering a row is what
+   brings it forward. Scoped to .draft-card so .task-ref elsewhere is unchanged. */
+.draft-card .task-ref {
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+}
+
+.draft-card:hover .task-ref {
+  color: var(--text);
 }
 
 /* Onboarding insights overview — two-row layout, container-query driven.

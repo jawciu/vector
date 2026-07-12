@@ -16,7 +16,7 @@ import CalendarDropdown from "@/app/ui/CalendarDropdown";
 import Sparkle from "@/app/ui/Sparkle";
 import TaskIdChip from "@/app/ui/TaskIdChip";
 import MeetingDrawer from "./MeetingDrawer";
-import { TASK_STATUSES } from "@/lib/constants";
+import { TASK_STATUSES, STATUS_COLORS } from "@/lib/constants";
 
 /**
  * "Vector suggests" inbox — list of PendingAIChange rows.
@@ -805,8 +805,8 @@ export function DraftCard({
             type="button"
             onClick={editing ? cancelEdit : onReject}
             disabled={busy}
-            className="text-btn"
-            style={{ padding: "4px 8px", fontSize: 14, color: "var(--text)", opacity: busy ? 0.5 : 1 }}
+            className="text-btn text-btn-tertiary"
+            style={{ padding: "4px 8px", fontSize: 14, opacity: busy ? 0.5 : 1 }}
           >
             {editing ? "Cancel" : "Dismiss"}
           </button>
@@ -816,7 +816,7 @@ export function DraftCard({
                 type="button"
                 onClick={openEdit}
                 disabled={busy}
-                className="btn-secondary text-sm rounded-lg"
+                className="btn-ghost text-sm rounded-lg"
                 style={{ padding: "4px 10px", fontSize: 14, opacity: busy ? 0.5 : 1 }}
               >
                 Edit
@@ -1395,11 +1395,10 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
           <button
             onClick={onReject}
             disabled={busy}
-            className="text-btn"
+            className="text-btn text-btn-tertiary"
             style={{
               padding: "4px 8px",
               fontSize: 14,
-              color: "var(--text)",
               opacity: busy ? 0.5 : 1,
             }}
           >
@@ -1408,7 +1407,7 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
           <div style={{ display: "flex", gap: 8 }}>
             <a
               href={mailto}
-              className="btn-secondary text-sm rounded-lg"
+              className="btn-ghost text-sm rounded-lg"
               style={{ padding: "4px 10px", fontSize: 14, textDecoration: "none" }}
             >
               Open in mail
@@ -1660,6 +1659,7 @@ export function CreateTaskCard({
           selected={selected}
           onToggleSelect={onToggleSelect}
           busy={busy}
+          vendorUsers={vendorUsers}
         />
       ) : (
         <CreateTaskHeader draft={draft} taskTitle={taskTitle} generatedDate={generatedDate} isPending={isPending} />
@@ -1702,23 +1702,27 @@ export function CreateTaskCard({
             type="button"
             onClick={handleDismissOrExitEdit}
             disabled={busy || saving}
-            className="text-btn"
+            className="text-btn text-btn-tertiary"
             style={{
               padding: "4px 8px",
               fontSize: 14,
-              color: "var(--text)",
               opacity: busy || saving ? 0.5 : 1,
             }}
           >
             {cardMode === "edit" ? "Exit edit" : "Dismiss"}
           </button>
           <div style={{ display: "flex", gap: 8 }}>
+            {/* Row-level action hierarchy: Create task (secondary) > Edit task
+                (ghost) > Dismiss (tertiary text). Deliberately NO primary here —
+                this action repeats once per draft down a scrolling page, so a
+                filled button would carry no hierarchy and would drown out the
+                page-level primary. Carbon/Atlassian: one primary per page. */}
             {cardMode === "compact" ? (
               <button
                 type="button"
                 onClick={() => setCardMode("edit")}
                 disabled={busy}
-                className="btn-secondary text-sm rounded-lg"
+                className="btn-ghost text-sm rounded-lg"
                 style={{ padding: "4px 10px", fontSize: 14 }}
               >
                 Edit task
@@ -1728,7 +1732,7 @@ export function CreateTaskCard({
                 type="button"
                 onClick={handleSaveDraft}
                 disabled={busy || saving || !dirty}
-                className="btn-secondary text-sm rounded-lg"
+                className="btn-ghost text-sm rounded-lg"
                 style={{ padding: "4px 10px", fontSize: 14, opacity: !dirty || saving ? 0.5 : 1 }}
               >
                 {saving ? "…" : "Save draft"}
@@ -1741,8 +1745,8 @@ export function CreateTaskCard({
               aria-disabled={busy || saving || selected}
               aria-label={selected ? "Unselect to approve individually" : undefined}
               title={selected ? "Unselect to approve individually" : undefined}
-              className="btn-primary text-sm rounded-lg"
-              style={{ padding: "4px 10px", fontSize: 14, fontWeight: 600, opacity: busy || selected ? 0.5 : 1 }}
+              className="btn-secondary text-sm rounded-lg"
+              style={{ padding: "4px 10px", fontSize: 14, opacity: busy || selected ? 0.5 : 1 }}
             >
               {busy ? "…" : "Create task"}
             </button>
@@ -1786,10 +1790,13 @@ function payloadsEqual(a, b) {
 }
 
 /** Header — breadcrumb + meta rows (shared by compact and edit). */
-/** Two-column compact view per Figma 140:9165.
+/** Two-column compact view.
  *  Left: heading (✓ Create task) + task-name code block + meta (✨ miniti · confidence).
- *  Right: task-card-style preview, lightens on outer-card hover. */
-function CreateTaskCompact({ draft, taskTitle, payload, isPending, selected, onToggleSelect, busy }) {
+ *  Right: the metadata the task would be created with — due date, status,
+ *  owner, notes/comments, priority. Rests dim, lifts on row hover. It is NOT a
+ *  card and deliberately does not repeat the task title, which is already the
+ *  most prominent thing on the left. */
+function CreateTaskCompact({ draft, taskTitle, payload, isPending, selected, onToggleSelect, busy, vendorUsers = [] }) {
   return (
     <div style={{ display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }}>
       <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
@@ -1823,7 +1830,7 @@ function CreateTaskCompact({ draft, taskTitle, payload, isPending, selected, onT
         </div>
       </div>
       <div style={{ flex: "1 1 240px", minWidth: 0 }}>
-        <CreateTaskPreview payload={payload} />
+        <CreateTaskPreview payload={payload} vendorUsers={vendorUsers} />
       </div>
     </div>
   );
@@ -1858,61 +1865,74 @@ function CreateTaskHeader({ draft, taskTitle, generatedDate, isPending }) {
   );
 }
 
-/** Compact preview — small task-card-style summary inside the outer
- *  bordered card. Visually echoes a kanban TaskCard but stripped down. */
-function CreateTaskPreview({ payload }) {
+/** The metadata column on a compact draft row — what this task would be
+ *  created *with*. No card chrome and no task title (the left column already
+ *  owns the name). Dim at rest, lifts on row hover via `.draft-card-preview`. */
+function CreateTaskPreview({ payload, vendorUsers = [] }) {
   const due = payload.dueDate ? new Date(payload.dueDate) : null;
   const dueLabel = due
     ? due.toLocaleDateString("en-GB", { day: "numeric", month: "short" })
     : null;
   const dueAgo = due ? formatDueAgo(due) : null;
   const noteCount = payload.notes && payload.notes.trim() ? 1 : 0;
+  const ownerName = vendorUsers.find((u) => u.id === payload.ownerId)?.name || null;
+  // A task created from a draft always starts here, so the colour is fixed —
+  // but read it from the same map the kanban card uses rather than hardcoding.
+  const statusColor = STATUS_COLORS["Not started"];
 
+  // One row per fact, all at kanban-card proportions (text-sm, 14px icons,
+  // 18px priority chevrons) so this reads as the same visual language.
   return (
     <div
       className="draft-card-preview"
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 12,
-        padding: "12px 16px",
-        borderRadius: 8,
+        alignItems: "flex-end",
+        textAlign: "right",
+        gap: 8,
+        justifyContent: "center",
+        height: "100%",
       }}
     >
-      <div style={{ fontSize: 14, lineHeight: 1.4 }}>
-        {payload.title || "Untitled task"}
-      </div>
+      {/* Row 1: status */}
+      <span
+        className="text-sm rounded-md"
+        style={{ color: statusColor, border: `0.5px solid ${statusColor}`, padding: "2px 4px" }}
+      >
+        Not started
+      </span>
+
+      {/* Row 2: due date */}
       {dueLabel && (
-        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
+        <span className="text-sm" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
           <CalendarIcon />
-          <span>{dueLabel}</span>
+          {dueLabel}
           {dueAgo && <span>· {dueAgo}</span>}
-        </div>
-      )}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-        <span
-          className="status-pill"
-          style={{
-            border: "1px solid var(--border-subtle)",
-            padding: "2px 6px",
-            borderRadius: 6,
-            fontSize: 11,
-          }}
-        >
-          Not started
         </span>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 12 }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }} title="Notes">
-            <NotesIcon />
-            {noteCount}
-          </span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }} title="Comments">
-            <CommentsIcon />
-            0
-          </span>
-          <PriorityIcon priority={payload.priority} />
-        </div>
-      </div>
+      )}
+
+      {/* Row 3: owner */}
+      {ownerName && (
+        <span className="text-sm truncate" style={{ maxWidth: "100%" }} title={`Owner: ${ownerName}`}>
+          {ownerName}
+        </span>
+      )}
+
+      {/* Row 4: notes + comments */}
+      <span className="text-sm" style={{ display: "inline-flex", alignItems: "center", gap: 12 }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }} title="Notes">
+          <NotesIcon />
+          {noteCount}
+        </span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }} title="Comments">
+          <CommentsIcon />
+          0
+        </span>
+      </span>
+
+      {/* Row 5: priority */}
+      <PriorityIcon priority={payload.priority} size={18} />
     </div>
   );
 }
@@ -2318,7 +2338,7 @@ function NotesIcon() {
 
 function CommentsIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "currentColor", flexShrink: 0 }}>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "currentColor", flexShrink: 0 }}>
       <path d="M2 4a1.5 1.5 0 0 1 1.5-1.5h7A1.5 1.5 0 0 1 12 4v4a1.5 1.5 0 0 1-1.5 1.5H6.5L4 12V9.5h-.5A1.5 1.5 0 0 1 2 8V4Z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round" />
     </svg>
   );
