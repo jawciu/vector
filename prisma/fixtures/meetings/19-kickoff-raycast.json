@@ -1,0 +1,62 @@
+{
+  "daysAgo": 9,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "C7A41E92-3D6B-4F18-9E0A-2B5D8C1447FA",
+      "title": "Vector × Raycast — implementation kickoff",
+      "duration_seconds": 2874,
+      "language": "en",
+      "summary": "Kickoff for the Raycast implementation. They are migrating off Metabase onto Vector, with dbt Core on BigQuery as the source of truth. Priya wants the executive KPI dashboard live before the company all-hands in September, and an AI analyst pilot for the growth team after parity is proven. Three access prerequisites came out of the call: a read-only BigQuery service account, Vector's static IPs on their network policy, and read access to the dbt repo. Marta flagged that anything touching production access has to clear their internal security review first, which she could not put a date on.",
+      "action_items": [
+        "Marta to provision a read-only BigQuery service account scoped to the ANALYTICS schema",
+        "Marta to add Vector Cloud static IPs to the BigQuery network policy",
+        "Felix to grant Vector read access to the dbt project repo on GitHub",
+        "Maya to send the implementation plan and set up a weekly sync",
+        "Felix to export the list of top 20 Metabase dashboards by view count"
+      ],
+      "key_decisions": [
+        "Go-live target is the September all-hands — executive KPI dashboard must be live by then",
+        "Phase 1 is dashboard parity with Metabase; AI analyst pilot deferred until parity is signed off",
+        "fct_installs is the first fact table to get a metrics block"
+      ],
+      "topics": ["kickoff", "bigquery", "metabase migration", "dbt", "security review", "timeline"],
+      "discussion_flow": ["intros", "current stack walkthrough", "goals and success criteria", "timeline", "technical prerequisites", "security review process", "next steps"],
+      "notes": "Priya is the exec sponsor and clearly has the mandate. Felix knows the dbt project well and is keen. Marta is the constraint — she owns both BigQuery and Google Workspace, and she was noticeably careful about committing to dates because of their security review process. Worth watching.",
+      "speaker_count": 5,
+      "speaker_names": { "-1": "You", "0": "Priya Raman", "1": "Felix Gruber", "2": "Marta Silva", "3": "Theo Okonkwo" },
+      "transcript": [
+        { "speaker": "You", "text": "Thanks for making the time, everyone. The goal today is to agree what success looks like and get the technical prerequisites moving so Theo isn't blocked next week.", "timestamp": 5.1 },
+        { "speaker": "Priya Raman", "text": "Sounds right. The short version of why we're here — Metabase has become a graveyard. Four hundred odd dashboards, nobody knows which ones are trustworthy, and every number in a leadership meeting gets argued with.", "timestamp": 24.7 },
+        { "speaker": "You", "text": "That's the pattern we see constantly. Felix, can you walk us through what's underneath it?", "timestamp": 48.3 },
+        { "speaker": "Felix Gruber", "text": "Everything lands in BigQuery. We run dbt Core, about ninety models, repo's on GitHub. The models are in decent shape — it's the presentation layer that's rotted.", "timestamp": 59.9 },
+        { "speaker": "Theo Okonkwo", "text": "That's a good starting point, honestly. If the project compiles clean we can scaffold the semantic layer within days of getting repo access.", "timestamp": 94.2 },
+        { "speaker": "Priya Raman", "text": "What do you actually need from us to start?", "timestamp": 121.5 },
+        { "speaker": "Theo Okonkwo", "text": "Three things. A read-only service account on BigQuery scoped to your ANALYTICS schema. Our static egress IPs added to your network policy. And read access to the dbt repo — we never push, we only read.", "timestamp": 129.8 },
+        { "speaker": "Marta Silva", "text": "I can do all three technically. I want to set expectations though — anything that grants an external party access to production data has to go through our security review. That's not me being difficult, it's policy.", "timestamp": 163.4 },
+        { "speaker": "You", "text": "Completely understood. How long does that review typically take?", "timestamp": 194.0 },
+        { "speaker": "Marta Silva", "text": "It varies. I'd rather not give you a number I can't hold to. I'll open the ticket this week and chase it.", "timestamp": 202.6 },
+        { "speaker": "Priya Raman", "text": "Marta, can you make it a priority? The whole timeline hangs off it.", "timestamp": 228.1 },
+        { "speaker": "Marta Silva", "text": "I'll do what I can.", "timestamp": 241.9 },
+        { "speaker": "You", "text": "Let's plan around it rather than wait on it. Felix, is there anything we can do with the repo alone, before warehouse access clears?", "timestamp": 250.3 },
+        { "speaker": "Theo Okonkwo", "text": "Repo access alone gets us a long way. I can compile the project and draft the first metrics without ever touching the warehouse. The data connection is only needed when we validate numbers.", "timestamp": 268.7 },
+        { "speaker": "Felix Gruber", "text": "Repo read access I can probably get done faster — it's source code, not customer data. Different risk profile. I'll push on that one.", "timestamp": 297.2 },
+        { "speaker": "Priya Raman", "text": "Good. On scope — I want the executive KPI dashboard live before our September all-hands. That's the thing I'll be judged on.", "timestamp": 330.6 },
+        { "speaker": "You", "text": "That's the anchor then. Parity first, AI analyst pilot after. I wouldn't put an AI analyst in front of your growth team on a semantic layer nobody trusts yet.", "timestamp": 361.4 },
+        { "speaker": "Priya Raman", "text": "Agreed. Prove the numbers, then get clever.", "timestamp": 389.0 },
+        { "speaker": "Felix Gruber", "text": "Which fact table do you want to start with? I'd say fct_installs — it's our cleanest and it's what leadership asks about most.", "timestamp": 401.7 },
+        { "speaker": "Theo Okonkwo", "text": "Perfect. We'll put the first metrics block on fct_installs and use it as the template for the rest.", "timestamp": 418.3 },
+        { "speaker": "You", "text": "Maya will send the implementation plan and a weekly sync invite. Felix, could you also export your top twenty Metabase dashboards by view count? That tells us what actually matters versus what merely exists.", "timestamp": 437.9 },
+        { "speaker": "Felix Gruber", "text": "Happy to. I suspect the answer is embarrassing.", "timestamp": 462.5 },
+        { "speaker": "You", "text": "It always is. Thanks everyone — summary and actions in your inbox within the hour.", "timestamp": 474.1 }
+      ],
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "priya@raycast.com", "name": "Priya Raman", "domain": "raycast.com" },
+        { "email": "felix@raycast.com", "name": "Felix Gruber", "domain": "raycast.com" },
+        { "email": "marta@raycast.com", "name": "Marta Silva", "domain": "raycast.com" }
+      ]
+    }
+  }
+}

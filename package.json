@@ -13,6 +13,7 @@
     "build:ds": "node scripts/build-theme.mjs",
     "seed": "npx tsx prisma/seed.js",
     "seed:activity": "npx tsx prisma/seed-recent-activity.js",
+    "seed:notifications": "npx tsx prisma/seed-demo-notifications.js",
     "seed:ai-fixtures": "npx tsx prisma/seed-ai-test-fixtures.js",
     "test": "vitest run",
     "test:watch": "vitest",

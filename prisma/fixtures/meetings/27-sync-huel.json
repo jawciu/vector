@@ -1,0 +1,59 @@
+{
+  "daysAgo": 4,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "B5741E0C-9D26-4A83-97F1-6082C3E5B14A",
+      "title": "Huel weekly sync — order metrics + Entra SSO",
+      "duration_seconds": 2019,
+      "language": "en",
+      "summary": "Weekly sync. Work on the fct_orders metrics block is progressing but the subscription revenue definition is still open: Huel's finance team recognises subscription revenue on dispatch, while the growth team reports it on order placement, and the gap is material during promotional periods when orders spike days before dispatch. Chloe is pulling both series. Microsoft Entra SAML configuration is underway and Raj hit a group-claim mapping issue that is slowing the role and permission work, which is why that task is on hold. Dashboard migration is progressing well and the Tableau inventory is nearly complete.",
+      "action_items": [
+        "Oliver to rule on whether subscription revenue is recognised on dispatch or on order placement",
+        "Chloe to pull both revenue series across the last two promotional periods to quantify the gap",
+        "Raj to fix the Entra group-claim mapping so roles come through on the SAML assertion",
+        "Ines to unblock role and permission mapping once group claims are working",
+        "Chloe to finish the Tableau dashboard inventory"
+      ],
+      "key_decisions": [
+        "Role and permission mapping stays on hold until Entra group claims are fixed — no manual role assignment as a workaround",
+        "Revenue recognition basis will be decided against the promotional-period numbers, not in principle",
+        "Parity sign-off against Tableau is a hard gate before the wider rollout"
+      ],
+      "topics": ["fct_orders", "revenue recognition", "entra sso", "group claims", "tableau migration", "permissions"],
+      "discussion_flow": ["metrics block status", "revenue recognition dispute", "sso and group claims", "dashboard migration", "next steps"],
+      "notes": "Two open definitional questions, both real, both being handled properly. Raj is competent and the Entra issue is genuinely fiddly rather than neglect. The temptation to work around the group-claim problem by assigning roles by hand was raised and correctly rejected — it would have created a permissions model nobody could audit.",
+      "speaker_count": 5,
+      "speaker_names": { "-1": "You", "0": "Oliver Bennett", "1": "Chloe Ashworth", "2": "Raj Mehta", "3": "Ines Ferreira" },
+      "transcript": [
+        { "speaker": "Ines Ferreira", "text": "Chloe, where are we on the fct_orders metrics block?", "timestamp": 5.2 },
+        { "speaker": "Chloe Ashworth", "text": "Most of it is landed. Order volume, AOV, repeat rate, churn — all defined and tested. Subscription revenue is the one I can't close.", "timestamp": 12.7 },
+        { "speaker": "Ines Ferreira", "text": "Because?", "timestamp": 38.1 },
+        { "speaker": "Chloe Ashworth", "text": "Finance recognises it on dispatch. Growth reports it on order placement. Ninety-five percent of the time those are the same day and nobody cares. But during a promotion, orders spike and dispatch lags by three or four days, and suddenly the two numbers are meaningfully apart in exactly the week everyone is staring at the dashboard.", "timestamp": 42.9 },
+        { "speaker": "Oliver Bennett", "text": "That explains an argument I sat through in January and did not understand at the time.", "timestamp": 88.4 },
+        { "speaker": "You", "text": "This is the most common thing we find, honestly. Two teams have been quietly right about different things for years and it only surfaces when someone tries to write the definition down.", "timestamp": 97.0 },
+        { "speaker": "Oliver Bennett", "text": "For the exec dashboard it has to be dispatch. That's what we report externally and I'm not having two versions of revenue in the building.", "timestamp": 118.6 },
+        { "speaker": "Chloe Ashworth", "text": "Growth won't love that. Their whole promotional readout is based on placement.", "timestamp": 143.2 },
+        { "speaker": "You", "text": "Then let's not force them to give it up — define both, name them precisely, and make the exec dashboard use the dispatch one. Growth keeps their metric, it just stops being called the same thing.", "timestamp": 151.8 },
+        { "speaker": "Oliver Bennett", "text": "That's reasonable. Chloe, pull both series over the last two promotions so I can see the size of the gap before I commit.", "timestamp": 180.3 },
+        { "speaker": "Chloe Ashworth", "text": "On it.", "timestamp": 204.7 },
+        { "speaker": "Ines Ferreira", "text": "Raj, SSO?", "timestamp": 210.5 },
+        { "speaker": "Raj Mehta", "text": "Entra SAML is configured and authentication works. The problem is group claims — the assertion is coming through without the group memberships, so Vector sees a valid user with no role.", "timestamp": 217.9 },
+        { "speaker": "Ines Ferreira", "text": "Which is why the role and permission mapping is stuck.", "timestamp": 251.4 },
+        { "speaker": "Raj Mehta", "text": "Exactly. It's a claims configuration thing on our side, not a Vector problem. I've had it before, it's fiddly but it's solvable. Give me a few days.", "timestamp": 258.0 },
+        { "speaker": "Chloe Ashworth", "text": "Could we not just assign the roles by hand in the meantime so we're not blocked?", "timestamp": 283.6 },
+        { "speaker": "Raj Mehta", "text": "We could, and then in six months nobody will remember which roles are real and which ones I typed in manually. I'd rather wait.", "timestamp": 292.1 },
+        { "speaker": "You", "text": "Agreed, and I'd have argued the same. A permissions model you can't audit is worse than a delayed one.", "timestamp": 316.8 },
+        { "speaker": "Ines Ferreira", "text": "Then it stays on hold. Chloe, how's the Tableau inventory?", "timestamp": 334.5 },
+        { "speaker": "Chloe Ashworth", "text": "Nearly done. Around sixty dashboards, of which maybe eighteen are actually used. The rest are archaeology.", "timestamp": 342.2 }
+      ],
+      "attendees": [
+        { "email": "ines@vector.test", "name": "Ines Ferreira", "domain": "vector.test" },
+        { "email": "caroline@vector.test", "name": "Caroline Jaworsky", "domain": "vector.test" },
+        { "email": "oliver@huel.com", "name": "Oliver Bennett", "domain": "huel.com" },
+        { "email": "chloe@huel.com", "name": "Chloe Ashworth", "domain": "huel.com" },
+        { "email": "raj@huel.com", "name": "Raj Mehta", "domain": "huel.com" }
+      ]
+    }
+  }
+}

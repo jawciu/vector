@@ -1,0 +1,49 @@
+{
+  "daysAgo": 5,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "4B8E0A57-72CD-4916-A3F5-C0D71E9B6234",
+      "title": "Raycast weekly sync — access still blocked",
+      "duration_seconds": 968,
+      "language": "en",
+      "summary": "Short weekly sync, and a thin one. Only Felix joined from Raycast — Marta was pulled into their compliance audit and Priya did not attend for the second week running. No movement on the security review, so the BigQuery service account, the network policy change and the dbt repo access all remain outstanding. Felix's attempt to split repo access into a separate lower-risk request was rejected. Everything downstream of connectivity is now blocked: the dbt compile, the semantic layer, the metrics validation, the dashboard migration and the SSO work. Felix said the team would come back to us once the audit is finished but could not say when that is.",
+      "action_items": [
+        "Felix to send an update once the compliance audit finishes and the security queue reopens",
+        "Maya to escalate to Priya and propose moving the go-live date if access does not land within a week"
+      ],
+      "key_decisions": [
+        "Repo access will not be split out — it stays bundled in the full security review",
+        "Vector will pause active build work on Raycast until access lands"
+      ],
+      "topics": ["blocked", "security review", "compliance audit", "timeline risk", "escalation"],
+      "discussion_flow": ["attendance", "access status", "what is now blocked", "timeline", "next steps"],
+      "notes": "Concerning. Second consecutive call without Priya, and now Marta is absent too. Felix is engaged but has no authority to unblock any of this. The phrase he used was 'we'll come back to you' — which in practice means we have lost control of the timeline. If we don't hear anything in the next few days this needs an exec-level escalation, not another weekly sync.",
+      "speaker_count": 3,
+      "speaker_names": { "-1": "You", "0": "Felix Gruber", "1": "Theo Okonkwo" },
+      "transcript": [
+        { "speaker": "You", "text": "Hi Felix. Is Marta joining us?", "timestamp": 3.8 },
+        { "speaker": "Felix Gruber", "text": "No — she's been pulled onto the compliance audit full time. And Priya's travelling. It's just me today, sorry.", "timestamp": 9.6 },
+        { "speaker": "You", "text": "No problem. Any movement on the security review?", "timestamp": 26.1 },
+        { "speaker": "Felix Gruber", "text": "None. And the split request I tried to raise got rejected — they won't separate repo access from the warehouse access. It all goes through together or not at all.", "timestamp": 33.4 },
+        { "speaker": "Theo Okonkwo", "text": "So we're still at zero. No service account, no IPs, no repo.", "timestamp": 58.9 },
+        { "speaker": "Felix Gruber", "text": "Correct. I know how that sounds.", "timestamp": 68.2 },
+        { "speaker": "You", "text": "I'm not going to pretend it's fine. Let me lay out what this actually costs, because I don't think it's visible on your side. Theo?", "timestamp": 74.7 },
+        { "speaker": "Theo Okonkwo", "text": "Everything is downstream of connectivity. I can't connect the repo, so I can't compile. I can't compile, so the semantic layer can't be validated. Without a validated semantic layer we can't migrate a single dashboard, we can't do parity sign-off, and the AI analyst pilot is meaningless. The SSO and permissions work also assumes a working connection. That's essentially the whole project sitting behind one ticket.", "timestamp": 88.3 },
+        { "speaker": "Felix Gruber", "text": "When you put it like that. I'll be honest, I don't think anyone internally has connected those dots.", "timestamp": 137.5 },
+        { "speaker": "You", "text": "That's usually the problem. It looks like one IT ticket, so it gets one IT ticket's worth of urgency.", "timestamp": 151.0 },
+        { "speaker": "Felix Gruber", "text": "Look — realistically, the audit has another couple of weeks in it and the security team isn't going to look at anything until it's done. Let us come back to you once that's cleared. I don't want to keep taking your time with a call that's the same every week.", "timestamp": 166.8 },
+        { "speaker": "You", "text": "I'd rather keep the slot, even if it's five minutes. Going quiet is how projects die.", "timestamp": 203.4 },
+        { "speaker": "Felix Gruber", "text": "Fair. But I can't promise Marta or Priya will be on it.", "timestamp": 217.9 },
+        { "speaker": "You", "text": "Understood. Then here's what I'll do — I'll write to Priya directly. Her September date does not survive another two weeks of this, and she should be the one deciding whether to move it or to push the review. That's not a decision you or I should be making for her.", "timestamp": 226.5 },
+        { "speaker": "Felix Gruber", "text": "That's probably the right call. Thanks for being straight about it.", "timestamp": 268.1 },
+        { "speaker": "You", "text": "Thanks Felix. We'll be ready to move fast the moment you unblock us.", "timestamp": 281.7 }
+      ],
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "felix@raycast.com", "name": "Felix Gruber", "domain": "raycast.com" }
+      ]
+    }
+  }
+}

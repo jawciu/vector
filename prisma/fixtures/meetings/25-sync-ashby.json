@@ -1,0 +1,56 @@
+{
+  "daysAgo": 4,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "D40B7A16-C583-49E2-B1F7-2E86039C5A4D",
+      "title": "Ashby weekly sync — parity check + embedding scope",
+      "duration_seconds": 2144,
+      "language": "en",
+      "summary": "Weekly sync. The semantic layer is done and the executive KPI dashboard is close to parity with Mode, with one open discrepancy: time-to-hire is running about a day and a half lower in Vector because Mode counts calendar days and the dbt model counts business days. Nate confirmed the dbt definition is the correct one and Mode has been wrong for two years, so parity will be declared against the corrected number with a note to the exec team. Team dashboard migration is deliberately on hold until that lands. Okta SSO configuration is underway. Nate delivered the customer-facing metric list, which excludes all cross-customer benchmarking fields as expected.",
+      "action_items": [
+        "Ritu to document the business-day vs calendar-day discrepancy for the exec team so nobody thinks the number dropped",
+        "Nate to sign off parity on the executive KPI dashboard once the note is circulated",
+        "Theo to unblock team dashboard migration as soon as parity is signed off",
+        "Theo to finish Okta SAML configuration and test with a non-admin account",
+        "Caroline to schedule the AI analyst pilot walkthrough for the recruiting ops team"
+      ],
+      "key_decisions": [
+        "The dbt business-day definition of time-to-hire is authoritative; Mode's calendar-day figure was wrong and will not be replicated",
+        "Team dashboard migration stays on hold until executive parity is signed off",
+        "Cross-customer benchmarking fields are excluded from anything customer-facing"
+      ],
+      "topics": ["parity", "time-to-hire", "mode migration", "okta sso", "embedding scope", "ai analyst"],
+      "discussion_flow": ["parity status", "time-to-hire discrepancy", "what stays blocked", "sso progress", "embedding metric list", "next steps"],
+      "notes": "Textbook example of a migration surfacing a bug in the thing being migrated from. Nate handled it well — he could have asked us to bug-for-bug replicate Mode and instead chose to fix the number. The on-hold status on team dashboards is intentional and healthy, not a stall.",
+      "speaker_count": 4,
+      "speaker_names": { "-1": "You", "0": "Nate Coleman", "1": "Ritu Sharma", "2": "Theo Okonkwo" },
+      "transcript": [
+        { "speaker": "You", "text": "Theo, where are we on the exec dashboard?", "timestamp": 4.3 },
+        { "speaker": "Theo Okonkwo", "text": "Rebuilt and matching, with one exception. Time-to-hire comes out about a day and a half lower in Vector than in Mode, consistently, across every segment.", "timestamp": 11.8 },
+        { "speaker": "Nate Coleman", "text": "Consistently is interesting. A random discrepancy is a bug, a consistent one is a definition.", "timestamp": 39.2 },
+        { "speaker": "Ritu Sharma", "text": "It's a definition. I dug into it yesterday. The dbt model counts business days between application and offer. The Mode query counts calendar days. Nobody noticed because nobody ever put the two numbers side by side.", "timestamp": 47.6 },
+        { "speaker": "Theo Okonkwo", "text": "So which is right?", "timestamp": 78.1 },
+        { "speaker": "Nate Coleman", "text": "Business days. Unambiguously. If a candidate sits over a weekend that's not our recruiters being slow. The dbt model is correct and the Mode dashboard has been overstating time-to-hire for about two years.", "timestamp": 84.9 },
+        { "speaker": "You", "text": "I want to flag the awkward part, because it'll land on you rather than us. The moment you switch, your headline recruiting metric improves by a day and a half overnight, and it will look like someone is massaging the number.", "timestamp": 112.4 },
+        { "speaker": "Nate Coleman", "text": "Yes. That's exactly what it'll look like.", "timestamp": 141.0 },
+        { "speaker": "Ritu Sharma", "text": "I'll write it up properly. What the old query did, what the new one does, why business days is the right basis, and a chart showing both series so it's obvious the shape didn't change, only the level.", "timestamp": 149.7 },
+        { "speaker": "You", "text": "That's exactly right, and send it before the dashboard goes live rather than after. Explaining a number change in advance is a memo; explaining it afterwards is a defence.", "timestamp": 178.3 },
+        { "speaker": "Nate Coleman", "text": "Noted. Once that circulates I'll sign off parity.", "timestamp": 203.6 },
+        { "speaker": "Theo Okonkwo", "text": "I've kept the team dashboard migration on hold deliberately until that happens. No point migrating forty dashboards onto a metric definition that might still change.", "timestamp": 214.2 },
+        { "speaker": "You", "text": "Right call. Keep it there.", "timestamp": 241.8 },
+        { "speaker": "Theo Okonkwo", "text": "SSO is in progress. Okta SAML is configured, I want to test it end to end with a non-admin account before I call it done — admin accounts hide permission bugs.", "timestamp": 249.5 },
+        { "speaker": "Nate Coleman", "text": "Use mine, I'm not an admin in Vector.", "timestamp": 277.0 },
+        { "speaker": "Nate Coleman", "text": "Also — I've got the customer-facing metric list for you. Pipeline volume, stage conversion, time-in-stage, offer acceptance. All scoped to the customer's own data. Everything benchmark-related is out.", "timestamp": 286.4 },
+        { "speaker": "Theo Okonkwo", "text": "That's a clean list and every one of those is already in the semantic layer. Embedding will be quick once permissions are locked.", "timestamp": 318.9 },
+        { "speaker": "You", "text": "Good week. I'll get the AI analyst walkthrough booked with recruiting ops.", "timestamp": 340.2 }
+      ],
+      "attendees": [
+        { "email": "caroline@vector.test", "name": "Caroline Jaworsky", "domain": "vector.test" },
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "nate@ashbyhq.com", "name": "Nate Coleman", "domain": "ashbyhq.com" },
+        { "email": "ritu@ashbyhq.com", "name": "Ritu Sharma", "domain": "ashbyhq.com" }
+      ]
+    }
+  }
+}

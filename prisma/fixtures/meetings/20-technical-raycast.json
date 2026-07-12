@@ -1,0 +1,53 @@
+{
+  "daysAgo": 7,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "9F2C6D80-14AB-4E53-B7C1-6A3E9D2F5188",
+      "title": "Raycast technical working session — warehouse + repo access",
+      "duration_seconds": 2361,
+      "language": "en",
+      "summary": "Technical session to unblock connectivity. Nothing has been provisioned yet — the BigQuery service account and the network policy change are both sitting in Raycast's security review queue, and the dbt repo access Felix hoped to fast-track was pulled into the same review. Theo cannot connect the repo or run a compile until that clears, so the semantic layer work is stalled before it started. Marta could not give a date. Priya did not attend.",
+      "action_items": [
+        "Marta to chase the security review ticket and get an ETA by end of week",
+        "Felix to check whether repo read access can be split out of the security review as a separate lower-risk request",
+        "Theo to prepare the dbt compile and metrics scaffolding offline so it can run the moment access lands",
+        "Maya to flag the access delay to Priya directly"
+      ],
+      "key_decisions": [
+        "Semantic layer work is formally blocked pending Raycast's security review",
+        "Vector will prepare everything that does not require live access, so nothing else is lost to the wait"
+      ],
+      "topics": ["bigquery", "service account", "network policy", "github repo", "security review", "blocked"],
+      "discussion_flow": ["access status check", "security review process", "what can proceed without access", "risk to timeline", "next steps"],
+      "notes": "This is the second call in a row where access was the whole agenda. Marta is doing her best but clearly does not control the review queue. Priya's absence is notable given she called the timeline the thing she'd be judged on. Timeline risk is real and growing.",
+      "speaker_count": 4,
+      "speaker_names": { "-1": "You", "0": "Felix Gruber", "1": "Marta Silva", "2": "Theo Okonkwo" },
+      "transcript": [
+        { "speaker": "You", "text": "Morning. Priya sends apologies, she's double-booked. Let's get straight into it — Theo, where are we on connectivity?", "timestamp": 6.4 },
+        { "speaker": "Theo Okonkwo", "text": "Nowhere, unfortunately. I have no BigQuery service account, no IP allowlisting, and no repo access. I genuinely can't start.", "timestamp": 18.9 },
+        { "speaker": "Marta Silva", "text": "That's on our side and I'm sorry. All three requests are in the security review queue. I opened the tickets the day after kickoff.", "timestamp": 41.2 },
+        { "speaker": "You", "text": "Felix, I thought repo access might move faster since it's source code rather than customer data?", "timestamp": 66.7 },
+        { "speaker": "Felix Gruber", "text": "So did I. Security bundled it with the other two. Their argument is that the dbt project contains column names and business logic, so it's treated as sensitive by default.", "timestamp": 75.3 },
+        { "speaker": "Theo Okonkwo", "text": "That's a defensible position, it's just an expensive one for us. Repo access alone would let me compile the project and draft the whole first metrics block without touching a single row of data.", "timestamp": 103.8 },
+        { "speaker": "Felix Gruber", "text": "I'll go back and try to split it out as a separate request with a lower risk rating. No promises.", "timestamp": 131.5 },
+        { "speaker": "You", "text": "Marta, is there any ETA at all on the review? Even a bad one is more useful than none.", "timestamp": 152.0 },
+        { "speaker": "Marta Silva", "text": "I asked. The queue is long and there's a compliance audit running in parallel that's eating the team. I'll chase it again but I can't promise you a date this week.", "timestamp": 161.4 },
+        { "speaker": "You", "text": "Okay. I want to be straight with you both — the September all-hands date Priya anchored on assumes we start building this week. Every day of review is a day off the build.", "timestamp": 190.6 },
+        { "speaker": "Marta Silva", "text": "Understood. I'll escalate internally.", "timestamp": 218.3 },
+        { "speaker": "Theo Okonkwo", "text": "In the meantime I'll do everything that doesn't need access. I'll write the metrics definitions for fct_installs against the schema Felix described, get the CI checks scaffolded, and stage it all. When access lands we run it the same day rather than starting from zero.", "timestamp": 231.7 },
+        { "speaker": "Felix Gruber", "text": "That helps. I can send you the fct_installs schema and our naming conventions doc so you're not guessing.", "timestamp": 269.1 },
+        { "speaker": "Theo Okonkwo", "text": "Perfect, that's most of what I need.", "timestamp": 288.4 },
+        { "speaker": "You", "text": "Maya, can you take the action of raising this with Priya directly? She should hear from us that her date is at risk, and hear it early rather than late.", "timestamp": 299.0 },
+        { "speaker": "Marta Silva", "text": "I'd appreciate that, honestly. It'll carry more weight coming from you than from me.", "timestamp": 322.8 },
+        { "speaker": "You", "text": "Then let's do that. Same time next week, and hopefully we're talking about metrics instead of tickets.", "timestamp": 338.2 }
+      ],
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "felix@raycast.com", "name": "Felix Gruber", "domain": "raycast.com" },
+        { "email": "marta@raycast.com", "name": "Marta Silva", "domain": "raycast.com" }
+      ]
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "daysAgo": 3,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "6C05F79E-B2A1-4D3C-8E64-91AB57D0C3E2",
+      "title": "beehiiv semantic layer working session — fct_subscriptions",
+      "duration_seconds": 3402,
+      "language": "en",
+      "summary": "Working session on the first metrics block. Aisha delivered all three access prerequisites within two days of kickoff, so Theo had the repo connected and a clean dbt compile running before the call. The session was spent on fct_subscriptions naming, and Aisha's prediction was correct — growth and finance have materially different definitions of an active subscriber, differing on whether to include subscribers in a payment-failure grace period. The metrics block is on hold until Marcus rules. Everything else on the semantic layer progressed.",
+      "action_items": [
+        "Marcus to rule on whether payment-failure grace-period subscribers count as active",
+        "Aisha to pull the numbers both ways so the decision is made against real figures rather than opinion",
+        "Theo to land the uncontested metrics on fct_subscriptions and leave active_subscribers stubbed",
+        "Theo to set up CI checks on semantic layer changes"
+      ],
+      "key_decisions": [
+        "Uncontested metrics ship now; active_subscribers is stubbed pending Marcus's ruling",
+        "Grace-period definition will be decided against real numbers, not in the abstract",
+        "CI checks go in before any dashboard migration begins"
+      ],
+      "topics": ["semantic layer", "fct_subscriptions", "metric naming", "active subscriber", "dbt compile", "ci"],
+      "discussion_flow": ["access confirmed", "dbt compile results", "metrics walkthrough", "active subscriber dispute", "what ships now", "next steps"],
+      "notes": "Night and day compared to some accounts — Aisha turned around all three access requests in under 48 hours and the project compiled clean first try. The active_subscriber dispute is exactly the fight she predicted at kickoff. Blocking the metrics block on it is the right call; shipping a metric that two departments disagree on would poison the semantic layer on day one.",
+      "speaker_count": 4,
+      "speaker_names": { "-1": "You", "0": "Aisha Diallo", "1": "Theo Okonkwo", "2": "Sam Whitfield" },
+      "transcript": [
+        { "speaker": "Sam Whitfield", "text": "Before anything else — Aisha, you got us all three access items in two days. That is genuinely the fastest turnaround we've had this year.", "timestamp": 7.2 },
+        { "speaker": "Aisha Diallo", "text": "It's not hard when nobody's in the way.", "timestamp": 22.6 },
+        { "speaker": "Theo Okonkwo", "text": "It made a real difference. Repo's connected, project compiles clean, all hundred and eleven models. No warnings worth mentioning.", "timestamp": 29.4 },
+        { "speaker": "Sam Whitfield", "text": "Then let's spend the time on the thing you flagged at kickoff. fct_subscriptions.", "timestamp": 51.8 },
+        { "speaker": "Aisha Diallo", "text": "Right. So I went and pulled every definition of active subscriber currently in production. There are four. Two of them are the same thing written differently, which leaves two that genuinely disagree.", "timestamp": 60.3 },
+        { "speaker": "Theo Okonkwo", "text": "What's the axis of disagreement?", "timestamp": 92.7 },
+        { "speaker": "Aisha Diallo", "text": "Grace period. When a subscriber's card fails we keep serving them for fourteen days while we retry. Growth counts those people as active — they're reading the newsletter, they're engaged. Finance does not — no money has arrived.", "timestamp": 99.1 },
+        { "speaker": "Sam Whitfield", "text": "And both are defensible, which is what makes it a real dispute rather than a bug.", "timestamp": 138.5 },
+        { "speaker": "Aisha Diallo", "text": "Exactly. Growth isn't wrong. Finance isn't wrong. But the executive dashboard can't show two different subscriber counts with the same label.", "timestamp": 146.9 },
+        { "speaker": "Theo Okonkwo", "text": "How big is the gap in practice? If it's a rounding error nobody will fight about it.", "timestamp": 174.2 },
+        { "speaker": "Aisha Diallo", "text": "I don't have the number in front of me. I'd guess low single digit percent but I genuinely don't know, and I don't want to guess in a room where it might get quoted.", "timestamp": 182.6 },
+        { "speaker": "Sam Whitfield", "text": "Then let's get the number before the argument. Can you pull it both ways?", "timestamp": 209.4 },
+        { "speaker": "Aisha Diallo", "text": "Yes. Give me a day.", "timestamp": 221.0 },
+        { "speaker": "Sam Whitfield", "text": "That's the right shape. Marcus said at kickoff he'd own the ruling — this is the first thing to send him, with both numbers attached. A decision against real figures is a decision. A decision in the abstract is a preference.", "timestamp": 228.7 },
+        { "speaker": "Theo Okonkwo", "text": "So what do I do with the metrics block in the meantime? I don't want to sit on my hands.", "timestamp": 267.3 },
+        { "speaker": "Aisha Diallo", "text": "Most of the metrics aren't disputed. Churn, MRR, new subscriptions, reactivations — nobody argues about those.", "timestamp": 278.9 },
+        { "speaker": "Theo Okonkwo", "text": "Then I'll land the uncontested ones and stub active_subscribers with a comment pointing at the open decision. The moment Marcus rules, it's a one-line change.", "timestamp": 296.4 },
+        { "speaker": "Sam Whitfield", "text": "Good. And put the CI checks in now, before any migration starts — I don't want a semantic layer change landing without a test once the dashboards depend on it.", "timestamp": 324.1 },
+        { "speaker": "Theo Okonkwo", "text": "Already scoped. That's this week.", "timestamp": 348.8 },
+        { "speaker": "Aisha Diallo", "text": "This is the conversation I've been trying to have internally for a year, incidentally. It took an external party asking the question.", "timestamp": 356.2 },
+        { "speaker": "Sam Whitfield", "text": "It usually does. Nobody wants to be the one who reopens a definition everyone's quietly been living with.", "timestamp": 379.5 }
+      ],
+      "attendees": [
+        { "email": "sam@vector.test", "name": "Sam Whitfield", "domain": "vector.test" },
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "aisha@beehiiv.com", "name": "Aisha Diallo", "domain": "beehiiv.com" }
+      ]
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "daysAgo": 36,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "A82F5C31-6E49-4B70-9D18-3C7E0B4A9F26",
+      "title": "Vector × Ashby — embedded analytics kickoff",
+      "duration_seconds": 2810,
+      "language": "en",
+      "summary": "Kickoff for the Ashby embedded analytics rollout. They run dbt Core on Snowflake, repo on GitHub, and are moving reporting off Mode. The distinguishing requirement is that Ashby wants to embed Vector dashboards inside their own product for their customers, not just use them internally — so row-level permissions are a first-class concern rather than an afterthought. Nate wants the executive KPI dashboard internally first to prove parity, then embedding. fct_pipeline is the anchor fact table. Access was agreed with no obstacles and Ritu committed to having everything provisioned within the week.",
+      "action_items": [
+        "Ritu to provision a read-only Snowflake service account scoped to the ANALYTICS schema",
+        "Ritu to add Vector Cloud static IPs to the Snowflake network policy",
+        "Ritu to grant Vector read access to the dbt project repo on GitHub",
+        "Caroline to send the implementation plan and weekly sync invite",
+        "Nate to confirm which customer-facing metrics are in scope for embedding"
+      ],
+      "key_decisions": [
+        "Internal parity first, customer-facing embedding second — embedding does not start until parity is signed off",
+        "fct_pipeline is the first fact table to get a metrics block",
+        "Okta is the SSO provider; row-level permissions are in scope from day one, not deferred"
+      ],
+      "topics": ["kickoff", "snowflake", "mode migration", "embedded analytics", "row-level permissions", "okta"],
+      "discussion_flow": ["intros", "current stack walkthrough", "embedding requirement", "goals and success criteria", "technical prerequisites", "next steps"],
+      "notes": "Different shape to our usual onboarding — the end users are Ashby's customers, not Ashby's staff, so permissions and multi-tenancy are the real project. Nate is pragmatic and clear about sequencing. Ritu is fast and unblocked. Low-risk account on current evidence.",
+      "speaker_count": 4,
+      "speaker_names": { "-1": "You", "0": "Nate Coleman", "1": "Ritu Sharma", "2": "Theo Okonkwo" },
+      "transcript": [
+        { "speaker": "You", "text": "Thanks for the time. I want to spend most of this on the embedding requirement, because it makes your project meaningfully different from a standard rollout.", "timestamp": 5.6 },
+        { "speaker": "Nate Coleman", "text": "Agreed, and I'm glad you led with that. The internal use case is real but it's not the reason we bought. Our customers want analytics inside Ashby, and right now we hand-build every one of those views.", "timestamp": 22.1 },
+        { "speaker": "Theo Okonkwo", "text": "So the end user is a recruiter at one of your customers, looking at their own hiring pipeline, inside your product.", "timestamp": 51.4 },
+        { "speaker": "Nate Coleman", "text": "Exactly. And they must never, under any circumstances, see another customer's data.", "timestamp": 63.8 },
+        { "speaker": "Theo Okonkwo", "text": "Then row-level permissions aren't a phase-three nicety, they're load-bearing from the first dashboard. That changes how I'd sequence this.", "timestamp": 72.3 },
+        { "speaker": "You", "text": "It does. Nate, how do you want to order it? My instinct is prove parity internally before you put anything in front of a paying customer.", "timestamp": 94.7 },
+        { "speaker": "Nate Coleman", "text": "That's my instinct too. If our own exec dashboard doesn't match Mode, I'm certainly not shipping it to customers. Internal parity first. Embedding second.", "timestamp": 111.2 },
+        { "speaker": "You", "text": "Good. That's the plan then.", "timestamp": 139.5 },
+        { "speaker": "Theo Okonkwo", "text": "Ritu, what's underneath? Warehouse, repo, models?", "timestamp": 146.9 },
+        { "speaker": "Ritu Sharma", "text": "Snowflake, dbt Core, GitHub. Around eighty models. fct_pipeline is the one you want — it's every candidate stage transition and it's what every customer question ultimately reduces to.", "timestamp": 154.3 },
+        { "speaker": "Theo Okonkwo", "text": "Then that's where the first metrics block goes. What do you need from us to get me access?", "timestamp": 186.0 },
+        { "speaker": "Ritu Sharma", "text": "Nothing, I can just do it. Read-only service account on ANALYTICS, your IPs on the network policy, repo read access. I'll have it done this week.", "timestamp": 195.7 },
+        { "speaker": "Theo Okonkwo", "text": "That is a refreshingly short answer.", "timestamp": 219.4 },
+        { "speaker": "Ritu Sharma", "text": "We're a small team. There's nobody to ask.", "timestamp": 226.8 },
+        { "speaker": "Nate Coleman", "text": "One thing I do need to go away and figure out — exactly which metrics we're comfortable exposing to customers. Some of what's in fct_pipeline is benchmarking data across our whole book, and that's commercially sensitive.", "timestamp": 238.2 },
+        { "speaker": "You", "text": "That's an important call and it's yours to make, not ours. Can you come back with a scoped list of customer-facing metrics before we start the embedding phase?", "timestamp": 269.5 },
+        { "speaker": "Nate Coleman", "text": "Yes. I'll have it well before you need it.", "timestamp": 293.1 },
+        { "speaker": "You", "text": "Perfect. I'll send the plan and a weekly sync. Ritu, ping us the moment access lands and Theo will start the same day.", "timestamp": 301.6 }
+      ],
+      "attendees": [
+        { "email": "caroline@vector.test", "name": "Caroline Jaworsky", "domain": "vector.test" },
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "nate@ashbyhq.com", "name": "Nate Coleman", "domain": "ashbyhq.com" },
+        { "email": "ritu@ashbyhq.com", "name": "Ritu Sharma", "domain": "ashbyhq.com" }
+      ]
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "daysAgo": 6,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "E1D93B44-8A07-42FC-95B2-7F60C3A8D591",
+      "title": "Vector × beehiiv — onboarding kickoff",
+      "duration_seconds": 2695,
+      "language": "en",
+      "summary": "Kickoff for the beehiiv implementation. They run dbt Core on Snowflake with the repo on GitHub, and are moving off Looker. Marcus wants subscription and revenue metrics to be the first thing modelled — fct_subscriptions is the anchor fact table. Aisha raised early that their existing metric naming is inconsistent across teams and will need a cleanup pass before anything is migrated, which she expects to be contentious. Access requests were agreed with no obvious obstacles: Snowflake service account, static IPs on the network policy, and repo read access. Okta SSO to be configured before the wider rollout.",
+      "action_items": [
+        "Aisha to provision a read-only Snowflake service account scoped to the ANALYTICS schema",
+        "Aisha to add Vector Cloud static IPs to the Snowflake network policy",
+        "Aisha to grant Vector read access to the dbt repo on GitHub",
+        "Marcus to nominate a decision-maker for metric naming disputes",
+        "Sam to send the implementation plan and weekly sync invite"
+      ],
+      "key_decisions": [
+        "fct_subscriptions is the first fact table to get a metrics block",
+        "Metric naming conventions will be agreed before dashboard migration begins, not during",
+        "Okta is the SSO provider; SSO lands before company-wide rollout"
+      ],
+      "topics": ["kickoff", "snowflake", "looker migration", "dbt", "metric naming", "okta"],
+      "discussion_flow": ["intros", "current stack walkthrough", "goals and success criteria", "metric naming concerns", "technical prerequisites", "next steps"],
+      "notes": "Healthy kickoff. Marcus is decisive and Aisha is technically strong and refreshingly blunt about the mess in their metric definitions. The naming cleanup is the thing most likely to cause friction — she predicted a fight between growth and finance over how 'active subscriber' is defined, and I believe her.",
+      "speaker_count": 4,
+      "speaker_names": { "-1": "You", "0": "Marcus Bell", "1": "Aisha Diallo", "2": "Sam Whitfield" },
+      "transcript": [
+        { "speaker": "You", "text": "Thanks for joining. Let's use the hour to agree on what we're building, in what order, and what we need from you to start.", "timestamp": 4.9 },
+        { "speaker": "Marcus Bell", "text": "Straightforward from our side. Looker costs us a fortune, nobody outside the data team can use it, and every dashboard is a bespoke artefact. We want self-serve that actually gets served.", "timestamp": 20.3 },
+        { "speaker": "Sam Whitfield", "text": "What does the stack look like underneath?", "timestamp": 47.6 },
+        { "speaker": "Aisha Diallo", "text": "Snowflake, dbt Core, repo on GitHub. Around a hundred and ten models. It's fine. The models are not the problem.", "timestamp": 55.1 },
+        { "speaker": "You", "text": "Go on — what is the problem?", "timestamp": 78.4 },
+        { "speaker": "Aisha Diallo", "text": "The definitions. Growth calls an active subscriber one thing, finance calls it another, and both of them are in production dashboards with the same label. If you migrate that mess into a semantic layer you've just made the mess authoritative.", "timestamp": 84.9 },
+        { "speaker": "Sam Whitfield", "text": "That's exactly right, and it's the single most valuable thing anyone has said in a kickoff this month. We should fix the definitions before we migrate, not during.", "timestamp": 116.2 },
+        { "speaker": "Marcus Bell", "text": "That'll be a fight.", "timestamp": 143.7 },
+        { "speaker": "Aisha Diallo", "text": "It'll be a fight whether we have it now or in three months. Now is cheaper.", "timestamp": 148.0 },
+        { "speaker": "You", "text": "Then let's have it now. Marcus, the thing we need from you is a name — who is the person who gets to settle a definition dispute when growth and finance disagree?", "timestamp": 158.5 },
+        { "speaker": "Marcus Bell", "text": "It should be me. Let me confirm that's politically survivable and come back to you.", "timestamp": 187.3 },
+        { "speaker": "You", "text": "Perfect. Which fact table do we start with?", "timestamp": 209.8 },
+        { "speaker": "Marcus Bell", "text": "Subscriptions. That's the business. fct_subscriptions is where everything interesting lives.", "timestamp": 216.4 },
+        { "speaker": "Aisha Diallo", "text": "Agreed, and it's also where the naming inconsistency is worst. So we'll hit the hard problem first.", "timestamp": 234.1 },
+        { "speaker": "Sam Whitfield", "text": "That's the right order. On access — I need a read-only Snowflake service account scoped to ANALYTICS, our static egress IPs on your network policy, and read access to the dbt repo.", "timestamp": 249.6 },
+        { "speaker": "Aisha Diallo", "text": "All three are mine. I can get them done this week — none of it needs a committee.", "timestamp": 281.2 },
+        { "speaker": "Sam Whitfield", "text": "That is a lovely sentence to hear.", "timestamp": 297.5 },
+        { "speaker": "Marcus Bell", "text": "One more thing — SSO. We're an Okta shop and I don't want a second set of credentials floating around before we roll this out company-wide.", "timestamp": 306.8 },
+        { "speaker": "You", "text": "Noted. We'll get Okta SAML configured before the wider rollout rather than after — retrofitting SSO once people have accounts is unpleasant.", "timestamp": 331.4 },
+        { "speaker": "Marcus Bell", "text": "Good. Then I think we're aligned.", "timestamp": 358.9 },
+        { "speaker": "You", "text": "Sam will send the plan and a weekly sync. Aisha, ping us the moment the service account is live and we'll start the same day.", "timestamp": 366.2 }
+      ],
+      "attendees": [
+        { "email": "sam@vector.test", "name": "Sam Whitfield", "domain": "vector.test" },
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "marcus@beehiiv.com", "name": "Marcus Bell", "domain": "beehiiv.com" },
+        { "email": "aisha@beehiiv.com", "name": "Aisha Diallo", "domain": "beehiiv.com" }
+      ]
+    }
+  }
+}

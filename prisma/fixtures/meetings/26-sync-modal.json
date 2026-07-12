@@ -1,0 +1,55 @@
+{
+  "daysAgo": 6,
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "7E19C4D2-05FA-4638-8B93-D1C6427E0A85",
+      "title": "Modal weekly sync — dashboard migration + SSO",
+      "duration_seconds": 2287,
+      "language": "en",
+      "summary": "Weekly sync. The semantic layer and CI checks are complete and the executive KPI dashboard rebuild is underway. Migration of the team dashboards has been paused pending an unresolved question about GPU cost attribution — the finance view allocates idle GPU time to the team that reserved the capacity, while the platform view allocates it to no one, and the two produce materially different cost-per-team numbers. Elena is taking the decision. Google Workspace SAML SSO configuration is in progress. The AI analyst pilot is running with a small group and early feedback is positive, though Jonah flagged that it answers confidently on metrics that are not yet in the semantic layer, which needs guardrails.",
+      "action_items": [
+        "Elena to rule on whether idle GPU time is attributed to the reserving team or left unallocated",
+        "Jonah to pull cost-per-team both ways so the decision is made against real numbers",
+        "Theo to add guardrails so the AI analyst refuses questions outside the semantic layer rather than guessing",
+        "Theo to finish Google Workspace SAML configuration",
+        "Elena to nominate the second wave of AI analyst pilot users"
+      ],
+      "key_decisions": [
+        "Team dashboard migration stays paused until GPU cost attribution is settled",
+        "AI analyst must decline out-of-scope questions rather than answer them speculatively",
+        "Parity sign-off is a hard gate before company-wide rollout"
+      ],
+      "topics": ["dashboard migration", "gpu cost attribution", "sso", "ai analyst", "guardrails", "parity"],
+      "discussion_flow": ["semantic layer status", "cost attribution problem", "sso progress", "ai analyst feedback", "guardrails", "next steps"],
+      "notes": "Solid account. The cost attribution question is a genuine business decision rather than a technical blocker, and Elena is the right person to take it. Jonah's guardrails observation is sharp and worth generalising — an AI analyst that confidently answers off a metric it doesn't have is worse than one that says no.",
+      "speaker_count": 4,
+      "speaker_names": { "-1": "You", "0": "Elena Petrova", "1": "Jonah Fields", "2": "Theo Okonkwo" },
+      "transcript": [
+        { "speaker": "Theo Okonkwo", "text": "Semantic layer's done, CI checks are green, and I'm most of the way through the exec KPI rebuild. The blocker is one level up from me.", "timestamp": 6.1 },
+        { "speaker": "Elena Petrova", "text": "Go on.", "timestamp": 27.4 },
+        { "speaker": "Theo Okonkwo", "text": "Cost per team. When a team reserves GPU capacity and doesn't use all of it, who pays for the idle time? Your finance model charges it to the reserving team. The platform team's own dashboard leaves it unallocated. Both are in production and they disagree by a lot.", "timestamp": 33.8 },
+        { "speaker": "Jonah Fields", "text": "Not by a little, either. For some teams it's a thirty percent swing in their reported cost.", "timestamp": 71.2 },
+        { "speaker": "Elena Petrova", "text": "Of course it is. Those two dashboards were built eighteen months apart by people who never spoke.", "timestamp": 80.6 },
+        { "speaker": "You", "text": "Which is the honest number, in your view?", "timestamp": 96.3 },
+        { "speaker": "Elena Petrova", "text": "It depends what you're using it for, which is the annoying answer. If I'm asking whether a team is being wasteful, charging them for idle reservations is exactly right — that's the behaviour I want to discourage. If I'm asking what a team actually consumed, it's wrong.", "timestamp": 104.9 },
+        { "speaker": "Theo Okonkwo", "text": "Then it might be two metrics rather than one. Reserved cost and consumed cost, both defined, both visible, and it's clear which is which.", "timestamp": 146.5 },
+        { "speaker": "Elena Petrova", "text": "That's better than what I was about to say. Let me sit with it for a day.", "timestamp": 172.0 },
+        { "speaker": "You", "text": "Jonah, could you pull cost-per-team both ways in the meantime? Elena's decision is easier against real figures than in the abstract.", "timestamp": 180.7 },
+        { "speaker": "Jonah Fields", "text": "Yes. I'll have it tomorrow.", "timestamp": 204.1 },
+        { "speaker": "Theo Okonkwo", "text": "And I'll hold the team dashboard migration until it's settled. Migrating forty dashboards onto a cost metric that's about to change would be an expensive mistake.", "timestamp": 211.8 },
+        { "speaker": "You", "text": "Agreed. What's the read on the AI analyst pilot?", "timestamp": 238.4 },
+        { "speaker": "Jonah Fields", "text": "Broadly good. People like it. One thing worries me though — I asked it a question about something we haven't modelled yet, and instead of saying it didn't know, it gave me a confident answer that it had clearly constructed from adjacent tables. It was wrong, and it was wrong very fluently.", "timestamp": 246.9 },
+        { "speaker": "Theo Okonkwo", "text": "That's a guardrails gap and it's on us. It should refuse anything that isn't backed by a defined metric. I'd rather it be unhelpful than confidently wrong.", "timestamp": 288.3 },
+        { "speaker": "Elena Petrova", "text": "Strongly agree. One confidently wrong number in a leadership meeting and nobody trusts the tool again.", "timestamp": 314.7 },
+        { "speaker": "You", "text": "Theo will take that as a priority. Elena, if you can nominate the second pilot wave we'll have them ready once guardrails are in.", "timestamp": 328.2 }
+      ],
+      "attendees": [
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "caroline@vector.test", "name": "Caroline Jaworsky", "domain": "vector.test" },
+        { "email": "elena@modal.com", "name": "Elena Petrova", "domain": "modal.com" },
+        { "email": "jonah@modal.com", "name": "Jonah Fields", "domain": "modal.com" }
+      ]
+    }
+  }
+}
