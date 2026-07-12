@@ -291,6 +291,7 @@ export const PendingAIChangeScalarFieldEnum = {
   onboardingId: 'onboardingId',
   action: 'action',
   payload: 'payload',
+  ownerId: 'ownerId',
   sourceQuote: 'sourceQuote',
   sourceUrl: 'sourceUrl',
   confidence: 'confidence',

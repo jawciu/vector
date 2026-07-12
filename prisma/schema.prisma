@@ -36,6 +36,7 @@ model VendorUser {
   ownedTasks       Task[]
   activities       ActivityLog[]
   notifications    Notification[] @relation("NotificationRecipientVendor")
+  ownedDrafts      PendingAIChange[] @relation("PendingAIChangeOwner")
 }
 
 model ActivityLog {
@@ -266,6 +267,16 @@ model PendingAIChange {
   onboarding     Onboarding     @relation(fields: [onboardingId], references: [id], onDelete: Cascade)
   action         String         // "create_task" | "match_existing" | "update_status" | "reassign" | "reprioritise"
   payload        Json           // proposed change — tool call arguments
+  // Owner of a draft_followup: the vendor whose task the nudge is about, and
+  // whose voice the email is written in. Only draft_followup rows set it —
+  // meeting-derived drafts (create_task etc.) are onboarding-wide, not owned.
+  // A REAL foreign key, deliberately: this used to live only inside `payload`
+  // as JSON, which Postgres treats as opaque text. A vendor-user merge updated
+  // every relational column but left the JSON pointing at a deleted user, and
+  // because the follow-up filter reads this field, every follow-up silently
+  // became invisible. SetNull so an orphaned draft is never mis-attributed.
+  ownerId        Int?
+  ownerUser      VendorUser?    @relation("PendingAIChangeOwner", fields: [ownerId], references: [id], onDelete: SetNull)
   sourceQuote    String?        // transcript snippet / event description that justified it
   sourceUrl      String?        // link back to original (Miniti URL, Linear issue link, etc.)
   confidence     String         // "low" | "medium" | "high"
@@ -278,6 +289,7 @@ model PendingAIChange {
 
   @@index([onboardingId, status])
   @@index([status, createdAt])
+  @@index([action, status, ownerId])
 }
 
 // Stores connection status + secrets per integration source.

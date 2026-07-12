@@ -236,6 +236,7 @@ export type VendorUserWhereInput = {
   ownedTasks?: Prisma.TaskListRelationFilter
   activities?: Prisma.ActivityLogListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
+  ownedDrafts?: Prisma.PendingAIChangeListRelationFilter
 }
 
 export type VendorUserOrderByWithRelationInput = {
@@ -250,6 +251,7 @@ export type VendorUserOrderByWithRelationInput = {
   ownedTasks?: Prisma.TaskOrderByRelationAggregateInput
   activities?: Prisma.ActivityLogOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
+  ownedDrafts?: Prisma.PendingAIChangeOrderByRelationAggregateInput
 }
 
 export type VendorUserWhereUniqueInput = Prisma.AtLeast<{
@@ -267,6 +269,7 @@ export type VendorUserWhereUniqueInput = Prisma.AtLeast<{
   ownedTasks?: Prisma.TaskListRelationFilter
   activities?: Prisma.ActivityLogListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
+  ownedDrafts?: Prisma.PendingAIChangeListRelationFilter
 }, "id" | "authUserId" | "email">
 
 export type VendorUserOrderByWithAggregationInput = {
@@ -308,6 +311,7 @@ export type VendorUserCreateInput = {
   ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerUserInput
   activities?: Prisma.ActivityLogCreateNestedManyWithoutActorVendorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientVendorInput
+  ownedDrafts?: Prisma.PendingAIChangeCreateNestedManyWithoutOwnerUserInput
 }
 
 export type VendorUserUncheckedCreateInput = {
@@ -322,6 +326,7 @@ export type VendorUserUncheckedCreateInput = {
   ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerUserInput
   activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorVendorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientVendorInput
+  ownedDrafts?: Prisma.PendingAIChangeUncheckedCreateNestedManyWithoutOwnerUserInput
 }
 
 export type VendorUserUpdateInput = {
@@ -335,6 +340,7 @@ export type VendorUserUpdateInput = {
   ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerUserNestedInput
   activities?: Prisma.ActivityLogUpdateManyWithoutActorVendorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutRecipientVendorNestedInput
+  ownedDrafts?: Prisma.PendingAIChangeUpdateManyWithoutOwnerUserNestedInput
 }
 
 export type VendorUserUncheckedUpdateInput = {
@@ -349,6 +355,7 @@ export type VendorUserUncheckedUpdateInput = {
   ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerUserNestedInput
   activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorVendorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientVendorNestedInput
+  ownedDrafts?: Prisma.PendingAIChangeUncheckedUpdateManyWithoutOwnerUserNestedInput
 }
 
 export type VendorUserCreateManyInput = {
@@ -491,6 +498,22 @@ export type VendorUserUpdateOneWithoutOwnedTasksNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUserUpdateToOneWithWhereWithoutOwnedTasksInput, Prisma.VendorUserUpdateWithoutOwnedTasksInput>, Prisma.VendorUserUncheckedUpdateWithoutOwnedTasksInput>
 }
 
+export type VendorUserCreateNestedOneWithoutOwnedDraftsInput = {
+  create?: Prisma.XOR<Prisma.VendorUserCreateWithoutOwnedDraftsInput, Prisma.VendorUserUncheckedCreateWithoutOwnedDraftsInput>
+  connectOrCreate?: Prisma.VendorUserCreateOrConnectWithoutOwnedDraftsInput
+  connect?: Prisma.VendorUserWhereUniqueInput
+}
+
+export type VendorUserUpdateOneWithoutOwnedDraftsNestedInput = {
+  create?: Prisma.XOR<Prisma.VendorUserCreateWithoutOwnedDraftsInput, Prisma.VendorUserUncheckedCreateWithoutOwnedDraftsInput>
+  connectOrCreate?: Prisma.VendorUserCreateOrConnectWithoutOwnedDraftsInput
+  upsert?: Prisma.VendorUserUpsertWithoutOwnedDraftsInput
+  disconnect?: Prisma.VendorUserWhereInput | boolean
+  delete?: Prisma.VendorUserWhereInput | boolean
+  connect?: Prisma.VendorUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUserUpdateToOneWithWhereWithoutOwnedDraftsInput, Prisma.VendorUserUpdateWithoutOwnedDraftsInput>, Prisma.VendorUserUncheckedUpdateWithoutOwnedDraftsInput>
+}
+
 export type VendorUserCreateWithoutActivitiesInput = {
   authUserId?: string | null
   email: string
@@ -501,6 +524,7 @@ export type VendorUserCreateWithoutActivitiesInput = {
   ownedOnboardings?: Prisma.OnboardingCreateNestedManyWithoutOwnerUserInput
   ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientVendorInput
+  ownedDrafts?: Prisma.PendingAIChangeCreateNestedManyWithoutOwnerUserInput
 }
 
 export type VendorUserUncheckedCreateWithoutActivitiesInput = {
@@ -514,6 +538,7 @@ export type VendorUserUncheckedCreateWithoutActivitiesInput = {
   ownedOnboardings?: Prisma.OnboardingUncheckedCreateNestedManyWithoutOwnerUserInput
   ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientVendorInput
+  ownedDrafts?: Prisma.PendingAIChangeUncheckedCreateNestedManyWithoutOwnerUserInput
 }
 
 export type VendorUserCreateOrConnectWithoutActivitiesInput = {
@@ -542,6 +567,7 @@ export type VendorUserUpdateWithoutActivitiesInput = {
   ownedOnboardings?: Prisma.OnboardingUpdateManyWithoutOwnerUserNestedInput
   ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutRecipientVendorNestedInput
+  ownedDrafts?: Prisma.PendingAIChangeUpdateManyWithoutOwnerUserNestedInput
 }
 
 export type VendorUserUncheckedUpdateWithoutActivitiesInput = {
@@ -555,6 +581,7 @@ export type VendorUserUncheckedUpdateWithoutActivitiesInput = {
   ownedOnboardings?: Prisma.OnboardingUncheckedUpdateManyWithoutOwnerUserNestedInput
   ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientVendorNestedInput
+  ownedDrafts?: Prisma.PendingAIChangeUncheckedUpdateManyWithoutOwnerUserNestedInput
 }
 
 export type VendorUserCreateWithoutNotificationsInput = {
@@ -567,6 +594,7 @@ export type VendorUserCreateWithoutNotificationsInput = {
   ownedOnboardings?: Prisma.OnboardingCreateNestedManyWithoutOwnerUserInput
   ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerUserInput
   activities?: Prisma.ActivityLogCreateNestedManyWithoutActorVendorInput
+  ownedDrafts?: Prisma.PendingAIChangeCreateNestedManyWithoutOwnerUserInput
 }
 
 export type VendorUserUncheckedCreateWithoutNotificationsInput = {
@@ -580,6 +608,7 @@ export type VendorUserUncheckedCreateWithoutNotificationsInput = {
   ownedOnboardings?: Prisma.OnboardingUncheckedCreateNestedManyWithoutOwnerUserInput
   ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerUserInput
   activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorVendorInput
+  ownedDrafts?: Prisma.PendingAIChangeUncheckedCreateNestedManyWithoutOwnerUserInput
 }
 
 export type VendorUserCreateOrConnectWithoutNotificationsInput = {
@@ -608,6 +637,7 @@ export type VendorUserUpdateWithoutNotificationsInput = {
   ownedOnboardings?: Prisma.OnboardingUpdateManyWithoutOwnerUserNestedInput
   ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerUserNestedInput
   activities?: Prisma.ActivityLogUpdateManyWithoutActorVendorNestedInput
+  ownedDrafts?: Prisma.PendingAIChangeUpdateManyWithoutOwnerUserNestedInput
 }
 
 export type VendorUserUncheckedUpdateWithoutNotificationsInput = {
@@ -621,6 +651,7 @@ export type VendorUserUncheckedUpdateWithoutNotificationsInput = {
   ownedOnboardings?: Prisma.OnboardingUncheckedUpdateManyWithoutOwnerUserNestedInput
   ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerUserNestedInput
   activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorVendorNestedInput
+  ownedDrafts?: Prisma.PendingAIChangeUncheckedUpdateManyWithoutOwnerUserNestedInput
 }
 
 export type VendorUserCreateWithoutOwnedOnboardingsInput = {
@@ -633,6 +664,7 @@ export type VendorUserCreateWithoutOwnedOnboardingsInput = {
   ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerUserInput
   activities?: Prisma.ActivityLogCreateNestedManyWithoutActorVendorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientVendorInput
+  ownedDrafts?: Prisma.PendingAIChangeCreateNestedManyWithoutOwnerUserInput
 }
 
 export type VendorUserUncheckedCreateWithoutOwnedOnboardingsInput = {
@@ -646,6 +678,7 @@ export type VendorUserUncheckedCreateWithoutOwnedOnboardingsInput = {
   ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerUserInput
   activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorVendorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientVendorInput
+  ownedDrafts?: Prisma.PendingAIChangeUncheckedCreateNestedManyWithoutOwnerUserInput
 }
 
 export type VendorUserCreateOrConnectWithoutOwnedOnboardingsInput = {
@@ -674,6 +707,7 @@ export type VendorUserUpdateWithoutOwnedOnboardingsInput = {
   ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerUserNestedInput
   activities?: Prisma.ActivityLogUpdateManyWithoutActorVendorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutRecipientVendorNestedInput
+  ownedDrafts?: Prisma.PendingAIChangeUpdateManyWithoutOwnerUserNestedInput
 }
 
 export type VendorUserUncheckedUpdateWithoutOwnedOnboardingsInput = {
@@ -687,6 +721,7 @@ export type VendorUserUncheckedUpdateWithoutOwnedOnboardingsInput = {
   ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerUserNestedInput
   activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorVendorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientVendorNestedInput
+  ownedDrafts?: Prisma.PendingAIChangeUncheckedUpdateManyWithoutOwnerUserNestedInput
 }
 
 export type VendorUserCreateWithoutOwnedTasksInput = {
@@ -699,6 +734,7 @@ export type VendorUserCreateWithoutOwnedTasksInput = {
   ownedOnboardings?: Prisma.OnboardingCreateNestedManyWithoutOwnerUserInput
   activities?: Prisma.ActivityLogCreateNestedManyWithoutActorVendorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientVendorInput
+  ownedDrafts?: Prisma.PendingAIChangeCreateNestedManyWithoutOwnerUserInput
 }
 
 export type VendorUserUncheckedCreateWithoutOwnedTasksInput = {
@@ -712,6 +748,7 @@ export type VendorUserUncheckedCreateWithoutOwnedTasksInput = {
   ownedOnboardings?: Prisma.OnboardingUncheckedCreateNestedManyWithoutOwnerUserInput
   activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorVendorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientVendorInput
+  ownedDrafts?: Prisma.PendingAIChangeUncheckedCreateNestedManyWithoutOwnerUserInput
 }
 
 export type VendorUserCreateOrConnectWithoutOwnedTasksInput = {
@@ -740,6 +777,7 @@ export type VendorUserUpdateWithoutOwnedTasksInput = {
   ownedOnboardings?: Prisma.OnboardingUpdateManyWithoutOwnerUserNestedInput
   activities?: Prisma.ActivityLogUpdateManyWithoutActorVendorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutRecipientVendorNestedInput
+  ownedDrafts?: Prisma.PendingAIChangeUpdateManyWithoutOwnerUserNestedInput
 }
 
 export type VendorUserUncheckedUpdateWithoutOwnedTasksInput = {
@@ -751,6 +789,77 @@ export type VendorUserUncheckedUpdateWithoutOwnedTasksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOnboardings?: Prisma.OnboardingUncheckedUpdateManyWithoutOwnerUserNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorVendorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientVendorNestedInput
+  ownedDrafts?: Prisma.PendingAIChangeUncheckedUpdateManyWithoutOwnerUserNestedInput
+}
+
+export type VendorUserCreateWithoutOwnedDraftsInput = {
+  authUserId?: string | null
+  email: string
+  name: string
+  role?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedOnboardings?: Prisma.OnboardingCreateNestedManyWithoutOwnerUserInput
+  ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerUserInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutActorVendorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientVendorInput
+}
+
+export type VendorUserUncheckedCreateWithoutOwnedDraftsInput = {
+  id?: number
+  authUserId?: string | null
+  email: string
+  name: string
+  role?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedOnboardings?: Prisma.OnboardingUncheckedCreateNestedManyWithoutOwnerUserInput
+  ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerUserInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutActorVendorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientVendorInput
+}
+
+export type VendorUserCreateOrConnectWithoutOwnedDraftsInput = {
+  where: Prisma.VendorUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.VendorUserCreateWithoutOwnedDraftsInput, Prisma.VendorUserUncheckedCreateWithoutOwnedDraftsInput>
+}
+
+export type VendorUserUpsertWithoutOwnedDraftsInput = {
+  update: Prisma.XOR<Prisma.VendorUserUpdateWithoutOwnedDraftsInput, Prisma.VendorUserUncheckedUpdateWithoutOwnedDraftsInput>
+  create: Prisma.XOR<Prisma.VendorUserCreateWithoutOwnedDraftsInput, Prisma.VendorUserUncheckedCreateWithoutOwnedDraftsInput>
+  where?: Prisma.VendorUserWhereInput
+}
+
+export type VendorUserUpdateToOneWithWhereWithoutOwnedDraftsInput = {
+  where?: Prisma.VendorUserWhereInput
+  data: Prisma.XOR<Prisma.VendorUserUpdateWithoutOwnedDraftsInput, Prisma.VendorUserUncheckedUpdateWithoutOwnedDraftsInput>
+}
+
+export type VendorUserUpdateWithoutOwnedDraftsInput = {
+  authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedOnboardings?: Prisma.OnboardingUpdateManyWithoutOwnerUserNestedInput
+  ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerUserNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutActorVendorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRecipientVendorNestedInput
+}
+
+export type VendorUserUncheckedUpdateWithoutOwnedDraftsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedOnboardings?: Prisma.OnboardingUncheckedUpdateManyWithoutOwnerUserNestedInput
+  ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerUserNestedInput
   activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutActorVendorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientVendorNestedInput
 }
@@ -765,6 +874,7 @@ export type VendorUserCountOutputType = {
   ownedTasks: number
   activities: number
   notifications: number
+  ownedDrafts: number
 }
 
 export type VendorUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -772,6 +882,7 @@ export type VendorUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extens
   ownedTasks?: boolean | VendorUserCountOutputTypeCountOwnedTasksArgs
   activities?: boolean | VendorUserCountOutputTypeCountActivitiesArgs
   notifications?: boolean | VendorUserCountOutputTypeCountNotificationsArgs
+  ownedDrafts?: boolean | VendorUserCountOutputTypeCountOwnedDraftsArgs
 }
 
 /**
@@ -812,6 +923,13 @@ export type VendorUserCountOutputTypeCountNotificationsArgs<ExtArgs extends runt
   where?: Prisma.NotificationWhereInput
 }
 
+/**
+ * VendorUserCountOutputType without action
+ */
+export type VendorUserCountOutputTypeCountOwnedDraftsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PendingAIChangeWhereInput
+}
+
 
 export type VendorUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -825,6 +943,7 @@ export type VendorUserSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   ownedTasks?: boolean | Prisma.VendorUser$ownedTasksArgs<ExtArgs>
   activities?: boolean | Prisma.VendorUser$activitiesArgs<ExtArgs>
   notifications?: boolean | Prisma.VendorUser$notificationsArgs<ExtArgs>
+  ownedDrafts?: boolean | Prisma.VendorUser$ownedDraftsArgs<ExtArgs>
   _count?: boolean | Prisma.VendorUserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendorUser"]>
 
@@ -864,6 +983,7 @@ export type VendorUserInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   ownedTasks?: boolean | Prisma.VendorUser$ownedTasksArgs<ExtArgs>
   activities?: boolean | Prisma.VendorUser$activitiesArgs<ExtArgs>
   notifications?: boolean | Prisma.VendorUser$notificationsArgs<ExtArgs>
+  ownedDrafts?: boolean | Prisma.VendorUser$ownedDraftsArgs<ExtArgs>
   _count?: boolean | Prisma.VendorUserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type VendorUserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -876,6 +996,7 @@ export type $VendorUserPayload<ExtArgs extends runtime.Types.Extensions.Internal
     ownedTasks: Prisma.$TaskPayload<ExtArgs>[]
     activities: Prisma.$ActivityLogPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
+    ownedDrafts: Prisma.$PendingAIChangePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1283,6 +1404,7 @@ export interface Prisma__VendorUserClient<T, Null = never, ExtArgs extends runti
   ownedTasks<T extends Prisma.VendorUser$ownedTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorUser$ownedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   activities<T extends Prisma.VendorUser$activitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorUser$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.VendorUser$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorUser$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ownedDrafts<T extends Prisma.VendorUser$ownedDraftsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorUser$ownedDraftsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PendingAIChangePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1800,6 +1922,30 @@ export type VendorUser$notificationsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * VendorUser.ownedDrafts
+ */
+export type VendorUser$ownedDraftsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PendingAIChange
+   */
+  select?: Prisma.PendingAIChangeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PendingAIChange
+   */
+  omit?: Prisma.PendingAIChangeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PendingAIChangeInclude<ExtArgs> | null
+  where?: Prisma.PendingAIChangeWhereInput
+  orderBy?: Prisma.PendingAIChangeOrderByWithRelationInput | Prisma.PendingAIChangeOrderByWithRelationInput[]
+  cursor?: Prisma.PendingAIChangeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PendingAIChangeScalarFieldEnum | Prisma.PendingAIChangeScalarFieldEnum[]
 }
 
 /**

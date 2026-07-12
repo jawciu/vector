@@ -30,6 +30,7 @@ export type PendingAIChangeAvgAggregateOutputType = {
   id: number | null
   sourceEventId: number | null
   onboardingId: number | null
+  ownerId: number | null
   resolvedBy: number | null
   appliedTaskId: number | null
 }
@@ -38,6 +39,7 @@ export type PendingAIChangeSumAggregateOutputType = {
   id: number | null
   sourceEventId: number | null
   onboardingId: number | null
+  ownerId: number | null
   resolvedBy: number | null
   appliedTaskId: number | null
 }
@@ -48,6 +50,7 @@ export type PendingAIChangeMinAggregateOutputType = {
   sourceEventId: number | null
   onboardingId: number | null
   action: string | null
+  ownerId: number | null
   sourceQuote: string | null
   sourceUrl: string | null
   confidence: string | null
@@ -65,6 +68,7 @@ export type PendingAIChangeMaxAggregateOutputType = {
   sourceEventId: number | null
   onboardingId: number | null
   action: string | null
+  ownerId: number | null
   sourceQuote: string | null
   sourceUrl: string | null
   confidence: string | null
@@ -83,6 +87,7 @@ export type PendingAIChangeCountAggregateOutputType = {
   onboardingId: number
   action: number
   payload: number
+  ownerId: number
   sourceQuote: number
   sourceUrl: number
   confidence: number
@@ -100,6 +105,7 @@ export type PendingAIChangeAvgAggregateInputType = {
   id?: true
   sourceEventId?: true
   onboardingId?: true
+  ownerId?: true
   resolvedBy?: true
   appliedTaskId?: true
 }
@@ -108,6 +114,7 @@ export type PendingAIChangeSumAggregateInputType = {
   id?: true
   sourceEventId?: true
   onboardingId?: true
+  ownerId?: true
   resolvedBy?: true
   appliedTaskId?: true
 }
@@ -118,6 +125,7 @@ export type PendingAIChangeMinAggregateInputType = {
   sourceEventId?: true
   onboardingId?: true
   action?: true
+  ownerId?: true
   sourceQuote?: true
   sourceUrl?: true
   confidence?: true
@@ -135,6 +143,7 @@ export type PendingAIChangeMaxAggregateInputType = {
   sourceEventId?: true
   onboardingId?: true
   action?: true
+  ownerId?: true
   sourceQuote?: true
   sourceUrl?: true
   confidence?: true
@@ -153,6 +162,7 @@ export type PendingAIChangeCountAggregateInputType = {
   onboardingId?: true
   action?: true
   payload?: true
+  ownerId?: true
   sourceQuote?: true
   sourceUrl?: true
   confidence?: true
@@ -258,6 +268,7 @@ export type PendingAIChangeGroupByOutputType = {
   onboardingId: number
   action: string
   payload: runtime.JsonValue
+  ownerId: number | null
   sourceQuote: string | null
   sourceUrl: string | null
   confidence: string
@@ -299,6 +310,7 @@ export type PendingAIChangeWhereInput = {
   onboardingId?: Prisma.IntFilter<"PendingAIChange"> | number
   action?: Prisma.StringFilter<"PendingAIChange"> | string
   payload?: Prisma.JsonFilter<"PendingAIChange">
+  ownerId?: Prisma.IntNullableFilter<"PendingAIChange"> | number | null
   sourceQuote?: Prisma.StringNullableFilter<"PendingAIChange"> | string | null
   sourceUrl?: Prisma.StringNullableFilter<"PendingAIChange"> | string | null
   confidence?: Prisma.StringFilter<"PendingAIChange"> | string
@@ -310,6 +322,7 @@ export type PendingAIChangeWhereInput = {
   appliedTaskId?: Prisma.IntNullableFilter<"PendingAIChange"> | number | null
   sourceEvent?: Prisma.XOR<Prisma.ExternalEventNullableScalarRelationFilter, Prisma.ExternalEventWhereInput> | null
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
+  ownerUser?: Prisma.XOR<Prisma.VendorUserNullableScalarRelationFilter, Prisma.VendorUserWhereInput> | null
 }
 
 export type PendingAIChangeOrderByWithRelationInput = {
@@ -319,6 +332,7 @@ export type PendingAIChangeOrderByWithRelationInput = {
   onboardingId?: Prisma.SortOrder
   action?: Prisma.SortOrder
   payload?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
   sourceQuote?: Prisma.SortOrderInput | Prisma.SortOrder
   sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   confidence?: Prisma.SortOrder
@@ -330,6 +344,7 @@ export type PendingAIChangeOrderByWithRelationInput = {
   appliedTaskId?: Prisma.SortOrderInput | Prisma.SortOrder
   sourceEvent?: Prisma.ExternalEventOrderByWithRelationInput
   onboarding?: Prisma.OnboardingOrderByWithRelationInput
+  ownerUser?: Prisma.VendorUserOrderByWithRelationInput
 }
 
 export type PendingAIChangeWhereUniqueInput = Prisma.AtLeast<{
@@ -342,6 +357,7 @@ export type PendingAIChangeWhereUniqueInput = Prisma.AtLeast<{
   onboardingId?: Prisma.IntFilter<"PendingAIChange"> | number
   action?: Prisma.StringFilter<"PendingAIChange"> | string
   payload?: Prisma.JsonFilter<"PendingAIChange">
+  ownerId?: Prisma.IntNullableFilter<"PendingAIChange"> | number | null
   sourceQuote?: Prisma.StringNullableFilter<"PendingAIChange"> | string | null
   sourceUrl?: Prisma.StringNullableFilter<"PendingAIChange"> | string | null
   confidence?: Prisma.StringFilter<"PendingAIChange"> | string
@@ -353,6 +369,7 @@ export type PendingAIChangeWhereUniqueInput = Prisma.AtLeast<{
   appliedTaskId?: Prisma.IntNullableFilter<"PendingAIChange"> | number | null
   sourceEvent?: Prisma.XOR<Prisma.ExternalEventNullableScalarRelationFilter, Prisma.ExternalEventWhereInput> | null
   onboarding?: Prisma.XOR<Prisma.OnboardingScalarRelationFilter, Prisma.OnboardingWhereInput>
+  ownerUser?: Prisma.XOR<Prisma.VendorUserNullableScalarRelationFilter, Prisma.VendorUserWhereInput> | null
 }, "id">
 
 export type PendingAIChangeOrderByWithAggregationInput = {
@@ -362,6 +379,7 @@ export type PendingAIChangeOrderByWithAggregationInput = {
   onboardingId?: Prisma.SortOrder
   action?: Prisma.SortOrder
   payload?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
   sourceQuote?: Prisma.SortOrderInput | Prisma.SortOrder
   sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   confidence?: Prisma.SortOrder
@@ -388,6 +406,7 @@ export type PendingAIChangeScalarWhereWithAggregatesInput = {
   onboardingId?: Prisma.IntWithAggregatesFilter<"PendingAIChange"> | number
   action?: Prisma.StringWithAggregatesFilter<"PendingAIChange"> | string
   payload?: Prisma.JsonWithAggregatesFilter<"PendingAIChange">
+  ownerId?: Prisma.IntNullableWithAggregatesFilter<"PendingAIChange"> | number | null
   sourceQuote?: Prisma.StringNullableWithAggregatesFilter<"PendingAIChange"> | string | null
   sourceUrl?: Prisma.StringNullableWithAggregatesFilter<"PendingAIChange"> | string | null
   confidence?: Prisma.StringWithAggregatesFilter<"PendingAIChange"> | string
@@ -414,6 +433,7 @@ export type PendingAIChangeCreateInput = {
   appliedTaskId?: number | null
   sourceEvent?: Prisma.ExternalEventCreateNestedOneWithoutPendingChangesInput
   onboarding: Prisma.OnboardingCreateNestedOneWithoutPendingChangesInput
+  ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedDraftsInput
 }
 
 export type PendingAIChangeUncheckedCreateInput = {
@@ -423,6 +443,7 @@ export type PendingAIChangeUncheckedCreateInput = {
   onboardingId: number
   action: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerId?: number | null
   sourceQuote?: string | null
   sourceUrl?: string | null
   confidence: string
@@ -449,6 +470,7 @@ export type PendingAIChangeUpdateInput = {
   appliedTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sourceEvent?: Prisma.ExternalEventUpdateOneWithoutPendingChangesNestedInput
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutPendingChangesNestedInput
+  ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedDraftsNestedInput
 }
 
 export type PendingAIChangeUncheckedUpdateInput = {
@@ -458,6 +480,7 @@ export type PendingAIChangeUncheckedUpdateInput = {
   onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
   action?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sourceQuote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   confidence?: Prisma.StringFieldUpdateOperationsInput | string
@@ -476,6 +499,7 @@ export type PendingAIChangeCreateManyInput = {
   onboardingId: number
   action: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerId?: number | null
   sourceQuote?: string | null
   sourceUrl?: string | null
   confidence: string
@@ -509,6 +533,7 @@ export type PendingAIChangeUncheckedUpdateManyInput = {
   onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
   action?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sourceQuote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   confidence?: Prisma.StringFieldUpdateOperationsInput | string
@@ -537,6 +562,7 @@ export type PendingAIChangeCountOrderByAggregateInput = {
   onboardingId?: Prisma.SortOrder
   action?: Prisma.SortOrder
   payload?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   sourceQuote?: Prisma.SortOrder
   sourceUrl?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
@@ -552,6 +578,7 @@ export type PendingAIChangeAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sourceEventId?: Prisma.SortOrder
   onboardingId?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   resolvedBy?: Prisma.SortOrder
   appliedTaskId?: Prisma.SortOrder
 }
@@ -562,6 +589,7 @@ export type PendingAIChangeMaxOrderByAggregateInput = {
   sourceEventId?: Prisma.SortOrder
   onboardingId?: Prisma.SortOrder
   action?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   sourceQuote?: Prisma.SortOrder
   sourceUrl?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
@@ -579,6 +607,7 @@ export type PendingAIChangeMinOrderByAggregateInput = {
   sourceEventId?: Prisma.SortOrder
   onboardingId?: Prisma.SortOrder
   action?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   sourceQuote?: Prisma.SortOrder
   sourceUrl?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
@@ -594,8 +623,51 @@ export type PendingAIChangeSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sourceEventId?: Prisma.SortOrder
   onboardingId?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   resolvedBy?: Prisma.SortOrder
   appliedTaskId?: Prisma.SortOrder
+}
+
+export type PendingAIChangeCreateNestedManyWithoutOwnerUserInput = {
+  create?: Prisma.XOR<Prisma.PendingAIChangeCreateWithoutOwnerUserInput, Prisma.PendingAIChangeUncheckedCreateWithoutOwnerUserInput> | Prisma.PendingAIChangeCreateWithoutOwnerUserInput[] | Prisma.PendingAIChangeUncheckedCreateWithoutOwnerUserInput[]
+  connectOrCreate?: Prisma.PendingAIChangeCreateOrConnectWithoutOwnerUserInput | Prisma.PendingAIChangeCreateOrConnectWithoutOwnerUserInput[]
+  createMany?: Prisma.PendingAIChangeCreateManyOwnerUserInputEnvelope
+  connect?: Prisma.PendingAIChangeWhereUniqueInput | Prisma.PendingAIChangeWhereUniqueInput[]
+}
+
+export type PendingAIChangeUncheckedCreateNestedManyWithoutOwnerUserInput = {
+  create?: Prisma.XOR<Prisma.PendingAIChangeCreateWithoutOwnerUserInput, Prisma.PendingAIChangeUncheckedCreateWithoutOwnerUserInput> | Prisma.PendingAIChangeCreateWithoutOwnerUserInput[] | Prisma.PendingAIChangeUncheckedCreateWithoutOwnerUserInput[]
+  connectOrCreate?: Prisma.PendingAIChangeCreateOrConnectWithoutOwnerUserInput | Prisma.PendingAIChangeCreateOrConnectWithoutOwnerUserInput[]
+  createMany?: Prisma.PendingAIChangeCreateManyOwnerUserInputEnvelope
+  connect?: Prisma.PendingAIChangeWhereUniqueInput | Prisma.PendingAIChangeWhereUniqueInput[]
+}
+
+export type PendingAIChangeUpdateManyWithoutOwnerUserNestedInput = {
+  create?: Prisma.XOR<Prisma.PendingAIChangeCreateWithoutOwnerUserInput, Prisma.PendingAIChangeUncheckedCreateWithoutOwnerUserInput> | Prisma.PendingAIChangeCreateWithoutOwnerUserInput[] | Prisma.PendingAIChangeUncheckedCreateWithoutOwnerUserInput[]
+  connectOrCreate?: Prisma.PendingAIChangeCreateOrConnectWithoutOwnerUserInput | Prisma.PendingAIChangeCreateOrConnectWithoutOwnerUserInput[]
+  upsert?: Prisma.PendingAIChangeUpsertWithWhereUniqueWithoutOwnerUserInput | Prisma.PendingAIChangeUpsertWithWhereUniqueWithoutOwnerUserInput[]
+  createMany?: Prisma.PendingAIChangeCreateManyOwnerUserInputEnvelope
+  set?: Prisma.PendingAIChangeWhereUniqueInput | Prisma.PendingAIChangeWhereUniqueInput[]
+  disconnect?: Prisma.PendingAIChangeWhereUniqueInput | Prisma.PendingAIChangeWhereUniqueInput[]
+  delete?: Prisma.PendingAIChangeWhereUniqueInput | Prisma.PendingAIChangeWhereUniqueInput[]
+  connect?: Prisma.PendingAIChangeWhereUniqueInput | Prisma.PendingAIChangeWhereUniqueInput[]
+  update?: Prisma.PendingAIChangeUpdateWithWhereUniqueWithoutOwnerUserInput | Prisma.PendingAIChangeUpdateWithWhereUniqueWithoutOwnerUserInput[]
+  updateMany?: Prisma.PendingAIChangeUpdateManyWithWhereWithoutOwnerUserInput | Prisma.PendingAIChangeUpdateManyWithWhereWithoutOwnerUserInput[]
+  deleteMany?: Prisma.PendingAIChangeScalarWhereInput | Prisma.PendingAIChangeScalarWhereInput[]
+}
+
+export type PendingAIChangeUncheckedUpdateManyWithoutOwnerUserNestedInput = {
+  create?: Prisma.XOR<Prisma.PendingAIChangeCreateWithoutOwnerUserInput, Prisma.PendingAIChangeUncheckedCreateWithoutOwnerUserInput> | Prisma.PendingAIChangeCreateWithoutOwnerUserInput[] | Prisma.PendingAIChangeUncheckedCreateWithoutOwnerUserInput[]
+  connectOrCreate?: Prisma.PendingAIChangeCreateOrConnectWithoutOwnerUserInput | Prisma.PendingAIChangeCreateOrConnectWithoutOwnerUserInput[]
+  upsert?: Prisma.PendingAIChangeUpsertWithWhereUniqueWithoutOwnerUserInput | Prisma.PendingAIChangeUpsertWithWhereUniqueWithoutOwnerUserInput[]
+  createMany?: Prisma.PendingAIChangeCreateManyOwnerUserInputEnvelope
+  set?: Prisma.PendingAIChangeWhereUniqueInput | Prisma.PendingAIChangeWhereUniqueInput[]
+  disconnect?: Prisma.PendingAIChangeWhereUniqueInput | Prisma.PendingAIChangeWhereUniqueInput[]
+  delete?: Prisma.PendingAIChangeWhereUniqueInput | Prisma.PendingAIChangeWhereUniqueInput[]
+  connect?: Prisma.PendingAIChangeWhereUniqueInput | Prisma.PendingAIChangeWhereUniqueInput[]
+  update?: Prisma.PendingAIChangeUpdateWithWhereUniqueWithoutOwnerUserInput | Prisma.PendingAIChangeUpdateWithWhereUniqueWithoutOwnerUserInput[]
+  updateMany?: Prisma.PendingAIChangeUpdateManyWithWhereWithoutOwnerUserInput | Prisma.PendingAIChangeUpdateManyWithWhereWithoutOwnerUserInput[]
+  deleteMany?: Prisma.PendingAIChangeScalarWhereInput | Prisma.PendingAIChangeScalarWhereInput[]
 }
 
 export type PendingAIChangeCreateNestedManyWithoutOnboardingInput = {
@@ -682,6 +754,89 @@ export type PendingAIChangeUncheckedUpdateManyWithoutSourceEventNestedInput = {
   deleteMany?: Prisma.PendingAIChangeScalarWhereInput | Prisma.PendingAIChangeScalarWhereInput[]
 }
 
+export type PendingAIChangeCreateWithoutOwnerUserInput = {
+  source: string
+  action: string
+  payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  sourceQuote?: string | null
+  sourceUrl?: string | null
+  confidence: string
+  status?: string
+  rejectedReason?: string | null
+  createdAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedBy?: number | null
+  appliedTaskId?: number | null
+  sourceEvent?: Prisma.ExternalEventCreateNestedOneWithoutPendingChangesInput
+  onboarding: Prisma.OnboardingCreateNestedOneWithoutPendingChangesInput
+}
+
+export type PendingAIChangeUncheckedCreateWithoutOwnerUserInput = {
+  id?: number
+  source: string
+  sourceEventId?: number | null
+  onboardingId: number
+  action: string
+  payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  sourceQuote?: string | null
+  sourceUrl?: string | null
+  confidence: string
+  status?: string
+  rejectedReason?: string | null
+  createdAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedBy?: number | null
+  appliedTaskId?: number | null
+}
+
+export type PendingAIChangeCreateOrConnectWithoutOwnerUserInput = {
+  where: Prisma.PendingAIChangeWhereUniqueInput
+  create: Prisma.XOR<Prisma.PendingAIChangeCreateWithoutOwnerUserInput, Prisma.PendingAIChangeUncheckedCreateWithoutOwnerUserInput>
+}
+
+export type PendingAIChangeCreateManyOwnerUserInputEnvelope = {
+  data: Prisma.PendingAIChangeCreateManyOwnerUserInput | Prisma.PendingAIChangeCreateManyOwnerUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type PendingAIChangeUpsertWithWhereUniqueWithoutOwnerUserInput = {
+  where: Prisma.PendingAIChangeWhereUniqueInput
+  update: Prisma.XOR<Prisma.PendingAIChangeUpdateWithoutOwnerUserInput, Prisma.PendingAIChangeUncheckedUpdateWithoutOwnerUserInput>
+  create: Prisma.XOR<Prisma.PendingAIChangeCreateWithoutOwnerUserInput, Prisma.PendingAIChangeUncheckedCreateWithoutOwnerUserInput>
+}
+
+export type PendingAIChangeUpdateWithWhereUniqueWithoutOwnerUserInput = {
+  where: Prisma.PendingAIChangeWhereUniqueInput
+  data: Prisma.XOR<Prisma.PendingAIChangeUpdateWithoutOwnerUserInput, Prisma.PendingAIChangeUncheckedUpdateWithoutOwnerUserInput>
+}
+
+export type PendingAIChangeUpdateManyWithWhereWithoutOwnerUserInput = {
+  where: Prisma.PendingAIChangeScalarWhereInput
+  data: Prisma.XOR<Prisma.PendingAIChangeUpdateManyMutationInput, Prisma.PendingAIChangeUncheckedUpdateManyWithoutOwnerUserInput>
+}
+
+export type PendingAIChangeScalarWhereInput = {
+  AND?: Prisma.PendingAIChangeScalarWhereInput | Prisma.PendingAIChangeScalarWhereInput[]
+  OR?: Prisma.PendingAIChangeScalarWhereInput[]
+  NOT?: Prisma.PendingAIChangeScalarWhereInput | Prisma.PendingAIChangeScalarWhereInput[]
+  id?: Prisma.IntFilter<"PendingAIChange"> | number
+  source?: Prisma.StringFilter<"PendingAIChange"> | string
+  sourceEventId?: Prisma.IntNullableFilter<"PendingAIChange"> | number | null
+  onboardingId?: Prisma.IntFilter<"PendingAIChange"> | number
+  action?: Prisma.StringFilter<"PendingAIChange"> | string
+  payload?: Prisma.JsonFilter<"PendingAIChange">
+  ownerId?: Prisma.IntNullableFilter<"PendingAIChange"> | number | null
+  sourceQuote?: Prisma.StringNullableFilter<"PendingAIChange"> | string | null
+  sourceUrl?: Prisma.StringNullableFilter<"PendingAIChange"> | string | null
+  confidence?: Prisma.StringFilter<"PendingAIChange"> | string
+  status?: Prisma.StringFilter<"PendingAIChange"> | string
+  rejectedReason?: Prisma.StringNullableFilter<"PendingAIChange"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"PendingAIChange"> | Date | string
+  resolvedAt?: Prisma.DateTimeNullableFilter<"PendingAIChange"> | Date | string | null
+  resolvedBy?: Prisma.IntNullableFilter<"PendingAIChange"> | number | null
+  appliedTaskId?: Prisma.IntNullableFilter<"PendingAIChange"> | number | null
+}
+
 export type PendingAIChangeCreateWithoutOnboardingInput = {
   source: string
   action: string
@@ -696,6 +851,7 @@ export type PendingAIChangeCreateWithoutOnboardingInput = {
   resolvedBy?: number | null
   appliedTaskId?: number | null
   sourceEvent?: Prisma.ExternalEventCreateNestedOneWithoutPendingChangesInput
+  ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedDraftsInput
 }
 
 export type PendingAIChangeUncheckedCreateWithoutOnboardingInput = {
@@ -704,6 +860,7 @@ export type PendingAIChangeUncheckedCreateWithoutOnboardingInput = {
   sourceEventId?: number | null
   action: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerId?: number | null
   sourceQuote?: string | null
   sourceUrl?: string | null
   confidence: string
@@ -741,27 +898,6 @@ export type PendingAIChangeUpdateManyWithWhereWithoutOnboardingInput = {
   data: Prisma.XOR<Prisma.PendingAIChangeUpdateManyMutationInput, Prisma.PendingAIChangeUncheckedUpdateManyWithoutOnboardingInput>
 }
 
-export type PendingAIChangeScalarWhereInput = {
-  AND?: Prisma.PendingAIChangeScalarWhereInput | Prisma.PendingAIChangeScalarWhereInput[]
-  OR?: Prisma.PendingAIChangeScalarWhereInput[]
-  NOT?: Prisma.PendingAIChangeScalarWhereInput | Prisma.PendingAIChangeScalarWhereInput[]
-  id?: Prisma.IntFilter<"PendingAIChange"> | number
-  source?: Prisma.StringFilter<"PendingAIChange"> | string
-  sourceEventId?: Prisma.IntNullableFilter<"PendingAIChange"> | number | null
-  onboardingId?: Prisma.IntFilter<"PendingAIChange"> | number
-  action?: Prisma.StringFilter<"PendingAIChange"> | string
-  payload?: Prisma.JsonFilter<"PendingAIChange">
-  sourceQuote?: Prisma.StringNullableFilter<"PendingAIChange"> | string | null
-  sourceUrl?: Prisma.StringNullableFilter<"PendingAIChange"> | string | null
-  confidence?: Prisma.StringFilter<"PendingAIChange"> | string
-  status?: Prisma.StringFilter<"PendingAIChange"> | string
-  rejectedReason?: Prisma.StringNullableFilter<"PendingAIChange"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"PendingAIChange"> | Date | string
-  resolvedAt?: Prisma.DateTimeNullableFilter<"PendingAIChange"> | Date | string | null
-  resolvedBy?: Prisma.IntNullableFilter<"PendingAIChange"> | number | null
-  appliedTaskId?: Prisma.IntNullableFilter<"PendingAIChange"> | number | null
-}
-
 export type PendingAIChangeCreateWithoutSourceEventInput = {
   source: string
   action: string
@@ -776,6 +912,7 @@ export type PendingAIChangeCreateWithoutSourceEventInput = {
   resolvedBy?: number | null
   appliedTaskId?: number | null
   onboarding: Prisma.OnboardingCreateNestedOneWithoutPendingChangesInput
+  ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedDraftsInput
 }
 
 export type PendingAIChangeUncheckedCreateWithoutSourceEventInput = {
@@ -784,6 +921,7 @@ export type PendingAIChangeUncheckedCreateWithoutSourceEventInput = {
   onboardingId: number
   action: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerId?: number | null
   sourceQuote?: string | null
   sourceUrl?: string | null
   confidence: string
@@ -821,12 +959,84 @@ export type PendingAIChangeUpdateManyWithWhereWithoutSourceEventInput = {
   data: Prisma.XOR<Prisma.PendingAIChangeUpdateManyMutationInput, Prisma.PendingAIChangeUncheckedUpdateManyWithoutSourceEventInput>
 }
 
+export type PendingAIChangeCreateManyOwnerUserInput = {
+  id?: number
+  source: string
+  sourceEventId?: number | null
+  onboardingId: number
+  action: string
+  payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  sourceQuote?: string | null
+  sourceUrl?: string | null
+  confidence: string
+  status?: string
+  rejectedReason?: string | null
+  createdAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedBy?: number | null
+  appliedTaskId?: number | null
+}
+
+export type PendingAIChangeUpdateWithoutOwnerUserInput = {
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  action?: Prisma.StringFieldUpdateOperationsInput | string
+  payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  sourceQuote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  rejectedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  appliedTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  sourceEvent?: Prisma.ExternalEventUpdateOneWithoutPendingChangesNestedInput
+  onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutPendingChangesNestedInput
+}
+
+export type PendingAIChangeUncheckedUpdateWithoutOwnerUserInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceEventId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
+  action?: Prisma.StringFieldUpdateOperationsInput | string
+  payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  sourceQuote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  rejectedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  appliedTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+}
+
+export type PendingAIChangeUncheckedUpdateManyWithoutOwnerUserInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceEventId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
+  action?: Prisma.StringFieldUpdateOperationsInput | string
+  payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  sourceQuote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  rejectedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  appliedTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+}
+
 export type PendingAIChangeCreateManyOnboardingInput = {
   id?: number
   source: string
   sourceEventId?: number | null
   action: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerId?: number | null
   sourceQuote?: string | null
   sourceUrl?: string | null
   confidence: string
@@ -852,6 +1062,7 @@ export type PendingAIChangeUpdateWithoutOnboardingInput = {
   resolvedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   appliedTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sourceEvent?: Prisma.ExternalEventUpdateOneWithoutPendingChangesNestedInput
+  ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedDraftsNestedInput
 }
 
 export type PendingAIChangeUncheckedUpdateWithoutOnboardingInput = {
@@ -860,6 +1071,7 @@ export type PendingAIChangeUncheckedUpdateWithoutOnboardingInput = {
   sourceEventId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   action?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sourceQuote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   confidence?: Prisma.StringFieldUpdateOperationsInput | string
@@ -877,6 +1089,7 @@ export type PendingAIChangeUncheckedUpdateManyWithoutOnboardingInput = {
   sourceEventId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   action?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sourceQuote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   confidence?: Prisma.StringFieldUpdateOperationsInput | string
@@ -894,6 +1107,7 @@ export type PendingAIChangeCreateManySourceEventInput = {
   onboardingId: number
   action: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerId?: number | null
   sourceQuote?: string | null
   sourceUrl?: string | null
   confidence: string
@@ -919,6 +1133,7 @@ export type PendingAIChangeUpdateWithoutSourceEventInput = {
   resolvedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   appliedTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutPendingChangesNestedInput
+  ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedDraftsNestedInput
 }
 
 export type PendingAIChangeUncheckedUpdateWithoutSourceEventInput = {
@@ -927,6 +1142,7 @@ export type PendingAIChangeUncheckedUpdateWithoutSourceEventInput = {
   onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
   action?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sourceQuote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   confidence?: Prisma.StringFieldUpdateOperationsInput | string
@@ -944,6 +1160,7 @@ export type PendingAIChangeUncheckedUpdateManyWithoutSourceEventInput = {
   onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
   action?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sourceQuote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   confidence?: Prisma.StringFieldUpdateOperationsInput | string
@@ -964,6 +1181,7 @@ export type PendingAIChangeSelect<ExtArgs extends runtime.Types.Extensions.Inter
   onboardingId?: boolean
   action?: boolean
   payload?: boolean
+  ownerId?: boolean
   sourceQuote?: boolean
   sourceUrl?: boolean
   confidence?: boolean
@@ -975,6 +1193,7 @@ export type PendingAIChangeSelect<ExtArgs extends runtime.Types.Extensions.Inter
   appliedTaskId?: boolean
   sourceEvent?: boolean | Prisma.PendingAIChange$sourceEventArgs<ExtArgs>
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
+  ownerUser?: boolean | Prisma.PendingAIChange$ownerUserArgs<ExtArgs>
 }, ExtArgs["result"]["pendingAIChange"]>
 
 export type PendingAIChangeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -984,6 +1203,7 @@ export type PendingAIChangeSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   onboardingId?: boolean
   action?: boolean
   payload?: boolean
+  ownerId?: boolean
   sourceQuote?: boolean
   sourceUrl?: boolean
   confidence?: boolean
@@ -995,6 +1215,7 @@ export type PendingAIChangeSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   appliedTaskId?: boolean
   sourceEvent?: boolean | Prisma.PendingAIChange$sourceEventArgs<ExtArgs>
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
+  ownerUser?: boolean | Prisma.PendingAIChange$ownerUserArgs<ExtArgs>
 }, ExtArgs["result"]["pendingAIChange"]>
 
 export type PendingAIChangeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1004,6 +1225,7 @@ export type PendingAIChangeSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   onboardingId?: boolean
   action?: boolean
   payload?: boolean
+  ownerId?: boolean
   sourceQuote?: boolean
   sourceUrl?: boolean
   confidence?: boolean
@@ -1015,6 +1237,7 @@ export type PendingAIChangeSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   appliedTaskId?: boolean
   sourceEvent?: boolean | Prisma.PendingAIChange$sourceEventArgs<ExtArgs>
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
+  ownerUser?: boolean | Prisma.PendingAIChange$ownerUserArgs<ExtArgs>
 }, ExtArgs["result"]["pendingAIChange"]>
 
 export type PendingAIChangeSelectScalar = {
@@ -1024,6 +1247,7 @@ export type PendingAIChangeSelectScalar = {
   onboardingId?: boolean
   action?: boolean
   payload?: boolean
+  ownerId?: boolean
   sourceQuote?: boolean
   sourceUrl?: boolean
   confidence?: boolean
@@ -1035,18 +1259,21 @@ export type PendingAIChangeSelectScalar = {
   appliedTaskId?: boolean
 }
 
-export type PendingAIChangeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "source" | "sourceEventId" | "onboardingId" | "action" | "payload" | "sourceQuote" | "sourceUrl" | "confidence" | "status" | "rejectedReason" | "createdAt" | "resolvedAt" | "resolvedBy" | "appliedTaskId", ExtArgs["result"]["pendingAIChange"]>
+export type PendingAIChangeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "source" | "sourceEventId" | "onboardingId" | "action" | "payload" | "ownerId" | "sourceQuote" | "sourceUrl" | "confidence" | "status" | "rejectedReason" | "createdAt" | "resolvedAt" | "resolvedBy" | "appliedTaskId", ExtArgs["result"]["pendingAIChange"]>
 export type PendingAIChangeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sourceEvent?: boolean | Prisma.PendingAIChange$sourceEventArgs<ExtArgs>
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
+  ownerUser?: boolean | Prisma.PendingAIChange$ownerUserArgs<ExtArgs>
 }
 export type PendingAIChangeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sourceEvent?: boolean | Prisma.PendingAIChange$sourceEventArgs<ExtArgs>
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
+  ownerUser?: boolean | Prisma.PendingAIChange$ownerUserArgs<ExtArgs>
 }
 export type PendingAIChangeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sourceEvent?: boolean | Prisma.PendingAIChange$sourceEventArgs<ExtArgs>
   onboarding?: boolean | Prisma.OnboardingDefaultArgs<ExtArgs>
+  ownerUser?: boolean | Prisma.PendingAIChange$ownerUserArgs<ExtArgs>
 }
 
 export type $PendingAIChangePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1054,6 +1281,7 @@ export type $PendingAIChangePayload<ExtArgs extends runtime.Types.Extensions.Int
   objects: {
     sourceEvent: Prisma.$ExternalEventPayload<ExtArgs> | null
     onboarding: Prisma.$OnboardingPayload<ExtArgs>
+    ownerUser: Prisma.$VendorUserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1062,6 +1290,7 @@ export type $PendingAIChangePayload<ExtArgs extends runtime.Types.Extensions.Int
     onboardingId: number
     action: string
     payload: runtime.JsonValue
+    ownerId: number | null
     sourceQuote: string | null
     sourceUrl: string | null
     confidence: string
@@ -1467,6 +1696,7 @@ export interface Prisma__PendingAIChangeClient<T, Null = never, ExtArgs extends 
   readonly [Symbol.toStringTag]: "PrismaPromise"
   sourceEvent<T extends Prisma.PendingAIChange$sourceEventArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PendingAIChange$sourceEventArgs<ExtArgs>>): Prisma.Prisma__ExternalEventClient<runtime.Types.Result.GetResult<Prisma.$ExternalEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   onboarding<T extends Prisma.OnboardingDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OnboardingDefaultArgs<ExtArgs>>): Prisma.Prisma__OnboardingClient<runtime.Types.Result.GetResult<Prisma.$OnboardingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  ownerUser<T extends Prisma.PendingAIChange$ownerUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PendingAIChange$ownerUserArgs<ExtArgs>>): Prisma.Prisma__VendorUserClient<runtime.Types.Result.GetResult<Prisma.$VendorUserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1502,6 +1732,7 @@ export interface PendingAIChangeFieldRefs {
   readonly onboardingId: Prisma.FieldRef<"PendingAIChange", 'Int'>
   readonly action: Prisma.FieldRef<"PendingAIChange", 'String'>
   readonly payload: Prisma.FieldRef<"PendingAIChange", 'Json'>
+  readonly ownerId: Prisma.FieldRef<"PendingAIChange", 'Int'>
   readonly sourceQuote: Prisma.FieldRef<"PendingAIChange", 'String'>
   readonly sourceUrl: Prisma.FieldRef<"PendingAIChange", 'String'>
   readonly confidence: Prisma.FieldRef<"PendingAIChange", 'String'>
@@ -1923,6 +2154,25 @@ export type PendingAIChange$sourceEventArgs<ExtArgs extends runtime.Types.Extens
    */
   include?: Prisma.ExternalEventInclude<ExtArgs> | null
   where?: Prisma.ExternalEventWhereInput
+}
+
+/**
+ * PendingAIChange.ownerUser
+ */
+export type PendingAIChange$ownerUserArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VendorUser
+   */
+  select?: Prisma.VendorUserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VendorUser
+   */
+  omit?: Prisma.VendorUserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorUserInclude<ExtArgs> | null
+  where?: Prisma.VendorUserWhereInput
 }
 
 /**
