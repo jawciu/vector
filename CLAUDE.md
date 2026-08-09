@@ -241,8 +241,25 @@ The wrong filename `build-theme.js` appears in 3 docs + theme.css's own generate
 (hardcoded at build-theme.mjs:41). Visual report artifact (private, republished at the same URL
 each phase): https://claude.ai/code/artifact/e930beb8-5ede-466e-a98d-bb9018fa3f70
 
-**Next:** Phase 1 (tsconfig + `cn()` + Button→tsx pattern-setter) per `docs/DS-PLAN.md`. Commit the
-Phase-0 files when Caroline says so.
+**Phase 0 committed on `design-system`: `1774a2a`** (her explicit OK, 2026-08-09).
+
+**Phase 1 DONE 2026-08-09 (UNCOMMITTED on `design-system`):** TypeScript foundation.
+- devDeps typescript 6 + @types/{react,react-dom,node}; deps clsx + tailwind-merge.
+- `tsconfig.json` (strict, allowJs, checkJs:false — Next amended it on first build, that's normal);
+  `jsconfig.json` DELETED (Next ignores it once tsconfig exists). `next-env.d.ts` generated.
+- `app/ui/cn.ts` (clsx + twMerge — caller classes beat component defaults).
+- **`Button.js` → `Button.tsx`, the pattern-setter**: closed unions (ButtonVariant/Size/Tone),
+  extends ButtonHTMLAttributes, variants as a Record lookup emitting the SAME class strings as
+  before (pixel-identical), plus the app's first `loading` state: aria-busy, disabled, invisible
+  (not unmounted) label so width is preserved, centred `.btn-spinner` (new class in globals.css,
+  1em currentColor ring; reduced-motion SLOWS it — loading is essential status info).
+  ⚠ Spinner centring uses absolute inset-0 + flex, NOT `m-auto` — margin utilities are still dead
+  until Phase 2 fixes the reset. Don't "simplify" it to m-auto before then.
+- Verified: tsc --noEmit clean · build green · 63/63 unit tests · lint clean · audit ratchet
+  passes with tsCoverage 0 → 1/14, no regressions.
+
+**Next:** Phase 2 (token pipeline v2: @theme + all groups + margin-reset fix + drift fixes) per
+`docs/DS-PLAN.md`. Commit Phase 1 when Caroline says so.
 
 ### 2026-08-08 — Vector has a logo; favicon + app icons shipped
 

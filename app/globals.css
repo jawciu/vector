@@ -257,6 +257,30 @@ a {
   color: var(--danger-hover);
 }
 
+/* Button loading spinner (Button.tsx `loading` prop). 1em so it scales with
+ * the button's text size. Loading motion is essential status information, so
+ * reduced motion slows it rather than freezing it into a static ring. */
+.btn-spinner {
+  width: 1em;
+  height: 1em;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: btn-spin 0.6s linear infinite;
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-spinner {
+    animation-duration: 1.5s;
+  }
+}
+
 /* Mode toggle (e.g. Existing / New in onboarding modal) */
 .mode-toggle:not([data-active]):hover {
   color: var(--text);
