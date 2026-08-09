@@ -268,11 +268,20 @@ non-6-digit-hex). BOTH pending decisions RESOLVED by Caroline 2026-08-09: radius
 Tailwind's real values (rung names now match utilities — sm 4 / md 6 / lg 8 / xl 12 / full; the
 doc-only 10px never rendered), and text-xl = 20px (matches Tailwind + the login heading; 22 was
 paper-only). Zero pixels changed by either. Margin-fix before/after review artifact (flicker
-viewer): https://claude.ai/code/artifact/2076a6b8-bbda-41fc-96d7-aa485645d06c . Dev server running
-on :3010 for her to check the 4 interaction-gated margin spots (never touch 3000/3001).
+viewer): https://claude.ai/code/artifact/2076a6b8-bbda-41fc-96d7-aa485645d06c . The :3010 review
+server has been stopped again; spin one up on a spare port if she asks (never touch 3000/3001).
 
-**Next:** Caroline reviews the margin changes live on :3010 + the two pending decisions; commit
-Phase 2 when she says so; then Phase 3 (ESLint token rules + real CI) per `docs/DS-PLAN.md`.
+**Phase 2 committed: `3eaabed`. Phase 3 DONE 2026-08-09 (UNCOMMITTED on `design-system`)** — full
+detail in `docs/DS-LOG.md` Phase 3. `eslint-rules/index.mjs` (vector/no-raw-color +
+vector/no-arbitrary-tailwind; warn in feature code, ERROR in app/ui; escape hatch =
+eslint-disable with reason, pattern in Sparkle.js) + raw-element warnings (app/ui & Menu.js
+exempt). Current lint: 0 errors / 187 warnings (= the measured retrofit debt). Rules caught a real
+one day one: CalendarDropdown's hardcoded shadow → var(--shadow-floating). `ci.yml` REPLACES
+unit-tests.yml: lint / test / build (dummy DATABASE_URL + 2 Supabase vars, verified sufficient) /
+audit-ratchet jobs; triggers on main + design-system pushes — ⚠ UNEXERCISED until first push,
+watch the 4 jobs then.
+
+**Next:** commit Phase 3 when Caroline says so; then Phase 4 (Storybook) per `docs/DS-PLAN.md`.
 
 ### 2026-08-08 — Vector has a logo; favicon + app icons shipped
 

@@ -75,7 +75,7 @@ export default function CalendarDropdown({ value, viewDate, onViewDateChange, on
         borderRadius: 12,
         padding: 12,
         minWidth: 260,
-        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+        boxShadow: "var(--shadow-floating)",
       }}
     >
       {/* Header */}

@@ -130,4 +130,44 @@ source.
 **Verified:** `build:ds` + `lint:ds` clean · utilities compile (temp component
 grep against `.next/static/css`) · `tsc` clean · 63/63 tests · lint clean ·
 production build green · audit ratchet zero regressions · five before/after
-screenshot pairs eyeballed, all changes intended.
+screenshot pairs eyeballed by me AND published for Caroline as a flicker-viewer
+artifact (link in CLAUDE.md); she signed off 2026-08-09.
+
+---
+
+## Phase 3 — Enforcement: DS lint rules + real CI · 2026-08-09
+
+**What:** breaking the design system now produces red squiggles, and CI grew
+from one gate to four.
+
+- **`eslint-rules/index.mjs`** — inline flat-config plugin (`vector`):
+  - `vector/no-raw-color`: flags hex / `rgb()` literals in strings and
+    template literals. The escape hatch is
+    `eslint-disable-next-line vector/no-raw-color -- <reason>`
+    (pattern established in `app/ui/Sparkle.js` for its two SVG gradient
+    stops, which genuinely can't resolve CSS vars).
+  - `vector/no-arbitrary-tailwind`: flags `p-[13px]` / `bg-[#fff]`-style
+    arbitrary values that dodge the token scales.
+- **`eslint.config.mjs`** — severity strategy: both rules WARN in feature code
+  (the PostToolUse eslint hook surfaces warnings to agents on every edit, so
+  they self-correct without a thousand-error wall) and ERROR in `app/ui/`.
+  Plus `no-restricted-syntax` warnings on raw `<button>`/`<input>`/
+  `<textarea>`/`<select>` in feature code (app/ui and Menu.js exempt —
+  wrapping raw elements is a primitive's job). Current totals: **0 errors,
+  187 warnings** — the warnings are the measured retrofit debt, ratcheted by
+  the audit script, converted to errors per-directory as Phases 7-8 land.
+- **The rules caught a real violation on day one:** `CalendarDropdown.js:78`
+  hardcoded the floating shadow value (a lens-6 finding). Fixed to
+  `var(--shadow-floating)` — the token from Phase 2 existing is what made the
+  fix one line. rawRgba metric: 27 → 26.
+- **`.github/workflows/ci.yml`** replaces `unit-tests.yml`: four jobs —
+  `lint` (ESLint + design.md spec lint), `test` (vitest), `build` (production
+  build with dummy `DATABASE_URL` / Supabase env — verified locally that the
+  build needs exactly those three and contacts no service), `audit` (the
+  ratchet: any DS-metric regression vs the committed baseline fails CI).
+  Triggers include the `design-system` branch. NOTE: unexercised until the
+  branch is first pushed — verify the 4 jobs on that first push.
+
+**Verified:** lint 0 errors/187 warnings · Sparkle escape hatch clean · scratch
+violation in app/ui produces errors · `tsc` clean · 63/63 tests · build green
+with dummy env (no `.env`) · audit ratchet: zero regressions, rawRgba improved.

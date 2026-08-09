@@ -35,7 +35,9 @@ export default function Sparkle({ size = 16, className, style }) {
           y2="15"
           gradientUnits="userSpaceOnUse"
         >
+          {/* eslint-disable-next-line vector/no-raw-color -- SVG <stop> can't reliably resolve CSS vars; mirrors DESIGN.md aiGradientFrom */}
           <stop offset="0" stopColor="#C098FF" />
+          {/* eslint-disable-next-line vector/no-raw-color -- SVG <stop> can't reliably resolve CSS vars; mirrors DESIGN.md aiGradientTo */}
           <stop offset="1" stopColor="#FF9C7D" />
         </linearGradient>
       </defs>
