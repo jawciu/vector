@@ -1,15 +1,24 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, type ReactNode } from "react";
 
 /**
  * Tooltip that uses fixed positioning to escape overflow containers.
  * Wrap any element — tooltip text comes from the `label` or `lines` prop.
  */
-export default function Tooltip({ label, lines, children }) {
+
+export interface TooltipProps {
+  /** Single-line tooltip text. */
+  label?: ReactNode;
+  /** Multi-line tooltip: one array item per line. Takes precedence over `label`. */
+  lines?: ReactNode[];
+  children: ReactNode;
+}
+
+export default function Tooltip({ label, lines, children }: TooltipProps) {
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
-  const ref = useRef(null);
+  const ref = useRef<HTMLSpanElement>(null);
 
   const hasContent = label || (lines && lines.length > 0);
   if (!hasContent) return children;

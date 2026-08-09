@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 /**
  * Vector AI sparkle — the single source of truth for the gradient
  * 4-point star used everywhere Vector "speaks". Every surface that
@@ -15,7 +17,13 @@
  * (e.g. inline-text indicators). The viewBox is fixed at 14×14, so
  * the gradient maps consistently regardless of render size.
  */
-export default function Sparkle({ size = 16, className, style }) {
+export interface SparkleProps {
+  size?: number;
+  className?: string;
+  style?: CSSProperties;
+}
+
+export default function Sparkle({ size = 16, className, style }: SparkleProps) {
   return (
     <svg
       width={size}

@@ -39,9 +39,15 @@ const SCOPE = {
   uiDir: "app/ui",
   // Files allowed to contain raw hex, each for a documented reason.
   rawHexAllowlist: [
-    "app/ui/Sparkle.js", // SVG <stop> colours can't resolve CSS vars reliably (see file comment)
+    "app/ui/Sparkle.tsx", // SVG <stop> colours can't resolve CSS vars reliably (see file comment)
   ],
 };
+
+// Stories and meta manifests are DS documentation/scaffolding — they never
+// ship in the app bundle, and their layout styles (AllVariants grids etc.)
+// are not app drift. Excluded from every drift metric; storyCoverage still
+// counts them via the unfiltered ui file list.
+const isDsScaffolding = (rel) => /\.(stories|meta)\.|^\.storybook\//.test(rel);
 
 // Primitive names that count as "blessed" button-likes / form controls.
 const PRIMITIVE_BUTTONS = ["Button", "IconButton", "MenuTriggerButton", "MenuOption"];
@@ -65,8 +71,10 @@ function walk(dir, files = []) {
   return files;
 }
 
-const files = SCOPE.include.flatMap((d) => walk(resolve(ROOT, d)));
-const uiFiles = files.filter((f) => f.rel.startsWith(`${SCOPE.uiDir}/`));
+const allFiles = SCOPE.include.flatMap((d) => walk(resolve(ROOT, d)));
+const uiFiles = allFiles.filter((f) => f.rel.startsWith(`${SCOPE.uiDir}/`));
+// Drift metrics scan app code only — not stories/meta scaffolding.
+const files = allFiles.filter((f) => !isDsScaffolding(f.rel));
 const featureFiles = files.filter((f) => !f.rel.startsWith(`${SCOPE.uiDir}/`));
 
 // ---------------------------------------------------------------------------
@@ -117,7 +125,10 @@ const primButtons = countIn(featureFiles, jsxTag(PRIMITIVE_BUTTONS));
 const rawInputs = countIn(featureFiles, jsxTag(["input", "textarea", "select"]));
 const primInputs = countIn(featureFiles, jsxTag(PRIMITIVE_INPUTS));
 const scatteredSvg = countIn(featureFiles, /<svg(?=[\s>])/g);
-const centralSvg = countIn(uiFiles, /<svg(?=[\s>])/g);
+const centralSvg = countIn(
+  files.filter((f) => f.rel.startsWith(`${SCOPE.uiDir}/`)),
+  /<svg(?=[\s>])/g
+);
 
 // DS-layer maturity
 const uiComponentFiles = uiFiles.filter(

@@ -1,6 +1,31 @@
 "use client";
 
-export default function TabBar({ tabs, activeTab, onTabChange }) {
+import type { ReactNode } from "react";
+
+/**
+ * TabBar — DS primitive
+ *
+ * Underline-as-selection tab strip (see DESIGN.md): inactive labels are muted,
+ * the active tab is `text` with a 2px `action` underline — the only selected
+ * cue. Optional per-tab `badge` renders an action-coloured count pill capped
+ * at "99+".
+ */
+
+export interface Tab {
+  id: string;
+  label: string;
+  icon?: ReactNode;
+  /** Pending count — hidden when null/undefined/0, capped at "99+". */
+  badge?: number | null;
+}
+
+export interface TabBarProps {
+  tabs: Tab[];
+  activeTab: string;
+  onTabChange: (id: string) => void;
+}
+
+export default function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
   return (
     <div
       className="flex items-end gap-1"

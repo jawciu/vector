@@ -1,5 +1,7 @@
 "use client";
 
+import type { MouseEventHandler, ReactNode } from "react";
+
 /**
  * FieldRow — DS primitive (drawer detail view)
  *
@@ -13,7 +15,16 @@
  *   onClick   — click handler
  *   children  — custom content (overrides label)
  */
-export default function FieldRow({ icon, label, children, onClick, active }) {
+
+export interface FieldRowProps {
+  icon?: ReactNode;
+  label?: ReactNode;
+  children?: ReactNode;
+  onClick?: MouseEventHandler<HTMLDivElement>;
+  active?: boolean;
+}
+
+export default function FieldRow({ icon, label, children, onClick, active }: FieldRowProps) {
   return (
     <div
       className="field-row inline-flex items-center gap-2 rounded-lg cursor-pointer"

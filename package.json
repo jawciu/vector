@@ -16,6 +16,10 @@
     "seed:activity": "npx tsx prisma/seed-recent-activity.js",
     "seed:notifications": "npx tsx prisma/seed-demo-notifications.js",
     "seed:ai-fixtures": "npx tsx prisma/seed-ai-test-fixtures.js",
+    "prestorybook": "npm run build:ds",
+    "storybook": "storybook dev -p 6006",
+    "prebuild-storybook": "npm run build:ds",
+    "build-storybook": "storybook build",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
@@ -43,6 +47,9 @@
     "@playwright/test": "^1.60.0",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
+    "@storybook/addon-a11y": "^10.5.7",
+    "@storybook/addon-docs": "^10.5.7",
+    "@storybook/nextjs-vite": "^10.5.7",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^26.2.0",
     "@types/react": "^19.2.18",
@@ -54,9 +61,12 @@
     "pg": "^8.18.0",
     "postcss": "^8.5.6",
     "prisma": "^7.3.0",
+    "storybook": "^10.5.7",
+    "storybook-addon-pseudo-states": "^10.5.7",
     "tailwindcss": "^4.1.18",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
+    "vite": "^8.2.1",
     "vitest": "^4.1.10"
   }
 }

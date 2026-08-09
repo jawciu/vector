@@ -29,7 +29,10 @@ floor so the ratchet tightens.
 ## What each metric means
 
 All patterns are heuristic greps over `app/**` (excluding `app/api/`, which has
-no styling). "Feature code" means everything outside `app/ui/` — primitives are
+no styling, and — since Phase 4 — `*.stories.*` / `*.meta.*` files: stories are
+DS documentation scaffolding that never ships in the app bundle, so their
+layout styles are not app drift; the raw-hex allowlist tracks `Sparkle.tsx`
+post-TS-conversion). "Feature code" means everything outside `app/ui/` — primitives are
 *allowed* to use raw elements and SVGs internally; wrapping them is their job.
 Coverage metrics always report **count and ratio together** (`18/103 (17%)`):
 the ratio says how healthy the system is, the count says how big the clean-up

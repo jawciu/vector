@@ -1,10 +1,18 @@
+import type { CSSProperties } from "react";
+
 /**
  * Render an AI prose string with inline backtick-delimited spans converted
  * into `code-style chips` (.task-ref). The insight prompts ask the model
  * to wrap task title references in backticks; this is the single render
  * helper that turns those into the styled spans.
  */
-export default function InlineProse({ text, className, style }) {
+export interface InlineProseProps {
+  text?: string | null;
+  className?: string;
+  style?: CSSProperties;
+}
+
+export default function InlineProse({ text, className, style }: InlineProseProps) {
   if (!text) return null;
   const segments = splitBackticks(text);
   return (
@@ -22,8 +30,13 @@ export default function InlineProse({ text, className, style }) {
   );
 }
 
-function splitBackticks(text) {
-  const out = [];
+interface Segment {
+  code: boolean;
+  text: string;
+}
+
+function splitBackticks(text: string): Segment[] {
+  const out: Segment[] = [];
   const re = /`([^`]+)`/g;
   let lastIndex = 0;
   let match;

@@ -171,3 +171,63 @@ from one gate to four.
 **Verified:** lint 0 errors/187 warnings · Sparkle escape hatch clean · scratch
 violation in app/ui produces errors · `tsc` clean · 63/63 tests · build green
 with dummy env (no `.env`) · audit ratchet: zero regressions, rawRgba improved.
+
+---
+
+## Phase 4 — Storybook · 2026-08-09
+
+**What:** the DS's contract surface. All 14 primitives storied, 11 converted
+to TypeScript, the meta-manifest system live.
+
+- **Storybook 10.5.7** on `@storybook/nextjs-vite` (explicit Next 16 support;
+  the app's `--webpack` flag is irrelevant, SB's Vite builder is independent).
+  Addons: docs (autodocs from TS types), a11y (`test: "error"` — serious
+  violations fail), pseudo-states. `.storybook/preview.tsx` imports the real
+  `app/globals.css` (Tailwind + generated tokens), renders on the real dark
+  bg, maps the Geist font vars. `npm run storybook` / `build-storybook`, both
+  pre-running `build:ds`. `storybook-static/` gitignored.
+- **74 stories + 14 autodocs pages across all 14 primitives** (Button 15 ·
+  IconButton 7 · FieldPill/FieldRow 6 each · TabBar 6 · Drawer 6 · InsightCard
+  6 · CalendarDropdown 5 · Tooltip 4 · CompanyAvatar 4 · InlineProse 3 ·
+  Sparkle 2 · TaskIdChip 2 · Icons 2, incl. an auto-generated all-icons grid).
+  Doctrine encoded: named story per blessed state, pseudo hover/focus stories,
+  play functions asserting behaviour (ESC closes Drawer, day-click fires
+  onChange, disabled blocks clicks, loading sets aria-busy + preserves width),
+  AllVariants grids for future VRT, realistic content copied from real call
+  sites. Stories document what EXISTS — known gaps stay visible (e.g. Drawer's
+  `ClosedChildrenStillMounted` play PINS the tab-stop leak until Phase 5 fixes
+  it and must then be updated).
+- **DsMeta system**: `app/ui/ds-meta.ts` schema (status / useWhen /
+  dontUseWhen / a11y / tokens) + `dsMetaDescription()` rendered into each
+  autodocs page (simplification vs the plan's custom DocBlock — same content,
+  less machinery). All 14 primitives have `<Name>.meta.ts` with honest a11y
+  gap notes matching the lens-3 matrix. Deferred: the ds-manifest.json
+  aggregation script (agents can grep `*.meta.ts` directly; revisit in
+  Phase 6/9 if a single JSON surface earns its keep).
+- **TS conversions (byte-identical DOM)**: IconButton (aria-label now REQUIRED
+  by type), Sparkle, TaskIdChip, InlineProse, CompanyAvatar (name required),
+  Tooltip, FieldPill, FieldRow, TabBar, Icons (+ Button from Phase 1) = 11/14.
+  Still JS: Drawer, CalendarDropdown, InsightCard (complex; Phase 5 converts
+  as it touches them). Their stories carry typed casts to be deleted then.
+- **New findings from story-writing** (Phase 5 fix list): hovering the ACTIVE
+  tab dims it (`.tab-btn:hover` specificity order, globals.css); Calendar
+  month prev/next buttons have NO accessible name (critical axe hit — its
+  stories carry `a11y: { test: "todo" }` with a comment); Drawer has an
+  undocumented `background` prop.
+- **Audit script updated** (metric-definition change, documented in
+  ds-audit/README): stories/meta files are DS scaffolding excluded from drift
+  metrics; allowlist tracks Sparkle.tsx. The ratchet CAUGHT both staleness
+  issues itself (4 false regressions) before the fix — working as designed.
+
+**Verified:** `build-storybook` green, index.json = 74 stories / 14 docs /
+14 components · `tsc --noEmit` clean · lint 0 errors · 63/63 tests · audit
+ratchet zero regressions with storyCoverage 0→100%, tsCoverage 0→78.6%.
+
+**Caroline's review addition (2026-08-09): `Interactive` playground stories.**
+Her call after reviewing: frozen single-state stories are right for docs/VRT,
+but stateful components must ALSO ship one stateful playground where the full
+lifecycle works by hand. Added to Drawer (button opens; chevron/ESC/outside
+click genuinely close) and CalendarDropdown (starts COLLAPSED like the real
+field; click opens, picking closes). Both `tags: ["no-vrt"]`. **Doctrine going
+forward: every stateful primitive gets an Interactive story** (Modal + Menu in
+Phase 5 must ship with one). Now 76 stories.

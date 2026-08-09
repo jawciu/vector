@@ -1,12 +1,19 @@
 "use client";
 
+import type { CSSProperties } from "react";
+
 /**
  * Icons — shared DS icon components
  * All icons use currentColor — set color via parent's CSS color property.
  * Default to --text-muted by wrapping in an element with that color.
  */
 
-export function CalendarIcon({ className, style }) {
+interface IconProps {
+  className?: string;
+  style?: CSSProperties;
+}
+
+export function CalendarIcon({ className, style }: IconProps) {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ color: "var(--text-muted)", ...style }} aria-hidden>
       <path d="M0.777344 2.72046C0.777344 2.46767 0.859288 2.22524 1.00515 2.0465C1.15101 1.86775 1.34884 1.76733 1.55512 1.76733H12.444C12.6503 1.76733 12.8481 1.86775 12.994 2.0465C13.1398 2.22524 13.2218 2.46767 13.2218 2.72046V6.53296H0.777344V2.72046Z" stroke="currentColor" strokeLinejoin="round"/>
@@ -14,6 +21,14 @@ export function CalendarIcon({ className, style }) {
       <path d="M0.777344 6.53296H13.2218V11.7642C13.2218 11.9184 13.1398 12.0662 12.994 12.1752C12.8481 12.2842 12.6503 12.3455 12.444 12.3455H1.55512C1.34884 12.3455 1.15101 12.2842 1.00515 12.1752C0.859288 12.0662 0.777344 11.9184 0.777344 11.7642V6.53296Z" stroke="currentColor" strokeLinejoin="round"/>
     </svg>
   );
+}
+
+/** Canonical task priority values (lib/constants.js PRIORITIES). */
+export type TaskPriority = "low" | "medium" | "high";
+
+interface PriorityIconProps extends IconProps {
+  priority?: TaskPriority | null;
+  size?: number;
 }
 
 /**
@@ -24,11 +39,11 @@ export function CalendarIcon({ className, style }) {
  * - medium: bottom + middle --action, top --icon-tertiary
  * - high: all bars --action
  */
-export function PriorityIcon({ priority, size = 14, className, style }) {
+export function PriorityIcon({ priority, size = 14, className, style }: PriorityIconProps) {
   const active = "var(--action)";
   const muted = "var(--icon-tertiary)";
 
-  const colorMap = {
+  const colorMap: Record<string, [string, string, string]> = {
     low:    [muted,  muted,  active],  // [top, middle, bottom]
     medium: [muted,  active, active],
     high:   [active, active, active],
@@ -48,7 +63,7 @@ export function PriorityIcon({ priority, size = 14, className, style }) {
   );
 }
 
-export function StatusIcon({ className, style }) {
+export function StatusIcon({ className, style }: IconProps) {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ color: "var(--text-muted)", ...style }} aria-hidden>
       <g clipPath="url(#status-clip)">
@@ -63,7 +78,7 @@ export function StatusIcon({ className, style }) {
   );
 }
 
-export function OwnerIcon({ className, style }) {
+export function OwnerIcon({ className, style }: IconProps) {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ color: "var(--text-muted)", ...style }} aria-hidden>
       <path d="M11.1248 11.3571C11.3669 11.5864 11.5915 11.834 11.7928 12.1006C10.5402 13.2782 8.85576 14.0017 7.00089 14.0017C5.14576 14.0017 3.46063 13.2785 2.20801 12.1006C2.40924 11.834 2.63397 11.5864 2.87603 11.3571C3.95146 12.3759 5.40268 13.0021 7.00089 13.0021C8.59884 13.0021 10.0494 12.3756 11.1248 11.3571Z" fill="currentColor"/>
@@ -74,7 +89,7 @@ export function OwnerIcon({ className, style }) {
   );
 }
 
-export function AssigneeIcon({ className, style }) {
+export function AssigneeIcon({ className, style }: IconProps) {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ color: "var(--text-muted)", ...style }} aria-hidden>
       <path d="M11.1248 11.3571C11.3669 11.5864 11.5915 11.834 11.7928 12.1006C10.5402 13.2782 8.85576 14.0017 7.00089 14.0017C5.14576 14.0017 3.46063 13.2785 2.20801 12.1006C2.40924 11.834 2.63397 11.5864 2.87603 11.3571C3.95146 12.3759 5.40268 13.0021 7.00089 13.0021C8.59884 13.0021 10.0494 12.3756 11.1248 11.3571Z" fill="currentColor"/>
@@ -85,7 +100,7 @@ export function AssigneeIcon({ className, style }) {
   );
 }
 
-export function MembersIcon({ className, style }) {
+export function MembersIcon({ className, style }: IconProps) {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ color: "var(--text-muted)", ...style }} aria-hidden>
       <path d="M9.33301 11.6667V11.0833C9.33301 10.4645 9.08717 9.871 8.64959 9.43342C8.21201 8.99583 7.61851 8.75 6.99967 8.75H2.91634C2.2975 8.75 1.70401 8.99583 1.26643 9.43342C0.82884 9.871 0.583008 10.4645 0.583008 11.0833V11.6667M9.04134 6.41667C9.66018 6.41667 10.2537 6.17083 10.6913 5.73325C11.1288 5.29566 11.3747 4.70217 11.3747 4.08333C11.3747 3.46449 11.1288 2.871 10.6913 2.43342C10.2537 1.99583 9.66018 1.75 9.04134 1.75M13.4163 11.6667V11.0833C13.4163 10.4645 13.1705 9.871 12.7329 9.43342C12.2953 8.99583 11.7018 8.75 11.083 8.75M7.29134 4.08333C7.29134 4.70217 7.04551 5.29566 6.60792 5.73325C6.17034 6.17083 5.57685 6.41667 4.95801 6.41667C4.33917 6.41667 3.74568 6.17083 3.30809 5.73325C2.87051 5.29566 2.62467 4.70217 2.62467 4.08333C2.62467 3.46449 2.87051 2.871 3.30809 2.43342C3.74568 1.99583 4.33917 1.75 4.95801 1.75C5.57685 1.75 6.17034 1.99583 6.60792 2.43342C7.04551 2.871 7.29134 3.46449 7.29134 4.08333Z" stroke="currentColor" strokeWidth="1.16667" strokeLinecap="square"/>
@@ -93,7 +108,7 @@ export function MembersIcon({ className, style }) {
   );
 }
 
-export function DependenciesIcon({ className, style }) {
+export function DependenciesIcon({ className, style }: IconProps) {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ color: "var(--text-muted)", ...style }} aria-hidden>
       <g clipPath="url(#dep-clip)">

@@ -1,5 +1,7 @@
 "use client";
 
+import type { MouseEventHandler, ReactNode } from "react";
+
 /**
  * FieldPill — DS primitive
  *
@@ -13,7 +15,16 @@
  *   onClick   — click handler (typically toggles a dropdown)
  *   children  — custom content (overrides label)
  */
-export default function FieldPill({ icon, label, children, onClick, active }) {
+
+export interface FieldPillProps {
+  icon?: ReactNode;
+  label?: ReactNode;
+  children?: ReactNode;
+  onClick?: MouseEventHandler<HTMLDivElement>;
+  active?: boolean;
+}
+
+export default function FieldPill({ icon, label, children, onClick, active }: FieldPillProps) {
   return (
     <div
       className="field-pill flex flex-1 items-center gap-1 rounded-lg cursor-pointer"

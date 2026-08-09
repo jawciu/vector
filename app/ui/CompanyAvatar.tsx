@@ -11,7 +11,23 @@ import { avatarColor, avatarInitials } from "@/lib/avatar";
  * `radius` / `fontSize` exist so call sites converted from inline JSX can
  * keep their exact previous rendering (some used rounded-[3px] / text-[8px]).
  */
-export default function CompanyAvatar({ name, logoUrl, size = 16, radius = 4, fontSize }) {
+export interface CompanyAvatarProps {
+  /** Company name — drives the deterministic colour + initials fallback. */
+  name: string;
+  /** App-relative logo path (e.g. "/logos/fal.png"); falls back to initials when unset. */
+  logoUrl?: string | null;
+  size?: number;
+  radius?: number;
+  fontSize?: number;
+}
+
+export default function CompanyAvatar({
+  name,
+  logoUrl,
+  size = 16,
+  radius = 4,
+  fontSize,
+}: CompanyAvatarProps) {
   if (logoUrl) {
     return (
       <span

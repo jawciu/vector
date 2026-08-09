@@ -281,7 +281,24 @@ unit-tests.yml: lint / test / build (dummy DATABASE_URL + 2 Supabase vars, verif
 audit-ratchet jobs; triggers on main + design-system pushes — ⚠ UNEXERCISED until first push,
 watch the 4 jobs then.
 
-**Next:** commit Phase 3 when Caroline says so; then Phase 4 (Storybook) per `docs/DS-PLAN.md`.
+**Phase 3 committed: `2a67e21`. Phase 4 DONE 2026-08-09 (UNCOMMITTED on `design-system`)** — full
+detail in `docs/DS-LOG.md` Phase 4. Storybook 10.5.7 (@storybook/nextjs-vite, addons docs/a11y/
+pseudo-states; `npm run storybook` port 6006). **74 stories + 14 autodocs across ALL 14 primitives;
+11/14 converted to TSX** (Drawer/CalendarDropdown/InsightCard stay .js until Phase 5; their
+stories carry typed casts to delete then). DsMeta system: ds-meta.ts schema + <Name>.meta.ts per
+primitive, rendered into autodocs via dsMetaDescription (simplified vs plan's custom DocBlock).
+Story doctrine: stories document what EXISTS — Drawer's ClosedChildrenStillMounted play PINS the
+tab-stop leak and must be UPDATED when Phase 5 fixes it. New Phase-5 fixes found by storying:
+active-tab-dims-on-hover (.tab-btn specificity), Calendar month arrows have no accessible name
+(stories carry a11y test:"todo"), Drawer's undocumented background prop. Audit script now excludes
+*.stories.*/*.meta.* as DS scaffolding (metric-definition change, documented; the ratchet caught
+its own staleness — 4 false regressions — before the fix). Verified: 74/14/14 in index.json, tsc
+clean, lint 0 errors, 63/63 tests, ratchet green with storyCoverage 0→100% + tsCoverage 0→78.6%.
+
+**Next:** Caroline reviews Storybook — background servers started by agents keep getting stopped
+in this environment, so she should run `npm run storybook` herself in a terminal (port 6006), or
+type `! npm run storybook` in the Claude prompt. Commit Phase 4 when she says so; then Phase 5 (new primitives: Modal on native <dialog>, Field/Input/Textarea/Select, Spinner,
+Badge, Menu move) per `docs/DS-PLAN.md` — Phase 5 also picks up the story-writing findings above.
 
 ### 2026-08-08 — Vector has a logo; favicon + app icons shipped
 

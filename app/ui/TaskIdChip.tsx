@@ -18,7 +18,13 @@
  *   <TaskIdChip task={task} />
  *   <span>{task.title}</span>
  */
-export default function TaskIdChip({ task, className = "" }) {
+export interface TaskIdChipProps {
+  /** Any task-shaped object; only `taskId` is read. */
+  task?: { taskId?: string | null } | null;
+  className?: string;
+}
+
+export default function TaskIdChip({ task, className = "" }: TaskIdChipProps) {
   if (!task?.taskId) return null;
   return <span className={`task-id ${className}`.trim()}>{task.taskId}</span>;
 }
