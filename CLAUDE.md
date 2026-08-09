@@ -258,8 +258,21 @@ each phase): https://claude.ai/code/artifact/e930beb8-5ede-466e-a98d-bb9018fa3f7
 - Verified: tsc --noEmit clean · build green · 63/63 unit tests · lint clean · audit ratchet
   passes with tsCoverage 0 → 1/14, no regressions.
 
-**Next:** Phase 2 (token pipeline v2: @theme + all groups + margin-reset fix + drift fixes) per
-`docs/DS-PLAN.md`. Commit Phase 1 when Caroline says so.
+**Phase 1 committed: `2548e80`. Phase 2 DONE 2026-08-09 (UNCOMMITTED on `design-system`)** — full
+detail in `docs/DS-LOG.md` Phase 2. Headlines: theme.css is now @theme (utilities bg-action /
+text-muted / shadow-floating / bg-scrim REAL, verified compiling) + legacy :root aliases;
+margin-reset bug FIXED (`@layer base`), all 15 dead margin usages activated and screenshot-verified
+harmless; DESIGN.md drift fixed at source (dead tokens removed — `primary` KEPT, design.md lint
+requires one; scrim lives in a custom `overlays:` frontmatter section because the spec rejects
+non-6-digit-hex). BOTH pending decisions RESOLVED by Caroline 2026-08-09: radius scale aligned to
+Tailwind's real values (rung names now match utilities — sm 4 / md 6 / lg 8 / xl 12 / full; the
+doc-only 10px never rendered), and text-xl = 20px (matches Tailwind + the login heading; 22 was
+paper-only). Zero pixels changed by either. Margin-fix before/after review artifact (flicker
+viewer): https://claude.ai/code/artifact/2076a6b8-bbda-41fc-96d7-aa485645d06c . Dev server running
+on :3010 for her to check the 4 interaction-gated margin spots (never touch 3000/3001).
+
+**Next:** Caroline reviews the margin changes live on :3010 + the two pending decisions; commit
+Phase 2 when she says so; then Phase 3 (ESLint token rules + real CI) per `docs/DS-PLAN.md`.
 
 ### 2026-08-08 — Vector has a logo; favicon + app icons shipped
 

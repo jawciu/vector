@@ -53,7 +53,7 @@ converted as the pattern-setter every later primitive copies.
   JS app compiles but is not type-checked; Next.js amended it on first build
   (jsx `react-jsx`, `.next/types` includes) — that's expected, keep its edits.
   `jsconfig.json` deleted (ignored once tsconfig exists). `next-env.d.ts`
-  generated and committed (Next convention).
+  generated (gitignored in this repo).
 - `app/ui/cn.ts` — `clsx` + `twMerge`. Caller-supplied Tailwind classes now
   beat component defaults regardless of order; custom classes pass through.
 - `app/ui/Button.js` → **`Button.tsx`**:
@@ -74,3 +74,60 @@ converted as the pattern-setter every later primitive copies.
 
 **Verified:** `tsc --noEmit` clean · `npm run build` green · 63/63 unit tests ·
 lint clean · audit ratchet: `tsCoverage 0 → 1/14`, zero regressions.
+
+---
+
+## Phase 2 — Token pipeline v2 · 2026-08-09
+
+**What:** the tokens plugged into Tailwind (the DS's front door), the
+margin-reset live bug fixed, and the drift the audit found corrected at the
+source.
+
+- **`scripts/build-theme.mjs` rewritten.** `app/theme.css` is now two blocks:
+  1. `@theme` — Tailwind v4 token registration. Every DESIGN.md colour (38
+     entries incl. the new `scrim`), `--font-sans`, `--shadow-floating` and
+     `--ease-standard` are now BOTH CSS variables and real utility classes:
+     `bg-action`, `text-muted`, `border-border`, `shadow-floating`, `bg-scrim`
+     all verified compiling in the production build.
+  2. `:root` legacy aliases — every pre-@theme name (`--action`,
+     `--bg-elevated`, …) aliased onto the @theme variable, so all existing CSS
+     and inline styles render identically. Deleted in Phase 8.
+  - Colours come from `design.md export` (resolves `{colors.x}` references);
+    shadows/motion/fontFamily are parsed from the frontmatter directly (the
+    exporter drops those groups); the translucent `scrim` lives in a custom
+    `overlays:` frontmatter section because the design.md spec rejects
+    non-6-digit-hex colours (learned the hard way: rgba() and #00000099 both
+    fail lint).
+- **Deliberately NOT emitted** — no `--radius-*` or `--text-*` overrides.
+  Both questions were put to Caroline with the usage data and RESOLVED
+  2026-08-09: the documented scales align to Tailwind's real values (radius
+  rung names now match the utilities — sm 4 / md 6 / lg 8 / xl 12; type scale
+  xl = 20px). The old doc-only values (lg 10px, xl 22px) had never rendered
+  anywhere, so zero pixels changed and the scales are simply live-by-default.
+  The 20px card radius stays documented as the one bespoke value outside the
+  scale.
+- **The margin-reset bug fixed**: `* { box-sizing; margin: 0 }` moved into
+  `@layer base` (unlayered rules beat Tailwind's layered utilities). The 15
+  dead margin usages in 12 files activated. Before/after screenshots taken of
+  login, dashboard, settings, onboarding detail, and the narrow overlay: every
+  change is the intended small gap (button offset on login, footer breathing
+  room on dashboard, overlay heading spacing improved); zero breakage.
+  Not screenshotted (interaction-gated, safe by inspection): the `mt-1`
+  dropdown offsets in PeoplePicker/Sidebar and the `ml-2` close-button gaps in
+  the three modals.
+- **DESIGN.md drift fixes at the source:** the `@theme` claim is now TRUE
+  (reworded to describe the real pipeline); Architecture section corrected
+  (tokens in theme.css, not globals.css); InsightCard/Shapes radius claims
+  corrected (20px bespoke, outside the scale); Future plans rewritten to
+  reflect reality + the two pending decisions; typography scale formalised in
+  the frontmatter. **Dead tokens removed:** `warning`, `navHover`,
+  `accentMuted`, `secondary`, `tertiary` aliases (`primary` kept — design.md
+  lint requires one; documented as spec ceremony). **Dead CSS removed:**
+  `.task-filter-btn`.
+- `lint:ds` passes at 0 errors / 0 warnings (previously it wasn't run in
+  anger; the scrim experiments proved it actually validates).
+
+**Verified:** `build:ds` + `lint:ds` clean · utilities compile (temp component
+grep against `.next/static/css`) · `tsc` clean · 63/63 tests · lint clean ·
+production build green · audit ratchet zero regressions · five before/after
+screenshot pairs eyeballed, all changes intended.

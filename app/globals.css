@@ -22,9 +22,15 @@ html {
   color-scheme: dark;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
+/* Base reset. MUST live in @layer base: unlayered rules beat Tailwind's
+ * layered utilities, so an unlayered version of this rule silently disables
+ * every margin utility (m-*, mt-*, …) app-wide — that was a live bug from the
+ * Create-Next-App template until 2026-08-09 (see docs/DS-LOG.md Phase 2). */
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+  }
 }
 
 a {
@@ -1155,15 +1161,6 @@ a {
 
 .add-task-btn:hover {
   color: var(--text);
-}
-
-/* Filter button styles */
-.task-filter-btn {
-  transition: all 0.15s ease;
-}
-
-.task-filter-btn:hover {
-  background-color: var(--surface-hover);
 }
 
 .notes-textarea::placeholder {
