@@ -199,6 +199,63 @@ _Newest first. Why, not just what._
 
 _Newest first._
 
+### 2026-08-08 — Agent-first DS: plan adopted + Phase 0 (baseline audit) done. UNCOMMITTED.
+
+**⚠ ALL DS WORK LIVES ON BRANCH `design-system` (created 2026-08-09, off main).** Caroline's call:
+she's mid job-hunt and Vercel deploys main, so nothing DS-related touches main until she merges.
+Also verified 2026-08-09: the `* { margin: 0 }` reset is from the Create-Next-App initial commit
+(`c2b3bd5`, 27 Jan), NOT from her onboardings-table edge-to-edge work; exactly **15 margin-utility
+usages** in 12 files are currently dead and will activate when Phase 2 layers the reset (list via
+`grep -rE '\b(m|mt|mb|ml|mr|mx|my)-[0-9]' app`) — each needs a before/after eyeball, and the fix
+does NOT resurrect browser default margins (the reset stays, just inside `@layer base`).
+
+**The big picture:** Caroline approved a 10-phase plan to rebuild Vector's design system as an
+agent-first DS with Storybook — a portfolio centrepiece AND her learning vehicle for founding-designer
+roles. **`docs/DS-PLAN.md` is the plan of record** (Part A: reusable 7-lens audit playbook; Part B:
+phases 0–10). **`docs/DS-PLAN-SIMPLE.md` is the same plan in plain English, heading-for-heading** —
+keep BOTH in sync whenever the plan changes, she reads them side by side. Her binding decisions:
+TS in `app/ui/` only · self-hosted VRT (Playwright + Vercel-hosted Storybook, no Chromatic) ·
+retrofit in two stages (targeted, then full sweep — the sweep was her addition) · coverage metrics
+always show count + ratio together, never % alone.
+
+**Phase 0 shipped (all uncommitted, awaiting her OK):**
+- `scripts/audit-ds.mjs` — zero-dep DS scorecard (`npm run audit:ds`; `--json`, `--out`,
+  `--baseline <file>` ratchet mode that exits 1 on any metric regression — verified both directions).
+  Repo-specific patterns live in the `SCOPE`/`PRIMITIVE_*` block at the top.
+- `docs/ds-audit/2026-08-baseline.json` — the frozen "before" snapshot; `docs/ds-audit/README.md` —
+  metric definitions. package.json gained `audit:ds`.
+- Baseline: 1,081 inline styles · buttons 55/143 (38.5% counting all blessed button-likes; the plan's
+  older "18/103 (17%)" was `<Button>`-only) · inputs 0/39 · icons 12/112 · stories + TS 0/14 ·
+  **5 modal shells with no dialog a11y — the script found a 5th (`OnboardingActions.js`) the manual
+  audit missed**. Also discovered: FollowUpModal + TeamPanel have a LOCAL `<Field>` component —
+  never count it as a DS primitive, and absorb it when `app/ui/Field.tsx` ships in Phase 5.
+
+**Full seven-lens evaluation completed same day (also uncommitted):** lenses 3/5/6/7 written up in
+`docs/ds-audit/2026-08-lenses.md`. Headlines: focus-visible covers ONLY the six `.btn-*` classes;
+task cards/draft cards/Field editors are keyboard-inoperable divs; Drawer leaks tab stops when
+closed; no loading or error state exists in any primitive; **52 doc defects** (19 FALSE · 11 STALE ·
+5 DEAD · 17 MINOR — skills are the least accurate docs, README the most); and one LIVE BUG:
+`globals.css:25` unlayered `* { margin: 0 }` after the Tailwind import kills every `m-*` utility
+app-wide (fix scheduled in Phase 2 — grep `m-*` usages first, fixing it activates dead classes).
+The wrong filename `build-theme.js` appears in 3 docs + theme.css's own generated header
+(hardcoded at build-theme.mjs:41). Visual report artifact (private, republished at the same URL
+each phase): https://claude.ai/code/artifact/e930beb8-5ede-466e-a98d-bb9018fa3f70
+
+**Next:** Phase 1 (tsconfig + `cn()` + Button→tsx pattern-setter) per `docs/DS-PLAN.md`. Commit the
+Phase-0 files when Caroline says so.
+
+### 2026-08-08 — Vector has a logo; favicon + app icons shipped
+
+**Done:** Caroline designed the Vector logo (a filled double chevron pointing up-right, 45° sheared ends — `--action` lilac #C098FF on #18181E, both exact DS tokens). Process: I generated a 20-option HTML gallery, she picked the double chevron (option 14), I did a squared/modernised round of 10 tile treatments referencing logos she likes (Wise-style chunky flat glyphs), and she then designed the final mark herself in Figma. Both throwaway galleries lived in the session scratchpad — already gone, nothing in the repo.
+
+- **Committed and pushed: `756f30b` "Add Vector logo as favicon and app icons"** (Caroline OK'd commit + push explicitly). Contents: `app/favicon.ico` (replaced Next default; 16/32/48 packed), `app/icon.png` (512), `app/apple-icon.png` (180) — all picked up by Next.js **file conventions, zero `layout.js` changes** — plus the master files moved from repo root into `public/`: `vector-logo.png` (615×615 original) and `vector-logo.svg` (her Figma export, glyph-only, transparent bg — use this if the mark ever goes into the sidebar/login UI).
+- Favicon PNGs were derived from her PNG with Lanczos (PIL) — no vector redraw, per her explicit instruction. A full size kit (16/32/48/192/512 + apple-touch + .ico) also sits in `~/Desktop/vector-favicons/` for LinkedIn/portfolio use.
+- Verified end-to-end on a live dev server: rendered HTML links all three icons, every route serves byte-identical files. **Gotcha: something else (coral-gradient icon, likely the portfolio app) is currently squatting port 3001, so THIS app's `npm run dev` lands on port 3000** — reverse of the documented convention. Careful with `pkill -f "next dev --webpack"`: it can kill the other app too if it runs the same command (it survived this time — different invocation).
+
+**State:** clean working tree except this CLAUDE.md entry; `local HEAD == origin/main == 756f30b`. Dev server stopped. CI push run is asset-only, nothing to watch.
+
+**Next steps:** none pending from this session. Commit this CLAUDE.md entry when Caroline OKs it. If she wants the logo inside the app UI (sidebar header, login page), `public/vector-logo.svg` is the source to use.
+
 ### 2026-07-13 — `.btn-secondary` hover verified app-wide (the flagged risk from 2026-07-12 is CLEARED)
 
 **Done:** swept every `.btn-secondary` usage in the app (25 usages across 15 files, plus the 6 `Button variant="secondary"` modal Cancels) and verified the new `--surface-hover` hover on each distinct surface it sits on, in the browser (Playwright against `localhost:3001`, logged in as the e2e user; portal checked via a live `portal_token` magic-link cookie for Raycast #63):

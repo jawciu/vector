@@ -11,6 +11,7 @@
     "lint": "eslint",
     "lint:ds": "design.md lint DESIGN.md",
     "build:ds": "node scripts/build-theme.mjs",
+    "audit:ds": "node scripts/audit-ds.mjs",
     "seed": "npx tsx prisma/seed.js",
     "seed:activity": "npx tsx prisma/seed-recent-activity.js",
     "seed:notifications": "npx tsx prisma/seed-demo-notifications.js",
