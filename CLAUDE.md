@@ -297,9 +297,22 @@ active-tab-dims-on-hover (.tab-btn specificity), Calendar month arrows have no a
 its own staleness — 4 false regressions — before the fix). Verified: 74/14/14 in index.json, tsc
 clean, lint 0 errors, 63/63 tests, ratchet green with storyCoverage 0→100% + tsCoverage 0→78.6%.
 
-**Next:** Caroline reviews Storybook — background servers started by agents keep getting stopped
-in this environment, so she should run `npm run storybook` herself in a terminal (port 6006), or
-type `! npm run storybook` in the Claude prompt. Commit Phase 4 when she says so; then Phase 5 (new primitives: Modal on native <dialog>, Field/Input/Textarea/Select, Spinner,
+**Phase 5 DONE 2026-08-11 (UNCOMMITTED on `design-system`)** — full detail in `docs/DS-LOG.md`
+Phase 5. New primitives: Modal (native <dialog>, scrim token, 12px radius, experimental) ·
+Field/Input/Textarea/Select (on-scale, NEW visuals: input focus border + per-field invalid state)
+· Spinner · Badge (token utilities, not inline vars) · Menu MOVED to app/ui (byte-identical,
+components/Menu.js = shim, 14 consumers untouched, keyboard model deliberately deferred). Four
+pinned gaps FIXED: Drawer inert-when-closed, Calendar arrow labels, active-tab hover dim,
+FieldPill/Row keyboard + NEW focus ring. Found: PortalDrawer hand-rolls its own panel, still
+leaks — Phase 7 list. Storybook: 119 stories / 22 components. HER RULE IN FORCE: NO screenshots/
+VRT baselines until she approves everything in Storybook; audit inlineStyles floor is 1083 (+2
+justified: Spinner dynamic fontSize, Menu move) — refresh baseline WITH her phase approval only.
+
+**Next:** Caroline reviews ALL Phase 5 additions in Storybook (`! cd /Users/caro/Code/onboarding
+&& npm run storybook`, port 6006) — the experimental-status components + the flagged NEW visuals
+(input focus/invalid states, field-editor focus rings, Modal's 12px radius). Commit Phase 5 +
+refresh audit baseline when she approves; then Phase 6 (VRT + public Storybook — needs her
+approval to take ANY screenshots, and the branch pushed for CI). (new primitives: Modal on native <dialog>, Field/Input/Textarea/Select, Spinner,
 Badge, Menu move) per `docs/DS-PLAN.md` — Phase 5 also picks up the story-writing findings above.
 
 ### 2026-08-08 — Vector has a logo; favicon + app icons shipped

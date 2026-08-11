@@ -231,3 +231,66 @@ click genuinely close) and CalendarDropdown (starts COLLAPSED like the real
 field; click opens, picking closes). Both `tags: ["no-vrt"]`. **Doctrine going
 forward: every stateful primitive gets an Interactive story** (Modal + Menu in
 Phase 5 must ship with one). Now 76 stories.
+
+---
+
+## Phase 5 — New primitives + pinned-gap fixes · 2026-08-11
+
+**What:** the eight missing primitives exist, and the four gaps Phase 4's
+stories pinned are fixed. NOTHING is adopted by feature code yet — every new
+visual awaits Caroline's Storybook review (her rule: no screenshots/baselines
+until she approves everything).
+
+**New primitives** (all TSX + stories + meta + Interactive playgrounds):
+- **`Modal.tsx`** (experimental) — native `<dialog>` + `showModal()`: browser
+  focus trap, ESC, implicit dialog semantics, `::backdrop` painted with the
+  scrim token. Required `title` → aria-labelledby. Sizes sm/md/lg. Radius
+  12px per the documented scale (legacy modals are 20px; converge Phase 7).
+  9 stories incl. DestructiveConfirm recipe + FocusContainment play.
+- **`Field.tsx` + `Input.tsx` + `Textarea.tsx` + `Select.tsx`** (experimental)
+  — Field owns label/help/error + id/aria wiring (cloneElement; error id in
+  both aria-errormessage AND aria-describedby for AT compat). `.input` CSS in
+  globals.css derived from `.search-input` but ON-SCALE where the hand-rolled
+  inputs drifted (14px text not 13, 8/12px padding, rounded-lg 8px). 20
+  stories. **NEW VISUALS pending Caroline: input focus style (action border)
+  and per-field invalid state (danger border holding through focus + inline
+  error copy — the app currently only does form-top banners).**
+- **`Spinner.tsx`** (stable — visual already shipped inside Button) — wraps
+  `.btn-spinner`, size via fontSize (the class is 1em-based), role="status"
+  when labelled. **`Badge.tsx`** (experimental) — generalises `.status-pill`;
+  closed colour union mapping to token UTILITY classes (text-*/bg-*), not
+  inline vars. StatusBadge.js untouched until Phase 7.
+- **Menu moved into the DS layer**: `app/ui/Menu.tsx` (typed, byte-identical
+  output — deliberately NOT cn(), to preserve exact class strings);
+  `app/components/Menu.js` is now a 4-line re-export shim, 14 consumers
+  unchanged, `npm run build` proves it. 6 stories. Keyboard model (arrows/
+  ESC/aria-expanded) deliberately NOT added — separate reviewed change,
+  honestly documented in Menu.meta.ts.
+
+**Pinned gaps fixed** (each story that pinned a gap now pins the fix):
+- Drawer: `inert` when closed — tab-stop leak dead; ClosedChildrenStillMounted
+  → `ClosedPanelIsInert`. (No focus trap yet; still documented.)
+- CalendarDropdown: month arrows labelled ("Previous/Next month"), a11y todo
+  removed, MonthNavigation selects by accessible name.
+- TabBar: active tab no longer dims on hover
+  (`.tab-btn:not([data-active]):hover`).
+- FieldPill/FieldRow: keyboard-operable (role="button", tabIndex, Enter/Space
+  via synthesized click so inner clear-buttons don't double-fire) + **NEW
+  VISUAL pending Caroline: focus ring on field editors** (--focus-ring, same
+  shape as the shared button rule).
+
+**Found during the work:** PortalDrawer hand-rolls its own `.task-drawer`
+panel (doesn't use the primitive) so it STILL leaks tab stops — added to the
+Phase 7 retrofit list.
+
+**Audit note:** inlineStyles sits at 1083 vs the 1081 baseline: +1 Spinner
+(dynamic numeric fontSize — legitimately inline) and +1 net from Menu's
+byte-identical move. Both justified; the committed baseline gets refreshed to
+this floor WITH Caroline's phase approval, not before. The ratchet also caught
+Modal/Badge initially using inline `var()`s — both were rewritten onto the
+token utilities (the DS layer must exemplify its own front door).
+
+**Verified:** tsc clean · eslint app/ui 0 errors/warnings · repo lint 0 errors
+· 63/63 tests · `npm run build` green (Menu shim safe) · build-storybook green:
+**119 stories / 20 docs pages / 22 ui components, storyCoverage 90.9%
+(Icons+ds-meta helpers uncovered), tsCoverage 86.4%** · no screenshots taken.

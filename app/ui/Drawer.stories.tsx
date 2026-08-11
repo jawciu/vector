@@ -54,8 +54,8 @@ function DrawerBody() {
  * Fixed-position shell (right edge, fills to the bottom) — stories run
  * fullscreen so the panel isn't fighting the centered-layout wrapper.
  * The component stays mounted while `open` toggles (the slide animation
- * needs DOM presence) — see ClosedChildrenStillMounted for the honest
- * consequence of that.
+ * needs DOM presence); while closed the panel is `inert` so the mounted
+ * children can't leak tab stops — see ClosedPanelIsInert.
  */
 const config: Meta<typeof Drawer> = {
   component: Drawer,
@@ -80,8 +80,18 @@ export default config;
 
 type Story = StoryObj<typeof Drawer>;
 
-/** Default 520px width, default close button, default `--deeper-bg`. */
-export const Open: Story = {};
+/**
+ * Default 520px width, default close button, default `--deeper-bg`.
+ * The play pins the other half of the inert contract: an OPEN panel must
+ * NOT be inert (see ClosedPanelIsInert for the closed half).
+ */
+export const Open: Story = {
+  play: async ({ canvasElement }) => {
+    const panel = canvasElement.querySelector(".task-drawer");
+    await expect(panel).not.toBeNull();
+    await expect(panel!).not.toHaveAttribute("inert");
+  },
+};
 
 /**
  * THE PLAYGROUND — a stateful wrapper so the full lifecycle is experienceable
@@ -141,12 +151,13 @@ export const EscapeCloses: Story = {
 };
 
 /**
- * DOCUMENTED GAP (audit Lens 3): while closed, the panel is only translated
- * off-screen — children stay mounted and keyboard-reachable, so a closed
- * drawer leaks tab stops. This story pins that reality; if a focus-managed
- * Drawer ever lands, this play function is the one to update.
+ * FIXED (was the Lens 3 tab-stop leak): while closed, the panel stays
+ * mounted (the slide animation needs DOM presence) but now carries `inert`,
+ * so its children are out of the tab order and unreachable by click or AT.
+ * This story pins both halves of that contract: mounted AND inert when
+ * closed. The Open story pins the inverse (no inert while open).
  */
-export const ClosedChildrenStillMounted: Story = {
+export const ClosedPanelIsInert: Story = {
   args: { open: false },
   play: async ({ canvasElement }) => {
     const heading = within(canvasElement).getByText("Configure SSO for pilot users");
@@ -154,5 +165,6 @@ export const ClosedChildrenStillMounted: Story = {
     const panel = canvasElement.querySelector(".task-drawer");
     await expect(panel).not.toBeNull();
     await expect(panel!.classList.contains("task-drawer--open")).toBe(false);
+    await expect(panel!).toHaveAttribute("inert");
   },
 };

@@ -15,6 +15,10 @@ import { forwardRef, useEffect, useRef } from "react";
  *   - The component stays mounted while `open` toggles so the slide
  *     animation has time to play. Caller decides whether to also unmount
  *     the wrapper later (most callers just keep it mounted).
+ *   - While closed the panel carries the `inert` attribute (React 19
+ *     native prop), so the off-screen children are removed from the tab
+ *     order and can't be clicked or read by AT — mounted for the
+ *     animation, unreachable for input.
  *   - ESC always closes.
  *   - Outside-click closes when `useClickOutside` is true (the default).
  *     The kanban TaskDrawer opts out (`useClickOutside={false}`) because
@@ -34,7 +38,8 @@ import { forwardRef, useEffect, useRef } from "react";
  *   closeButton     — default true. Render the built-in close button.
  *   className       — extra classes on the panel.
  *   children        — drawer contents. Always rendered while the panel
- *                     is mounted (the animation needs DOM presence).
+ *                     is mounted (the animation needs DOM presence);
+ *                     inert while closed (see above).
  */
 const Drawer = forwardRef(function Drawer(
   {
@@ -83,6 +88,7 @@ const Drawer = forwardRef(function Drawer(
     <div
       {...rest}
       ref={setRef}
+      inert={!open}
       className={`task-drawer${open ? " task-drawer--open" : ""}${className ? ` ${className}` : ""}`}
       style={{
         position: "fixed",

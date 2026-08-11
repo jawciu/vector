@@ -14,8 +14,9 @@ export const meta: DsMeta = {
     "Plain actions — use Button/IconButton.",
   ],
   a11y: [
-    "KNOWN GAP (lens 3, ranked #5): renders a <div onClick> — not focusable, not keyboard operable, no role. The drawer's primary editors are mouse-only today. Phase 5 converts it to a native button; don't work around it per call site.",
-    "The :focus-within style already lights the row when an inner focusable (e.g. clear button) has focus — that is the row's only keyboard affordance today.",
+    "FIXED (was Lens 3 gap #5, mouse-only field editors): when `onClick` is present the row carries role=\"button\" + tabIndex=0, Enter and Space activate it (Space preventDefaults so the page doesn't scroll), and :focus-visible draws the shared 2px focus-ring outline. Without `onClick` it stays a plain non-interactive div.",
+    "HONEST NOTE: it is still a <div> with a button role, not a native <button> — call-site layout (content-hugging inline-flex rows) depends on the element. Don't add per-call-site tabIndex/keydown workarounds; the primitive owns the keyboard contract now.",
+    "Keys originating on focusable children are ignored by the row (the child handles its own activation), and the :focus-within style still lights the row when an inner focusable (e.g. clear button) has focus.",
   ],
-  tokens: ["bgHover", "surfaceHover", "buttonSecondaryBorder", "textMuted"],
+  tokens: ["bgHover", "surfaceHover", "buttonSecondaryBorder", "textMuted", "focusRing"],
 };

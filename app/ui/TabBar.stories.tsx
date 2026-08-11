@@ -76,6 +76,12 @@ export const ActiveStates: Story = {
   ),
 };
 
+/**
+ * Hover lifts INACTIVE labels from textMuted to textSecondary; the active
+ * tab keeps `text` (the hover rule is guarded with `:not([data-active])` —
+ * it used to fire on the active tab too and dim it, the Lens 3 bug this
+ * story originally pinned).
+ */
 export const Hover: Story = { parameters: { pseudo: { hover: true } } };
 
 export const ClickBehaviour: Story = {

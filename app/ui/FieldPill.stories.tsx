@@ -57,6 +57,27 @@ export const ClickBehaviour: Story = {
   },
 };
 
+/**
+ * NEW — pending Caroline's review. The focus ring on field editors is a new
+ * visible state: with `onClick` the pill is role="button" + tabIndex=0 (the
+ * Lens 3 "mouse-only field editors" gap, fixed), and :focus-visible draws
+ * the shared 2px `focus-ring` outline. The play walks the keyboard path:
+ * Tab reaches the pill, Enter activates it, Space activates it too (with
+ * preventDefault so the page doesn't scroll).
+ */
+export const FocusVisible: Story = {
+  parameters: { pseudo: { focusVisible: true } },
+  play: async ({ args, canvasElement }) => {
+    await userEvent.tab();
+    const pill = within(canvasElement).getByRole("button");
+    await expect(pill).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClick).toHaveBeenCalledOnce();
+    await userEvent.keyboard(" ");
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
+};
+
 /** Rest / empty / active side by side — the visual-regression shot. */
 export const AllVariants: Story = {
   render: () => (

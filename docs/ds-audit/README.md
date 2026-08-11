@@ -21,10 +21,17 @@ npm run audit:ds -- --baseline docs/ds-audit/2026-08-baseline.json
                                                    # compare + exit 1 on regression
 ```
 
-The `--baseline` mode is the **ratchet**: CI runs it against the committed
-baseline, so any change that makes a metric worse fails the build. The DS can
-only move forward. After a retrofit lands, refresh the baseline to the new
-floor so the ratchet tightens.
+The `--baseline` mode is the **ratchet**: CI runs it against
+`ratchet-baseline.json`, so any change that makes a metric worse fails the
+build. The DS can only move forward. After an approved phase lands, refresh
+that file to the new floor (`npm run audit:ds -- --out
+docs/ds-audit/ratchet-baseline.json`) so the ratchet tightens.
+
+Two baseline files, two jobs: **`2026-08-baseline.json` is immutable** — the
+pre-DS "before" snapshot preserved for the final before/after story — while
+**`ratchet-baseline.json` advances** with each approved phase (created at
+Phase 5, when two justified inline styles — Spinner's dynamic fontSize and
+Menu's byte-identical move — nudged the floor to 1,083).
 
 ## What each metric means
 

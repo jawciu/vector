@@ -14,7 +14,8 @@ export const meta: DsMeta = {
   ],
   a11y: [
     "Day cells and footer actions are real `<button type=\"button\">`s, so they are individually focusable and Enter/Space-clickable.",
-    "HONEST GAPS (audit Lens 3 — documented, not yet fixed): no `role=\"grid\"`/dialog semantics, no arrow-key navigation between days, no ESC-to-close (outside click only), the month prev/next buttons have NO accessible name (icon-only, critical axe hit — the stories mark a11y as todo for this reason), and hover styles are applied by JS mutation rather than CSS.",
+    "FIXED (was a Lens 3 gap and a critical axe hit): the month chevrons carry `aria-label=\"Previous month\"` / `\"Next month\"` (icons aria-hidden), so they are announced and selectable by name — the MonthNavigation story selects them that way.",
+    "HONEST GAPS (audit Lens 3 — documented, not yet fixed): no `role=\"grid\"`/dialog semantics, no arrow-key navigation between days, no ESC-to-close (outside click only), and hover styles are applied by JS mutation rather than CSS.",
     "\"Today\" is marked by a border ring only — visual, not announced.",
   ],
   tokens: ["bgElevated", "border", "shadowFloating", "action", "actionText", "surfaceHover", "iconTertiary", "textMuted"],

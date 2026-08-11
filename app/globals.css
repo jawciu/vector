@@ -87,7 +87,7 @@ a {
   color: var(--text);
 }
 
-.tab-btn:hover .tab-btn__inner {
+.tab-btn:not([data-active]):hover .tab-btn__inner {
   color: var(--text-secondary);
 }
 
@@ -285,6 +285,112 @@ a {
   .btn-spinner {
     animation-duration: 1.5s;
   }
+}
+
+/* Modal (app/ui/Modal.tsx) — native <dialog>, so focus trapping, ESC and the
+ * top layer come from the browser. The scrim is the ::backdrop, painted with
+ * the DESIGN.md scrim token. Radius 12px = rounded.xl per the documented
+ * scale ("Bulk action bar, modals"); the legacy hand-rolled modals were 20px,
+ * and converge on this during the Phase 7 retrofit. */
+.modal {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  width: calc(100vw - 48px);
+}
+
+.modal::backdrop {
+  background: var(--color-scrim);
+}
+
+.modal--sm { max-width: 400px; }
+.modal--md { max-width: 520px; }
+.modal--lg { max-width: 640px; }
+
+/* Form controls (app/ui/Input.tsx / Textarea.tsx / Select.tsx) — the Phase 5
+ * Field primitives. State model extracted from `.search-input` (the best
+ * current hand-rolled pattern):
+ *   default → `border` border on `bg`
+ *   hover   → `bg-hover` + `buttonSecondaryBorder`
+ *   focus   → `action` border on `bg`
+ * NEW (pending Caroline's review): the focus treatment on a STANDALONE
+ * control — .search-input only ever did this on a wrapper via :focus-within;
+ * naked inputs in the app today are outline-none with no focus style at all.
+ * NEW (pending Caroline's review): the invalid state — `danger` border that
+ * holds through hover AND focus, so a broken field stays visibly broken
+ * while it's being fixed. */
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px; /* text-sm — "default UI size" per the DESIGN.md scale */
+  font-family: inherit;
+  line-height: 1.4;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px; /* rounded.lg — "Inputs, buttons" per DESIGN.md Shapes */
+  outline: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.input:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--button-secondary-border);
+}
+
+.input:focus {
+  background: var(--bg);
+  border-color: var(--action);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input--invalid,
+.input--invalid:hover:not(:disabled),
+.input--invalid:focus {
+  border-color: var(--danger);
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Field (app/ui/Field.tsx) — label / help / error copy around one control.
+ * Label = the DESIGN.md `smallLabel` token, i.e. the Settings NAME/EMAIL
+ * idiom (11px uppercase textMuted), formalised as a class. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+.field-help {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* NEW (pending Caroline's review): inline error copy in `danger` below the
+ * control — pairs with .input--invalid. */
+.field-error {
+  font-size: 12px;
+  color: var(--danger);
 }
 
 /* Mode toggle (e.g. Existing / New in onboarding modal) */
@@ -654,6 +760,14 @@ a {
 .field-row[data-active="true"] {
   background: var(--surface-hover);
   border-color: var(--button-secondary-border);
+}
+
+/* Field triggers are keyboard-focusable (role="button" + tabIndex when they
+ * carry onClick), so they get the same focus ring as the .btn-* set. */
+.field-pill:focus-visible,
+.field-row:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* Pill dropdown triggers */

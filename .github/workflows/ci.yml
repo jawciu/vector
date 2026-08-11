@@ -65,5 +65,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 26
+      # ratchet-baseline.json advances with each approved phase;
+      # 2026-08-baseline.json is the immutable pre-DS "before" snapshot.
       - name: DS audit ratchet
-        run: node scripts/audit-ds.mjs --baseline docs/ds-audit/2026-08-baseline.json
+        run: node scripts/audit-ds.mjs --baseline docs/ds-audit/ratchet-baseline.json

@@ -66,11 +66,6 @@ const config: Meta<typeof CalendarHost> = {
     layout: "padded",
     docs: { description: { component: dsMetaDescription(dsMeta) } },
     dsMeta,
-    // KNOWN VIOLATION, documented not fixed (audit Lens 3 / CalendarDropdown
-    // meta): the month prev/next buttons are icon-only with no accessible
-    // name, which axe flags as critical. Marked todo until the component
-    // grows aria-labels.
-    a11y: { test: "todo" },
   },
   render: (args) => <CalendarHost {...args} />,
   args: {
@@ -167,16 +162,18 @@ export const FooterActions: Story = {
 };
 
 /**
- * Month paging via the header chevrons. They have no accessible name (see
- * the meta's a11y gaps), so this play selects them positionally — the first
- * two buttons in the DOM are prev/next.
+ * Month paging via the header chevrons, selected by their accessible names
+ * ("Previous month" / "Next month") — pinning both the paging behaviour and
+ * the labels themselves (the old positional selection pinned the Lens 3
+ * unlabelled-buttons gap, now fixed).
  */
 export const MonthNavigation: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByText("August 2026")).toBeInTheDocument();
-    const [, nextButton] = canvas.getAllByRole("button");
-    await userEvent.click(nextButton);
+    await userEvent.click(canvas.getByRole("button", { name: "Next month" }));
     await expect(canvas.getByText("September 2026")).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Previous month" }));
+    await expect(canvas.getByText("August 2026")).toBeInTheDocument();
   },
 };

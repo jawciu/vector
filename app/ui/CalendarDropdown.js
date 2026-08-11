@@ -86,21 +86,23 @@ export default function CalendarDropdown({ value, viewDate, onViewDateChange, on
         <div className="flex items-center gap-1">
           <button
             type="button"
+            aria-label="Previous month"
             onClick={() => onViewDateChange(new Date(year, month - 1, 1))}
             className="flex items-center justify-center w-6 h-6 rounded icon-btn"
             style={{ background: "none", border: "none", cursor: "pointer" }}
           >
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
               <path d="M7 1L3 5L7 9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           <button
             type="button"
+            aria-label="Next month"
             onClick={() => onViewDateChange(new Date(year, month + 1, 1))}
             className="flex items-center justify-center w-6 h-6 rounded icon-btn"
             style={{ background: "none", border: "none", cursor: "pointer" }}
           >
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
               <path d="M3 1L7 5L3 9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
