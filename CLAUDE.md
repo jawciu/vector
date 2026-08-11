@@ -281,8 +281,10 @@ unit-tests.yml: lint / test / build (dummy DATABASE_URL + 2 Supabase vars, verif
 audit-ratchet jobs; triggers on main + design-system pushes — ⚠ UNEXERCISED until first push,
 watch the 4 jobs then.
 
-**Phase 3 committed: `2a67e21`. Phase 4 DONE 2026-08-09 (UNCOMMITTED on `design-system`)** — full
-detail in `docs/DS-LOG.md` Phase 4. Storybook 10.5.7 (@storybook/nextjs-vite, addons docs/a11y/
+**Phase 3 committed: `2a67e21`. Phase 4 DONE + COMMITTED `5affc7a` (2026-08-09, her OK)** — full
+detail in `docs/DS-LOG.md` Phase 4. Her review added the Interactive-playground doctrine (76
+stories now); she's still reviewing Storybook at her own pace — treat further story tweaks as
+review follow-ups, not a new phase. Storybook 10.5.7 (@storybook/nextjs-vite, addons docs/a11y/
 pseudo-states; `npm run storybook` port 6006). **74 stories + 14 autodocs across ALL 14 primitives;
 11/14 converted to TSX** (Drawer/CalendarDropdown/InsightCard stay .js until Phase 5; their
 stories carry typed casts to delete then). DsMeta system: ds-meta.ts schema + <Name>.meta.ts per
