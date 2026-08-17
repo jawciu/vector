@@ -292,5 +292,89 @@ token utilities (the DS layer must exemplify its own front door).
 
 **Verified:** tsc clean · eslint app/ui 0 errors/warnings · repo lint 0 errors
 · 63/63 tests · `npm run build` green (Menu shim safe) · build-storybook green:
-**119 stories / 20 docs pages / 22 ui components, storyCoverage 90.9%
-(Icons+ds-meta helpers uncovered), tsCoverage 86.4%** · no screenshots taken.
+119 stories / 20 docs pages / 22 ui components, storyCoverage 90.9%,
+tsCoverage 86.4% · no screenshots taken. (A parenthetical here previously
+misnamed the uncovered story files — the actual gap was Select/Textarea, since
+closed. Caught by the 2026-08-11 peer review, finding 3.)
+
+---
+
+## Review round 1 — Caroline's 23-point Storybook review · 2026-08-11
+
+**What:** her full review of Phases 4-5 in Storybook, turned into fixes, new
+primitives, Foundations docs, an icon sweep, and a commissioned peer review.
+Still NO screenshots/baselines — everything awaits her re-review in Storybook.
+
+**Her rulings applied directly:** loading buttons keep the ACTIVE colour
+(primary→action-active, destructive→danger-active, cursor:progress) ·
+spinner slowed 0.6s→1s (reduced-motion 2s) and standalone default is action
+lilac · Modal has a built-in X close (IconButton + CloseIcon, closeButton
+prop default true) · Badge gained size sm 12px/500 · md 14px/400 — the 14px
+"product badge" she spotted was InsightCard's inline override of the 12px
+class, now formalised as a variant.
+
+**Her review found a Storybook-addon BUG:** storybook-addon-pseudo-states
+leaks `parameters.pseudo` into GLOBALS on story view and never clears it, so
+after visiting any Hover/Focus story, every later story of every component
+renders hovered/focused. This explained "AllVariants is in focus state",
+"default looks the same as hover", and IconButton's phantom resting
+background. Fixed with a `withPseudoGlobalsReset` decorator in
+.storybook/preview.tsx (upstream diagnosis documented in the code).
+
+**Story revamps:** FieldPill/FieldRow (one canonical content across all
+states, Default(filled)/Empty/Hover/Active/FocusVisible), IconButton
+(HoverVsActive comparison, NEW danger tone pending review), TabBar
+(Interactive playground), Tooltip (Open story first; docs previews now
+iframe so the open tip is visible — play functions never run inline),
+behaviour tests renamed "… (test)" with explanations. Menu gained
+`checked`/`multiselect` (checkbox dropdown variant, pending review; uses
+role=menu for the multiselect case — the briefed listbox+menuitemcheckbox
+combination is invalid ARIA and was corrected).
+
+**Icon sweep:** registry 7 → 36 (all her named icons harvested from feature
+code; three competing X glyphs and two searches deduped with decisions
+recorded; CheckSquare's baked lilac → currentColor). Stories: Generic/AI
+grids (Sparkle co-presented per her ruling) + an InheritedColor strip
+demonstrating the rule she asked about: icon colour is ALWAYS inherited from
+the parent via currentColor, never a prop.
+
+**Form family:** Input → **TextField** (her naming; `.input` CSS class name
+kept, flagged as separate decision) · Textarea + Select got their own story
+files · NEW: SearchField (from the shipped search boxes; clear-X is new,
+flagged) · Checkbox (from the member-picker; unchecked border is
+iconTertiary — the shipped hex IS that token) · TaskTick (the task-complete
+circle, bounce animation self-guarded for reduced motion). Her investigation
+answered: the app has TWO input species — boxed (settings/search → TextField)
+and borderless-inline (task title, drawer fields → future InlineTextField,
+awaiting her naming).
+
+**Foundations section (top of sidebar):** Colours (swatches painted from
+var(--color-*), drift-proof) · Typography · Spacing & radius · Motion (live
+bezier plot) · **Voice & copy — NO EM DASHES EVER**, sentence case, British
+spelling, operator tone · plus the Menu explainer MDX. Five NEW DESIGN.md
+ambiguities surfaced for Caroline (stale `warning` prose, "no formal scale
+yet" contradiction, overclaimed motion rule, duration-token survival plan,
+Geist Mono unregistered).
+
+**Commissioned peer review** (`docs/ds-audit/2026-08-peer-review.md`):
+**grade B+** — machinery "ahead of most production systems", five FIX NOW
+findings, ALL FIXED same day: (1) cn()/tailwind-merge was EATING Button's
+.text-btn base class — a real rendering bug in the pattern-setter; fixed via
+registered class groups + cn.test.js regression pin (the DS's first unit
+test, suite now 66); (2) Modal scrim-click ate form data on selection drags —
+fixed via pointerdown tracking; (3) meta rot swept; (4) Tooltip keyboard
+support shipped (focus/blur/ESC/aria-describedby); (5) IconButton className
+policy decided (layout-only, cn-merged) and Drawer's hand-rolled close button
+replaced with IconButton + PanelCloseIcon. OPEN review items for Caroline:
+active/selected naming unification, Badge variant union, className doctrine
+write-up, CSS-layer split, InlineProse rename, div→button for Field editors
+(Phase 7).
+
+**Audit floor note:** the new primitives' faithful internal styles put
+inlineStyles at 1091 / hardcodedGeometry at 1007 vs the 1083/1000 ratchet
+floor (+ the CSS-layer question is peer-review item 11, open). Ratchet
+baseline refreshes with her approval of this round, as before.
+
+**Verified:** tsc clean · eslint app/ui + .storybook 0 errors/warnings ·
+66/66 tests · build green · build-storybook green: **176 stories / 31 docs
+pages / 25 components · storyCoverage 100% · tsCoverage 88%**.

@@ -15,7 +15,8 @@ export const meta: DsMeta = {
   ],
   a11y: [
     "Listbox semantics: MenuList defaults `role=\"listbox\"`, MenuOption renders `role=\"option\"` with `aria-selected` driven by `active`; options are native buttons, so Tab + Enter/Space work.",
+    "NEW (pending Caroline's review) — checkbox variant for multi-select menus: MenuOption `checked` (defined true/false) renders a leading 16px checkbox visual (aria-hidden) and switches the row to `role=\"menuitemcheckbox\"` + `aria-checked`; pair with `<MenuList multiselect>`, which defaults the container to `role=\"menu\"` (the required parent — menuitemcheckbox is invalid inside a listbox, and aria-multiselectable is invalid on a menu). `checked` undefined = byte-identical single-select rendering.",
     "HONEST GAPS (documented, not yet fixed — a separate reviewed change, NOT part of the Phase 5 move): no arrow-key navigation, no typeahead, no ESC-to-close, no focus management on open/close, and the trigger carries no `aria-expanded`/`aria-haspopup`. Callers own outside-click and ESC handling themselves until the DS grows a managed menu.",
   ],
-  tokens: ["buttonSecondaryBorder (trigger)", "bgElevated (list)", "border", "bgHover (option hover)", "surfaceHover (option active)", "textMuted"],
+  tokens: ["buttonSecondaryBorder (trigger)", "bgElevated (list)", "border", "bgHover (option hover)", "surfaceHover (option active)", "textMuted", "action (checkbox fill)", "actionText (checkbox tick)"],
 };

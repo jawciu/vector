@@ -42,24 +42,30 @@ const FILLED_CLASSES: Record<BadgeColor, string> = {
   muted: "bg-text-muted",
 };
 
+export type BadgeSize = "sm" | "md";
+
 export interface BadgeProps {
   children: ReactNode;
   /** Status token the pill communicates. Default "muted". */
   color?: BadgeColor;
   /** Louder header-level variant: fills with the colour, text goes dark. */
   filled?: boolean;
+  /** sm 12px/500 (table pills) · md 14px/400 (insight-card pills). */
+  size?: BadgeSize;
 }
 
 export default function Badge({
   children,
   color = "muted",
   filled = false,
+  size = "sm",
 }: BadgeProps) {
   return (
     <span
       className={cn(
         "status-pill",
         filled && "status-pill--filled",
+        size === "md" && "status-pill--md",
         // Outlined: colour via `color` (border rides on currentColor).
         // Filled: colour via `background` (text colour comes from the class).
         filled ? FILLED_CLASSES[color] : OUTLINED_CLASSES[color]

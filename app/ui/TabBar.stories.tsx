@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { useState } from "react";
 import { expect, fn, userEvent, within } from "storybook/test";
 import TabBar, { type Tab } from "./TabBar";
 import { dsMetaDescription } from "./ds-meta";
@@ -43,7 +44,34 @@ export default config;
 
 type Story = StoryObj<typeof TabBar>;
 
+/**
+ * Rest state, Overview active. Selection cues are the active tab's full
+ * `text` colour plus the 2px `action` underline; inactive labels sit at
+ * `textMuted`. Same three tabs (Overview / Tasks / Details) in every story.
+ */
 export const Default: Story = {};
+
+/**
+ * THE PLAYGROUND — click tabs to move the underline; the story owns
+ * `activeTab` the way a real page does. no-vrt.
+ */
+export const Interactive: Story = {
+  tags: ["no-vrt"],
+  render: () => {
+    function TabBarPlayground() {
+      const [active, setActive] = useState("overview");
+      return <TabBar tabs={TABS} activeTab={active} onTabChange={setActive} />;
+    }
+    return <TabBarPlayground />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Tasks" }));
+    await expect(canvas.getByRole("button", { name: "Tasks" })).toHaveAttribute("data-active");
+    await userEvent.click(canvas.getByRole("button", { name: "Overview" }));
+    await expect(canvas.getByRole("button", { name: "Overview" })).toHaveAttribute("data-active");
+  },
+};
 
 /** Badge pill hides at 0/null and caps at "99+" past two digits. */
 export const WithBadges: Story = {
@@ -77,14 +105,21 @@ export const ActiveStates: Story = {
 };
 
 /**
- * Hover lifts INACTIVE labels from textMuted to textSecondary; the active
- * tab keeps `text` (the hover rule is guarded with `:not([data-active])` —
- * it used to fire on the active tab too and dim it, the Lens 3 bug this
- * story originally pinned).
+ * Every tab is force-hovered here; only the INACTIVE labels react, lifting
+ * from `textMuted` to `textSecondary` — no fill, no underline change. The
+ * active tab keeps `text` (the hover rule is guarded with
+ * `:not([data-active])` — it used to fire on the active tab too and dim it,
+ * the Lens 3 bug this story originally pinned).
  */
 export const Hover: Story = { parameters: { pseudo: { hover: true } } };
 
+/**
+ * Interaction test — the canvas intentionally looks like Default. Open the
+ * Interactions panel to watch it click tabs and assert onTabChange wiring
+ * (fires with the tab id; clicking the already-active tab still fires).
+ */
 export const ClickBehaviour: Story = {
+  name: "Click behaviour (test)",
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole("button", { name: "Tasks" }));

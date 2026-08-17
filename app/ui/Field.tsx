@@ -6,13 +6,13 @@ import { cloneElement, useId, type ReactElement, type ReactNode } from "react";
  * Field — DS primitive, the form-row wrapper.
  *
  * Owns the label / help / error copy AND their wiring to exactly one control
- * child (Input / Textarea / Select): useId generates the control id, and
+ * child (TextField / Textarea / Select): useId generates the control id, and
  * cloneElement injects id + aria-describedby (help) + aria-invalid /
  * aria-errormessage (error). cloneElement was chosen over context or a
  * render-prop because it keeps the call site to the bare minimum:
  *
  *   <Field label="Email" help="Used for the invite.">
- *     <Input type="email" />
+ *     <TextField type="email" />
  *   </Field>
  *
  * A child's own `id` wins over the generated one; a child's own `required`
@@ -33,7 +33,7 @@ interface ControlProps {
 
 export interface FieldProps {
   label: ReactNode;
-  /** Exactly one form control (Input / Textarea / Select). */
+  /** Exactly one form control (TextField / Textarea / Select). */
   children: ReactElement<ControlProps>;
   /** Persistent hint below the control (aria-describedby). */
   help?: ReactNode;

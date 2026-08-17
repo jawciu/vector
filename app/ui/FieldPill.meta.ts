@@ -11,7 +11,7 @@ export const meta: DsMeta = {
   dontUseWhen: [
     "Drawer detail views — use FieldRow: borderless at rest, content-hugging, same API.",
     "Plain actions (submit, cancel, delete) — use Button/IconButton; FieldPill is a field trigger with a value, not an action.",
-    "Menu triggers outside a field context — use MenuTriggerButton (app/components/Menu.js until Phase 5 moves it).",
+    "Menu triggers outside a field context — use MenuTriggerButton (app/ui/Menu).",
   ],
   a11y: [
     "FIXED (was Lens 3 gap #5, mouse-only field editors): when `onClick` is present the pill carries role=\"button\" + tabIndex=0, Enter and Space activate it (Space preventDefaults so the page doesn't scroll), and :focus-visible draws the shared 2px focus-ring outline. Without `onClick` it stays a plain non-interactive div.",

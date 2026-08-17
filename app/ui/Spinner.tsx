@@ -3,8 +3,9 @@
  *
  * The `.btn-spinner` visual (globals.css) as a standalone: a 1em circular
  * track spun by CSS, sized here via `fontSize` so one number controls the
- * whole ring. Colour comes from `currentColor` — wrap it in a coloured
- * element (or set `color` inline) to tint it.
+ * whole ring. Standalone spinners default to the action lilac (Caroline's
+ * ruling, 2026-08-11); inside Button the raw class keeps `currentColor` so
+ * the ring matches the button's text colour.
  *
  * Button.tsx keeps rendering the class internally for its `loading` state;
  * this component exists for loading affordances OUTSIDE a button (panel
@@ -32,7 +33,7 @@ export default function Spinner({
       // inline-block: .btn-spinner has no display rule — inside Button the
       // flex parent blockifies it, but standalone an inline span would
       // ignore the 1em width/height and collapse.
-      className="btn-spinner inline-block"
+      className="btn-spinner inline-block text-action"
       style={{ fontSize: size }}
       role={ariaLabel ? "status" : undefined}
       aria-label={ariaLabel}

@@ -4,13 +4,13 @@ export const meta: DsMeta = {
   status: "experimental",
   useWhen: [
     "Any labelled form row: create/edit modal bodies, settings forms, the Phase 7 retrofit of the ~39 hand-rolled inputs.",
-    "Wrapping exactly one Input / Textarea / Select — Field owns the label, help and error copy plus all id/aria wiring.",
+    "Wrapping exactly one TextField / Textarea / Select — Field owns the label, help and error copy plus all id/aria wiring.",
     "Validation errors: pass `error` and Field flips the control invalid and announces the message — don't hand-roll a red div.",
   ],
   dontUseWhen: [
     "Drawer detail rows (icon + value, no label copy) — use FieldRow.",
     "Pill-shaped dropdown triggers inside modals (due date, priority) — use FieldPill.",
-    "Search fields — use the `.search-input` wrapper pattern (absorbed as an Input variant in Phase 7).",
+    "Search fields — use SearchField (it owns its own icon + input layout, no Field wrapper).",
     "The local <Field> helpers inside TeamPanel.js / FollowUpModal.js are unrelated namesakes, not consumers of this primitive (retrofit is Phase 7's job).",
   ],
   a11y: [

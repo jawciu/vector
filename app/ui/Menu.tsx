@@ -70,15 +70,28 @@ export function MenuTriggerButton({
   );
 }
 
-export type MenuListProps = HTMLAttributes<HTMLDivElement>;
+export interface MenuListProps extends HTMLAttributes<HTMLDivElement> {
+  /**
+   * NEW (2026-08, pending Caroline's review): multi-select menu whose rows
+   * are checkbox options (MenuOption `checked`). Defaults the container role
+   * to "menu" instead of "listbox", because role="menuitemcheckbox" requires
+   * a menu/menubar/group parent — it is invalid ARIA inside a listbox (and
+   * aria-multiselectable is likewise invalid on a menu, so the checkbox
+   * variant swaps pattern wholesale rather than mixing the two). An explicit
+   * `role` prop still wins. Undefined → byte-identical listbox rendering.
+   */
+  multiselect?: boolean;
+}
 
 export function MenuList({
-  role = "listbox",
+  role,
+  multiselect = false,
   className = "",
   style,
   children,
   ...rest
 }: MenuListProps) {
+  const resolvedRole = role ?? (multiselect ? "menu" : "listbox");
   const baseClassName =
     "absolute left-0 z-10 rounded-lg border px-1 py-1 shadow-lg flex flex-col gap-1";
   const baseStyle: CSSProperties = {
@@ -91,7 +104,7 @@ export function MenuList({
 
   return (
     <div
-      role={role}
+      role={resolvedRole}
       className={`${baseClassName} ${className}`.trim()}
       style={{ ...baseStyle, ...style }}
       {...rest}
@@ -105,34 +118,78 @@ export interface MenuOptionProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Currently-selected option — drives aria-selected + the active style. */
   active?: boolean;
+  /**
+   * NEW (2026-08, pending Caroline's review): defined (true/false) turns the
+   * row into a checkbox option for multi-select menus — a leading 16px
+   * checkbox visual (4px radius, `border` outline; checked = `action` fill +
+   * dark `actionText` tick), role="menuitemcheckbox" and aria-checked
+   * INSTEAD of role="option" + aria-selected. Use inside a
+   * `<MenuList multiselect>` so the container role is a valid parent.
+   * Undefined → byte-identical previous rendering.
+   */
+  checked?: boolean;
 }
 
 export function MenuOption({
   type = "button",
   active = false,
+  checked,
   className = "",
   style,
   children,
   ...rest
 }: MenuOptionProps) {
+  const isCheckbox = checked !== undefined;
   const baseClassName =
     "flex w-full items-center rounded text-left text-sm transition-colors menu-option";
   const activeClassName = active ? "menu-option-active" : "";
+  // Checked checkbox rows read at full text/weight like selected rows do.
+  const highlighted = active || checked === true;
   const baseStyle: CSSProperties = {
-    color: active ? "var(--text)" : "var(--text-muted)",
-    fontWeight: active ? 600 : 400,
+    color: highlighted ? "var(--text)" : "var(--text-muted)",
+    fontWeight: highlighted ? 600 : 400,
     padding: "4px 8px",
   };
 
   return (
     <button
       type={type}
-      role="option"
-      aria-selected={active}
+      role={isCheckbox ? "menuitemcheckbox" : "option"}
+      aria-selected={isCheckbox ? undefined : active}
+      aria-checked={isCheckbox ? checked : undefined}
       className={`${baseClassName} ${activeClassName} ${className}`.trim()}
       style={{ ...baseStyle, ...style }}
       {...rest}
     >
+      {isCheckbox && (
+        <span
+          aria-hidden="true"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 16,
+            height: 16,
+            marginRight: 8,
+            flexShrink: 0,
+            borderRadius: 4,
+            border: `1px solid ${checked ? "var(--action)" : "var(--border)"}`,
+            background: checked ? "var(--action)" : "transparent",
+          }}
+        >
+          {checked && (
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+              <path
+                d="M2 5.2 4.2 7.4 8 3"
+                stroke="var(--action-text)"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+        </span>
+      )}
       {children}
     </button>
   );

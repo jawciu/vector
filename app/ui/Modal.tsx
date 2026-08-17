@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { cn } from "./cn";
+import IconButton from "./IconButton";
+import { CloseIcon } from "./Icons";
 
 /**
  * Modal — DS primitive, built on the native <dialog> element.
@@ -28,6 +30,8 @@ export interface ModalProps {
   footer?: ReactNode;
   /** Max width: sm 400 / md 520 (default) / lg 640. */
   size?: ModalSize;
+  /** Built-in X in the header (default true — Caroline's ruling 2026-08-11). */
+  closeButton?: boolean;
 }
 
 export default function Modal({
@@ -37,8 +41,10 @@ export default function Modal({
   children,
   footer,
   size = "md",
+  closeButton = true,
 }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
+  const pressOnBackdrop = useRef(false);
   const titleId = useId();
 
   useEffect(() => {
@@ -59,15 +65,29 @@ export default function Modal({
         e.preventDefault();
         onClose();
       }}
-      // Scrim click: the backdrop registers as a click on the dialog element
-      // itself (clicks inside land on children).
+      // Scrim click: the backdrop registers events on the dialog element
+      // itself (events inside land on children). Close only when the PRESS
+      // started on the backdrop too — otherwise a text-selection drag that
+      // starts inside a form and releases over the scrim would eat the
+      // user's half-filled form (peer review, 2026-08-11).
+      onPointerDown={(e) => {
+        pressOnBackdrop.current = e.target === ref.current;
+      }}
       onClick={(e) => {
-        if (e.target === ref.current) onClose();
+        if (e.target === ref.current && pressOnBackdrop.current) onClose();
+        pressOnBackdrop.current = false;
       }}
     >
-      <h2 id={titleId} className="text-lg font-semibold">
-        {title}
-      </h2>
+      <div className="flex items-start justify-between gap-3">
+        <h2 id={titleId} className="text-lg font-semibold">
+          {title}
+        </h2>
+        {closeButton && (
+          <IconButton aria-label="Close" onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        )}
+      </div>
       <div className="mt-4 text-sm text-text-secondary">{children}</div>
       {footer && (
         <div className="mt-6 flex items-center justify-end gap-2">{footer}</div>

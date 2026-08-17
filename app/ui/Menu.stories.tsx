@@ -167,3 +167,114 @@ export const Interactive: StoryObj<{ onSelect: (status: string) => void }> = {
     ).toHaveAttribute("aria-selected", "false");
   },
 };
+
+/**
+ * NEW — pending Caroline's review. Dropdown WITH checkboxes: the multi-select
+ * variant (plain single-select menus above stay checkbox-free). `checked` on
+ * MenuOption renders the leading 16px checkbox — 4px radius, `border`
+ * outline; checked = `action` fill + dark `actionText` tick — and switches
+ * the row to role="menuitemcheckbox" + aria-checked; checked rows read at
+ * full `text` weight like selected rows. `multiselect` on MenuList defaults
+ * the container role to "menu", the required parent for menuitemcheckbox
+ * (invalid inside the default listbox, and aria-multiselectable is invalid
+ * on a menu — so the checkbox variant swaps ARIA pattern wholesale).
+ */
+export const WithCheckboxes: Story = {
+  render: () => (
+    <div style={{ position: "relative", width: "fit-content", minHeight: 190 }}>
+      <MenuTriggerButton active>Filter statuses</MenuTriggerButton>
+      <MenuList multiselect aria-label="Filter statuses" style={{ width: 176 }}>
+        <MenuOption checked>Not started</MenuOption>
+        <MenuOption checked>In progress</MenuOption>
+        <MenuOption checked={false}>Blocked</MenuOption>
+        <MenuOption checked={false}>Done</MenuOption>
+      </MenuList>
+    </div>
+  ),
+};
+
+/**
+ * NEW — pending Caroline's review. THE MULTI-SELECT PLAYGROUND: toggling a
+ * checkbox row keeps the menu OPEN (the common multi-select UX — closing on
+ * every tick makes picking three things a chore); only outside-click closes.
+ * The trigger carries the selection count. no-vrt.
+ */
+export const InteractiveMultiSelect: StoryObj<{ onToggle: (status: string) => void }> = {
+  tags: ["no-vrt"],
+  args: { onToggle: fn() },
+  render: (args) => {
+    function MultiSelectPlayground() {
+      const [open, setOpen] = useState(false);
+      const [selected, setSelected] = useState<string[]>(["In progress"]);
+      const wrapperRef = useRef<HTMLDivElement>(null);
+
+      // Outside-click closes — callers own this until the DS grows a
+      // managed menu (see the meta's honest gaps).
+      useEffect(() => {
+        if (!open) return;
+        const onMouseDown = (e: MouseEvent) => {
+          if (!wrapperRef.current?.contains(e.target as Node)) setOpen(false);
+        };
+        document.addEventListener("mousedown", onMouseDown);
+        return () => document.removeEventListener("mousedown", onMouseDown);
+      }, [open]);
+
+      return (
+        <div style={{ minHeight: 260, padding: 24 }}>
+          <div
+            ref={wrapperRef}
+            style={{ position: "relative", width: "fit-content" }}
+          >
+            <MenuTriggerButton active={open} onClick={() => setOpen((o) => !o)}>
+              Statuses ({selected.length})
+            </MenuTriggerButton>
+            {open && (
+              <MenuList multiselect aria-label="Filter statuses" style={{ width: 176 }}>
+                {TASK_STATUSES.map((s: string) => (
+                  <MenuOption
+                    key={s}
+                    checked={selected.includes(s)}
+                    onClick={() => {
+                      args.onToggle(s);
+                      setSelected((prev) =>
+                        prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s],
+                      );
+                    }}
+                  >
+                    {s}
+                  </MenuOption>
+                ))}
+              </MenuList>
+            )}
+          </div>
+        </div>
+      );
+    }
+    return <MultiSelectPlayground />;
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Trigger opens the menu.
+    await userEvent.click(canvas.getByRole("button", { name: /Statuses/ }));
+    const menu = canvas.getByRole("menu");
+    const blocked = within(menu).getByRole("menuitemcheckbox", { name: "Blocked" });
+    await expect(blocked).toHaveAttribute("aria-checked", "false");
+
+    // Toggling fires the handler and must NOT close the menu.
+    await userEvent.click(blocked);
+    await expect(args.onToggle).toHaveBeenCalledWith("Blocked");
+    const stillOpen = canvas.getByRole("menu");
+    await expect(
+      within(stillOpen).getByRole("menuitemcheckbox", { name: "Blocked" }),
+    ).toHaveAttribute("aria-checked", "true");
+
+    // Toggling off works too, and the menu still stays open.
+    await userEvent.click(
+      within(stillOpen).getByRole("menuitemcheckbox", { name: "In progress" }),
+    );
+    await expect(
+      within(canvas.getByRole("menu")).getByRole("menuitemcheckbox", { name: "In progress" }),
+    ).toHaveAttribute("aria-checked", "false");
+  },
+};

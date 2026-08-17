@@ -1,10 +1,15 @@
 "use client";
 
-import { useState, useRef, type ReactNode } from "react";
+import { useEffect, useId, useState, useRef, type ReactNode } from "react";
 
 /**
  * Tooltip that uses fixed positioning to escape overflow containers.
  * Wrap any element — tooltip text comes from the `label` or `lines` prop.
+ *
+ * Keyboard/AT support (peer-review fix, 2026-08-11): the wrapper is
+ * focusable, focus/blur mirror hover, ESC dismisses, and the open tooltip is
+ * wired via aria-describedby — the hover-only gap in the audit's Lens 3 is
+ * closed. Touch remains unsupported (documented in the meta).
  */
 
 export interface TooltipProps {
@@ -19,6 +24,17 @@ export default function Tooltip({ label, lines, children }: TooltipProps) {
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const ref = useRef<HTMLSpanElement>(null);
+  const tipId = useId();
+
+  // ESC dismisses while open (listener only attached while visible).
+  useEffect(() => {
+    if (!visible) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setVisible(false);
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [visible]);
 
   const hasContent = label || (lines && lines.length > 0);
   if (!hasContent) return children;
@@ -39,11 +55,17 @@ export default function Tooltip({ label, lines, children }: TooltipProps) {
       ref={ref}
       onMouseEnter={show}
       onMouseLeave={() => setVisible(false)}
+      onFocus={show}
+      onBlur={() => setVisible(false)}
+      tabIndex={0}
+      aria-describedby={visible ? tipId : undefined}
       style={{ position: "relative" }}
     >
       {children}
       {visible && (
         <span
+          id={tipId}
+          role="tooltip"
           style={{
             position: "fixed",
             top: pos.top,

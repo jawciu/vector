@@ -10,7 +10,7 @@ export const meta: DsMeta = {
   ],
   dontUseWhen: [
     "Icon-only actions — use IconButton.",
-    "Menu/dropdown triggers — use MenuTriggerButton (app/components/Menu.js until Phase 5 moves it).",
+    "Menu/dropdown triggers — use MenuTriggerButton (app/ui/Menu).",
     "Navigation to another page — use a link styled as text, not a button.",
   ],
   a11y: [

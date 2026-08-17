@@ -15,7 +15,7 @@ export const meta: DsMeta = {
   ],
   a11y: [
     "Each tab is a native <button type=\"button\">, so tabs are individually clickable and reachable with Tab.",
-    "KNOWN GAP (lens 3): no tablist semantics — no role=tablist/tab, no aria-selected (selection is a visual data-active only), no arrow-key model. Phase 5 adds the ARIA tabs pattern; don't bolt roles on per call site.",
+    "KNOWN GAP (lens 3): no tablist semantics — no role=tablist/tab, no aria-selected (selection is a visual data-active only), no arrow-key model. adding the ARIA tabs pattern is a queued reviewed change (post-review round, 2026-08-11); don't bolt roles on per call site.",
     "KNOWN GAP: no focus-visible ring — the shared focus rule covers only the .btn-*/.icon-btn set (lens-3 gap #3), so tab focus falls back to the UA default.",
     "The badge carries aria-label \"<n> pending\", so the count is announced as part of the tab's accessible name.",
   ],

@@ -1,6 +1,8 @@
 "use client";
 
 import { forwardRef, useEffect, useRef } from "react";
+import IconButton from "./IconButton";
+import { PanelCloseIcon } from "./Icons";
 
 /**
  * Slide-in right-edge drawer primitive. Extracted from the kanban
@@ -105,36 +107,21 @@ const Drawer = forwardRef(function Drawer(
       }}
     >
       {closeButton && open && (
-        <button
-          type="button"
-          onClick={onClose}
+        // The DS's own primitive, not a hand-rolled copy (peer-review fix,
+        // 2026-08-11): IconButton takes className for layout; the off-scale
+        // 18px top matches the drawer's header padding.
+        <IconButton
           aria-label="Close"
-          className="flex items-center justify-center w-5 h-5 rounded icon-btn"
-          style={{
-            position: "absolute",
-            top: 18,
-            right: 16,
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            zIndex: 2,
-          }}
+          onClick={onClose}
+          className="absolute"
+          style={{ top: 18, right: 16, zIndex: 2 }}
         >
-          <DrawerCloseIcon />
-        </button>
+          <PanelCloseIcon />
+        </IconButton>
       )}
       {children}
     </div>
   );
 });
-
-function DrawerCloseIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden>
-      <path d="M1.32129 10.1182L6.2296 5.40892L1.32129 0.600098" stroke="currentColor" strokeWidth="1.06126" strokeLinecap="round" />
-      <path d="M9.67871 0.583496L9.67871 10.4167" stroke="currentColor" strokeWidth="1.06126" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 export default Drawer;

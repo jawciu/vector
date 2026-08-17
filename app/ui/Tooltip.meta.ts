@@ -14,7 +14,8 @@ export const meta: DsMeta = {
     "Long prose — the body is white-space:nowrap per line; anything paragraph-length belongs in an InsightCard or inline text.",
   ],
   a11y: [
-    "KNOWN GAP (lens 3): hover-only — mouseenter/mouseleave with no focus/blur trigger, no aria-describedby, no ESC dismiss. Invisible to keyboard, touch and screen-reader users. Phase 5 adds the focus trigger + ARIA wiring; do not fork per-call-site workarounds meanwhile.",
+    "FIXED (2026-08-11, was the lens-3 hover-only gap): the wrapper is focusable (tabIndex 0), focus/blur mirror hover, ESC dismisses, and the open tip is announced via role=tooltip + aria-describedby.",
+    "REMAINING GAP: no touch trigger — the content must never be touch-critical (the .health-pill usage still is; Phase 7 gives it a text fallback).",
     "Because of that gap, content must be supplementary only — .health-pill currently hides the entire health rationale behind it (lens-3 gap #6) and is the anti-pattern, not the precedent.",
     "The body is pointer-events:none, so it never traps the pointer or intercepts clicks.",
   ],

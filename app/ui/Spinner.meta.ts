@@ -14,7 +14,7 @@ export const meta: DsMeta = {
   ],
   a11y: [
     "Pass `aria-label` to announce it: the span becomes `role=\"status\"` (polite live region). Without a label it renders `aria-hidden` — decorative, so the surrounding context must state that something is loading.",
-    "Loading motion is essential status information: `prefers-reduced-motion` SLOWS the spin (1.5s) rather than freezing it into a static ring (globals.css).",
+    "Loading motion is essential status information: `prefers-reduced-motion` SLOWS the spin (2s) rather than freezing it into a static ring (globals.css).",
   ],
   tokens: ["currentColor (inherits text colour — no fixed token)"],
 };

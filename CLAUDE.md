@@ -308,11 +308,20 @@ leaks — Phase 7 list. Storybook: 119 stories / 22 components. HER RULE IN FORC
 VRT baselines until she approves everything in Storybook; audit inlineStyles floor is 1083 (+2
 justified: Spinner dynamic fontSize, Menu move) — refresh baseline WITH her phase approval only.
 
-**Next:** Caroline reviews ALL Phase 5 additions in Storybook (`! cd /Users/caro/Code/onboarding
-&& npm run storybook`, port 6006) — the experimental-status components + the flagged NEW visuals
-(input focus/invalid states, field-editor focus rings, Modal's 12px radius). Commit Phase 5 +
-refresh audit baseline when she approves; then Phase 6 (VRT + public Storybook — needs her
-approval to take ANY screenshots, and the branch pushed for CI). (new primitives: Modal on native <dialog>, Field/Input/Textarea/Select, Spinner,
+**Phase 5 committed `0452ce0`. REVIEW ROUND 1 DONE 2026-08-11 (UNCOMMITTED)** — her 23-point
+Storybook review fully processed; see `docs/DS-LOG.md` "Review round 1" for everything. Headlines:
+her review exposed a REAL storybook-addon-pseudo-states globals leak (fixed in preview.tsx);
+Input→TextField rename; icons 7→36; Foundations docs section (incl. Voice: NO EM DASHES EVER);
+new SearchField/Checkbox/TaskTick; commissioned peer review graded B+ and its 5 FIX-NOW items all
+shipped same day (incl. a real cn()/tailwind-merge bug eating .text-btn — pinned by cn.test.js,
+the DS's first unit test; suite now 66). Storybook: 176 stories / 31 docs / 25 components,
+storyCoverage 100%. OPEN Caroline decisions queued: active/selected naming, Badge variant union,
+className doctrine, CSS-layer split, InlineProse rename, InlineTextField naming, KanbanCard
+extraction (deliberately deferred), Foundations' 5 DESIGN.md ambiguities, peer-review items 6-12.
+
+**Next:** Caroline re-reviews in Storybook; commit + refresh ratchet baseline on her OK; then her
+queued decisions, then Phase 6 (VRT + public Storybook — screenshots only after she approves
+everything, branch push needed for CI). (new primitives: Modal on native <dialog>, Field/Input/Textarea/Select, Spinner,
 Badge, Menu move) per `docs/DS-PLAN.md` — Phase 5 also picks up the story-writing findings above.
 
 ### 2026-08-08 — Vector has a logo; favicon + app icons shipped

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, userEvent, within } from "storybook/test";
-import Input from "./Input";
+import TextField from "./TextField";
 import { dsMetaDescription } from "./ds-meta";
-import { meta as dsMeta } from "./Input.meta";
+import { meta as dsMeta } from "./TextField.meta";
 
 /**
  * NOTE (Caroline's review, pending): two NEW design decisions live here —
@@ -14,8 +14,8 @@ import { meta as dsMeta } from "./Input.meta";
  * Both are extracted-from-`.search-input` otherwise: `border` on `bg` →
  * hover `bg-hover` + `buttonSecondaryBorder`.
  */
-const config: Meta<typeof Input> = {
-  component: Input,
+const config: Meta<typeof TextField> = {
+  component: TextField,
   tags: ["autodocs"],
   parameters: {
     docs: { description: { component: dsMetaDescription(dsMeta) } },
@@ -34,7 +34,7 @@ const config: Meta<typeof Input> = {
 };
 export default config;
 
-type Story = StoryObj<typeof Input>;
+type Story = StoryObj<typeof TextField>;
 
 /** Resting state: `border` border on `bg`, placeholder in `textMuted`. */
 export const Default: Story = {};
@@ -84,10 +84,10 @@ export const TypingBehaviour: Story = {
 export const AllStates: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12, width: 320 }}>
-      <Input aria-label="Empty" placeholder="Placeholder" />
-      <Input aria-label="Filled" defaultValue="Filled value" />
-      <Input aria-label="Invalid" invalid defaultValue="not-an-email" />
-      <Input aria-label="Disabled" disabled defaultValue="Disabled value" />
+      <TextField aria-label="Empty" placeholder="Placeholder" />
+      <TextField aria-label="Filled" defaultValue="Filled value" />
+      <TextField aria-label="Invalid" invalid defaultValue="not-an-email" />
+      <TextField aria-label="Disabled" disabled defaultValue="Disabled value" />
     </div>
   ),
 };

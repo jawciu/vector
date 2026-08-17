@@ -7,7 +7,7 @@ export const meta: DsMeta = {
     "Anywhere a hand-rolled `<textarea>` exists today (Phase 7 retrofits them onto this).",
   ],
   dontUseWhen: [
-    "Single-line values — use Input.",
+    "Single-line values — use TextField.",
     "Rich text / markdown editing — nothing in the DS yet; don't fake it with a textarea and expect formatting.",
   ],
   a11y: [

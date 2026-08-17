@@ -7,7 +7,7 @@ export const meta: DsMeta = {
     "Anywhere a hand-rolled `<input style={{…}}>` exists today (Phase 7 retrofits them onto this).",
   ],
   dontUseWhen: [
-    "Search fields with a magnifier icon — use the `.search-input` wrapper pattern until it's absorbed as an Input variant (Phase 7).",
+    "Search fields with a magnifier icon — use SearchField (the `.search-input` wrapper pattern as a primitive).",
     "Multi-line text — use Textarea.",
     "Picking from a fixed set — use Select, or MenuList for rich dropdowns.",
   ],

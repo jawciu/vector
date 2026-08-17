@@ -60,7 +60,13 @@ export const LongLabel: Story = {
   args: { children: "Send follow-up summary to every stakeholder on this onboarding" },
 };
 
+/**
+ * Interaction test — the canvas intentionally looks like Primary. Open the
+ * Interactions panel to watch it click the button and assert the wiring
+ * (onClick fires once, type="button").
+ */
 export const ClickBehaviour: Story = {
+  name: "Click behaviour (test)",
   play: async ({ args, canvasElement }) => {
     const button = within(canvasElement).getByRole("button");
     await userEvent.click(button);

@@ -6,6 +6,7 @@ export const meta: DsMeta = {
     "Icon-only actions: meatball/overflow menus, plus (add task), close buttons, delete-a-row.",
     "Pass `isActive` while the menu/popover it controls is open — applies `.icon-btn--active` (surfaceHover fill, full text colour) so the trigger stays lit.",
     "Inner SVGs at 11–12px using `currentColor` so the icon inherits the state colour (see DESIGN.md).",
+    "NEW (pending Caroline's review): `tone=\"danger\"` for destructive icon actions (delete a row) — glyph at danger stepping to dangerHover, mirroring .text-btn-danger; hover/active fills stay the neutral bgHover/surfaceHover.",
   ],
   dontUseWhen: [
     "The action has a visible text label — use Button (any variant, including `text`).",
@@ -19,5 +20,5 @@ export const meta: DsMeta = {
     "Shared `:focus-visible` ring via the .icon-btn rule in globals.css (2px focusRing, 2px offset).",
     "Disabled suppresses hover, dims to iconTertiary, and blocks clicks natively.",
   ],
-  tokens: ["textMuted", "bgHover", "surfaceHover", "iconTertiary", "focusRing"],
+  tokens: ["textMuted", "bgHover", "surfaceHover", "iconTertiary", "focusRing", "danger (tone=danger)", "dangerHover (tone=danger)"],
 };

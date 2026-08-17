@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { expect, userEvent, within } from "storybook/test";
 import Field from "./Field";
-import Input from "./Input";
+import TextField from "./TextField";
 import Select from "./Select";
 import Textarea from "./Textarea";
 import Button from "./Button";
@@ -26,7 +26,7 @@ const config: Meta<typeof Field> = {
   },
   args: {
     label: "Email",
-    children: <Input type="email" placeholder="tom@vector.example" />,
+    children: <TextField type="email" placeholder="tom@vector.example" />,
   },
   decorators: [
     (Story) => (
@@ -66,7 +66,7 @@ export const Required: Story = {
  */
 export const InvalidWithError: Story = {
   args: {
-    children: <Input type="email" defaultValue="tom@" />,
+    children: <TextField type="email" defaultValue="tom@" />,
     error: "Enter a full email address.",
   },
   play: async ({ canvasElement }) => {
@@ -84,7 +84,7 @@ export const InvalidWithError: Story = {
 export const Disabled: Story = {
   args: {
     label: "Workspace",
-    children: <Input disabled defaultValue="Vector HQ" />,
+    children: <TextField disabled defaultValue="Vector HQ" />,
     help: "Contact an admin to rename the workspace.",
   },
 };
@@ -130,16 +130,16 @@ export const AllStates: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 20, width: 320 }}>
       <Field label="Name">
-        <Input placeholder="e.g. Tom Okafor" />
+        <TextField placeholder="e.g. Tom Okafor" />
       </Field>
       <Field label="Email" required help="Used for the portal invite.">
-        <Input type="email" defaultValue="tom@vector.example" />
+        <TextField type="email" defaultValue="tom@vector.example" />
       </Field>
       <Field label="Email" error="Enter a full email address.">
-        <Input type="email" defaultValue="tom@" />
+        <TextField type="email" defaultValue="tom@" />
       </Field>
       <Field label="Workspace" help="Contact an admin to rename.">
-        <Input disabled defaultValue="Vector HQ" />
+        <TextField disabled defaultValue="Vector HQ" />
       </Field>
       <Field label="Owner">
         <Select defaultValue="tom">
@@ -183,7 +183,7 @@ export const Interactive: Story = {
             help={error ? undefined : "They can sign in with this address later."}
             error={error}
           >
-            <Input
+            <TextField
               type="email"
               placeholder="tom@vector.example"
               value={email}

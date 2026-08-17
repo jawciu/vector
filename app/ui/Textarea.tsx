@@ -6,8 +6,8 @@ import { cn } from "./cn";
 /**
  * Textarea — DS primitive, a thin styled native <textarea>.
  *
- * Shares the `.input` class with Input/Select (plus a `textarea.input` rule:
- * vertical resize, 80px min-height). `invalid` behaves exactly as on Input.
+ * Shares the `.input` class with TextField/Select (plus a `textarea.input` rule:
+ * vertical resize, 80px min-height). `invalid` behaves exactly as on TextField.
  */
 
 export interface TextareaProps

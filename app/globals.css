@@ -134,6 +134,27 @@ a {
   cursor: not-allowed;
 }
 
+/* NEW (2026-08, pending Caroline's review): destructive icon button —
+   IconButton `tone="danger"`. Mirrors .text-btn-danger's colour step
+   (danger → danger-hover on hover); the hover/active fills stay the neutral
+   bg-hover / surface-hover steps from the base .icon-btn so the only red is
+   the glyph itself. Disabled inherits the base iconTertiary dimming
+   (.icon-btn:disabled outranks .icon-btn--danger). */
+.icon-btn--danger {
+  color: var(--danger);
+}
+
+.icon-btn--danger:hover:not(:disabled) {
+  background-color: var(--bg-hover);
+  color: var(--danger-hover);
+}
+
+.icon-btn--danger:active:not(:disabled),
+.icon-btn--danger.icon-btn--active {
+  background-color: var(--surface-hover);
+  color: var(--danger-hover);
+}
+
 /* Secondary button */
 .btn-secondary {
   background-color: var(--bg);
@@ -272,7 +293,8 @@ a {
   border-radius: 9999px;
   border: 2px solid currentColor;
   border-top-color: transparent;
-  animation: btn-spin 0.6s linear infinite;
+  /* 1s per revolution — 0.6s read as frantic (Caroline, 2026-08-11) */
+  animation: btn-spin 1s linear infinite;
 }
 
 @keyframes btn-spin {
@@ -283,8 +305,21 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   .btn-spinner {
-    animation-duration: 1.5s;
+    animation-duration: 2s;
   }
+}
+
+/* Loading buttons keep the ACTIVE colour, not the disabled wash — a working
+ * button is busy, not unavailable (Caroline, 2026-08-11). The [aria-busy]
+ * hook is set by Button's `loading` prop, which also sets `disabled`. */
+.btn-primary[aria-busy="true"]:disabled {
+  background-color: var(--action-active);
+  cursor: progress;
+}
+
+.btn-destructive[aria-busy="true"]:disabled {
+  background-color: var(--danger-active);
+  cursor: progress;
 }
 
 /* Modal (app/ui/Modal.tsx) — native <dialog>, so focus trapping, ESC and the
@@ -309,8 +344,11 @@ a {
 .modal--md { max-width: 520px; }
 .modal--lg { max-width: 640px; }
 
-/* Form controls (app/ui/Input.tsx / Textarea.tsx / Select.tsx) — the Phase 5
- * Field primitives. State model extracted from `.search-input` (the best
+/* Form controls (app/ui/TextField.tsx / Textarea.tsx / Select.tsx) — the
+ * Phase 5 Field primitives. The component was renamed Input → TextField
+ * (Caroline, 2026-08-11) but the `.input` class name is kept AS IS for now —
+ * renaming the CSS layer is a separate decision.
+ * State model extracted from `.search-input` (the best
  * current hand-rolled pattern):
  *   default → `border` border on `bg`
  *   hover   → `bg-hover` + `buttonSecondaryBorder`
@@ -391,6 +429,61 @@ textarea.input {
 .field-error {
   font-size: 12px;
   color: var(--danger);
+}
+
+/* Checkbox (app/ui/Checkbox.tsx) — the dropdown-row checkbox ("the one we
+ * use in drop downs", Caroline 2026-08-11), extracted from the TaskDrawer /
+ * CreateTaskModal member pickers. Same 16px hit area as .member-checkbox;
+ * the states are painted by the inner 14px svg. NEW (pending Caroline's
+ * review): the focus-visible ring — the hand-rolled ones had none. */
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: none;
+  border: none;
+  border-radius: 4px; /* rounded.sm — shapes the focus outline only */
+  padding: 0;
+  cursor: pointer;
+}
+
+.checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.checkbox:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* TaskTick (app/ui/TaskTick.tsx) — the circular mark-a-task-done tick,
+ * extracted from TaskCardView's CheckboxButton. 4px padding around the 14px
+ * svg = a 22px hit area, matching the shipped button (minus its call-site
+ * negative margins, which stay at the call site). NEW (pending Caroline's
+ * review): the focus-visible ring — the shipped button had none. */
+.task-tick {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.task-tick:disabled {
+  /* Read-only surfaces (e.g. InsightsPanel): not washed out, just inert —
+   * matches the shipped non-interactive rendering. */
+  cursor: default;
+}
+
+.task-tick:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* Mode toggle (e.g. Existing / New in onboarding modal) */
@@ -821,6 +914,16 @@ textarea.input {
 .status-pill--filled {
   border: 0.5px solid transparent;
   color: var(--text-dark);
+}
+
+/* md size: the insight-card pills render 14px/400 via inline overrides today
+ * (InsightCard.js) while the class is 12px/500 — drift found in Caroline's
+ * 2026-08-11 review. Formalised as a size variant; Phase 7 folds the inline
+ * overrides onto it. */
+.status-pill--md {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
 }
 
 /* AI surface treatment — gradient used on the Vector sparkle and any
