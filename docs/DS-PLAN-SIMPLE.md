@@ -110,7 +110,14 @@ Your addition: once the worst offenders are fixed and the system has proven itse
 - The design-system skill is rewritten around the new world, with the key sentence: "if the state you need has no story, you are off-road: add the story first."
 - A new storybook skill teaches agents how to run it, write a story, query the story list, and update the screenshot baselines.
 - CLAUDE.md gets the new-component checklist: TypeScript + locked variants + all states + a story per state + meta file + play function + accessibility clean + screenshot baseline.
-**Done when:** running the build twice produces no changes (proof the generation is stable) and no stale values exist anywhere.
+- **Helping agents find the right component (added 2026-09-10).** Agents handed a flat folder of components read every file, burn tokens, and still pick by name alone. The fix is letting them narrow down before they read anything. Five small additions, done in this order:
+  1. Every component's meta file gets an **intent**: is it an action, an input, navigation, data display, or feedback? One word each.
+  2. Every meta file can also say what it **pairs with** (Field goes with TextField, Textarea and Select; Modal goes with Button).
+  3. The build **generates an index page** for the components folder: one table with each component's name, intent, status, one line on when to use it, and where it lives. An agent reads that one file to get its bearings instead of opening 25. It is generated from the meta files, never written by hand, so it can never go stale.
+  4. The audit script gets a new number: how many components have a meta file out of how many there are. The rule "every component must have one" then gets enforced by the ratchet instead of relying on people remembering.
+  5. The agent instructions teach two questions to ask before reading any code: "what job does this need to do?" then "is there already a blessed component for that?" And the review skill (currently out of date) is rewritten to check the meta contract and to report every rejection as: the problem, the evidence, the suggested fix.
+  Adds about half a day to the phase.
+**Done when:** running the build twice produces no changes (proof the generation is stable, now including the index), no stale values exist anywhere, and every component has a meta file.
 
 ## Phase 10 — The portfolio piece (in the portfolio repo)
 Run the audit one last time and put the two scorecards side by side. The story writes itself: raw buttons 103 → ~20 after stage one and near zero after the sweep, hand-made inputs 27 → 0, modal implementations 4 → 1, story coverage 0 → 100%, accessible dialogs 0 → all, automatic checks 1 → 6. Assets: the public Storybook link, the scorecard table, before/after modal screenshots, one diagram of the whole pipeline, and Part A presented as "here is how I would audit YOUR design system in week one", which is a killer line for founding-designer interviews.
