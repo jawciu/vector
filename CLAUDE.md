@@ -308,7 +308,8 @@ leaks — Phase 7 list. Storybook: 119 stories / 22 components. HER RULE IN FORC
 VRT baselines until she approves everything in Storybook; audit inlineStyles floor is 1083 (+2
 justified: Spinner dynamic fontSize, Menu move) — refresh baseline WITH her phase approval only.
 
-**Phase 5 committed `0452ce0`. REVIEW ROUND 1 DONE 2026-08-11 (UNCOMMITTED)** — her 23-point
+**Phase 5 committed `0452ce0`. REVIEW ROUND 1 COMMITTED `06e5c2e` (2026-08-17, her OK; ratchet
+baseline refreshed in the same commit). Working tree clean as of 2026-08-20.** — her 23-point
 Storybook review fully processed; see `docs/DS-LOG.md` "Review round 1" for everything. Headlines:
 her review exposed a REAL storybook-addon-pseudo-states globals leak (fixed in preview.tsx);
 Input→TextField rename; icons 7→36; Foundations docs section (incl. Voice: NO EM DASHES EVER);
@@ -319,10 +320,24 @@ storyCoverage 100%. OPEN Caroline decisions queued: active/selected naming, Badg
 className doctrine, CSS-layer split, InlineProse rename, InlineTextField naming, KanbanCard
 extraction (deliberately deferred), Foundations' 5 DESIGN.md ambiguities, peer-review items 6-12.
 
-**Next:** Caroline re-reviews in Storybook; commit + refresh ratchet baseline on her OK; then her
-queued decisions, then Phase 6 (VRT + public Storybook — screenshots only after she approves
-everything, branch push needed for CI). (new primitives: Modal on native <dialog>, Field/Input/Textarea/Select, Spinner,
+**Next (handoff 2026-08-20, Caroline signed off to sleep):** she re-reviews the round-1 changes in
+Storybook at her leisure (run it HERSELF or via `! cd /Users/caro/Code/onboarding && npm run
+storybook` — agent-started servers get killed in this environment). THEN, in order: (1) her queued
+decisions — active/selected naming, Badge variant union, className doctrine write-up, CSS-layer
+split, InlineProse rename, InlineTextField naming+build, KanbanCard extraction, the 5 DESIGN.md
+ambiguities from Foundations, peer-review items 6-12; (2) Phase 6 (VRT + public Storybook) —
+REMEMBER her rule: NO screenshots/baselines until she has approved everything in Storybook, and
+the branch must be pushed for CI's first run (never push without her explicit say-so). She had a
+meeting planned with someone building AI-agent DS tooling — she may return with ideas/requests
+from that conversation. (new primitives: Modal on native <dialog>, Field/Input/Textarea/Select, Spinner,
 Badge, Menu move) per `docs/DS-PLAN.md` — Phase 5 also picks up the story-writing findings above.
+
+**2026-09-10 — branch PUSHED to origin (her call, for a job application; main untouched, nothing
+merged).** All four CI gates re-verified locally first: tsc clean, lint 0 errors / 187 warnings, 66/66
+tests, build green, ratchet green vs `ratchet-baseline.json`. This is CI's FIRST real run — check the
+4 jobs on GitHub. GOTCHA: a bare local `npm run lint` shows ~319 errors, ALL inside the gitignored
+`storybook-static/` build output; CI never sees it. Delete that folder or ignore it in eslint config.
+Storybook re-review still pending; Phase 6 still blocked on it.
 
 ### 2026-08-08 — Vector has a logo; favicon + app icons shipped
 
