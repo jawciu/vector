@@ -35,11 +35,14 @@ const withPseudoGlobalsReset: Decorator = (Story, context) => {
   const hasPseudoParameter = Object.keys(pseudoParameter).some(
     (key) => key !== "rootSelector",
   );
+  // Only emit while a pseudo global is actually set: on docs pages every story
+  // renders together and an unconditional emit re-renders the page forever.
+  const pseudoGlobalSet = Boolean(context.globals.pseudo);
   // eslint-disable-next-line react-hooks/rules-of-hooks -- storybook/preview-api's useEffect (Storybook's decorator hook system, the same pattern the addon itself uses), not React's; decorators aren't React components.
   useEffect(() => {
     if (hasPseudoParameter) {
       pseudoCameFromParameters = true;
-    } else if (pseudoCameFromParameters) {
+    } else if (pseudoCameFromParameters && pseudoGlobalSet) {
       pseudoCameFromParameters = false;
       addons.getChannel().emit(UPDATE_GLOBALS, { globals: { pseudo: false } });
     }

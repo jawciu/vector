@@ -1,4 +1,5 @@
 import type { StorybookConfig } from "@storybook/nextjs-vite";
+import remarkGfm from "remark-gfm";
 
 /**
  * Storybook — the DS's contract surface (docs/DS-PLAN.md Phase 4).
@@ -16,7 +17,7 @@ const config: StorybookConfig = {
   framework: "@storybook/nextjs-vite",
   stories: ["../app/ui/**/*.mdx", "../app/ui/**/*.stories.@(ts|tsx)"],
   addons: [
-    "@storybook/addon-docs",
+    { name: "@storybook/addon-docs", options: { mdxPluginOptions: { mdxCompileOptions: { remarkPlugins: [remarkGfm] } } } },
     "@storybook/addon-a11y",
     "storybook-addon-pseudo-states",
   ],

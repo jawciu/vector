@@ -6,7 +6,7 @@ export const meta: DsMeta = {
     "Filtering a visible list as the user types: tab headers (Actions, Meetings), dropdown people-pickers — anywhere the shipped `.search-input` wrapper is hand-rolled today (Phase 7 retrofits them onto this).",
   ],
   dontUseWhen: [
-    "Ordinary form values — use TextField inside <Field>; search boxes never take a Field label.",
+    "Ordinary form values — use TextField inside `<Field>`; search boxes never take a Field label.",
     "Submit-to-search flows (a query sent to a server on Enter) — nothing in the DS yet; this one filters live.",
   ],
   a11y: [

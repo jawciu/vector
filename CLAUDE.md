@@ -340,6 +340,14 @@ tests, build green, ratchet green vs `ratchet-baseline.json`. This is CI's FIRST
 4 jobs on GitHub. GOTCHA: a bare local `npm run lint` shows ~319 errors, ALL inside the gitignored
 `storybook-static/` build output; CI never sees it. Delete that folder or ignore it in eslint config.
 Storybook re-review still pending; Phase 6 still blocked on it.
+**2026-09-11 — three Storybook fixes during her re-review (UNCOMMITTED):** (1) the docs pages of every
+component with pseudo-state stories re-rendered in a loop ("flashing") — the round-1 pseudo-globals
+reset decorator in `preview.tsx` emitted unconditionally, and on a docs page all stories render
+together, so a pseudo story re-armed it every pass; now emits only while `context.globals.pseudo` is
+set. (2) MDX tables rendered as raw pipes on 4 Foundations/Menu pages — `remark-gfm` added and wired
+into addon-docs in `main.ts` (config change = Storybook restart). (3) bare `<Field label=…>` in five
+meta strings rendered as a DOM tag (36 console errors) — backticked. Verified: 0 re-renders/4s, 0
+console errors, tables render, story-mode leak guard still works, tsc + lint clean.
 
 ### 2026-08-08 — Vector has a logo; favicon + app icons shipped
 

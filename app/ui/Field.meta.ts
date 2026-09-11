@@ -11,7 +11,7 @@ export const meta: DsMeta = {
     "Drawer detail rows (icon + value, no label copy) — use FieldRow.",
     "Pill-shaped dropdown triggers inside modals (due date, priority) — use FieldPill.",
     "Search fields — use SearchField (it owns its own icon + input layout, no Field wrapper).",
-    "The local <Field> helpers inside TeamPanel.js / FollowUpModal.js are unrelated namesakes, not consumers of this primitive (retrofit is Phase 7's job).",
+    "The local `<Field>` helpers inside TeamPanel.js / FollowUpModal.js are unrelated namesakes, not consumers of this primitive (retrofit is Phase 7's job).",
   ],
   a11y: [
     "useId wires label→control (htmlFor/id): clicking the label focuses the control and screen readers can name it. A child's own `id` wins over the generated one.",
