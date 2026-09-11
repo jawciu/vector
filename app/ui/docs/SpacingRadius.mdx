@@ -1,0 +1,121 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Foundations/Spacing & radius" />
+
+export const Panel = ({ children }) => (
+  <div
+    style={{
+      color: "var(--color-text)",
+      background: "var(--color-bg)",
+      border: "1px solid var(--color-border)",
+      borderRadius: 8,
+      padding: "16px 20px",
+      margin: "16px 0 28px",
+    }}
+  >
+    {children}
+  </div>
+);
+
+export const SpaceRow = ({ name, px }) => (
+  <div style={{ display: "flex", alignItems: "center", gap: 20, padding: "7px 0" }}>
+    <code
+      style={{
+        width: 36,
+        flexShrink: 0,
+        fontSize: 12,
+        fontFamily: "var(--font-geist-mono, ui-monospace), monospace",
+        color: "var(--color-text-muted)",
+      }}
+    >
+      {name}
+    </code>
+    <span style={{ width: 44, flexShrink: 0, fontSize: 12, color: "var(--color-text-muted)" }}>
+      {px}px
+    </span>
+    <div style={{ width: px, height: 16, borderRadius: 2, background: "var(--color-action)" }} />
+  </div>
+);
+
+export const RadiusBox = ({ cls, label, px, use, radius }) => (
+  <div style={{ width: 150 }}>
+    <div
+      className={cls}
+      style={{
+        height: 64,
+        background: "var(--color-surface)",
+        border: "1px solid var(--color-button-secondary-border)",
+        borderRadius: radius,
+      }}
+    />
+    <div
+      style={{
+        marginTop: 8,
+        fontSize: 12,
+        fontFamily: "var(--font-geist-mono, ui-monospace), monospace",
+        color: "var(--color-text)",
+      }}
+    >
+      {label} · {px}
+    </div>
+    <div style={{ marginTop: 2, fontSize: 12, lineHeight: 1.4, color: "var(--color-text-muted)" }}>
+      {use}
+    </div>
+  </div>
+);
+
+# Spacing & radius
+
+Both scales are Tailwind v4's defaults, used directly. The rung names in `DESIGN.md`
+match the utilities, the utilities in use **are** the scale at runtime, and no
+`--spacing-*` or `--radius-*` overrides are emitted.
+
+## Spacing
+
+The Tailwind default scale is in use everywhere; these are the values Vector leans on
+most.
+
+<Panel>
+  <SpaceRow name="xs" px={4} />
+  <SpaceRow name="sm" px={8} />
+  <SpaceRow name="md" px={12} />
+  <SpaceRow name="lg" px={16} />
+  <SpaceRow name="xl" px={24} />
+</Panel>
+
+Where surfaces converge:
+
+- **Padding**: 12px (sm), 16px (md), 20 to 24px (lg) on cards and panels.
+- **Gaps**: 4px between menu items, 8 to 12px between cards, 24px between major sections
+  in a grid.
+- No formal grid system. The home page uses a 7-column CSS grid with explicit widths;
+  the onboarding board is a flex row of fixed-width 240px kanban columns.
+
+## Radius
+
+Aligned to Tailwind v4's default radius scale (Caroline's ruling, 2026-08-09). The boxes
+below render with the real utility classes, except the bespoke 20px card.
+
+<div style={{ display: "flex", flexWrap: "wrap", gap: 16, margin: "16px 0 28px" }}>
+  <RadiusBox cls="rounded-sm" label="rounded-sm" px="4px" use="Pills, small badges, IconButton (also plain rounded)" />
+  <RadiusBox cls="rounded-md" label="rounded-md" px="6px" use="Status badges, menu options" />
+  <RadiusBox cls="rounded-lg" label="rounded-lg" px="8px" use="Buttons, inputs" />
+  <RadiusBox cls="rounded-xl" label="rounded-xl" px="12px" use="Floating surfaces (bulk action bar), Modal" />
+  <RadiusBox radius={20} label="20px" px="bespoke" use="InsightCard shells (.oi-card / .pi-card): the one radius outside the scale" />
+  <RadiusBox cls="rounded-full" label="rounded-full" px="9999px" use="Avatar circles ONLY" />
+</div>
+
+## Shape rules
+
+| Use | Radius | Notes |
+| --- | --- | --- |
+| Avatars / initials circles | `rounded-full` | The **only** place `rounded-full` is correct |
+| IconButton | `rounded-sm` (4px) | Always `rounded`, never `rounded-full` |
+| Pills, status badges | `rounded-sm` / `rounded-md` | |
+| Inputs, buttons | `rounded-lg` (8px) | |
+| Cards, hero panels | 20px (bespoke) | InsightsPanel cards, PortfolioInsightsHero |
+| Bulk action bar, modals | `rounded-xl` (12px) | Floating surfaces |
+
+- **Don't ship `rounded-full` on a square element.** It is reserved for circles.
+- Arbitrary values (`p-[13px]`, `rounded-[10px]`) are flagged by
+  `vector/no-arbitrary-tailwind`: stay on the scale.

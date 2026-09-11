@@ -1,0 +1,71 @@
+# CI — replaces unit-tests.yml (DS-PLAN Phase 3).
+# Four independent gates: lint (ESLint incl. the vector/* DS rules at their
+# configured severities + design.md spec lint), unit tests, a production
+# build, and the DS audit ratchet (fails if any design-system metric
+# regresses vs the committed baseline — the repo can only improve).
+# Playwright e2e is NOT run here (needs a live DB + dev server).
+name: CI
+
+on:
+  push:
+    branches: [main, design-system]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+      - name: ESLint
+        run: npm run lint
+      - name: design.md spec lint
+        run: npm run lint:ds
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+      - name: Run unit tests
+        run: npm test
+
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # Dummy values — the build only needs these to exist (Prisma client
+      # instantiation during page-data collection; Supabase client config).
+      # No external service is contacted during a build.
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      NEXT_PUBLIC_SUPABASE_URL: https://ci-dummy.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-dummy-key
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+      - name: Production build
+        run: npm run build
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 26
+      # ratchet-baseline.json advances with each approved phase;
+      # 2026-08-baseline.json is the immutable pre-DS "before" snapshot.
+      - name: DS audit ratchet
+        run: node scripts/audit-ds.mjs --baseline docs/ds-audit/ratchet-baseline.json

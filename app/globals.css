@@ -22,9 +22,15 @@ html {
   color-scheme: dark;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
+/* Base reset. MUST live in @layer base: unlayered rules beat Tailwind's
+ * layered utilities, so an unlayered version of this rule silently disables
+ * every margin utility (m-*, mt-*, …) app-wide — that was a live bug from the
+ * Create-Next-App template until 2026-08-09 (see docs/DS-LOG.md Phase 2). */
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+  }
 }
 
 a {
@@ -81,7 +87,7 @@ a {
   color: var(--text);
 }
 
-.tab-btn:hover .tab-btn__inner {
+.tab-btn:not([data-active]):hover .tab-btn__inner {
   color: var(--text-secondary);
 }
 
@@ -126,6 +132,27 @@ a {
 .icon-btn:disabled {
   color: var(--icon-tertiary);
   cursor: not-allowed;
+}
+
+/* NEW (2026-08, pending Caroline's review): destructive icon button —
+   IconButton `tone="danger"`. Mirrors .text-btn-danger's colour step
+   (danger → danger-hover on hover); the hover/active fills stay the neutral
+   bg-hover / surface-hover steps from the base .icon-btn so the only red is
+   the glyph itself. Disabled inherits the base iconTertiary dimming
+   (.icon-btn:disabled outranks .icon-btn--danger). */
+.icon-btn--danger {
+  color: var(--danger);
+}
+
+.icon-btn--danger:hover:not(:disabled) {
+  background-color: var(--bg-hover);
+  color: var(--danger-hover);
+}
+
+.icon-btn--danger:active:not(:disabled),
+.icon-btn--danger.icon-btn--active {
+  background-color: var(--surface-hover);
+  color: var(--danger-hover);
 }
 
 /* Secondary button */
@@ -177,6 +204,16 @@ a {
   cursor: not-allowed;
 }
 
+/* Tertiary, danger tone (Button tone="danger"): red label, same colour step as
+   .text-btn-danger. Disabled still falls to text-muted via .btn-tertiary:disabled. */
+.btn-tertiary--danger {
+  color: var(--danger);
+}
+
+.btn-tertiary--danger:hover:not(:disabled) {
+  color: var(--danger-hover);
+}
+
 /* Primary button */
 .btn-primary {
   background-color: var(--action);
@@ -226,7 +263,9 @@ a {
   background-color: var(--surface-hover);
 }
 
-/* Inline text buttons (e.g. Copy / Revoke / Generate) */
+/* Legacy inline text buttons. Not a DS variant: six raw call sites (ContactsPanel,
+   PortalDrawer, ActionsTab, MeetingsTab). Deleted when Phase 7 retrofits them
+   onto .btn-tertiary. */
 .text-btn {
   background: none;
   border: none;
@@ -255,6 +294,208 @@ a {
 
 .text-btn-danger:hover:not(:disabled) {
   color: var(--danger-hover);
+}
+
+/* Button loading spinner (Button.tsx `loading` prop). 1em so it scales with
+ * the button's text size. Loading motion is essential status information, so
+ * reduced motion slows it rather than freezing it into a static ring. */
+.btn-spinner {
+  width: 1em;
+  height: 1em;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  /* 1s per revolution — 0.6s read as frantic (Caroline, 2026-08-11) */
+  animation: btn-spin 1s linear infinite;
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-spinner {
+    animation-duration: 2s;
+  }
+}
+
+/* Loading buttons keep the ACTIVE colour, not the disabled wash — a working
+ * button is busy, not unavailable (Caroline, 2026-08-11). The [aria-busy]
+ * hook is set by Button's `loading` prop, which also sets `disabled`. */
+.btn-primary[aria-busy="true"]:disabled {
+  background-color: var(--action-active);
+  cursor: progress;
+}
+
+.btn-destructive[aria-busy="true"]:disabled {
+  background-color: var(--danger-active);
+  cursor: progress;
+}
+
+/* Modal (app/ui/Modal.tsx) — native <dialog>, so focus trapping, ESC and the
+ * top layer come from the browser. The scrim is the ::backdrop, painted with
+ * the DESIGN.md scrim token. Radius 12px = rounded.xl per the documented
+ * scale ("Bulk action bar, modals"); the legacy hand-rolled modals were 20px,
+ * and converge on this during the Phase 7 retrofit. */
+.modal {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  width: calc(100vw - 48px);
+}
+
+.modal::backdrop {
+  background: var(--color-scrim);
+}
+
+.modal--sm { max-width: 400px; }
+.modal--md { max-width: 520px; }
+.modal--lg { max-width: 640px; }
+
+/* Form controls (app/ui/TextField.tsx / Textarea.tsx / Select.tsx) — the
+ * Phase 5 Field primitives. The component was renamed Input → TextField
+ * (Caroline, 2026-08-11) but the `.input` class name is kept AS IS for now —
+ * renaming the CSS layer is a separate decision.
+ * State model extracted from `.search-input` (the best
+ * current hand-rolled pattern):
+ *   default → `border` border on `bg`
+ *   hover   → `bg-hover` + `buttonSecondaryBorder`
+ *   focus   → `action` border on `bg`
+ * NEW (pending Caroline's review): the focus treatment on a STANDALONE
+ * control — .search-input only ever did this on a wrapper via :focus-within;
+ * naked inputs in the app today are outline-none with no focus style at all.
+ * NEW (pending Caroline's review): the invalid state — `danger` border that
+ * holds through hover AND focus, so a broken field stays visibly broken
+ * while it's being fixed. */
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px; /* text-sm — "default UI size" per the DESIGN.md scale */
+  font-family: inherit;
+  line-height: 1.4;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px; /* rounded.lg — "Inputs, buttons" per DESIGN.md Shapes */
+  outline: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.input:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--button-secondary-border);
+}
+
+.input:focus {
+  background: var(--bg);
+  border-color: var(--action);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input--invalid,
+.input--invalid:hover:not(:disabled),
+.input--invalid:focus {
+  border-color: var(--danger);
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Field (app/ui/Field.tsx) — label / help / error copy around one control.
+ * Label = the DESIGN.md `smallLabel` token, i.e. the Settings NAME/EMAIL
+ * idiom (11px uppercase textMuted), formalised as a class. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+.field-help {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* NEW (pending Caroline's review): inline error copy in `danger` below the
+ * control — pairs with .input--invalid. */
+.field-error {
+  font-size: 12px;
+  color: var(--danger);
+}
+
+/* Checkbox (app/ui/Checkbox.tsx) — the dropdown-row checkbox ("the one we
+ * use in drop downs", Caroline 2026-08-11), extracted from the TaskDrawer /
+ * CreateTaskModal member pickers. Same 16px hit area as .member-checkbox;
+ * the states are painted by the inner 14px svg. NEW (pending Caroline's
+ * review): the focus-visible ring — the hand-rolled ones had none. */
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: none;
+  border: none;
+  border-radius: 4px; /* rounded.sm — shapes the focus outline only */
+  padding: 0;
+  cursor: pointer;
+}
+
+.checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.checkbox:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* TaskTick (app/ui/TaskTick.tsx) — the circular mark-a-task-done tick,
+ * extracted from TaskCardView's CheckboxButton. 4px padding around the 14px
+ * svg = a 22px hit area, matching the shipped button (minus its call-site
+ * negative margins, which stay at the call site). NEW (pending Caroline's
+ * review): the focus-visible ring — the shipped button had none. */
+.task-tick {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.task-tick:disabled {
+  /* Read-only surfaces (e.g. InsightsPanel): not washed out, just inert —
+   * matches the shipped non-interactive rendering. */
+  cursor: default;
+}
+
+.task-tick:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* Mode toggle (e.g. Existing / New in onboarding modal) */
@@ -626,6 +867,15 @@ a {
   border-color: var(--button-secondary-border);
 }
 
+/* Legacy: field triggers used to be divs with role="button". The DS main
+   control is a native button now (.field-main:focus-visible above); this stays
+   for raw .field-pill/.field-row in feature code until Phase 7. */
+.field-pill:focus-visible,
+.field-row:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 /* Pill dropdown triggers */
 .field-pill {
   background: var(--bg-elevated);
@@ -638,6 +888,45 @@ a {
 
 .field-pill[data-active="true"] {
   background: var(--surface-hover);
+}
+
+/* Field pill/row internals. The wrapper owns the box and states; the main
+   control is a native button that fills it. The Clear (X) is a sibling button
+   at the end of the row: display:none at rest (no reserved space), shown on
+   wrapper hover / focus-within / active so the field grows to fit it. */
+.field-main {
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.field-main:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.field-clear {
+  display: none;
+  padding: 0 8px 0 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+.field-pill:hover .field-clear,
+.field-pill:focus-within .field-clear,
+.field-pill[data-active="true"] .field-clear,
+.field-row:hover .field-clear,
+.field-row:focus-within .field-clear,
+.field-row[data-active="true"] .field-clear {
+  display: inline-flex;
+}
+.field-clear:hover { color: var(--text); }
+.field-clear:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
 }
 
 .menu-trigger-pill {
@@ -658,10 +947,10 @@ a {
   cursor: default;
 }
 
-/* Status pill — outlined (default) and filled variants. Same outer
-   dimensions in both variants so they sit on the same baseline as the
-   table health pills. Pair with an inline `color` (outlined) or
-   `background` (filled) of the relevant status token. */
+/* Status pill. Outlined (default) and filled variants; md (14px, default)
+   and sm (12px, outlined only). Colour comes from the Badge primitive's
+   token utilities (app/ui/Badge.tsx); legacy call sites still pair the base
+   class with an inline colour until Phase 7. */
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -677,6 +966,24 @@ a {
 .status-pill--filled {
   border: 0.5px solid transparent;
   color: var(--text-dark);
+}
+
+/* md size: the insight-card pills render 14px/400 via inline overrides today
+ * (InsightCard.js) while the class is 12px/500 — drift found in Caroline's
+ * 2026-08-11 review. Formalised as a size variant; Phase 7 folds the inline
+ * overrides onto it. */
+.status-pill--md {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+/* sm size: the task drawer status picker chip (12px, 1px 4px). Badge only. */
+.status-pill--sm {
+  padding: 1px 4px;
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 400;
 }
 
 /* AI surface treatment — gradient used on the Vector sparkle and any
@@ -852,7 +1159,7 @@ a {
    AI draft references, portal task card, etc.). Source of the string is
    `task.taskId` (composed in lib/db.js from company.prefix + task.number).
    Inline-only: no background, no border, monospace, slightly smaller and
-   muted vs. the title it sits beside. Used by `app/ui/TaskIdChip.js`. */
+   muted vs. the title it sits beside. Used by `app/ui/TaskIdChip.tsx`. */
 .task-id {
   font-family: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
   font-size: 0.8125rem;
@@ -1131,15 +1438,6 @@ a {
 
 .add-task-btn:hover {
   color: var(--text);
-}
-
-/* Filter button styles */
-.task-filter-btn {
-  transition: all 0.15s ease;
-}
-
-.task-filter-btn:hover {
-  background-color: var(--surface-hover);
 }
 
 .notes-textarea::placeholder {

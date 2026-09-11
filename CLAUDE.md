@@ -129,6 +129,9 @@ proxy.js                  # Next.js middleware entry point (Supabase session)
 - All dropdowns/popovers MUST use `MenuList` + `MenuOption` from `app/components/Menu.js`.
 - IconButton: always `w-5 h-5 rounded` + `.icon-btn`. `rounded-full` is for avatar circles only.
 - DS primitives are added incrementally — only extract to `app/ui/` when explicitly asked.
+- **Any change to a DS primitive updates its meta, stories, JSDoc, DESIGN.md and every MDX/meta
+  that cross-references it, in the same change** (grep for the name). Full checklist in
+  `skills/design-system/SKILL.md`. Removing a component means the same sweep.
 
 ---
 
@@ -176,6 +179,16 @@ proxy.js                  # Next.js middleware entry point (Supabase session)
 
 _Newest first. Why, not just what._
 
+- **2026-09-11 — Rollout is STAGED, one component per PR; Phase 8 folded into Phase 7 as slices.** Caroline: "focus on a few components and take those to all the stages, so when we push to main I review a few components in production instead of freaking out about the whole app." Two facts make it safe: nothing in `app/ui` is user-visible until a screen imports it (Storybook does not ship with the app), and Vercel previews every PR, so she reviews one component across the app on the preview before merge. Slice order in `docs/DS-PLAN.md` Phase 7: 0 foundation merge (only visible change = the Phase 2 margin fix) → Button → Badge → Popover/keyboard/Select (sub-sliced, keyboard layer first) → Modal + form fields → pill clear → icons → inline-style sweep → keyboard walk. Phase 9 interleaves, ideally right after slice 0. **Ratchet baseline refreshed 2026-09-11 in the slice 0 PR (her go-ahead for slice 0 = the refresh).**
+- **2026-09-11 — Select (custom, never native) is the value picker; Menu is action menus only.** From a 37-surface survey: two trigger looks (inline drawer rows, bordered modal boxes) over one list, plus Members = searchable multi-select the docs never covered. Model matches Radix / React Aria / Ariakit / Polaris / Carbon: `Select` with `trigger="inline"|"boxed"`, `multiple`, `searchable`, on a shared Popover with a full keyboard model; FieldRow/FieldPill become its triggers; MenuList/MenuOption/MenuTriggerButton become internals with deprecated aliases. Name "Select" is free since the native wrapper was deleted, fenced by the raw-`<select>` lint and a Menu-vs-Select chooser doc. Four open questions for Caroline are in the plan (filter pills, active→open/selected rename, Field wrapping Select, AI-inbox disabled pills).
+- **2026-09-11 — Badge is the only status pill: 8-colour union (+mint/sky/candy), `status` prop owns the task-status mapping, `variant` filled|outlined replaces the `filled` boolean, outlined has md 14px / sm 12px.** Measured, not assumed: the board-header health pill she called "bold" is 14px/400 (the dark-on-bright fill reads heavier); the only 500-weight pill was the insight one. Filled = header pill exactly; she confirmed 400/14. Dead `StatusBadge.js` deleted (zero importers). The seven hand-rolled pill sites are slice 2.
+- **2026-09-11 — FieldPill/FieldRow: native `<button>` inside a non-interactive wrapper, inline clear X.** Her ask was the drawer's clear-on-hover pattern; the first cut nested a button inside `role="button"` (axe serious) and reserved width. Final: wrapper div + `.field-main` native button + sibling Clear button shown on hover/focus-within/open, field grows to fit (matches the app). Closes peer-review item 12 for these two.
+
+- **2026-09-11 — Select removed from the DS; keyboard operability is a hard requirement for the whole tool.** Caroline's Storybook review: "we should never have a system-native dropdown in the design system". The Select primitive had been built from the one hand-rolled native `<select>` in the app (Status, onboarding edit form) and the peer review had praised keeping the native popup for free keyboard/screen-reader behaviour; her rule wins. Select.tsx/meta/stories deleted, Field wraps TextField + Textarea only, dropdowns are always Menu. The Status field is a Phase 7 retrofit onto Menu. Consequence she called out herself: Menu's keyboard model (deferred in Phase 5) is now mandatory and lands before that retrofit, and every screen must be keyboard-operable by the Phase 8 exit. Plan updated in `docs/DS-PLAN.md` (+ plain-English twin).
+- **2026-09-11 — Button: `text` variant deprecated, tertiary gains `tone="danger"`.** Caroline: text and tertiary were one too many; the lilac text button survives only as deprecated until Phase 7 retrofits its 6 raw `.text-btn` call sites (ContactsPanel ×3 incl. the red Revoke, PortalDrawer upload, ActionsTab + MeetingsTab "Clear"). `tone` is now a compile error outside tertiary/text (peer-review item 9 closed); `disabled`/`loading`/`children` exposed as Storybook controls (inherited DOM props are skipped by docgen, so they must be declared).
+
+- **2026-09-10 — Phase 9 gains an agent-navigation package (intent + pairsWith on DsMeta, generated `app/ui/INDEX.md`, `metaCoverage` ratchet metric, two-questions doctrine + refusal format in the skills).** Caroline reviewed a talk on design systems built for LLMs and asked for its useful ideas folded in. The diagnosis it makes is real for us: an agent facing a flat `app/ui` folder reads everything and still picks by name; the cure is letting it narrow BEFORE reading (intent category → index → one meta file). Most of the talk's other ideas we already have (DsMeta = its per-component doc block, `status` = its published flag, ESLint + ratchet + CI = its mechanical review) or deliberately rejected: no atomic-level axis (25 primitives, all atoms/molecules — no discriminating power), no per-component changelogs (git + DS-LOG already; ceremony for one designer), no agent fleet gating every commit (wrong scale/cost), no per-component health dashboard (the scorecard is the dashboard). Our index is GENERATED from the meta files, which is stronger than the talk's hand-maintained one — that is the same drift class Phase 9 already kills for the style-right skill. Full spec in `docs/DS-PLAN.md` Phase 9 (+ the plain-English twin). **Her rule: the talk and its product are NOT to be named anywhere in the repo.** Still gated behind her Storybook re-review like the rest of Phase 9.
+
 - **2026-07-15 — Mobile is blocked in the vendor app; the portal stays mobile-friendly.** The vendor UI is not responsive yet and Caroline doesn't want anyone seeing it broken, so `DesktopOnlyOverlay` (`app/components/DesktopOnlyOverlay.js`, rendered from `AppShell` on all vendor paths including `/login`) covers the viewport below 768px with a branded "Vector is built for desktop" screen — custom SVG (monitor + mini kanban + lilac vector-arrow in the **action ramp**; the AI gradient/sparkle stays reserved for AI surfaces), draw-in/float animations in `globals.css` (`.dg-*`, `prefers-reduced-motion` respected). Visibility is pure CSS (`md:hidden`, zIndex 10000) — no UA sniffing, desktop untouched, and a squished desktop window is blocked too (the layout is equally broken there). **The customer portal is deliberately excluded** (`AppShell` early-returns for `/portal`) — it was built mobile-first and customers open magic links on phones. No escape hatch by choice; add a "continue anyway" link if Caroline ever needs to demo from a phone.
 
 - **2026-07-12 — Button emphasis is a three-tier ladder, and repeated rows get NO primary.** The AI draft inbox had a filled `btn-primary` on every row (`Create task` / `Comment` / `Approve`), so scrolling the page was a wall of purple. Researched the major design systems: **IBM Carbon** — *"Each page should have only one primary button… for data lists, low emphasis buttons (tertiary or ghost) may be a better choice"*; **Atlassian** — *"primary buttons should only appear once per area"*; Polaris and Material 3 agree. The logic that settled it: a filled button repeated N times conveys **zero** hierarchy (if every row shouts, no row is louder) *and* steals distinction from the page's real primary. So the inbox now has **zero primaries** — accept actions are `secondary`, everything else (`Dismiss` / `Edit task` / `Save draft` / `Open in mail`) is `tertiary`. **Merged `.btn-ghost` into `.btn-tertiary`** — Caroline correctly called out that two identical-looking low-emphasis classes is one too many. Tertiary = bare label, `textMuted` → `text` on hover, **never a background** (that's what made ghost look like a different component next to an inline Dismiss); the transparent 1px border only exists to height-match an adjacent secondary. Added `tertiary` to `app/ui/Button.js` and documented the whole ladder + the one-primary-per-section rule + 3 new Don'ts in DESIGN.md. **Also fixed `.btn-secondary`'s hover app-wide**: it went `--bg` (#18181E) → `--bg-hover` (#211F29), a ~3-point shift that is invisible when the button sits on an elevated card (#1D1C24). Hover is now `--surface-hover`, active is `--bg-hover`. **This changes every secondary button in the app** — worth an eye on other views.
@@ -198,6 +211,166 @@ _Newest first. Why, not just what._
 ## Session Log / Handoff
 
 _Newest first._
+
+### 2026-08-08 — Agent-first DS: plan adopted + Phase 0 (baseline audit) done. UNCOMMITTED.
+
+**⚠ ALL DS WORK LIVES ON BRANCH `design-system` (created 2026-08-09, off main).** Caroline's call:
+she's mid job-hunt and Vercel deploys main, so nothing DS-related touches main until she merges.
+Also verified 2026-08-09: the `* { margin: 0 }` reset is from the Create-Next-App initial commit
+(`c2b3bd5`, 27 Jan), NOT from her onboardings-table edge-to-edge work; exactly **15 margin-utility
+usages** in 12 files are currently dead and will activate when Phase 2 layers the reset (list via
+`grep -rE '\b(m|mt|mb|ml|mr|mx|my)-[0-9]' app`) — each needs a before/after eyeball, and the fix
+does NOT resurrect browser default margins (the reset stays, just inside `@layer base`).
+
+**The big picture:** Caroline approved a 10-phase plan to rebuild Vector's design system as an
+agent-first DS with Storybook — a portfolio centrepiece AND her learning vehicle for founding-designer
+roles. **`docs/DS-PLAN.md` is the plan of record** (Part A: reusable 7-lens audit playbook; Part B:
+phases 0–10). **`docs/DS-PLAN-SIMPLE.md` is the same plan in plain English, heading-for-heading** —
+keep BOTH in sync whenever the plan changes, she reads them side by side. Her binding decisions:
+TS in `app/ui/` only · self-hosted VRT (Playwright + Vercel-hosted Storybook, no Chromatic) ·
+retrofit in two stages (targeted, then full sweep — the sweep was her addition) · coverage metrics
+always show count + ratio together, never % alone.
+
+**Phase 0 shipped (all uncommitted, awaiting her OK):**
+- `scripts/audit-ds.mjs` — zero-dep DS scorecard (`npm run audit:ds`; `--json`, `--out`,
+  `--baseline <file>` ratchet mode that exits 1 on any metric regression — verified both directions).
+  Repo-specific patterns live in the `SCOPE`/`PRIMITIVE_*` block at the top.
+- `docs/ds-audit/2026-08-baseline.json` — the frozen "before" snapshot; `docs/ds-audit/README.md` —
+  metric definitions. package.json gained `audit:ds`.
+- Baseline: 1,081 inline styles · buttons 55/143 (38.5% counting all blessed button-likes; the plan's
+  older "18/103 (17%)" was `<Button>`-only) · inputs 0/39 · icons 12/112 · stories + TS 0/14 ·
+  **5 modal shells with no dialog a11y — the script found a 5th (`OnboardingActions.js`) the manual
+  audit missed**. Also discovered: FollowUpModal + TeamPanel have a LOCAL `<Field>` component —
+  never count it as a DS primitive, and absorb it when `app/ui/Field.tsx` ships in Phase 5.
+
+**Full seven-lens evaluation completed same day (also uncommitted):** lenses 3/5/6/7 written up in
+`docs/ds-audit/2026-08-lenses.md`. Headlines: focus-visible covers ONLY the six `.btn-*` classes;
+task cards/draft cards/Field editors are keyboard-inoperable divs; Drawer leaks tab stops when
+closed; no loading or error state exists in any primitive; **52 doc defects** (19 FALSE · 11 STALE ·
+5 DEAD · 17 MINOR — skills are the least accurate docs, README the most); and one LIVE BUG:
+`globals.css:25` unlayered `* { margin: 0 }` after the Tailwind import kills every `m-*` utility
+app-wide (fix scheduled in Phase 2 — grep `m-*` usages first, fixing it activates dead classes).
+The wrong filename `build-theme.js` appears in 3 docs + theme.css's own generated header
+(hardcoded at build-theme.mjs:41). Visual report artifact (private, republished at the same URL
+each phase): https://claude.ai/code/artifact/e930beb8-5ede-466e-a98d-bb9018fa3f70
+
+**Phase 0 committed on `design-system`: `1774a2a`** (her explicit OK, 2026-08-09).
+
+**Phase 1 DONE 2026-08-09 (UNCOMMITTED on `design-system`):** TypeScript foundation.
+- devDeps typescript 6 + @types/{react,react-dom,node}; deps clsx + tailwind-merge.
+- `tsconfig.json` (strict, allowJs, checkJs:false — Next amended it on first build, that's normal);
+  `jsconfig.json` DELETED (Next ignores it once tsconfig exists). `next-env.d.ts` generated.
+- `app/ui/cn.ts` (clsx + twMerge — caller classes beat component defaults).
+- **`Button.js` → `Button.tsx`, the pattern-setter**: closed unions (ButtonVariant/Size/Tone),
+  extends ButtonHTMLAttributes, variants as a Record lookup emitting the SAME class strings as
+  before (pixel-identical), plus the app's first `loading` state: aria-busy, disabled, invisible
+  (not unmounted) label so width is preserved, centred `.btn-spinner` (new class in globals.css,
+  1em currentColor ring; reduced-motion SLOWS it — loading is essential status info).
+  ⚠ Spinner centring uses absolute inset-0 + flex, NOT `m-auto` — margin utilities are still dead
+  until Phase 2 fixes the reset. Don't "simplify" it to m-auto before then.
+- Verified: tsc --noEmit clean · build green · 63/63 unit tests · lint clean · audit ratchet
+  passes with tsCoverage 0 → 1/14, no regressions.
+
+**Phase 1 committed: `2548e80`. Phase 2 DONE 2026-08-09 (UNCOMMITTED on `design-system`)** — full
+detail in `docs/DS-LOG.md` Phase 2. Headlines: theme.css is now @theme (utilities bg-action /
+text-muted / shadow-floating / bg-scrim REAL, verified compiling) + legacy :root aliases;
+margin-reset bug FIXED (`@layer base`), all 15 dead margin usages activated and screenshot-verified
+harmless; DESIGN.md drift fixed at source (dead tokens removed — `primary` KEPT, design.md lint
+requires one; scrim lives in a custom `overlays:` frontmatter section because the spec rejects
+non-6-digit-hex). BOTH pending decisions RESOLVED by Caroline 2026-08-09: radius scale aligned to
+Tailwind's real values (rung names now match utilities — sm 4 / md 6 / lg 8 / xl 12 / full; the
+doc-only 10px never rendered), and text-xl = 20px (matches Tailwind + the login heading; 22 was
+paper-only). Zero pixels changed by either. Margin-fix before/after review artifact (flicker
+viewer): https://claude.ai/code/artifact/2076a6b8-bbda-41fc-96d7-aa485645d06c . The :3010 review
+server has been stopped again; spin one up on a spare port if she asks (never touch 3000/3001).
+
+**Phase 2 committed: `3eaabed`. Phase 3 DONE 2026-08-09 (UNCOMMITTED on `design-system`)** — full
+detail in `docs/DS-LOG.md` Phase 3. `eslint-rules/index.mjs` (vector/no-raw-color +
+vector/no-arbitrary-tailwind; warn in feature code, ERROR in app/ui; escape hatch =
+eslint-disable with reason, pattern in Sparkle.js) + raw-element warnings (app/ui & Menu.js
+exempt). Current lint: 0 errors / 187 warnings (= the measured retrofit debt). Rules caught a real
+one day one: CalendarDropdown's hardcoded shadow → var(--shadow-floating). `ci.yml` REPLACES
+unit-tests.yml: lint / test / build (dummy DATABASE_URL + 2 Supabase vars, verified sufficient) /
+audit-ratchet jobs; triggers on main + design-system pushes — ⚠ UNEXERCISED until first push,
+watch the 4 jobs then.
+
+**Phase 3 committed: `2a67e21`. Phase 4 DONE + COMMITTED `5affc7a` (2026-08-09, her OK)** — full
+detail in `docs/DS-LOG.md` Phase 4. Her review added the Interactive-playground doctrine (76
+stories now); she's still reviewing Storybook at her own pace — treat further story tweaks as
+review follow-ups, not a new phase. Storybook 10.5.7 (@storybook/nextjs-vite, addons docs/a11y/
+pseudo-states; `npm run storybook` port 6006). **74 stories + 14 autodocs across ALL 14 primitives;
+11/14 converted to TSX** (Drawer/CalendarDropdown/InsightCard stay .js until Phase 5; their
+stories carry typed casts to delete then). DsMeta system: ds-meta.ts schema + <Name>.meta.ts per
+primitive, rendered into autodocs via dsMetaDescription (simplified vs plan's custom DocBlock).
+Story doctrine: stories document what EXISTS — Drawer's ClosedChildrenStillMounted play PINS the
+tab-stop leak and must be UPDATED when Phase 5 fixes it. New Phase-5 fixes found by storying:
+active-tab-dims-on-hover (.tab-btn specificity), Calendar month arrows have no accessible name
+(stories carry a11y test:"todo"), Drawer's undocumented background prop. Audit script now excludes
+*.stories.*/*.meta.* as DS scaffolding (metric-definition change, documented; the ratchet caught
+its own staleness — 4 false regressions — before the fix). Verified: 74/14/14 in index.json, tsc
+clean, lint 0 errors, 63/63 tests, ratchet green with storyCoverage 0→100% + tsCoverage 0→78.6%.
+
+**Phase 5 DONE 2026-08-11 (UNCOMMITTED on `design-system`)** — full detail in `docs/DS-LOG.md`
+Phase 5. New primitives: Modal (native <dialog>, scrim token, 12px radius, experimental) ·
+Field/Input/Textarea/Select (on-scale, NEW visuals: input focus border + per-field invalid state)
+· Spinner · Badge (token utilities, not inline vars) · Menu MOVED to app/ui (byte-identical,
+components/Menu.js = shim, 14 consumers untouched, keyboard model deliberately deferred). Four
+pinned gaps FIXED: Drawer inert-when-closed, Calendar arrow labels, active-tab hover dim,
+FieldPill/Row keyboard + NEW focus ring. Found: PortalDrawer hand-rolls its own panel, still
+leaks — Phase 7 list. Storybook: 119 stories / 22 components. HER RULE IN FORCE: NO screenshots/
+VRT baselines until she approves everything in Storybook; audit inlineStyles floor is 1083 (+2
+justified: Spinner dynamic fontSize, Menu move) — refresh baseline WITH her phase approval only.
+
+**Phase 5 committed `0452ce0`. REVIEW ROUND 1 COMMITTED `06e5c2e` (2026-08-17, her OK; ratchet
+baseline refreshed in the same commit). Working tree clean as of 2026-08-20.** — her 23-point
+Storybook review fully processed; see `docs/DS-LOG.md` "Review round 1" for everything. Headlines:
+her review exposed a REAL storybook-addon-pseudo-states globals leak (fixed in preview.tsx);
+Input→TextField rename; icons 7→36; Foundations docs section (incl. Voice: NO EM DASHES EVER);
+new SearchField/Checkbox/TaskTick; commissioned peer review graded B+ and its 5 FIX-NOW items all
+shipped same day (incl. a real cn()/tailwind-merge bug eating .text-btn — pinned by cn.test.js,
+the DS's first unit test; suite now 66). Storybook: 176 stories / 31 docs / 25 components,
+storyCoverage 100%. OPEN Caroline decisions queued: active/selected naming, Badge variant union,
+className doctrine, CSS-layer split, InlineProse rename, InlineTextField naming, KanbanCard
+extraction (deliberately deferred), Foundations' 5 DESIGN.md ambiguities, peer-review items 6-12.
+
+**Next (handoff 2026-08-20, Caroline signed off to sleep):** she re-reviews the round-1 changes in
+Storybook at her leisure (run it HERSELF or via `! cd /Users/caro/Code/onboarding && npm run
+storybook` — agent-started servers get killed in this environment). THEN, in order: (1) her queued
+decisions — active/selected naming, Badge variant union, className doctrine write-up, CSS-layer
+split, InlineProse rename, InlineTextField naming+build, KanbanCard extraction, the 5 DESIGN.md
+ambiguities from Foundations, peer-review items 6-12; (2) Phase 6 (VRT + public Storybook) —
+REMEMBER her rule: NO screenshots/baselines until she has approved everything in Storybook, and
+the branch must be pushed for CI's first run (never push without her explicit say-so). She had a
+meeting planned with someone building AI-agent DS tooling — she may return with ideas/requests
+from that conversation. (new primitives: Modal on native <dialog>, Field/Input/Textarea/Select, Spinner,
+Badge, Menu move) per `docs/DS-PLAN.md` — Phase 5 also picks up the story-writing findings above.
+
+**2026-09-10 — branch PUSHED to origin (her call, for a job application; main untouched, nothing
+merged).** All four CI gates re-verified locally first: tsc clean, lint 0 errors / 187 warnings, 66/66
+tests, build green, ratchet green vs `ratchet-baseline.json`. This is CI's FIRST real run — check the
+4 jobs on GitHub. GOTCHA: a bare local `npm run lint` shows ~319 errors, ALL inside the gitignored
+`storybook-static/` build output; CI never sees it. Delete that folder or ignore it in eslint config.
+Storybook re-review still pending; Phase 6 still blocked on it.
+**2026-09-11 — three Storybook fixes during her re-review (UNCOMMITTED):** (1) the docs pages of every
+component with pseudo-state stories re-rendered in a loop ("flashing") — the round-1 pseudo-globals
+reset decorator in `preview.tsx` emitted unconditionally, and on a docs page all stories render
+together, so a pseudo story re-armed it every pass; now emits only while `context.globals.pseudo` is
+set. (2) MDX tables rendered as raw pipes on 4 Foundations/Menu pages — `remark-gfm` added and wired
+into addon-docs in `main.ts` (config change = Storybook restart). (3) bare `<Field label=…>` in five
+meta strings rendered as a DOM tag (36 console errors) — backticked. Verified: 0 re-renders/4s, 0
+console errors, tables render, story-mode leak guard still works, tsc + lint clean.
+
+### 2026-08-08 — Vector has a logo; favicon + app icons shipped
+
+**Done:** Caroline designed the Vector logo (a filled double chevron pointing up-right, 45° sheared ends — `--action` lilac #C098FF on #18181E, both exact DS tokens). Process: I generated a 20-option HTML gallery, she picked the double chevron (option 14), I did a squared/modernised round of 10 tile treatments referencing logos she likes (Wise-style chunky flat glyphs), and she then designed the final mark herself in Figma. Both throwaway galleries lived in the session scratchpad — already gone, nothing in the repo.
+
+- **Committed and pushed: `756f30b` "Add Vector logo as favicon and app icons"** (Caroline OK'd commit + push explicitly). Contents: `app/favicon.ico` (replaced Next default; 16/32/48 packed), `app/icon.png` (512), `app/apple-icon.png` (180) — all picked up by Next.js **file conventions, zero `layout.js` changes** — plus the master files moved from repo root into `public/`: `vector-logo.png` (615×615 original) and `vector-logo.svg` (her Figma export, glyph-only, transparent bg — use this if the mark ever goes into the sidebar/login UI).
+- Favicon PNGs were derived from her PNG with Lanczos (PIL) — no vector redraw, per her explicit instruction. A full size kit (16/32/48/192/512 + apple-touch + .ico) also sits in `~/Desktop/vector-favicons/` for LinkedIn/portfolio use.
+- Verified end-to-end on a live dev server: rendered HTML links all three icons, every route serves byte-identical files. **Gotcha: something else (coral-gradient icon, likely the portfolio app) is currently squatting port 3001, so THIS app's `npm run dev` lands on port 3000** — reverse of the documented convention. Careful with `pkill -f "next dev --webpack"`: it can kill the other app too if it runs the same command (it survived this time — different invocation).
+
+**State:** clean working tree except this CLAUDE.md entry; `local HEAD == origin/main == 756f30b`. Dev server stopped. CI push run is asset-only, nothing to watch.
+
+**Next steps:** none pending from this session. Commit this CLAUDE.md entry when Caroline OKs it. If she wants the logo inside the app UI (sidebar header, login page), `public/vector-logo.svg` is the source to use.
 
 ### 2026-07-13 — `.btn-secondary` hover verified app-wide (the flagged risk from 2026-07-12 is CLEARED)
 

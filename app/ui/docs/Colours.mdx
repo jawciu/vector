@@ -1,0 +1,268 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Foundations/Colours" />
+
+export const mono = "var(--font-geist-mono, ui-monospace), monospace";
+
+export const Row = ({ children }) => (
+  <div style={{ display: "flex", flexWrap: "wrap", gap: 16, margin: "16px 0 28px" }}>
+    {children}
+  </div>
+);
+
+export const TokenLabel = ({ token, note }) => (
+  <>
+    <div
+      style={{
+        marginTop: 8,
+        fontSize: 12,
+        fontFamily: mono,
+        color: "var(--color-text)",
+        overflowWrap: "anywhere",
+      }}
+    >
+      {`var(--color-${token})`}
+    </div>
+    {note ? (
+      <div style={{ marginTop: 2, fontSize: 12, lineHeight: 1.4, color: "var(--color-text-muted)" }}>
+        {note}
+      </div>
+    ) : null}
+  </>
+);
+
+export const Swatch = ({ token, note }) => (
+  <div style={{ width: 168 }}>
+    <div
+      style={{
+        height: 56,
+        borderRadius: 8,
+        background: `var(--color-${token})`,
+        border: "1px solid var(--color-border)",
+      }}
+    />
+    <TokenLabel token={token} note={note} />
+  </div>
+);
+
+export const TextSwatch = ({ token, on = "bg-elevated", note }) => (
+  <div style={{ width: 168 }}>
+    <div
+      style={{
+        height: 56,
+        borderRadius: 8,
+        background: `var(--color-${on})`,
+        border: "1px solid var(--color-border)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 16,
+        color: `var(--color-${token})`,
+      }}
+    >
+      Aa Vector
+    </div>
+    <TokenLabel token={token} note={note} />
+  </div>
+);
+
+# Colours
+
+Every colour in Vector is a token defined in `DESIGN.md` and generated into `app/theme.css`
+by `npm run build:ds`. Each token is both a CSS variable and a Tailwind utility class
+(`bg-action`, `text-muted`, `border-border`). Prefer the utility classes in new code;
+`var(--color-*)` works everywhere for CSS and dynamic styles.
+
+The swatches below are painted with `var(--color-*)` directly, so this page can never
+drift from the shipped values. To change a colour, edit `DESIGN.md` and rebuild.
+
+## Surfaces
+
+Surfaces stack vertically by elevation: `bg` (page) → `bg-elevated` (cards, modals) →
+`surface` (buttons, inputs, pills). Depth comes from background layering, not shadows.
+Hover states bump one rung up; active/selected always lands on `surface-hover` regardless
+of base.
+
+<Row>
+  <Swatch token="deeper-bg" note="Recessed surface, slightly darker than bg (drawers)" />
+  <Swatch token="bg" note="Page / app background (lowest)" />
+  <Swatch token="bg-elevated" note="Elevated surfaces: cards, modals, kanban task cards" />
+  <Swatch token="surface" note="Interactive surface: buttons, inputs, pills" />
+</Row>
+
+Hover progressions:
+
+<Row>
+  <Swatch token="bg-hover" note="Hover on transparent / bg surfaces: menu rows, links" />
+  <Swatch token="bg-elevated-hover" note="Hover on bg-elevated surfaces" />
+  <Swatch token="surface-hover" note="Hover on surface. Also the active/selected state" />
+</Row>
+
+Borders:
+
+<Row>
+  <Swatch token="border" note="Default borders" />
+  <Swatch token="border-subtle" note="Lower-emphasis borders (currently the same value as border)" />
+  <Swatch token="button-secondary-border" note="Component-level: secondary button border" />
+</Row>
+
+## Text
+
+Three weights of emphasis. Going from `text-muted` straight to `text` on hover reads as
+"selected": use `text-secondary` for the hover step on navigation-like surfaces.
+
+<Row>
+  <TextSwatch token="text" note="Primary text on dark backgrounds" />
+  <TextSwatch token="text-secondary" note="Secondary text: hover step on nav, paragraph body" />
+  <TextSwatch token="text-muted" note="Tertiary text: labels, placeholder, inactive nav" />
+  <TextSwatch token="text-dark" on="action" note="Text on bright backgrounds (avatars, primary buttons)" />
+</Row>
+
+## Action
+
+The single warm-purple brand ramp. `action-text` is the text colour for content sitting
+on `action` backgrounds (buttons mostly).
+
+<Row>
+  <Swatch token="action" note="Primary button default" />
+  <Swatch token="action-hover" note="Subtle lighten on hover" />
+  <Swatch token="action-active" note="Darken when pressed" />
+  <Swatch token="action-disabled" note="Desaturated muted state" />
+  <TextSwatch token="action-text" on="action" note="Text on action backgrounds" />
+</Row>
+
+## Danger
+
+Destructive ramp: delete, revoke, error states, blocked tasks. Destructive buttons use
+`text-dark` for their label.
+
+<Row>
+  <Swatch token="danger" note="Destructive default" />
+  <Swatch token="danger-hover" note="Destructive hover" />
+  <Swatch token="danger-active" note="Destructive pressed" />
+  <Swatch token="danger-disabled" note="Destructive disabled" />
+</Row>
+
+## Status
+
+Reserved for state, never decoration. Status pill mapping: Declining → `danger`,
+At risk → `alert`, On track → `success`, Improving → `mint`.
+
+<Row>
+  <Swatch token="success" note="Completion, positive state (checkmark wins, Done tags)" />
+  <Swatch token="danger" note="Destructive and error (shared with the danger ramp)" />
+  <Swatch token="alert" note="Warning, caution (At risk)" />
+</Row>
+
+## Accent and utility
+
+<Row>
+  <Swatch token="accent" note="Cyan accent, rare use" />
+  <Swatch token="icon-tertiary" note="Disabled / placeholder icon" />
+</Row>
+
+## Avatar palette
+
+Rotates by initials hash. Only for avatar and company-initial pills. Never for status
+or action.
+
+<Row>
+  <Swatch token="mint" />
+  <Swatch token="rose" />
+  <Swatch token="sunset" />
+  <Swatch token="lilac" />
+  <Swatch token="sky" />
+  <Swatch token="candy" />
+</Row>
+
+## AI gradient
+
+Marks output as AI-generated: the Vector sparkle, AI section dividers, hover highlights
+on AI-actionable items. `ai-gradient-from` equals `action` lilac; `ai-gradient-to` is a
+warm peach. Always a 135deg sweep. For SVG fills, inline the gradient as a
+`<linearGradient>` referencing the two stops.
+
+<div
+  style={{
+    height: 56,
+    borderRadius: 8,
+    margin: "16px 0 8px",
+    maxWidth: 536,
+    background: "linear-gradient(135deg, var(--color-ai-gradient-from), var(--color-ai-gradient-to))",
+  }}
+/>
+<Row>
+  <Swatch token="ai-gradient-from" note="Gradient start (equals action)" />
+  <Swatch token="ai-gradient-to" note="Gradient end (warm peach)" />
+</Row>
+
+```css
+background: linear-gradient(135deg, var(--ai-gradient-from), var(--ai-gradient-to));
+```
+
+## Focus and scrim
+
+`focus-ring` (equals `action`) is the outline colour for `:focus-visible` on interactive
+elements: 2px solid, 2px offset. De-emphasising a control must never cost it a focus
+ring. `scrim` is the modal and dialog backdrop (60% black), painted on the native
+`<dialog>` `::backdrop` by the Modal primitive.
+
+<Row>
+  <div style={{ width: 168 }}>
+    <div
+      style={{
+        height: 56,
+        borderRadius: 8,
+        background: "var(--color-surface)",
+        border: "1px solid var(--color-border)",
+        outline: "2px solid var(--color-focus-ring)",
+        outlineOffset: 2,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 13,
+        color: "var(--color-text)",
+      }}
+    >
+      focus-visible
+    </div>
+    <TokenLabel token="focus-ring" note="Outline for :focus-visible (equals action)" />
+  </div>
+  <div style={{ width: 168 }}>
+    <div style={{ position: "relative", height: 56, borderRadius: 8, overflow: "hidden", border: "1px solid var(--color-border)" }}>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "var(--color-bg-elevated)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 13,
+          color: "var(--color-text)",
+        }}
+      >
+        content behind
+      </div>
+      <div style={{ position: "absolute", inset: "0 0 0 50%", background: "var(--color-scrim)" }} />
+    </div>
+    <TokenLabel token="scrim" note="Modal / dialog backdrop (60% black), right half above" />
+  </div>
+</Row>
+
+## Usage rules
+
+From the do's and don'ts in `DESIGN.md`:
+
+- **Layer surfaces for depth, not shadows.** Add a 1px `border` if more separation is
+  needed. The only shadow in the system is `shadow-floating` on the bulk action bar.
+- **Use `text-secondary` as the hover step** from `text-muted` on navigation surfaces.
+  Jumping straight to `text` reads as "selected".
+- **Don't use status colours for decoration**, for example `danger` for "important"
+  without an actual destructive action.
+- **Use the avatar palette for company and contact initials only.** Never for status
+  or action.
+- **Don't add new top-level CSS custom properties without updating `DESIGN.md`.** It is
+  the source of truth; `theme.css` is generated from it.
+- A `primary` alias exists in the tokens because the design.md spec requires one. It is
+  spec ceremony: use `action` in app code.

@@ -10,7 +10,9 @@ import { useEffect, useRef } from "react";
  *
  * Props:
  *   value            — selected date string (YYYY-MM-DD) or ""
- *   viewDate         — Date object controlling which month is displayed
+ *   viewDate         — Date object controlling which month is displayed;
+ *                      hosts start it at today (or the value's month) so the
+ *                      picker opens on the current month
  *   onViewDateChange — callback to update viewDate
  *   onChange          — called with YYYY-MM-DD string when a day is picked
  *   onClear          — called when "Clear" is clicked
@@ -75,7 +77,7 @@ export default function CalendarDropdown({ value, viewDate, onViewDateChange, on
         borderRadius: 12,
         padding: 12,
         minWidth: 260,
-        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+        boxShadow: "var(--shadow-floating)",
       }}
     >
       {/* Header */}
@@ -86,21 +88,23 @@ export default function CalendarDropdown({ value, viewDate, onViewDateChange, on
         <div className="flex items-center gap-1">
           <button
             type="button"
+            aria-label="Previous month"
             onClick={() => onViewDateChange(new Date(year, month - 1, 1))}
             className="flex items-center justify-center w-6 h-6 rounded icon-btn"
             style={{ background: "none", border: "none", cursor: "pointer" }}
           >
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
               <path d="M7 1L3 5L7 9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           <button
             type="button"
+            aria-label="Next month"
             onClick={() => onViewDateChange(new Date(year, month + 1, 1))}
             className="flex items-center justify-center w-6 h-6 rounded icon-btn"
             style={{ background: "none", border: "none", cursor: "pointer" }}
           >
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
               <path d="M3 1L7 5L3 9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>

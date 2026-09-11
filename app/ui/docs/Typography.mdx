@@ -1,0 +1,125 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Foundations/Typography" />
+
+export const fontVars = {
+  ["--font-geist-sans"]: "Geist, 'Geist Fallback', system-ui, sans-serif",
+  ["--font-geist-mono"]: "'Geist Mono', ui-monospace, monospace",
+};
+
+export const Sample = ({ children, style }) => (
+  <div
+    style={{
+      ...fontVars,
+      fontFamily: "var(--font-sans)",
+      color: "var(--color-text)",
+      background: "var(--color-bg)",
+      border: "1px solid var(--color-border)",
+      borderRadius: 8,
+      padding: "16px 20px",
+      margin: "16px 0 28px",
+      ...style,
+    }}
+  >
+    {children}
+  </div>
+);
+
+export const TypeRow = ({ cls, px, use, sample }) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "baseline",
+      gap: 24,
+      padding: "14px 0",
+      borderBottom: "1px solid var(--color-border)",
+    }}
+  >
+    <code
+      style={{
+        width: 88,
+        flexShrink: 0,
+        fontSize: 12,
+        fontFamily: "var(--font-geist-mono)",
+        color: "var(--color-text-muted)",
+      }}
+    >
+      {cls}
+    </code>
+    <span style={{ width: 44, flexShrink: 0, fontSize: 12, color: "var(--color-text-muted)" }}>
+      {px}
+    </span>
+    <span className={cls} style={{ flex: 1, minWidth: 200 }}>
+      {sample}
+    </span>
+    <span style={{ width: 180, flexShrink: 0, fontSize: 12, lineHeight: 1.4, color: "var(--color-text-muted)" }}>
+      {use}
+    </span>
+  </div>
+);
+
+# Typography
+
+Vector sets type in **Geist** (`--font-sans`, with a system-ui fallback) and uses
+**Geist Mono** for code-like content such as task IDs. The scale is expressed as the
+Tailwind utilities in use: every rung equals Tailwind v4's default, so `text-xs` through
+`text-xl` **are** the scale at runtime and no `--text-*` overrides are emitted.
+
+The rows below render with the real utility classes, so the sizes on this page are the
+sizes in the product.
+
+## The scale
+
+xl was proposed at 22px; Caroline ruled 20px (2026-08-09), matching Tailwind and the
+existing login heading.
+
+<Sample>
+  <TypeRow cls="text-xs" px="12px" use="Chips, metadata" sample="Last synced 4 minutes ago" />
+  <TypeRow cls="text-sm" px="14px" use="Default UI size, body" sample="Vendors see only the tasks assigned to them." />
+  <TypeRow cls="text-base" px="16px" use="Emphasised body" sample="Three tasks are blocked on customer input." />
+  <TypeRow cls="text-lg" px="18px" use="Panel titles" sample="Onboarding overview" />
+  <TypeRow cls="text-xl" px="20px" use="Page / dialog headings (login Sign in)" sample="Sign in" />
+</Sample>
+
+Body sits at `text-sm` (14px) with line-height 1.5.
+
+## Small label
+
+Section headers (for example card titles in InsightsPanel) use the small label treatment:
+11px, uppercase, 0.6px letter-spacing. It sits below the scale's `xs` rung and is a
+treatment, not a size rung.
+
+<Sample>
+  <div
+    style={{
+      fontSize: 11,
+      textTransform: "uppercase",
+      letterSpacing: "0.6px",
+      color: "var(--color-text-muted)",
+    }}
+  >
+    Focus today
+  </div>
+</Sample>
+
+## Fonts
+
+<Sample>
+  <div style={{ fontSize: 16 }}>Geist: the UI face for everything.</div>
+  <div style={{ fontSize: 14, marginTop: 12, fontFamily: "var(--font-geist-mono)" }}>
+    Geist Mono: code-like content (task IDs, token names).
+  </div>
+</Sample>
+
+- `--font-sans` is the registered token:
+  `var(--font-geist-sans), system-ui, sans-serif`. The app loads Geist via `next/font`
+  in `app/layout.js`; Storybook maps the same variables in `.storybook/preview.tsx`.
+- Geist Mono is loaded by the app as `--font-geist-mono`. It is not yet a registered
+  design token in `DESIGN.md` (only the sans stack is).
+
+## Rules
+
+- Reach for the scale's utility classes (`text-xs` … `text-xl`), never arbitrary sizes.
+  The `vector/no-arbitrary-tailwind` lint rule flags values that dodge the scale.
+- Source copy stays sentence case even when a treatment uppercases the rendered text
+  (see Foundations/Voice & copy).

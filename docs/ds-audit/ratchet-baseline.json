@@ -1,0 +1,150 @@
+{
+  "generatedAt": "2026-09-11",
+  "scannedFiles": 84,
+  "metrics": {
+    "rawHexTotal": 15,
+    "rawHexDistinct": 3,
+    "rawRgba": 26,
+    "inlineStyles": 1090,
+    "arbitraryTw": 34,
+    "hardcodedGeometry": 1000,
+    "rawButtons": 86,
+    "primitiveButtons": 55,
+    "buttonCoveragePct": 39,
+    "rawInputs": 39,
+    "primitiveInputs": 0,
+    "inputCoveragePct": 0,
+    "scatteredSvg": 100,
+    "centralSvg": 44,
+    "iconCoveragePct": 30.6,
+    "uiComponents": 24,
+    "storyFiles": 24,
+    "storyCoveragePct": 100,
+    "tsUiFiles": 21,
+    "tsCoveragePct": 87.5,
+    "dialogsMissingA11y": 5
+  },
+  "details": {
+    "rawHexValues": [
+      "#5D565D",
+      "#5cd6a5",
+      "#C098FF"
+    ],
+    "rawHexFiles": [
+      {
+        "file": "app/components/AIDraftInbox.js",
+        "count": 4
+      },
+      {
+        "file": "app/components/CreateTaskModal.js",
+        "count": 3
+      },
+      {
+        "file": "app/components/TaskDrawer.js",
+        "count": 3
+      },
+      {
+        "file": "app/admin/ai/page.js",
+        "count": 2
+      },
+      {
+        "file": "app/components/ContactsPanel.js",
+        "count": 2
+      },
+      {
+        "file": "app/components/PipelineTimeline.js",
+        "count": 1
+      }
+    ],
+    "worstInlineStyleFiles": [
+      {
+        "file": "app/components/AIDraftInbox.js",
+        "count": 158
+      },
+      {
+        "file": "app/components/TaskDrawer.js",
+        "count": 90
+      },
+      {
+        "file": "app/components/CreateTaskModal.js",
+        "count": 56
+      },
+      {
+        "file": "app/components/PipelineTimeline.js",
+        "count": 54
+      },
+      {
+        "file": "app/portal/[onboardingId]/PortalDrawer.js",
+        "count": 49
+      },
+      {
+        "file": "app/admin/ai/page.js",
+        "count": 46
+      },
+      {
+        "file": "app/components/TestWebhookPanel.js",
+        "count": 35
+      },
+      {
+        "file": "app/onboardings/[id]/OnboardingDetailClient.js",
+        "count": 30
+      }
+    ],
+    "worstRawButtonFiles": [
+      {
+        "file": "app/components/AIDraftInbox.js",
+        "count": 20
+      },
+      {
+        "file": "app/components/FollowUpModal.js",
+        "count": 5
+      },
+      {
+        "file": "app/components/TaskDrawer.js",
+        "count": 5
+      },
+      {
+        "file": "app/onboardings/[id]/OnboardingDetailClient.js",
+        "count": 5
+      },
+      {
+        "file": "app/components/ContactsPanel.js",
+        "count": 4
+      },
+      {
+        "file": "app/components/NotificationBell.js",
+        "count": 4
+      },
+      {
+        "file": "app/components/PipelineTimeline.js",
+        "count": 4
+      },
+      {
+        "file": "app/components/CreateOnboardingModal.js",
+        "count": 3
+      }
+    ],
+    "dialogFiles": [
+      {
+        "file": "app/components/CreateOnboardingModal.js",
+        "hasA11y": false
+      },
+      {
+        "file": "app/components/CreateTaskModal.js",
+        "hasA11y": false
+      },
+      {
+        "file": "app/components/FollowUpModal.js",
+        "hasA11y": false
+      },
+      {
+        "file": "app/components/MemberModal.js",
+        "hasA11y": false
+      },
+      {
+        "file": "app/components/OnboardingActions.js",
+        "hasA11y": false
+      }
+    ]
+  }
+}

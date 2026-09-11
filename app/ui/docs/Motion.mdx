@@ -1,0 +1,104 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import Button from "../Button";
+import Spinner from "../Spinner";
+
+<Meta title="Foundations/Motion" />
+
+export const Panel = ({ children, row }) => (
+  <div
+    style={{
+      color: "var(--color-text)",
+      background: "var(--color-bg)",
+      border: "1px solid var(--color-border)",
+      borderRadius: 8,
+      padding: "20px",
+      margin: "16px 0 28px",
+      ...(row ? { display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" } : {}),
+    }}
+  >
+    {children}
+  </div>
+);
+
+# Motion
+
+Vector's motion is small and functional: quick colour transitions on hover and press,
+one slide for the task drawer, and a handful of AI states. Two durations and one curve
+cover it.
+
+## Tokens
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `--ease-standard` | `cubic-bezier(0.4, 0, 0.2, 1)` | The standard easing curve for eased movement (the task drawer slide) |
+| `--duration-fast` | `0.15s` | Hover and active colour transitions |
+| `--duration-medium` | `0.25s` | Larger moves: the task drawer slide-in |
+
+<Panel row>
+  <svg width="120" height="120" viewBox="0 0 120 120" aria-label="ease-standard curve: cubic-bezier(0.4, 0, 0.2, 1)">
+    <rect x="10" y="10" width="100" height="100" fill="none" stroke="var(--color-border)" />
+    <path
+      d="M 10 110 C 50 110, 30 10, 110 10"
+      fill="none"
+      stroke="var(--color-action)"
+      strokeWidth="2"
+    />
+  </svg>
+  <div style={{ fontSize: 12, color: "var(--color-text-muted)", maxWidth: 280, lineHeight: 1.5 }}>
+    <code>cubic-bezier(0.4, 0, 0.2, 1)</code>: fast out, gentle settle. Time runs left to
+    right, progress bottom to top.
+  </div>
+</Panel>
+
+Hover a button to feel `--duration-fast` on the background transition:
+
+<Panel row>
+  <Button variant="primary">Add member</Button>
+  <Button variant="secondary">Create task</Button>
+  <Button variant="tertiary">Dismiss</Button>
+</Panel>
+
+## The spinner
+
+`.btn-spinner` is the loading indicator: a 1em `currentColor` ring spinning at **1s per
+revolution** (0.6s read as frantic, Caroline's call 2026-08-11). It is sized via
+`font-size`, so one number scales it, and it inherits colour from its context.
+
+<Panel row>
+  <Spinner size={16} />
+  <Spinner size={24} />
+  <span style={{ color: "var(--color-action)", display: "inline-flex" }}>
+    <Spinner size={24} aria-label="Loading insights" />
+  </span>
+  <Button variant="primary" loading>
+    Add member
+  </Button>
+</Panel>
+
+While loading, a button keeps the **active** colour rather than the disabled wash: a
+working button is busy, not unavailable (Caroline, 2026-08-11). It sets `aria-busy`,
+blocks interaction, shows `cursor: progress`, and keeps its width by hiding the label
+instead of unmounting it.
+
+## Reduced motion
+
+Under `prefers-reduced-motion: reduce`:
+
+- **The spinner slows to 2s per revolution rather than stopping.** Loading is essential
+  status information, so the motion is calmed, not removed.
+- The AI generating border (`.ai-generating.is-streaming`) pauses its spin; the 2s
+  crossfade still plays.
+- The AI sparkle twinkle stops.
+- The AI text shimmer turns off and the text reverts to flat `text-secondary`.
+
+The principle: motion that decorates is removed, motion that informs is slowed.
+
+## Rules
+
+- Use the tokens (`var(--ease-standard)`, `var(--duration-fast)`,
+  `var(--duration-medium)`), not new literal curves or durations.
+- Every animated state needs a reduced-motion answer: remove it if decorative, slow it
+  if it carries information.
+- For AI states, use the existing classes (`.ai-generating`, `.ai-sparkle-twinkle`,
+  `.ai-text-shimmer`) rather than inventing new loading motion; the sparkle twinkle
+  replaces a generic spinner during AI generation.

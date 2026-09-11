@@ -3,10 +3,9 @@ name: Vector
 version: 0.1.0
 description: Design system for Vector — a B2B onboarding workflow tool.
 colors:
-  # Spec-convention semantic aliases (point to our named tokens via references).
-  primary: "{colors.action}"        # Brand primary = the action ramp's default
-  secondary: "{colors.text}"        # Body / heading text
-  tertiary: "{colors.accent}"       # Cyan accent (used sparingly)
+  # Spec-convention alias: design.md lint requires a `primary`; ours is the
+  # action ramp's default. Not used directly in app code — use `action`.
+  primary: "{colors.action}"
 
   # Surfaces — vertical stacking by elevation
   deeperBg: "#14141A"           # Recessed surface — slightly darker than bg (drawers, etc.)
@@ -14,7 +13,6 @@ colors:
   bgElevated: "#1D1C24"         # Elevated surfaces — cards, modals, kanban task cards
   bgElevatedHover: "#232028"    # Hover on bg-elevated surfaces
   bgHover: "#211F29"            # Hover on transparent / bg surfaces — menu rows, links
-  navHover: "#211F29"           # Hover on nav surfaces (alias of bgHover)
   surface: "#1F1E26"            # Interactive surface — buttons, inputs, pills
   surfaceHover: "#26242F"       # Active/selected state on surfaces
 
@@ -42,14 +40,12 @@ colors:
   dangerActive: "#E5677B"       # Destructive pressed
   dangerDisabled: "#80444E"     # Destructive disabled
   alert: "#FFDA91"              # Warning, caution
-  warning: "#FBBF24"            # Warning amber (notifications, badges)
 
   # Focus
   focusRing: "{colors.action}"  # Outline colour for :focus-visible on interactive elements
 
   # Accent / utility
   accent: "#22D3EE"             # Cyan accent (rare use)
-  accentMuted: "#0891B2"        # Muted cyan
   iconTertiary: "#5D565D"       # Disabled / placeholder icon
 
   # Avatar / badge palette (rotates by initials hash)
@@ -72,11 +68,16 @@ colors:
 typography:
   fontFamily:
     sans: "var(--font-geist-sans), system-ui, sans-serif"
-  # Sizes are currently expressed via Tailwind utility classes (text-xs, text-sm, …).
-  # When we formalise a scale these will move into named ramps.
-  body:
-    fontSize: 14px
-    lineHeight: 1.5
+  # The type scale, expressed as the Tailwind utilities in use. Every rung
+  # equals Tailwind v4's default, so text-xs…text-xl ARE the scale at runtime
+  # and no --text-* overrides need emitting. (xl was proposed at 22px; Caroline
+  # ruled 20px, 2026-08-09 — matches Tailwind and the existing login heading.)
+  scale:
+    xs: 12px     # text-xs — chips, metadata
+    sm: 14px     # text-sm — default UI size, body
+    base: 16px   # text-base — emphasised body
+    lg: 18px     # text-lg — panel titles
+    xl: 20px     # text-xl — page/dialog headings (login "Sign in")
   smallLabel:
     fontSize: 11px
     textTransform: uppercase
@@ -91,12 +92,20 @@ spacing:
   xl: 24px
 
 rounded:
-  xs: 4px      # Pills, small badges, IconButton
-  sm: 6px      # Status badges, menu options
-  md: 8px      # Inputs, secondary buttons
-  lg: 10px     # Cards, hero panels
-  xl: 12px     # Large modal-like surfaces (bulk action bar)
-  full: 9999px # Avatar circles ONLY
+  # Aligned to Tailwind v4's default radius scale (Caroline's ruling
+  # 2026-08-09): the rung names match the utilities, the utilities in use ARE
+  # the scale at runtime, and no --radius-* overrides are emitted. (The old
+  # doc-only values — lg 10px etc. — never rendered anywhere.)
+  sm: 4px      # `rounded` / `rounded-sm` — pills, small badges, IconButton
+  md: 6px      # `rounded-md` — status badges, menu options
+  lg: 8px      # `rounded-lg` — buttons, inputs
+  xl: 12px     # `rounded-xl` — floating surfaces (bulk action bar)
+  full: 9999px # `rounded-full` — avatar circles ONLY
+
+# Custom section (not part of the design.md spec, which is hex-only for
+# colors): translucent overlay colours. Emitted to @theme by build-theme.mjs.
+overlays:
+  scrim: "rgba(0, 0, 0, 0.6)"   # Modal / dialog backdrop (60% black)
 
 shadows:
   # Currently we use almost no shadows — depth comes from bg layering.
@@ -112,7 +121,7 @@ motion:
 
 # Vector design system
 
-A dark-first design system for a B2B onboarding workflow tool. Tone: clear, operator-focused, minimal chrome, action-led. Built on **Tailwind CSS v4** with a CSS-first `@theme` config; `globals.css` is the runtime source, this file is the documented source of truth.
+A dark-first design system for a B2B onboarding workflow tool. Tone: clear, operator-focused, minimal chrome, action-led. Built on **Tailwind CSS v4** with a CSS-first `@theme` config: this file is the source of truth, `scripts/build-theme.mjs` generates `app/theme.css` from it (an `@theme` block registering every token as a utility class — `bg-action`, `text-muted`, `shadow-floating` — plus legacy `:root` aliases for the migration), and `globals.css` imports it and holds the component CSS.
 
 The system is deliberately **incremental** — Caroline adds primitives to the DS only when a pattern earns it. Don't pre-extract.
 
@@ -181,22 +190,21 @@ Depth is communicated by **background colour layering**, not shadows. The only s
 | Use | Token | Notes |
 |---|---|---|
 | Avatars / initials circles | `rounded.full` | The **only** place `rounded-full` is correct |
-| IconButton | `rounded.xs` (`4px`) | **Always `rounded`, never `rounded-full`** |
-| Pills, status badges | `rounded.xs` / `rounded.sm` | |
-| Inputs, secondary buttons | `rounded.md` | |
-| Cards, hero panels | `rounded.lg` | InsightsPanel cards, PortfolioInsightsHero |
+| IconButton | `rounded.sm` (`4px`) | **Always `rounded`, never `rounded-full`** |
+| Pills, status badges | `rounded.sm` / `rounded.md` | |
+| Inputs, buttons | `rounded.lg` (`8px`) | |
+| Cards, hero panels | 20px (bespoke) | InsightsPanel cards (`.oi-card`), PortfolioInsightsHero (`.pi-card`) — the one radius outside the scale |
 | Bulk action bar, modals | `rounded.xl` | Floating surfaces |
 
 ## Components
 
-### `Button` — `app/ui/Button.js`
+### `Button` — `app/ui/Button.tsx`
 
-Variants: `primary` | `secondary` | `tertiary` | `destructive` | `text`. Sizes: `xs` | `sm` (default). Solid variants share `rounded-lg` (8px) and `gap-2` (8px) between leading icon and label.
+Variants: `primary` | `secondary` | `tertiary` | `destructive`. Sizes: `xs` | `sm` (default). Solid variants share `rounded-lg` (8px) and `gap-2` (8px) between leading icon and label.
 - **Primary**: `font-semibold`, uses `.btn-primary` CSS class. Default `action`, hover `actionHover`, active `actionActive`, disabled `actionDisabled`. Text always `actionText`.
 - **Secondary**: `font-normal`, uses `.btn-secondary` CSS class. `surface` background, `border` border, `text` colour. Hover `surfaceHover`, active `bgHover`. Disabled keeps the border but text becomes `textMuted`.
-- **Tertiary**: `font-normal`, uses `.btn-tertiary` CSS class. No fill and no visible border — the label alone. Rests at `textMuted` (the same tone as an inactive tab label) and brightens to `text` on hover. **It never takes a background, on hover or otherwise.** Carries a transparent 1px border so its box matches an adjacent secondary and a button row doesn't shift. Disabled stays `textMuted`.
-- **Destructive**: `font-semibold`, uses `.btn-destructive` CSS class. Default `danger`, hover `dangerHover`, active `dangerActive`, disabled `dangerDisabled`. Text always `textDark`. Use only for irreversible actions (delete, revoke).
-- **Text**: inline text-only button via `.text-btn`. Pair with `tone="action"` (default, `action` colour) or `tone="danger"` (`danger` colour). No padding, no background, no radius. Use sparingly for inline actions like Copy / Revoke. **This is not a fourth emphasis tier** — it's the base for coloured inline links, not a button weight.
+- **Tertiary**: `font-normal`, uses `.btn-tertiary` CSS class. No fill and no visible border — the label alone. Rests at `textMuted` (the same tone as an inactive tab label) and brightens to `text` on hover. **It never takes a background, on hover or otherwise.** Carries a transparent 1px border so its box matches an adjacent secondary and a button row doesn't shift. Disabled stays `textMuted`. `tone="danger"` (`.btn-tertiary--danger`) turns the label `danger`, `dangerHover` on hover, for inline low-emphasis destructive actions such as Revoke. `tone` exists only on tertiary; the type forbids it on the other variants. The old lilac `.text-btn` is not a variant; its six raw call sites are retrofitted onto tertiary in Phase 7.
+- **Destructive**: `font-semibold`, uses `.btn-destructive` CSS class. Default `danger`, hover `dangerHover`, active `dangerActive`, disabled `dangerDisabled`. Text always `textDark`. Use only for irreversible actions as the solid, confirming button (delete, the confirm step of a revoke). An inline revoke in a table row is tertiary `tone="danger"`, not destructive.
 
 **Emphasis is a three-tier ladder: primary > secondary > tertiary.** There is no "ghost" — tertiary *is* the ghost. Cancel/dismiss alongside another button uses `variant="tertiary"` at the same size.
 
@@ -265,14 +273,18 @@ Pill-shaped trigger that opens a popover (date picker, status filter, etc.). The
 </button>
 ```
 
-### Status pill — `.status-pill`, `.status-pill--filled`
+### Status pill — `Badge` (`app/ui/Badge.tsx`)
 
-Small uppercase-or-cased label communicating state. Two variants:
+Small cased label communicating state. `Badge` is the only status pill in the DS (2026-09-11). Two variants:
 
-- **`.status-pill`** (default, outlined): transparent background, 1px border in the status colour, text in the status colour. Use inline alongside text or chips.
-- **`.status-pill--filled`**: filled in the status colour, text in `textDark`. Use as a louder header-level status (e.g. the "Declining" pill on `PortfolioInsightsHero`). Same proportions as the default variant: `padding: 2px 4px`, `rounded.sm` (6px), `12px` text.
+- **Outlined** (default): transparent background, 0.5px border and text in the colour. Two sizes: **md** 14px/20px, `padding: 2px 4px` (the kanban card chip, default) and **sm** 12px/16px, `padding: 1px 4px` (the task drawer status picker). Weight 400, `rounded.md` (6px).
+- **Filled**: the colour fills the pill, text in `textDark`. One size, md, the board header health and blocked pills. Same proportions as outlined md.
 
-Status → token mapping (used by Vector trend / portfolio status):
+Colour comes from one of two props, never both: `color` (the closed union `success` / `danger` / `alert` / `action` / `muted` / `mint` / `sky` / `candy`) or `status` (a task status; Badge owns the mapping: Not started → `muted`, In progress → `mint`, Under investigation → `sky`, On hold → `candy`, Blocked → `danger`, Done → `success`). Call sites never re-derive status colours.
+
+The CSS classes (`.status-pill`, `--filled`, `--md`, `--sm`) stay for the hand-rolled pills until Phase 7 retrofits them: the task status chips in `TaskCardView`, `TaskDrawer`, `PortalTaskCard`, `AIDraftInbox` and `CreateTaskModal`, `InsightStatusPill`, and the board header pills.
+
+Insight status → token mapping (used by Vector trend / portfolio status):
 - `Declining` → `danger`
 - `At risk` → `alert`
 - `On track` → `success`
@@ -332,11 +344,11 @@ Underline-as-selection pattern. Inactive tabs are `textMuted`, hover bumps to `t
 
 The visual language for AI-generated panels. Used by both the vendor onboarding overview (`InsightsPanel`) and the customer portal overview (`PortalOverview`) so the two surfaces feel like the same product.
 
-- **`InsightCard`** — outer shell. `rounded.xl` (20px), 1px `buttonSecondaryBorder`, `bg` background, `container-type: inline-size` so the section grid (`oi-row`) reflows at 1100px / 720px breakpoints. Pass `isStreaming` to enable the gradient sweep border animation (`.is-streaming`).
+- **`InsightCard`** — outer shell. 20px radius (bespoke — outside the `rounded` scale, whose `xl` is 12px; alignment pending the radius decision in Future plans), 1px `buttonSecondaryBorder`, `bg` background, `container-type: inline-size` so the section grid (`oi-row`) reflows at 1100px / 720px breakpoints. Pass `isStreaming` to enable the gradient sweep border animation (`.is-streaming`).
 - **`InsightCardHeader`** — `padding 16/16/12`. Slots: `title` (uppercase 16px label after the Vector sparkle), `statusPill` (rendered next to the title), `onRegenerate` (the `↻` icon button on the right). Disables the regenerate button while streaming.
 - **`InsightDivider`** — 1px `borderSubtle` rule; sits between header and the first row, and between rows.
 - **`InsightSection`** — section wrapper. Title is 14px semibold uppercase `textMuted` letter-spacing 0.5px, followed by an `.ai-divider` (the AI-gradient hairline). Section grid placement is controlled by classes `oi-section--{summary|risks|wins|focus|week}` defined in `globals.css`.
-- **`InsightStatusPill`** — `audience="vendor"` (default) maps `Declining`/`At risk`/`On track`/`Improving` → `danger`/`alert`/`success`/`mint`. `audience="customer"` maps `On track`/`Needs your input`/`In progress` → `success`/`alert`/`mint`. Both render as `.status-pill--filled`.
+- **`InsightStatusPill`** — `audience="vendor"` (default) maps `Declining`/`At risk`/`On track`/`Improving` → `danger`/`alert`/`success`/`mint`. `audience="customer"` maps `On track`/`Needs your input`/`In progress` → `success`/`alert`/`mint`. Both render as `.status-pill--filled` today; Phase 7 folds them onto `Badge` filled.
 - **`WinRow`** — single win, green `CheckCircle` + headline + muted detail. Use the `position` prop (`top`/`middle`/`bottom`/`only`) to round corners when stacking multiple rows into a single bordered group.
 - **`ThisWeekRow`** — single weekly priority, `PriorityIcon` + summary text. Same `position` API as `WinRow`.
 - **`RiskCard`** — vendor only. Severity pill on top (`high`/`medium`/`low` → `danger`/`alert`/`textMuted`) with the risk summary below. Stacks horizontally with `position` for shared rounded corners.
@@ -352,10 +364,11 @@ When extending: add a new `oi-section--<name>` class in `globals.css` to place a
 
 - **Layer surfaces** for depth, not shadows. Add `1px solid border` if more separation is needed.
 - **Use `textSecondary` as the hover step** from `textMuted` on navigation surfaces.
-- **Use `MenuList` + `MenuOption`** for every dropdown — even one-off menus.
+- **Use `MenuList` + `MenuOption`** for every dropdown — even one-off menus and plain pick-one-value fields. There is no native `<select>` in the DS.
 - **Reach for `rounded-full` only for avatar circles.** Everything else uses `rounded` or larger.
 - **Use the avatar palette** (`mint / rose / sunset / lilac / sky / candy`) for company / contact initials only.
 - **Add an icon button's `isActive` state** when the menu it controls is open — the persistent active style tells the user "this opened the thing".
+- **Give a field pill or row with a removable value `onClear`.** The Clear (X) appears inline at the end of the row on hover, focus-within and while the field is open, and the field grows to fit it; it is part of `FieldPill` and `FieldRow` (a sibling button after the native main control), never hand-rolled at the call site. Date pickers open on the current month (or the selected date's month).
 
 ### Don't
 
@@ -372,15 +385,17 @@ When extending: add a new `oi-section--<name>` class in `globals.css` to place a
 
 - **`app/ui/`** — design system primitives. No business logic, pure presentation.
 - **`app/components/`** — feature components. Compose UI primitives with business logic.
-- **CSS Custom Properties** — all colours via `var(--token-name)`. Tokens live in `globals.css` `:root`.
+- **Tokens** — generated into `app/theme.css` (`@theme` + legacy `:root` aliases) from this file. Prefer the utility classes (`bg-action`, `text-muted`) in new code; `var(--token-name)` works everywhere for CSS and dynamic styles.
 - **Variant API** — props like `variant`, `size` (will adopt `class-variance-authority` when this DS formalises).
 - **Composition over configuration** — compound components (Container + Item) rather than mega-config props.
 
 ## Future plans (not yet implemented)
 
-- Migrate tokens from `:root` to Tailwind v4 `@theme` block in `globals.css`
-- Formalise the typography scale
-- Move Menu primitives from `app/components/Menu.js` to `app/ui/dropdown/`
-- Add `cn()` utility (`clsx` + `tailwind-merge`)
-- Extract Badge, Status pill, Avatar as DS primitives when they earn it
-- Generate `globals.css` token block from this file via `design.md export` once the tooling is wired (Option A — see implementation plan)
+The full roadmap is `docs/DS-PLAN.md`; still-open items that belong to this file:
+
+- Move Menu primitives from `app/components/Menu.js` to `app/ui/` (DS-PLAN Phase 5)
+- Extract Badge, Spinner-as-component, Modal, Field/Input primitives (DS-PLAN Phase 5)
+
+Done since this list was written: tokens now emit as a Tailwind `@theme` block;
+`cn()` exists (`app/ui/cn.ts`); the typography scale is formalised above
+(xs–lg = Tailwind defaults, already in use at runtime).

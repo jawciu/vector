@@ -33,3 +33,19 @@ The canonical source of truth for this project's design system is [DESIGN.md](..
 - DS primitives go in `app/ui/`, not `app/components/`
 - Only extract when Caroline asks — incremental adoption, no premature abstraction
 - After extracting, document the component in DESIGN.md's Components section
+
+## Definition of done for ANY change to a DS primitive (Caroline's rule, 2026-09-11)
+
+A component change is not finished until every place that describes the component agrees with the
+code. Before reporting done, update all of these that mention the component, and grep to be sure:
+
+1. `app/ui/<Name>.meta.ts`: status, use-when, don't-use-when, a11y, tokens
+2. `app/ui/<Name>.stories.tsx`: one story per supported state; no story for a state that no longer exists
+3. The component's JSDoc header
+4. `DESIGN.md` Components section (and the Do's and Don'ts if a rule changed)
+5. Any `app/ui/docs/*.mdx` page that names it, and any OTHER meta file that cross-references it
+   (`grep -rn "<Name>" app/ui DESIGN.md skills`)
+6. This skill, if a rule here changed
+
+Removing a component means all six as well: Select's removal left "use Select" in three other
+metas and a docs page until someone grepped. Docs that lie are worse than no docs for an agent.

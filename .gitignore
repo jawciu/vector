@@ -54,3 +54,6 @@ next-env.d.ts
 
 # Playwright MCP scratch output
 .playwright-mcp/
+
+# Storybook build output
+/storybook-static/

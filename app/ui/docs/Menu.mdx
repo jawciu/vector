@@ -1,0 +1,117 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import * as MenuStories from "../Menu.stories";
+
+<Meta of={MenuStories} name="Explainer" />
+
+# Menu, explained
+
+Menu is not one component. It is the **anchored popover family behind every dropdown in
+Vector**: a trigger, a list, and its options, composed by the caller. `DESIGN.md` makes
+it a hard rule: **every dropdown and popover MUST use `MenuList` + `MenuOption`**, even
+one-off menus. That is what guarantees the consistent 4px container padding, 4px row
+gap, hover and active states, and border across all 14 consumers.
+
+It moved into the DS layer in Phase 5 (`app/ui/Menu.tsx`, typed, byte-identical output;
+`app/components/Menu.js` is now a re-export shim).
+
+## The three parts
+
+| Part | What it is | Styling contract |
+| --- | --- | --- |
+| `MenuTriggerButton` | The opener pill. Takes `active` while the menu is open so trigger and list read as one control | `.menu-trigger-pill`, `rounded-lg`, `buttonSecondaryBorder` |
+| `MenuList` | The dropdown container, a `role="listbox"`. Anchors `absolute` at `calc(100% + 4px)` below the trigger | `bgElevated` fill, `border`, 4px padding, 4px row gap |
+| `MenuOption` | One row, a native `<button>` with `role="option"`. `active` drives `aria-selected` and the selected style | `.menu-option` hover (`bgHover`), `.menu-option-active` (`surfaceHover`) |
+
+## How they compose
+
+The parent owns all the state. This is the real task status menu shape (TaskDrawer),
+annotated:
+
+```tsx
+function StatusMenu({ status, onChange }) {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef(null);
+
+  // Callers own outside-click (and ESC) themselves for now,
+  // until the DS grows a managed menu. See the gaps below.
+  useEffect(() => {
+    if (!open) return;
+    const onMouseDown = (e) => {
+      if (!wrapperRef.current?.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onMouseDown);
+    return () => document.removeEventListener("mousedown", onMouseDown);
+  }, [open]);
+
+  return (
+    // The wrapper must be position: relative. MenuList anchors to it.
+    <div ref={wrapperRef} style={{ position: "relative", width: "fit-content" }}>
+      {/* `active` while open: trigger and list read as one control */}
+      <MenuTriggerButton active={open} onClick={() => setOpen((o) => !o)}>
+        {status}
+      </MenuTriggerButton>
+
+      {open && (
+        // Caller-side tweaks go through `style`; it spread-merges over the
+        // base styles. minWidth: "100%" matches the trigger width.
+        <MenuList style={{ minWidth: "100%" }}>
+          {TASK_STATUSES.map((s) => (
+            <MenuOption
+              key={s}
+              active={s === status} // drives aria-selected + the active style
+              onClick={() => {
+                onChange(s);
+                setOpen(false); // picking closes; the parent decides
+              }}
+            >
+              {s}
+            </MenuOption>
+          ))}
+        </MenuList>
+      )}
+    </div>
+  );
+}
+```
+
+The `ListWithOptions` and `Interactive` stories on the docs page render exactly this
+composition with the real `TASK_STATUSES` data.
+
+## Dropdowns are always Menu
+
+There is no native `<select>` in the DS (Caroline's rule, 2026-09-11): every dropdown,
+including a plain pick-one-value field inside `<Field>`, is `Menu`. The one native
+select still in the app, the Status field in the onboarding edit form
+(`OnboardingActions.js`), is a Phase 7 retrofit onto these primitives. Menu's keyboard
+model (arrow keys, Escape, focus return; see Honest gaps below) lands before that retrofit,
+so the swap never loses what the native control gave for free.
+
+- **`Menu`**: any dropdown, from a plain value picker to rich rows with avatars, icons,
+  search, or status pills, and anchored action menus.
+- **Not either**: pill-shaped pickers in modal bodies (due date, priority, status) use
+  `FieldPill` + its dropdown; date picking uses `CalendarDropdown` (which wraps these
+  Menu primitives with the calendar grid already wired); blocking flows use `Modal`;
+  side-panel detail uses `Drawer`.
+- A standalone action button is not a menu trigger: use `Button` / `IconButton`. The
+  trigger pill implies something opens.
+
+## Honest gaps
+
+Documented, not yet fixed (a separate reviewed change, deliberately not part of the
+Phase 5 move):
+
+- No keyboard model: no arrow-key navigation, no typeahead, no ESC-to-close, and no
+  focus management on open or close.
+- The trigger carries no `aria-expanded` / `aria-haspopup`.
+- Callers own outside-click and ESC handling themselves until the DS grows a managed
+  menu.
+
+What DOES work today: options are native buttons, so Tab plus Enter/Space operate them,
+and `MenuList` / `MenuOption` carry listbox/option semantics with `aria-selected` driven
+by `active`.
+
+## In review: multi-select
+
+A checkbox / multi-select variant of `MenuOption` is **in review** (being added in a
+parallel change). Until it lands, treat multi-select as outside the DS: nothing covers it yet.
+Check the stories on this component for its current state before building on it.
