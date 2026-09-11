@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { MenuTriggerButton, MenuList, MenuOption } from "./Menu";
 import AIDraftInbox from "./AIDraftInbox";
+import Button from "@/app/ui/Button";
 
 const STATUSES = [
   { id: "pending", label: "Pending" },
@@ -170,14 +171,13 @@ export default function ActionsTab({
           <SearchInput value={query} onChange={setQuery} />
         </div>
         {isPending && visibleDrafts.length > 0 && (
-          <button
-            type="button"
+          <Button
             onClick={handleDismissAll}
-            className="btn-secondary text-sm rounded-lg"
+            variant="secondary"
             style={{ padding: "4px 10px", fontSize: 13, whiteSpace: "nowrap" }}
           >
             Dismiss all
-          </button>
+          </Button>
         )}
       </header>
 
@@ -242,15 +242,14 @@ function SearchInput({ value, onChange }) {
         }}
       />
       {value && (
-        <button
-          type="button"
+        <Button
           onClick={() => onChange("")}
           aria-label="Clear search"
-          className="text-btn"
-          style={{ padding: "2px 6px", fontSize: 12, color: "var(--text-muted)" }}
+          variant="tertiary"
+          style={{ padding: "2px 6px", fontSize: 12 }}
         >
           Clear
-        </button>
+        </Button>
       )}
     </div>
   );

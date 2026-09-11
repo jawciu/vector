@@ -2,8 +2,9 @@
 
 import InlineProse from "./InlineProse";
 import TaskCardView from "../components/TaskCardView";
-import { PriorityIcon } from "./Icons";
+import { PriorityIcon, RefreshIcon } from "./Icons";
 import Sparkle from "./Sparkle";
+import IconButton from "./IconButton";
 
 /**
  * Insight card primitives — extracted from `InsightsPanel` so the customer
@@ -56,20 +57,15 @@ export function InsightCardHeader({ title, statusPill, isStreaming, payload, onR
           )}
         </div>
         {onRegenerate && (
-          <button
+          <IconButton
+            aria-label="Regenerate insight"
+            title="Regenerate insight"
             onClick={onRegenerate}
             disabled={isStreaming}
-            aria-label="Regenerate"
-            className="btn-secondary text-sm rounded-lg"
-            style={{
-              padding: "4px 10px",
-              opacity: isStreaming ? 0.5 : 1,
-              cursor: isStreaming ? "default" : "pointer",
-              fontSize: 12,
-            }}
+            aria-busy={isStreaming || undefined}
           >
-            {isStreaming ? "…" : "↻"}
-          </button>
+            <RefreshIcon />
+          </IconButton>
         )}
       </div>
       <InsightDivider />

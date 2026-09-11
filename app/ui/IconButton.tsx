@@ -17,7 +17,7 @@ import { cn } from "./cn";
  *   action — default, the neutral textMuted glyph (unchanged rendering)
  *   danger — destructive actions (delete a row, remove a member): the glyph
  *            reads `danger` and steps to `danger-hover` on hover/active,
- *            mirroring .text-btn-danger; the hover/active background fills
+ *            mirroring .btn-tertiary--danger; the hover/active background fills
  *            stay the neutral bgHover/surfaceHover steps.
  *
  * `className` is accepted for LAYOUT ONLY (positioning within a parent —

@@ -101,6 +101,7 @@ export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onA
             onBlur={handleSave}
           />
         ) : (
+          // eslint-disable-next-line no-restricted-syntax -- inline title edit affordance, not a DS button
           <button
             className="text-sm font-semibold text-left truncate"
             style={{ color: "var(--text)", background: "none", border: "none", cursor: "pointer", lineHeight: 1 }}

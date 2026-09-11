@@ -7,6 +7,7 @@ import { MembersIcon } from "../ui/Icons";
 import { MenuList, MenuOption } from "./Menu";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import { CONTACT_ROLES } from "@/lib/constants";
+import IconButton from "@/app/ui/IconButton";
 
 function CloseIcon({ size = 12 }) {
   return (
@@ -18,6 +19,7 @@ function CloseIcon({ size = 12 }) {
 
 function PillClearButton({ onClick }) {
   return (
+    // eslint-disable-next-line no-restricted-syntax -- bare icon toggle inside a field row, no DS equivalent yet
     <button
       type="button"
       onClick={onClick}
@@ -132,14 +134,13 @@ export default function MemberModal({ open, mode, contact, onboardingId, onClose
           <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
             {title}
           </span>
-          <button
-            type="button"
+          <IconButton
+            aria-label="Close"
             onClick={onClose}
-            className="flex items-center justify-center w-5 h-5 rounded icon-btn"
             style={{ background: "none", border: "none", cursor: "pointer" }}
           >
             <CloseIcon />
-          </button>
+          </IconButton>
         </div>
 
         {/* Body */}

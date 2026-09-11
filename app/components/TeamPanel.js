@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Button from "@/app/ui/Button";
 
 /**
  * Team section on /settings. Manages VendorUser rows — your Vector team.
@@ -88,14 +89,14 @@ export default function TeamPanel({ initialUsers, currentVendorUserId }) {
             style={inputStyle}
           />
         </Field>
-        <button
+        <Button
           type="submit"
           disabled={busy || !email}
-          className="btn-primary text-sm rounded-lg"
+          variant="primary"
           style={{ padding: "8px 14px", fontSize: 13, fontWeight: 600, opacity: busy ? 0.5 : 1 }}
         >
           {busy ? "Adding…" : "Add"}
-        </button>
+        </Button>
       </form>
 
       {error && (
@@ -151,14 +152,14 @@ export default function TeamPanel({ initialUsers, currentVendorUserId }) {
                   <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{u.email}</div>
                 </div>
                 {!isMe && (
-                  <button
+                  <Button
                     onClick={() => handleDelete(u.id)}
                     disabled={deletingId === u.id}
-                    className="btn-secondary text-sm rounded-lg"
+                    variant="secondary"
                     style={{ padding: "4px 10px", fontSize: 12, opacity: deletingId === u.id ? 0.5 : 1 }}
                   >
                     {deletingId === u.id ? "…" : "Remove"}
-                  </button>
+                  </Button>
                 )}
               </div>
             );

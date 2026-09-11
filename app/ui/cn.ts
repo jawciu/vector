@@ -11,14 +11,14 @@ import { extendTailwindMerge } from "tailwind-merge";
  * TWO HONEST LIMITS (peer review, 2026-08-11):
  *
  * 1. Custom classes whose names look like Tailwind utilities get EATEN.
- *    tailwind-merge classified `.text-btn` / `.text-btn-action` /
- *    `.text-btn-danger` as competing text-COLOUR utilities and kept only the
- *    last — a live rendering bug in Button's text variant. The registration
- *    below puts each in its own single-member group so they pass through
- *    and never conflict with anything. ANY future custom class starting
- *    with a utility prefix (text-, bg-, border-, p-, m-, …) is the same
- *    landmine: either name it away from the namespace (.btn-*) or register
- *    it here. cn.test.js pins this.
+ *    tailwind-merge classified the old `.text-btn*` classes as competing
+ *    text-COLOUR utilities and kept only the last, a live rendering bug
+ *    until they were registered here. Those classes are gone (slice 1), so
+ *    nothing is registered today, but the mechanism stays: ANY future custom
+ *    class starting with a utility prefix (text-, bg-, border-, p-, m-, …)
+ *    is the same landmine. Either name it away from the namespace (.btn-*)
+ *    or add it to `classGroups` below as its own single-member group.
+ *    cn.test.js pins the pass-through of the .btn-* names.
  *
  * 2. Caller utilities only beat defaults CARRIED BY UTILITIES. Properties
  *    set by the unlayered `.btn-*`/`.icon-btn` classes (backgrounds etc.)
@@ -26,17 +26,11 @@ import { extendTailwindMerge } from "tailwind-merge";
  *    over @layer utilities. Overriding those requires a variant, not a
  *    className.
  */
-const twMerge = extendTailwindMerge<
-  "vector.text-btn" | "vector.text-btn-action" | "vector.text-btn-danger"
->({
+const twMerge = extendTailwindMerge({
   extend: {
-    classGroups: {
-      // One group per class: registered (so the colour-group matcher never
-      // claims them) but never conflicting with each other.
-      "vector.text-btn": ["text-btn"],
-      "vector.text-btn-action": ["text-btn-action"],
-      "vector.text-btn-danger": ["text-btn-danger"],
-    },
+    // One group per custom class that collides with a utility prefix:
+    // registered (so the matcher never claims it) but never conflicting.
+    classGroups: {},
   },
 });
 

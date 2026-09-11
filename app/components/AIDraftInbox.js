@@ -17,6 +17,7 @@ import Sparkle from "@/app/ui/Sparkle";
 import TaskIdChip from "@/app/ui/TaskIdChip";
 import MeetingDrawer from "./MeetingDrawer";
 import { TASK_STATUSES, STATUS_COLORS } from "@/lib/constants";
+import Button from "@/app/ui/Button";
 
 /**
  * "Vector suggests" inbox — list of PendingAIChange rows.
@@ -457,6 +458,7 @@ function DraftColumn({
 function MeetingPill({ title, onClick }) {
   return (
     <div className="meeting-separator">
+      {/* eslint-disable-next-line no-restricted-syntax -- clickable row, not a DS button */}
       <button
         type="button"
         onClick={onClick}
@@ -541,6 +543,7 @@ function DraftGroup({
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
             <span style={{ color: "var(--text-muted)" }}>From meeting:</span>
+            {/* eslint-disable-next-line no-restricted-syntax -- task reference chip, not a DS button */}
             <button
               type="button"
               onClick={() => onMeetingClick?.(group.eventId)}
@@ -660,20 +663,20 @@ function BulkActionBar({ count, onReject, onClear }) {
         <strong>{count}</strong> selected
       </span>
       <div style={{ display: "flex", gap: 8 }}>
-        <button
+        <Button
           onClick={onClear}
-          className="btn-secondary text-sm rounded-lg"
+          variant="secondary"
           style={{ padding: "4px 10px", fontSize: 12 }}
         >
           Clear
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onReject}
-          className="btn-secondary text-sm rounded-lg"
+          variant="secondary"
           style={{ padding: "4px 10px", fontSize: 12, color: "var(--danger)" }}
         >
           Reject selected
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -801,29 +804,26 @@ export function DraftCard({
 
       {isPending && (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <button
-            type="button"
+          <Button
             onClick={editing ? cancelEdit : onReject}
             disabled={busy}
-            className="btn-tertiary"
+            variant="tertiary"
             style={{ padding: "4px 8px", fontSize: 14, opacity: busy ? 0.5 : 1 }}
           >
             {editing ? "Cancel" : "Dismiss"}
-          </button>
+          </Button>
           <div style={{ display: "flex", gap: 8 }}>
             {editable && !editing && (
-              <button
-                type="button"
+              <Button
                 onClick={openEdit}
                 disabled={busy}
-                className="btn-tertiary text-sm rounded-lg"
+                variant="tertiary"
                 style={{ padding: "4px 10px", fontSize: 14, opacity: busy ? 0.5 : 1 }}
               >
                 Edit
-              </button>
+              </Button>
             )}
-            <button
-              type="button"
+            <Button
               onClick={() => {
                 onApprove(editing ? overrides : {});
                 if (editing) setEditing(false);
@@ -832,11 +832,11 @@ export function DraftCard({
               aria-disabled={busy || selected}
               aria-label={selected ? "Unselect to approve individually" : undefined}
               title={selected ? "Unselect to approve individually" : undefined}
-              className="btn-secondary text-sm rounded-lg"
+              variant="secondary"
               style={{ padding: "4px 14px", fontSize: 14, opacity: busy || selected ? 0.5 : 1 }}
             >
               {busy ? "…" : "Approve"}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -986,6 +986,7 @@ function StatusOverrideEditor({ value, onChange, disabled }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>New status</span>
       <div ref={ref} className="relative" style={{ width: "100%" }}>
+        {/* eslint-disable-next-line no-restricted-syntax -- dropdown trigger, becomes Select in slice 3 */}
         <button
           type="button"
           onClick={() => !disabled && setOpen((o) => !o)}
@@ -1074,6 +1075,7 @@ function PriorityOverrideEditor({ value, onChange, disabled }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>New priority</span>
       <div ref={ref} className="relative" style={{ width: "100%" }}>
+        {/* eslint-disable-next-line no-restricted-syntax -- dropdown trigger, becomes Select in slice 3 */}
         <button
           type="button"
           onClick={() => !disabled && setOpen((o) => !o)}
@@ -1330,6 +1332,7 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
           <FieldBlock
             label="Message"
             actions={
+              // eslint-disable-next-line no-restricted-syntax -- 16px icon, IconButton is fixed at 20px
               <button
                 type="button"
                 onClick={handleCopyBody}
@@ -1392,10 +1395,10 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
       {/* Action row */}
       {isPending && (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <button
+          <Button
             onClick={onReject}
             disabled={busy}
-            className="btn-tertiary"
+            variant="tertiary"
             style={{
               padding: "4px 8px",
               fontSize: 14,
@@ -1403,7 +1406,7 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
             }}
           >
             Dismiss
-          </button>
+          </Button>
           <div style={{ display: "flex", gap: 8 }}>
             <a
               href={mailto}
@@ -1412,10 +1415,10 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
             >
               Open in mail
             </a>
-            <button
+            <Button
               onClick={() => onApprove({ subject, body })}
               disabled={!canSend}
-              className="btn-secondary text-sm rounded-lg"
+              variant="secondary"
               style={{
                 padding: "4px 10px",
                 fontSize: 14,
@@ -1424,7 +1427,7 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
               title="Publishes the message body as a Comment visible in the customer portal."
             >
               {busy ? "…" : "Comment"}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -1697,11 +1700,10 @@ export function CreateTaskCard({
 
       {isPending && (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <button
-            type="button"
+          <Button
             onClick={handleDismissOrExitEdit}
             disabled={busy || saving}
-            className="btn-tertiary"
+            variant="tertiary"
             style={{
               padding: "4px 8px",
               fontSize: 14,
@@ -1709,7 +1711,7 @@ export function CreateTaskCard({
             }}
           >
             {cardMode === "edit" ? "Exit edit" : "Dismiss"}
-          </button>
+          </Button>
           <div style={{ display: "flex", gap: 8 }}>
             {/* Row-level action hierarchy: Create task (secondary) > Edit task
                 (ghost) > Dismiss (tertiary text). Deliberately NO primary here —
@@ -1717,38 +1719,35 @@ export function CreateTaskCard({
                 filled button would carry no hierarchy and would drown out the
                 page-level primary. Carbon/Atlassian: one primary per page. */}
             {cardMode === "compact" ? (
-              <button
-                type="button"
+              <Button
                 onClick={() => setCardMode("edit")}
                 disabled={busy}
-                className="btn-tertiary text-sm rounded-lg"
+                variant="tertiary"
                 style={{ padding: "4px 10px", fontSize: 14 }}
               >
                 Edit task
-              </button>
+              </Button>
             ) : (
-              <button
-                type="button"
+              <Button
                 onClick={handleSaveDraft}
                 disabled={busy || saving || !dirty}
-                className="btn-tertiary text-sm rounded-lg"
+                variant="tertiary"
                 style={{ padding: "4px 10px", fontSize: 14, opacity: !dirty || saving ? 0.5 : 1 }}
               >
                 {saving ? "…" : "Save draft"}
-              </button>
+              </Button>
             )}
-            <button
-              type="button"
+            <Button
               onClick={handleCreate}
               disabled={busy || saving || selected}
               aria-disabled={busy || saving || selected}
               aria-label={selected ? "Unselect to approve individually" : undefined}
               title={selected ? "Unselect to approve individually" : undefined}
-              className="btn-secondary text-sm rounded-lg"
+              variant="secondary"
               style={{ padding: "4px 10px", fontSize: 14, opacity: busy || selected ? 0.5 : 1 }}
             >
               {busy ? "…" : "Create task"}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -2113,6 +2112,7 @@ function SelectPill({ icon, label, valueLabel, options, selected, onSelect, disa
 
   return (
     <div ref={ref} className="relative" style={{ width: "100%" }}>
+      {/* eslint-disable-next-line no-restricted-syntax -- dropdown trigger, becomes Select in slice 3 */}
       <button
         type="button"
         onClick={() => !disabled && setOpen((o) => !o)}
@@ -2174,6 +2174,7 @@ function DueDatePill({ value, onChange, disabled }) {
 
   return (
     <div ref={ref} className="relative" style={{ flex: 1, minWidth: 140 }}>
+      {/* eslint-disable-next-line no-restricted-syntax -- dropdown trigger, becomes Select in slice 3 */}
       <button
         type="button"
         onClick={() => !disabled && setOpen((o) => !o)}
@@ -2234,6 +2235,7 @@ function PriorityPill({ value, onChange, disabled }) {
 
   return (
     <div ref={ref} className="relative" style={{ flex: 1, minWidth: 140 }}>
+      {/* eslint-disable-next-line no-restricted-syntax -- dropdown trigger, becomes Select in slice 3 */}
       <button
         type="button"
         onClick={() => !disabled && setOpen((o) => !o)}
@@ -2445,6 +2447,7 @@ function SelectCheckbox({ selected, onToggle, disabled }) {
   const [hovered, setHovered] = useState(false);
   const strokeColor = hovered && !disabled ? "var(--action)" : "var(--icon-tertiary)";
   return (
+    // eslint-disable-next-line no-restricted-syntax -- checkbox control, retrofits onto Checkbox later
     <button
       type="button"
       role="checkbox"

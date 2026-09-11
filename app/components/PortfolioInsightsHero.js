@@ -5,6 +5,7 @@ import Link from "next/link";
 import CompanyAvatar from "@/app/ui/CompanyAvatar";
 import InlineProse from "@/app/ui/InlineProse";
 import Sparkle from "@/app/ui/Sparkle";
+import Button from "@/app/ui/Button";
 
 const SOFT_TTL_MS = 4 * 60 * 60 * 1000;
 
@@ -168,11 +169,11 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
             </span>
           )}
         </div>
-        <button
+        <Button
           onClick={regenerate}
           disabled={isStreaming}
           aria-label="Regenerate"
-          className="btn-secondary text-sm rounded-lg"
+          variant="secondary"
           style={{
             padding: "4px 10px",
             opacity: isStreaming ? 0.5 : 1,
@@ -181,7 +182,7 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
           }}
         >
           {isStreaming ? "…" : "↻"}
-        </button>
+        </Button>
       </div>
 
       <hr style={{ height: 1, width: "100%", border: 0, background: "var(--border-subtle)", margin: 0 }} />

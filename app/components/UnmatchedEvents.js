@@ -5,6 +5,7 @@ import InlineEventDrafts from "./InlineEventDrafts";
 import { MetaDot, ChevronRight, FollowupSparkleIcon as MinitiSparkleIcon } from "./AIDraftInbox";
 import { MenuList, MenuOption } from "./Menu";
 import { AttendeeChip } from "./MeetingsTab";
+import Button from "@/app/ui/Button";
 
 /**
  * "Unmatched meetings" panel — shown above the drafts list when Miniti
@@ -206,10 +207,10 @@ export default function UnmatchedEvents({ initialEvents, onboardings }) {
                     onboardings={onboardings}
                     disabled={busy}
                   />
-                  <button
+                  <Button
                     onClick={() => handleAssign(event.id)}
                     disabled={busy || !onboardingId}
-                    className="btn-primary text-sm rounded-lg"
+                    variant="primary"
                     style={{
                       padding: "4px 14px",
                       opacity: busy || !onboardingId ? 0.5 : 1,
@@ -218,7 +219,7 @@ export default function UnmatchedEvents({ initialEvents, onboardings }) {
                     }}
                   >
                     {busy ? "…" : "Assign + process"}
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <>
@@ -282,6 +283,7 @@ function OnboardingPicker({ value, onChange, onboardings, disabled }) {
 
   return (
     <div ref={ref} className="relative" style={{ minWidth: 220 }}>
+      {/* eslint-disable-next-line no-restricted-syntax -- dropdown trigger, becomes Select in slice 3 */}
       <button
         type="button"
         onClick={() => !disabled && setOpen((o) => !o)}

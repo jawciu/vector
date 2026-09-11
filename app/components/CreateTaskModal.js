@@ -11,6 +11,7 @@ import { MenuList, MenuOption } from "./Menu";
 import { TASK_STATUSES, PRIORITIES, STATUS_COLORS } from "@/lib/constants";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
 import CompanyAvatar from "@/app/ui/CompanyAvatar";
+import IconButton from "@/app/ui/IconButton";
 
 function ChevronIcon() {
   return (
@@ -30,6 +31,7 @@ function CloseIcon({ size = 12 }) {
 
 function PillClearButton({ onClick }) {
   return (
+    // eslint-disable-next-line no-restricted-syntax -- bare icon toggle inside a field row, no DS equivalent yet
     <button
       type="button"
       onClick={onClick}
@@ -269,14 +271,13 @@ export default function CreateTaskModal({
             <ChevronIcon />
             <span className="text-sm" style={{ color: "var(--text)" }}>New task</span>
           </div>
-          <button
-            type="button"
+          <IconButton
+            aria-label="Close"
             onClick={handleClose}
-            className="flex items-center justify-center w-5 h-5 rounded icon-btn"
             style={{ background: "none", border: "none", cursor: "pointer" }}
           >
             <CloseIcon />
-          </button>
+          </IconButton>
         </div>
 
         {/* Form body */}
@@ -614,6 +615,7 @@ export default function CreateTaskModal({
                       .map((person) => {
                         const isSelected = formData.members.includes(person);
                         return (
+                          // eslint-disable-next-line no-restricted-syntax -- menu row, becomes a Select option in slice 3
                           <button
                             key={person}
                             type="button"

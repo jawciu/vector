@@ -302,6 +302,7 @@ const PortalDrawer = forwardRef(function PortalDrawer({
       >
         {/* Row: Mark as done + Close */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          {/* eslint-disable-next-line no-restricted-syntax -- state toggle that sheds the secondary skin once done */}
           <button
             type="button"
             onClick={handleMarkDone}
@@ -326,15 +327,13 @@ const PortalDrawer = forwardRef(function PortalDrawer({
             <span>{isDone ? "Done" : "Mark as done"}</span>
           </button>
 
-          <button
-            type="button"
+          <IconButton
             onClick={onClose}
-            className="flex items-center justify-center w-5 h-5 rounded icon-btn"
             aria-label="Close"
             style={{ background: "none", border: "none", cursor: "pointer" }}
           >
             <CloseIcon />
-          </button>
+          </IconButton>
         </div>
 
         {/* Title (read-only) */}
@@ -503,10 +502,10 @@ const PortalDrawer = forwardRef(function PortalDrawer({
             onChange={handleFileUpload}
             style={{ display: "none" }}
           />
-          <button
+          <Button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="text-btn-action flex items-center gap-1.5 text-sm font-medium rounded"
+            variant="tertiary" className="flex items-center gap-1.5 font-medium"
             style={{
               background: "none",
               border: "none",
@@ -520,7 +519,7 @@ const PortalDrawer = forwardRef(function PortalDrawer({
               <path d="M2.5 11.5h9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
             {uploading ? "Uploading…" : "Upload file"}
-          </button>
+          </Button>
           {uploadError && (
             <p className="text-xs" style={{ color: "var(--danger)" }}>{uploadError}</p>
           )}

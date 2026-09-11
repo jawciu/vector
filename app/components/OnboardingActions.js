@@ -224,16 +224,11 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
               <h2 className="text-base font-semibold" style={{ color: "var(--text)" }}>
                 Edit Onboarding
               </h2>
-              <button
-                type="button"
-                onClick={() => setEditOpen(false)}
-                className="flex items-center justify-center w-6 h-6 rounded"
-                style={{ color: "var(--text-muted)" }}
-              >
+              <IconButton aria-label="Close" onClick={() => setEditOpen(false)}>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                   <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
-              </button>
+              </IconButton>
             </div>
 
             {error && (

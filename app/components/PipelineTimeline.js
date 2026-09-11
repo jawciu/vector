@@ -3,6 +3,7 @@
 import { useState, useMemo, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Button from "@/app/ui/Button";
 
 /**
  * Admin /admin/ai → Pipeline tab. Full timeline of every Miniti event
@@ -57,6 +58,7 @@ export default function PipelineTimeline({ events = [] }) {
               : events.filter((e) => matchesFilter(e, f.id)).length;
             const active = filter === f.id;
             return (
+              // eslint-disable-next-line no-restricted-syntax -- segmented filter, TabBar retrofit later
               <button
                 key={f.id}
                 type="button"
@@ -76,11 +78,10 @@ export default function PipelineTimeline({ events = [] }) {
             );
           })}
         </div>
-        <button
-          type="button"
+        <Button
           onClick={handleRefresh}
           disabled={isRefreshing}
-          className="btn-secondary text-sm rounded-lg"
+          variant="secondary"
           style={{
             padding: "4px 10px",
             fontSize: 12,
@@ -94,7 +95,7 @@ export default function PipelineTimeline({ events = [] }) {
         >
           <RefreshIcon spinning={isRefreshing} />
           {isRefreshing ? "Refreshing…" : "Refresh"}
-        </button>
+        </Button>
       </div>
 
       {filtered.length === 0 && (
@@ -141,6 +142,7 @@ function PipelineRow({ event, isOpen, onToggle }) {
         flexDirection: "column",
       }}
     >
+      {/* eslint-disable-next-line no-restricted-syntax -- bare disclosure toggle, no DS equivalent */}
       <button
         type="button"
         onClick={onToggle}
@@ -411,6 +413,7 @@ function Collapsible({ label, json, content }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      {/* eslint-disable-next-line no-restricted-syntax -- bare disclosure toggle, no DS equivalent */}
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

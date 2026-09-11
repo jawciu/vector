@@ -378,3 +378,51 @@ baseline refreshes with her approval of this round, as before.
 **Verified:** tsc clean · eslint app/ui + .storybook 0 errors/warnings ·
 66/66 tests · build green · build-storybook green: **176 stories / 31 docs
 pages / 25 components · storyCoverage 100% · tsCoverage 88%**.
+
+## Slice 1, Button retrofit · 2026-09-11 · branch `retrofit/button`
+
+First slice of the staged rollout (DS-PLAN Phase 7). Every raw `<button>` in
+feature code was triaged: 47 converted, 39 left with a written reason
+(plus one hand-rolled secondary inside app/ui/InsightCard.js converted).
+
+- **Converted, mechanical (27):** every `className="btn-…"` button became
+  `<Button variant size>` with the class name as the variant; extra layout
+  classes pass through `className` (cn-merged), inline styles pass through
+  untouched, so the render is identical.
+- **Converted, text buttons (6):** the lilac `.text-btn` sites became
+  `variant="tertiary"` (Revoke gets `tone="danger"`): ContactsPanel Copy /
+  Send / Revoke, PortalDrawer Upload, ActionsTab + MeetingsTab Clear. The
+  `.text-btn*` CSS and its focus-visible selector are deleted. The three
+  ContactsPanel ones keep `className="p-0"` so the table row does not grow.
+  Intended visible change, measured before/after on a live server: Copy, Send
+  and Upload go from lilac to the tertiary grey with a hover step to `text`;
+  Copy / Send / Revoke gain tertiary's transparent 1px border (20px → 22px
+  tall); the two Clear buttons gain the hover step. Every converted `.btn-*`
+  button measured identical (font, weight, padding, colours, box).
+- **Converted, icon buttons (6):** the 20px close buttons in
+  CreateOnboardingModal, CreateTaskModal, MemberModal and PortalDrawer, and
+  the two notification bells, became `<IconButton aria-label>`.
+- **Left raw, with an eslint-disable and a reason (47):** dropdown and
+  filter-pill triggers and menu rows (Select, slice 3); checkbox and task-tick
+  controls; segmented controls and tab bars; list rows, cards and chips that
+  are clickable but are not buttons in the DS sense; bare disclosure toggles;
+  the 16px copy icon in AIDraftInbox; the done toggles that shed the
+  secondary skin. The muted micro text links were
+  converted to `tertiary xs` on Caroline's call: Mark all read, + Add
+  section, Show/Hide debug, the follow-up Copy. Show/Hide debug and Copy
+  dropped their 11px overrides and render at the xs default (12px, py-0.5
+  px-2); + Add section dropped its 14px semibold look and is plain tertiary xs too. The Cancel beside
+  the Add-phase button became `tertiary xs` (DESIGN.md: cancel alongside
+  another button is tertiary at the same size).
+- **Icon buttons normalised (Caroline's call):** the twelve notes toolbar
+  icons in TaskDrawer (24px → 20px; toolbar padding 4 → 6px so the row stays
+  33px), the OnboardingActions modal close (24 → 20px) and the FollowUpModal
+  close (28 → 20px) are `<IconButton>`; the dead `.toolbar-btn` CSS is gone.
+  The 16px copy icon in AIDraftInbox stays bespoke for now. The overview
+  insight card's regenerate control is an `IconButton` with a new registry
+  `RefreshIcon` (was a secondary Button carrying a text glyph).
+- **Numbers:** raw buttons 86 → 39, primitive buttons 55 → 102, button
+  coverage 39% → 72.3%. ESLint warnings 187 → 101. Ratchet baseline refreshed.
+- **Verified:** tsc clean · eslint 0 errors · 67/67 tests · production build
+  green · ratchet green.
+

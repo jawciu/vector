@@ -39,15 +39,6 @@ a {
 }
 
 /* Notes toolbar buttons */
-.toolbar-btn {
-  background: none;
-  transition: background-color 0.1s ease;
-}
-
-.toolbar-btn:hover {
-  background-color: var(--bg-hover);
-}
-
 /* Task drawer slide-in */
 .task-drawer {
   transform: translateX(100%);
@@ -106,8 +97,7 @@ a {
 .btn-primary:focus-visible,
 .btn-secondary:focus-visible,
 .btn-tertiary:focus-visible,
-.btn-destructive:focus-visible,
-.text-btn:focus-visible {
+.btn-destructive:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
@@ -135,7 +125,7 @@ a {
 }
 
 /* NEW (2026-08, pending Caroline's review): destructive icon button —
-   IconButton `tone="danger"`. Mirrors .text-btn-danger's colour step
+   IconButton `tone="danger"`. Mirrors .btn-tertiary--danger's colour step
    (danger → danger-hover on hover); the hover/active fills stay the neutral
    bg-hover / surface-hover steps from the base .icon-btn so the only red is
    the glyph itself. Disabled inherits the base iconTertiary dimming
@@ -205,7 +195,7 @@ a {
 }
 
 /* Tertiary, danger tone (Button tone="danger"): red label, same colour step as
-   .text-btn-danger. Disabled still falls to text-muted via .btn-tertiary:disabled. */
+   the deleted text-button danger colour step. Disabled still falls to text-muted via .btn-tertiary:disabled. */
 .btn-tertiary--danger {
   color: var(--danger);
 }
@@ -261,39 +251,6 @@ a {
 
 .menu-option-active {
   background-color: var(--surface-hover);
-}
-
-/* Legacy inline text buttons. Not a DS variant: six raw call sites (ContactsPanel,
-   PortalDrawer, ActionsTab, MeetingsTab). Deleted when Phase 7 retrofits them
-   onto .btn-tertiary. */
-.text-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  font-weight: 500;
-  transition: color 0.15s ease;
-}
-
-.text-btn:disabled {
-  color: var(--text-muted);
-  cursor: not-allowed;
-}
-
-.text-btn-action {
-  color: var(--action);
-}
-
-.text-btn-action:hover:not(:disabled) {
-  color: var(--action-hover);
-}
-
-.text-btn-danger {
-  color: var(--danger);
-}
-
-.text-btn-danger:hover:not(:disabled) {
-  color: var(--danger-hover);
 }
 
 /* Button loading spinner (Button.tsx `loading` prop). 1em so it scales with
@@ -791,7 +748,6 @@ textarea.input {
   opacity: 1;
   color: var(--text-secondary);
 }
-
 
 .task-completing {
   animation: taskComplete 0.8s ease forwards;

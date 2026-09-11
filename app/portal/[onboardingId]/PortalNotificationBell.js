@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
+import IconButton from "@/app/ui/IconButton";
 
 function BellIcon() {
   return (
@@ -105,9 +106,7 @@ export default function PortalNotificationBell() {
 
   return (
     <div ref={containerRef} className="relative">
-      <button
-        type="button"
-        className="icon-btn w-5 h-5 rounded flex items-center justify-center"
+      <IconButton
         data-active={open ? "true" : undefined}
         onClick={toggle}
         aria-label="Notifications"
@@ -115,7 +114,7 @@ export default function PortalNotificationBell() {
         aria-expanded={open}
       >
         <BellIcon />
-      </button>
+      </IconButton>
       {unread > 0 && (
         <span
           aria-hidden

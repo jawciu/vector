@@ -5,18 +5,18 @@
     "rawHexTotal": 15,
     "rawHexDistinct": 3,
     "rawRgba": 26,
-    "inlineStyles": 1090,
+    "inlineStyles": 1082,
     "arbitraryTw": 34,
-    "hardcodedGeometry": 1000,
-    "rawButtons": 86,
-    "primitiveButtons": 55,
-    "buttonCoveragePct": 39,
+    "hardcodedGeometry": 992,
+    "rawButtons": 39,
+    "primitiveButtons": 102,
+    "buttonCoveragePct": 72.3,
     "rawInputs": 39,
     "primitiveInputs": 0,
     "inputCoveragePct": 0,
     "scatteredSvg": 100,
-    "centralSvg": 44,
-    "iconCoveragePct": 30.6,
+    "centralSvg": 45,
+    "iconCoveragePct": 31,
     "uiComponents": 24,
     "storyFiles": 24,
     "storyCoveragePct": 100,
@@ -63,7 +63,7 @@
       },
       {
         "file": "app/components/TaskDrawer.js",
-        "count": 90
+        "count": 89
       },
       {
         "file": "app/components/CreateTaskModal.js",
@@ -86,42 +86,42 @@
         "count": 35
       },
       {
-        "file": "app/onboardings/[id]/OnboardingDetailClient.js",
-        "count": 30
+        "file": "app/components/UnmatchedEvents.js",
+        "count": 29
       }
     ],
     "worstRawButtonFiles": [
       {
         "file": "app/components/AIDraftInbox.js",
-        "count": 20
-      },
-      {
-        "file": "app/components/FollowUpModal.js",
-        "count": 5
-      },
-      {
-        "file": "app/components/TaskDrawer.js",
-        "count": 5
-      },
-      {
-        "file": "app/onboardings/[id]/OnboardingDetailClient.js",
-        "count": 5
-      },
-      {
-        "file": "app/components/ContactsPanel.js",
-        "count": 4
-      },
-      {
-        "file": "app/components/NotificationBell.js",
-        "count": 4
+        "count": 9
       },
       {
         "file": "app/components/PipelineTimeline.js",
-        "count": 4
+        "count": 3
+      },
+      {
+        "file": "app/components/Sidebar.js",
+        "count": 3
+      },
+      {
+        "file": "app/components/TaskDrawer.js",
+        "count": 3
       },
       {
         "file": "app/components/CreateOnboardingModal.js",
-        "count": 3
+        "count": 2
+      },
+      {
+        "file": "app/components/CreateTaskModal.js",
+        "count": 2
+      },
+      {
+        "file": "app/components/MeetingsTab.js",
+        "count": 2
+      },
+      {
+        "file": "app/components/NotificationBell.js",
+        "count": 2
       }
     ],
     "dialogFiles": [

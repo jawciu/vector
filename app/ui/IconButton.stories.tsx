@@ -110,7 +110,7 @@ export const Disabled: Story = {
 /**
  * NEW — pending Caroline's review. `tone="danger"` for destructive icon
  * actions (delete a row, remove a member). Treatment mirrors
- * `.text-btn-danger`: glyph at `danger`, stepping to `dangerHover` on
+ * `.btn-tertiary--danger`: glyph at `danger`, stepping to `dangerHover` on
  * hover/active; the background fills stay the NEUTRAL `bgHover`/`surfaceHover`
  * steps so the only red is the glyph itself (no red wash).
  */

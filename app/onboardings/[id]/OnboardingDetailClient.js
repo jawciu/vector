@@ -530,8 +530,8 @@ export default function OnboardingDetailClient({
               <TaskFilterMenu value={taskFilter} onChange={setFilter} />
 
               {/* Sort button */}
-              <button
-                className="btn-secondary flex items-center gap-1.5 text-sm rounded-lg ml-2"
+              <Button
+                variant="secondary" className="flex items-center gap-1.5 ml-2"
                 style={{ paddingTop: 4, paddingBottom: 4, paddingLeft: 8, paddingRight: 8 }}
                 disabled
               >
@@ -541,11 +541,11 @@ export default function OnboardingDetailClient({
                   <line x1="5" y1="11" x2="9" y2="11" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                 </svg>
                 <span>Sort</span>
-              </button>
+              </Button>
 
               {/* Filter button */}
-              <button
-                className="btn-secondary flex items-center gap-1.5 text-sm rounded-lg"
+              <Button
+                variant="secondary" className="flex items-center gap-1.5"
                 style={{ paddingTop: 4, paddingBottom: 4, paddingLeft: 8, paddingRight: 8 }}
                 disabled
               >
@@ -553,7 +553,7 @@ export default function OnboardingDetailClient({
                   <path d="M1 2h12l-4.5 5.5V12l-3-1.5V7.5L1 2z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" fill="none" />
                 </svg>
                 <span>Filter</span>
-              </button>
+              </Button>
             </div>
 
             {/* Right: health tags + member avatars */}
@@ -685,6 +685,7 @@ export default function OnboardingDetailClient({
 
                               {/* Add task button */}
                               <div style={{ marginTop: colTasks.length > 0 ? 8 : 0 }}>
+                                {/* eslint-disable-next-line no-restricted-syntax -- full-width add row, not a DS button */}
                                 <button
                                   onClick={() => setAddingInPhase(phase.id)}
                                   className="add-task-btn flex items-center gap-1 w-full text-sm"
@@ -734,23 +735,23 @@ export default function OnboardingDetailClient({
                         />
                         <div className="flex gap-2">
                           <Button size="xs" onClick={handleAddPhase}>Add</Button>
-                          <button
+                          <Button
+                            variant="tertiary"
+                            size="xs"
                             onClick={() => { setAddingPhase(false); setNewPhaseName(""); }}
-                            className="text-xs font-medium"
-                            style={{ color: "var(--text-muted)" }}
                           >
                             Cancel
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     ) : (
-                      <button
+                      <Button
+                        variant="tertiary"
+                        size="xs"
                         onClick={() => setAddingPhase(true)}
-                        className="text-sm font-semibold px-4 py-1"
-                        style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}
                       >
                         + Add section
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>

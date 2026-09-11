@@ -9,6 +9,7 @@ import FieldRow from "@/app/ui/FieldRow";
 import CalendarDropdown from "@/app/ui/CalendarDropdown";
 import Drawer from "@/app/ui/Drawer";
 import TaskIdChip from "@/app/ui/TaskIdChip";
+import IconButton from "@/app/ui/IconButton";
 import { FollowupSparkleIcon } from "./AIDraftInbox";
 import {
   CalendarIcon,
@@ -112,6 +113,7 @@ function DownloadIcon() {
 
 function PillClearButton({ onClick }) {
   return (
+    // eslint-disable-next-line no-restricted-syntax -- fourth local PillClearButton copy, replaced by FieldRow onClear in slice 5
     <button
       type="button"
       onClick={onClick}
@@ -271,23 +273,9 @@ function ToolbarSeparator() {
 
 function ToolbarButton({ title, onClick, children }) {
   return (
-    <button
-      type="button"
-      title={title}
-      onClick={onClick}
-      className="toolbar-btn flex items-center justify-center rounded text-xs"
-      style={{
-        width: 24,
-        height: 24,
-        border: "none",
-        cursor: "pointer",
-        color: "var(--text-muted)",
-        flexShrink: 0,
-        padding: 0,
-      }}
-    >
+    <IconButton aria-label={title} title={title} onClick={onClick} className="text-xs">
       {children}
-    </button>
+    </IconButton>
   );
 }
 
@@ -301,7 +289,7 @@ function NotesToolbar({ notesValue, setNotesValue, notesRef }) {
         flexDirection: "row",
         alignItems: "center",
         gap: 2,
-        padding: "4px 8px",
+        padding: "6px 8px",
         borderBottom: "1px solid var(--border)",
         background: "var(--bg)",
         borderRadius: "8px 8px 0 0",
@@ -671,6 +659,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
             Drawer primitive (top-right). Padding-right reserves space. */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, paddingRight: 32 }}>
           {/* Mark as done button */}
+          {/* eslint-disable-next-line no-restricted-syntax -- state toggle that sheds the secondary skin once done */}
           <button
             type="button"
             onClick={handleMarkDone}
@@ -699,11 +688,10 @@ const TaskDrawer = forwardRef(function TaskDrawer({
 
           {/* Draft follow-up with Vector — uses the AI-gradient sparkle
               shared with the insights cards. */}
-          <button
-            type="button"
+          <Button
             onClick={() => setFollowUpOpen(true)}
             disabled={!localTask?.id}
-            className="btn-secondary flex items-center gap-1 rounded-lg text-sm"
+            variant="secondary" className="flex items-center gap-1"
             style={{
               padding: "4px 8px",
               cursor: localTask?.id ? "pointer" : "default",
@@ -712,7 +700,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
           >
             <FollowupSparkleIcon />
             <span>Draft follow-up</span>
-          </button>
+          </Button>
         </div>
 
         {/* Title */}
@@ -1086,6 +1074,7 @@ const TaskDrawer = forwardRef(function TaskDrawer({
                       .map((person) => {
                         const isMember = (localTask.members || []).includes(person);
                         return (
+                          // eslint-disable-next-line no-restricted-syntax -- menu row, becomes a Select option in slice 3
                           <button
                             key={person}
                             type="button"

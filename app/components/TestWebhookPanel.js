@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { MenuList, MenuOption } from "./Menu";
+import Button from "@/app/ui/Button";
 
 /**
  * Admin tool — POSTs a fixture payload at our own Miniti webhook, then
@@ -121,14 +122,14 @@ export default function TestWebhookPanel({ fixtures }) {
           fixtures={fixtures}
           disabled={busy}
         />
-        <button
+        <Button
           onClick={handleSend}
           disabled={busy || !selected}
-          className="btn-primary text-sm rounded-lg"
+          variant="primary"
           style={{ padding: "6px 14px", fontSize: 13, opacity: busy ? 0.5 : 1 }}
         >
           {busy ? "Sending…" : "Send"}
-        </button>
+        </Button>
         {polling && (
           <span style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>
             Polling for orchestrator results…
@@ -259,6 +260,7 @@ function FixturePicker({ value, onChange, fixtures, disabled }) {
 
   return (
     <div ref={ref} className="relative" style={{ minWidth: 220 }}>
+      {/* eslint-disable-next-line no-restricted-syntax -- dropdown trigger, becomes Select in slice 3 */}
       <button
         type="button"
         onClick={() => !disabled && setOpen((o) => !o)}
@@ -415,6 +417,7 @@ function Collapsible({ label, summary, json }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      {/* eslint-disable-next-line no-restricted-syntax -- bare disclosure toggle, no DS equivalent */}
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Button from "@/app/ui/Button";
 
 /**
  * Admin list of events Vector started processing but never finished —
@@ -80,14 +81,14 @@ export default function StuckEventsList({ initialEvents }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {events.length > 1 && (
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <button
+          <Button
             onClick={handleReprocessAll}
             disabled={bulkBusy}
-            className="btn-secondary text-sm rounded-lg"
+            variant="secondary"
             style={{ padding: "4px 10px", fontSize: 12, opacity: bulkBusy ? 0.5 : 1 }}
           >
             {bulkBusy ? "Scheduling…" : `Reprocess all ${events.length}`}
-          </button>
+          </Button>
         </div>
       )}
       {bulkResult && (
@@ -152,34 +153,28 @@ export default function StuckEventsList({ initialEvents }) {
                 )}
               </div>
               <div style={{ display: "flex", gap: 6, flexShrink: 0, alignItems: "center" }}>
-                <button
+                <Button
+                  variant="tertiary"
+                  size="xs"
                   onClick={() => toggleDebug(event.id)}
-                  style={{
-                    fontSize: 11,
-                    color: "var(--text-muted)",
-                    background: "transparent",
-                    border: "none",
-                    padding: "4px 8px",
-                    cursor: "pointer",
-                  }}
                   title={hasDebug ? "Show orchestrator input/output JSON" : "No orchestrator I/O persisted yet — orchestrator never finished"}
                 >
                   {isDebugOpen ? "Hide debug" : "Show debug"}
-                </button>
+                </Button>
                 <Link
                   href={`/onboardings/${event.onboardingId}`}
                   style={{ fontSize: 11, color: "var(--text-muted)", padding: "4px 8px" }}
                 >
                   View
                 </Link>
-                <button
+                <Button
                   onClick={() => handleReprocess(event.id)}
                   disabled={busy}
-                  className="btn-secondary text-sm rounded-lg"
+                  variant="secondary"
                   style={{ padding: "4px 10px", fontSize: 12, opacity: busy ? 0.5 : 1 }}
                 >
                   {busy ? "…" : "Reprocess"}
-                </button>
+                </Button>
               </div>
             </div>
             {isDebugOpen && (

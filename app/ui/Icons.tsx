@@ -260,6 +260,16 @@ export function DownloadIcon({ size = 14, className, style }: SizedIconProps) {
   );
 }
 
+/** Circular arrow: regenerate / refresh (InsightCard regenerate). */
+export function RefreshIcon({ size = 14, className, style }: SizedIconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={style} aria-hidden>
+      <path d="M11.5 7A4.5 4.5 0 1 1 9.9 3.6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M10 1.5v2.5H7.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 /** Bare tick — the "mark done" button check (TaskDrawer, PortalDrawer). */
 export function CheckIcon({ size = 12, className, style }: SizedIconProps) {
   return (
@@ -472,6 +482,7 @@ export const GENERIC_ICONS: Record<string, AnyIcon> = {
   ClockIcon,
   FileIcon,
   DownloadIcon,
+  RefreshIcon,
   CheckIcon,
   CheckCircleIcon,
   CheckCircleSolidIcon,

@@ -13,7 +13,6 @@ export const meta: DsMeta = {
     "Icon-only actions — use IconButton.",
     "Menu/dropdown triggers — use MenuTriggerButton (app/ui/Menu).",
     "Navigation to another page — use a link styled as text, not a button.",
-    "The raw `.text-btn` classes in ContactsPanel / PortalDrawer / ActionsTab / MeetingsTab are Phase 7 retrofit targets onto `tertiary` (`tone=\"danger\"` for Revoke); do not add new ones.",
   ],
   a11y: [
     "Renders a native <button type=\"button\"> — keyboard and screen-reader behaviour come free; don't override `type` to submit unless it's in a form.",

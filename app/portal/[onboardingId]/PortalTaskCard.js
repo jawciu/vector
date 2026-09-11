@@ -41,6 +41,7 @@ function CheckboxButton({ isDone, isCompleting, onClick }) {
   const [hovered, setHovered] = useState(false);
 
   return (
+    // eslint-disable-next-line no-restricted-syntax -- task tick control, retrofits onto TaskTick later
     <button
       type="button"
       onClick={onClick}

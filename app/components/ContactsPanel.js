@@ -43,6 +43,7 @@ function activeLinkFor(contactId, magicLinks) {
 
 function Checkbox({ checked, indeterminate, disabled, onClick, ariaLabel, title }) {
   return (
+    // eslint-disable-next-line no-restricted-syntax -- checkbox control, retrofits onto Checkbox later
     <button
       type="button"
       className="group member-checkbox"
@@ -593,23 +594,24 @@ function ContactRow({
       <span style={cellStyle(5, isLast)}>
         {link && !showFailed ? (
           <div className="flex items-center gap-3">
-            <button onClick={onCopy} className="text-btn text-btn-action text-sm">
+            <Button onClick={onCopy} variant="tertiary" className="p-0">
               {copied ? "Copied!" : "Copy"}
-            </button>
-            <button onClick={onRevoke} className="text-btn text-btn-danger text-sm">
+            </Button>
+            <Button onClick={onRevoke} variant="tertiary" tone="danger" className="p-0">
               Revoke
-            </button>
+            </Button>
           </div>
         ) : (
-          <button
+          <Button
             onClick={onGenerate}
-            className="text-btn text-btn-action text-sm"
+            variant="tertiary"
+            className="p-0"
             disabled={noEmail}
             title={noEmail ? "Add an email to send invite" : undefined}
             style={noEmail ? { opacity: 0.4, cursor: "not-allowed" } : undefined}
           >
             {showFailed ? "Resend" : "Send"}
-          </button>
+          </Button>
         )}
       </span>
       {/* Actions */}

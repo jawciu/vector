@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Sparkle from "@/app/ui/Sparkle";
 import TaskIdChip from "@/app/ui/TaskIdChip";
+import Button from "@/app/ui/Button";
+import IconButton from "@/app/ui/IconButton";
 
 /**
  * "Draft follow-up with Vector" modal — opens from the task drawer.
@@ -206,22 +208,11 @@ export default function FollowUpModal({ open, onClose, taskId, taskTitle, taskCo
               {taskTitle ?? "Follow-up"}
             </h2>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            style={{
-              width: 28, height: 28, borderRadius: 6,
-              background: "transparent", border: "none",
-              color: "var(--text-muted)", cursor: "pointer",
-              display: "inline-flex", alignItems: "center", justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
+          <IconButton aria-label="Close" onClick={onClose} className="shrink-0">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
-          </button>
+          </IconButton>
         </div>
 
         {/* Tone tabs */}
@@ -232,6 +223,7 @@ export default function FollowUpModal({ open, onClose, taskId, taskTitle, taskCo
               { key: "firmer", label: "Firmer reminder", desc: "Direct, asks for a date" },
               { key: "escalation", label: "Escalation", desc: "Loop in a sponsor" },
             ].map((t) => (
+              // eslint-disable-next-line no-restricted-syntax -- segmented control, TabBar retrofit later
               <button
                 key={t.key}
                 onClick={() => handleToneChange(t.key)}
@@ -336,22 +328,22 @@ export default function FollowUpModal({ open, onClose, taskId, taskTitle, taskCo
             Vector never sends. Copy and paste into your email tool.
           </span>
           <div style={{ display: "flex", gap: 8 }}>
-            <button
+            <Button
               onClick={() => generate(tone)}
               disabled={streaming}
-              className="btn-secondary text-sm rounded-lg"
+              variant="secondary"
               style={{ padding: "4px 12px", fontSize: 13, opacity: streaming ? 0.5 : 1 }}
             >
               {streaming ? "…" : "↻ Regenerate"}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => handleCopy(`Subject: ${subject}\n\n${body}`, "all")}
               disabled={streaming || (!subject && !body)}
-              className="btn-primary text-sm rounded-lg"
+              variant="primary"
               style={{ padding: "4px 14px", fontSize: 13, fontWeight: 600, opacity: streaming || (!subject && !body) ? 0.5 : 1 }}
             >
               {copied === "all" ? "Copied!" : "Copy all"}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -366,20 +358,15 @@ function Field({ label, onCopy, copied, disabled, children }) {
         <span style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 600 }}>
           {label}
         </span>
-        <button
+        <Button
+          variant="tertiary"
+          size="xs"
           onClick={onCopy}
           disabled={disabled}
-          style={{
-            fontSize: 11,
-            color: copied ? "var(--action)" : "var(--text-muted)",
-            background: "transparent",
-            border: "none",
-            cursor: disabled ? "default" : "pointer",
-            padding: 0,
-          }}
+          style={{ color: copied ? "var(--action)" : undefined }}
         >
           {copied ? "Copied!" : "Copy"}
-        </button>
+        </Button>
       </div>
       {children}
     </div>
