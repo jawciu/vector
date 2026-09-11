@@ -204,6 +204,16 @@ a {
   cursor: not-allowed;
 }
 
+/* Tertiary, danger tone (Button tone="danger"): red label, same colour step as
+   .text-btn-danger. Disabled still falls to text-muted via .btn-tertiary:disabled. */
+.btn-tertiary--danger {
+  color: var(--danger);
+}
+
+.btn-tertiary--danger:hover:not(:disabled) {
+  color: var(--danger-hover);
+}
+
 /* Primary button */
 .btn-primary {
   background-color: var(--action);
@@ -253,7 +263,9 @@ a {
   background-color: var(--surface-hover);
 }
 
-/* Inline text buttons (e.g. Copy / Revoke / Generate) */
+/* Legacy inline text buttons. Not a DS variant: six raw call sites (ContactsPanel,
+   PortalDrawer, ActionsTab, MeetingsTab). Deleted when Phase 7 retrofits them
+   onto .btn-tertiary. */
 .text-btn {
   background: none;
   border: none;
@@ -855,8 +867,9 @@ textarea.input {
   border-color: var(--button-secondary-border);
 }
 
-/* Field triggers are keyboard-focusable (role="button" + tabIndex when they
- * carry onClick), so they get the same focus ring as the .btn-* set. */
+/* Legacy: field triggers used to be divs with role="button". The DS main
+   control is a native button now (.field-main:focus-visible above); this stays
+   for raw .field-pill/.field-row in feature code until Phase 7. */
 .field-pill:focus-visible,
 .field-row:focus-visible {
   outline: 2px solid var(--focus-ring);
@@ -877,6 +890,45 @@ textarea.input {
   background: var(--surface-hover);
 }
 
+/* Field pill/row internals. The wrapper owns the box and states; the main
+   control is a native button that fills it. The Clear (X) is a sibling button
+   at the end of the row: display:none at rest (no reserved space), shown on
+   wrapper hover / focus-within / active so the field grows to fit it. */
+.field-main {
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.field-main:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.field-clear {
+  display: none;
+  padding: 0 8px 0 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+.field-pill:hover .field-clear,
+.field-pill:focus-within .field-clear,
+.field-pill[data-active="true"] .field-clear,
+.field-row:hover .field-clear,
+.field-row:focus-within .field-clear,
+.field-row[data-active="true"] .field-clear {
+  display: inline-flex;
+}
+.field-clear:hover { color: var(--text); }
+.field-clear:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
 .menu-trigger-pill {
   background: var(--bg);
   transition: background 0.15s ease;
@@ -895,10 +947,10 @@ textarea.input {
   cursor: default;
 }
 
-/* Status pill — outlined (default) and filled variants. Same outer
-   dimensions in both variants so they sit on the same baseline as the
-   table health pills. Pair with an inline `color` (outlined) or
-   `background` (filled) of the relevant status token. */
+/* Status pill. Outlined (default) and filled variants; md (14px, default)
+   and sm (12px, outlined only). Colour comes from the Badge primitive's
+   token utilities (app/ui/Badge.tsx); legacy call sites still pair the base
+   class with an inline colour until Phase 7. */
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -922,6 +974,14 @@ textarea.input {
  * overrides onto it. */
 .status-pill--md {
   font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+/* sm size: the task drawer status picker chip (12px, 1px 4px). Badge only. */
+.status-pill--sm {
+  padding: 1px 4px;
+  font-size: 12px;
   line-height: 20px;
   font-weight: 400;
 }

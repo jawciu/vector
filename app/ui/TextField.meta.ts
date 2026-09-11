@@ -9,7 +9,7 @@ export const meta: DsMeta = {
   dontUseWhen: [
     "Search fields with a magnifier icon — use SearchField (the `.search-input` wrapper pattern as a primitive).",
     "Multi-line text — use Textarea.",
-    "Picking from a fixed set — use Select, or MenuList for rich dropdowns.",
+    "Picking from a fixed set — use MenuList + MenuOption; the DS has no native select.",
   ],
   a11y: [
     "Needs an accessible name: render inside `<Field label=…>` (preferred) or pass aria-label when standalone.",

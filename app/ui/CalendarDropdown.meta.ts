@@ -4,7 +4,8 @@ export const meta: DsMeta = {
   status: "stable",
   useWhen: [
     "Picking a single date on a field row (task target date, meeting date, draft due date) — TaskDrawer, CreateTaskModal, CreateOnboardingModal, MeetingsTab and AIDraftInbox all use it.",
-    "Render it INSIDE a `position: relative` anchor (it positions itself `absolute left-0 top-full`), conditionally on your own `open` state.",
+    "Render it INSIDE a `position: relative` anchor (it positions itself `absolute left-0 top-full`), conditionally on your own `open` state. The trigger is a FieldPill (or FieldRow) with `onClear`, so a picked date clears from the pill's X as well as the footer.",
+    "Initialise `viewDate` to today, or to the selected value's month when there is one, so the picker always opens on the current month with today outlined (every app call site does this; the stories do too).",
     "It is fully controlled: `value` (YYYY-MM-DD string or \"\"), `viewDate` + `onViewDateChange` (Date driving the visible month), `onChange`, `onClear`, `onClose` (fired on outside mousedown).",
   ],
   dontUseWhen: [

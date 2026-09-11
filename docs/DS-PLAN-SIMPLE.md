@@ -83,7 +83,7 @@ Beside each component we add a small `.meta.ts` file: is it stable or experiment
 ## Phase 5 — New components (2 to 3 days, each one ships on its own)
 In order of how much old mess each one cleans up:
 1. **Modal**, built on the browser's native `<dialog>` element, which gives keyboard focus trapping, Escape-to-close and the dark backdrop for free, with screen-reader support built in. Corner radius follows the documented scale (12px), which means the current 20px modals visibly change; that is intentional and gets written down.
-2. **Field, Input, Textarea, Select**: Field owns the label, help text and error message and wires them together properly; the controls handle their own states.
+2. **Field, TextField, Textarea** (Input was renamed TextField, and the Select built here was removed on 2026-09-11): Field owns the label, help text and error message and wires them together properly; the controls handle their own states.
 3. **Spinner** (Button's loading state needs it) and **Badge**.
 4. Move the Menu components into the design-system folder, leaving a forwarding file behind so nothing else has to change yet.
 **Done when:** everything is in Storybook with full state stories, and the Modal's play function proves focus stays inside and Escape closes it.
@@ -93,26 +93,36 @@ Build the screenshot safety net: a Playwright script reads Storybook's list of s
 Then deploy Storybook as its own little website on Vercel, e.g. `ds.vector.quest`: your public, shareable design system. One gotcha to fix: the cron job in `vercel.json` would leak into the new project, so it moves to the Vercel dashboard.
 **Done when:** two CI runs in a row pass with no photo churn, and the public URL is live.
 
-## Phase 7 — Fixing the old screens, stage one (2 to 3 days, one PR per problem type)
-Now protected by lint, screenshots and the audit guard rail:
-1. The five scrim modals (the audit script found a fifth one, `OnboardingActions.js`, that the manual audit had missed) become the one Modal component, and their forms adopt the new Field/Input components at the same time. Roughly 700 duplicated lines deleted, and the accessibility gap closed, in one move. Take before/after screenshots for the case study.
-2. The remaining hand-made inputs become Input components.
-3. The 47 buttons that use the `.btn-*` CSS classes directly are near-mechanical swaps to `<Button>` (the class name literally says which variant). The ~23 fully bespoke ones get judged case by case.
-After each PR the audit script proves the numbers improved, and the end-to-end tests confirm the create-task and create-onboarding flows still work. At the end, the lint warnings become hard errors in the cleaned folders.
-**Done when:** roughly 80%+ of buttons and 90%+ of inputs use the components, there is one Modal in the codebase, and everything is green.
+## Phase 7 — Staged rollout, one component at a time (Caroline's call, 2026-09-11)
 
-## Phase 8 — Full sweep, stage two (3 to 5 days, done in slices)
-Your addition: once the worst offenders are fixed and the system has proven itself, we go back and clean up EVERYTHING else. Every remaining hand-made button and input becomes the component. The ~112 scattered hand-drawn icons move into the one shared icon file. Inline styles that just reference tokens become the new utility classes, and hardcoded numbers (like `borderRadius: 20`) become tokens. A few inline styles legitimately have to stay (drag-and-drop positioning, truly dynamic values), so we measure that realistic floor rather than chasing zero. At the end, the lint warnings become hard errors everywhere, the old-variable compatibility block is deleted (nothing uses it anymore), and the audit baseline is reset to the new, much lower floor. This runs as one small PR per screen area, each proven safe by the audit script, the screenshots and the end-to-end tests, and it can happen in parallel with phases 9 and 10.
-**Done when:** the scorecard is at or near zero on every metric, lint is strict everywhere, and the compatibility scaffolding is gone.
+**Why:** the component library and Storybook are invisible to users until a screen actually uses a component, and Vercel builds a preview link for every pull request. So each component goes live on its own, and Caroline reviews one component across the app on a preview link, never the whole app in one go. The old "stage one / stage two" split is folded into the slices below.
 
-## Phase 9 — Updating the agent instructions (half to 1 day)
+**Every slice is the same loop:** approve it in Storybook, swap the screens that use it, open a pull request, review the preview link, merge. Each slice is done when the audit numbers improved, the end-to-end tests pass, the component works from the keyboard, the screenshots match, and Caroline has signed off the preview.
+
+0. **Foundation merge, first:** everything on the branch today. The only thing users could notice is the margin fix from Phase 2, which is what to look at on the preview. The audit baseline gets refreshed in this pull request.
+1. **Button:** the 47 buttons that already use the button CSS classes are near-mechanical swaps; the six lilac text buttons become tertiary (the red Revoke becomes the danger tone) and the old text-button CSS is deleted; the ~23 fully bespoke ones are judged case by case.
+2. **Badge:** the seven hand-made status pills across the app become the Badge component. Expect the overview insight pills to get slightly bigger and lighter, that is what "make them the same" means.
+3. **Dropdowns, the big one, in small steps:** first the shared popover and keyboard behaviour go in underneath the existing Menu code, so every dropdown gains arrow keys and Escape at once with no visual change. Then the new Select component with its two looks (inline rows, bordered boxes), then multi-select and search, then Menu is narrowed to action menus only. Then the screens move over one group at a time: drawer pickers, modal pickers, Members, the last native Status dropdown, the AI inbox pills, the three-dot menus, the sidebar and notification popovers. Four questions for Caroline are listed in the technical plan.
+4. **Modals and form fields:** the five copy-pasted modals become the one Modal component and their forms adopt Field, TextField and Textarea. About 700 duplicated lines deleted and the accessibility gap closed.
+5. **Clear buttons:** the three hand-made clear-on-hover buttons use the new built-in one.
+6. **Icons:** the ~112 scattered inline icons move into the icon registry.
+7. **Inline styles, folder by folder:** token values move to the utilities, hard-coded sizes move to tokens, and the lint warnings become errors in each cleaned folder.
+8. **Keyboard walk of every screen** to close.
+
+**Order:** 0 first because it unblocks previews. 1 and 2 are easy rehearsals of the loop. Keyboard behaviour goes in before any dropdown is rebuilt, because keyboard support is now a hard rule. Modals come after dropdowns so their forms land on the final Select.
+
+## Phase 8 — (folded into Phase 7 as steps 6 to 8, 2026-09-11)
+
+Heading kept so older notes still point somewhere. The full-sweep work is steps 6 to 8 above.
+
+## Phase 9 — Updating the agent instructions (half to 1 day, can happen alongside Phase 7, ideally right after step 0)
 - The style-right skill's token table becomes GENERATED from DESIGN.md, so it can never go stale again (that is how the two outdated colours got in).
 - The design-system skill is rewritten around the new world, with the key sentence: "if the state you need has no story, you are off-road: add the story first."
 - A new storybook skill teaches agents how to run it, write a story, query the story list, and update the screenshot baselines.
 - CLAUDE.md gets the new-component checklist: TypeScript + locked variants + all states + a story per state + meta file + play function + accessibility clean + screenshot baseline.
 - **Helping agents find the right component (added 2026-09-10).** Agents handed a flat folder of components read every file, burn tokens, and still pick by name alone. The fix is letting them narrow down before they read anything. Five small additions, done in this order:
   1. Every component's meta file gets an **intent**: is it an action, an input, navigation, data display, or feedback? One word each.
-  2. Every meta file can also say what it **pairs with** (Field goes with TextField, Textarea and Select; Modal goes with Button).
+  2. Every meta file can also say what it **pairs with** (Field goes with TextField and Textarea; Modal goes with Button).
   3. The build **generates an index page** for the components folder: one table with each component's name, intent, status, one line on when to use it, and where it lives. An agent reads that one file to get its bearings instead of opening 25. It is generated from the meta files, never written by hand, so it can never go stale.
   4. The audit script gets a new number: how many components have a meta file out of how many there are. The rule "every component must have one" then gets enforced by the ratchet instead of relying on people remembering.
   5. The agent instructions teach two questions to ask before reading any code: "what job does this need to do?" then "is there already a blessed component for that?" And the review skill (currently out of date) is rewritten to check the meta contract and to report every rejection as: the problem, the evidence, the suggested fix.
@@ -140,7 +150,7 @@ Run the audit one last time and put the two scorecards side by side. The story w
 - `DESIGN.md`: gains the type scale and the overlay token, loses the lies.
 - `eslint.config.mjs` + `eslint-rules/`: the new automatic rules.
 - `app/ui/Button.tsx`: the template all other components copy.
-- `app/ui/Modal.tsx`, `Field/Input/Textarea/Select.tsx`, `Spinner.tsx`, `Badge.tsx`, `Menu.tsx`: the new components.
+- `app/ui/Modal.tsx`, `Field/TextField/Textarea.tsx`, `Spinner.tsx`, `Badge.tsx`, `Menu.tsx`: the new components.
 - `.storybook/`, `playwright.vrt.config.ts`, `vrt/`: Storybook and screenshot testing, all new.
 - `.github/workflows/ci.yml`: the expanded automatic checks.
 - `skills/` + `CLAUDE.md`: the refreshed agent instructions.

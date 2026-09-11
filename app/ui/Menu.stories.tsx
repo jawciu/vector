@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useEffect, useRef, useState } from "react";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import { MenuTriggerButton, MenuList, MenuOption } from "./Menu";
-import { TASK_STATUSES, STATUS_COLORS } from "@/lib/constants";
+import { TASK_STATUSES } from "@/lib/constants";
+import Badge, { type BadgeStatus } from "./Badge";
 import { dsMetaDescription } from "./ds-meta";
 import { meta as dsMeta } from "./Menu.meta";
 
@@ -10,7 +11,7 @@ import { meta as dsMeta } from "./Menu.meta";
  * Menu is a registry of three primitives (trigger / list / option), so the
  * stories render compositions rather than one component. The list stories
  * reproduce the real task status menu (TaskDrawer) — same TASK_STATUSES
- * labels, same status-pill spans inside each option.
+ * labels, same status chips (Badge, sm) inside each option.
  */
 const config: Meta = {
   tags: ["autodocs"],
@@ -23,22 +24,12 @@ export default config;
 
 type Story = StoryObj;
 
-/** The status-pill span rendered inside each option, as TaskDrawer does. */
+/** The status chip inside each option: the Badge primitive at its drawer size. */
 function StatusPill({ status }: { status: string }) {
-  const color =
-    (STATUS_COLORS as Record<string, string>)[status] ?? "var(--text-muted)";
   return (
-    <span
-      style={{
-        color,
-        border: `0.5px solid ${color}`,
-        padding: "1px 4px",
-        borderRadius: 6,
-        fontSize: 12,
-      }}
-    >
+    <Badge status={status as BadgeStatus} size="sm">
       {status}
-    </span>
+    </Badge>
   );
 }
 

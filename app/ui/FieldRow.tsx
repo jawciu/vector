@@ -1,6 +1,7 @@
 "use client";
 
-import type { KeyboardEvent, MouseEventHandler, ReactNode } from "react";
+import type { MouseEventHandler, ReactNode } from "react";
+import { PillClearButton } from "./FieldPill";
 
 /**
  * FieldRow — DS primitive (drawer detail view)
@@ -8,15 +9,19 @@ import type { KeyboardEvent, MouseEventHandler, ReactNode } from "react";
  * Clean label+value row with no default border. Border + background appear
  * only when active (dropdown open). Content-hugging (inline-flex, not full-width).
  *
- * Stays a <div> (call-site layout depends on it) but is keyboard operable
- * when `onClick` is present: role="button", tabIndex=0, and Enter/Space
- * synthesize a click (Space with preventDefault so the page doesn't scroll).
+ * Structure mirrors FieldPill: a non-interactive wrapper div carries the box
+ * and states; the main control is a native <button type="button"> with the
+ * icon/label/children and the onClick. With `onClear` and a value, a Clear
+ * (X) <button> follows inline at the end of the row, hidden at rest and shown
+ * on hover, focus-within or while active, so the row grows to fit it
+ * (TaskDrawer's due-date row).
  *
  * Props:
  *   icon      — left-side icon element
  *   label     — fallback text when no children
  *   active    — shows border + bg when the row's dropdown is open
- *   onClick   — click handler
+ *   onClick   — click handler on the main button
+ *   onClear   — clears the value; renders the inline Clear (X) when children are set
  *   children  — custom content (overrides label)
  */
 
@@ -24,42 +29,25 @@ export interface FieldRowProps {
   icon?: ReactNode;
   label?: ReactNode;
   children?: ReactNode;
-  onClick?: MouseEventHandler<HTMLDivElement>;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+  onClear?: () => void;
   active?: boolean;
 }
 
-export default function FieldRow({ icon, label, children, onClick, active }: FieldRowProps) {
+export default function FieldRow({ icon, label, children, onClick, onClear, active }: FieldRowProps) {
   return (
     <div
-      className="field-row inline-flex items-center gap-2 rounded-lg cursor-pointer"
+      className="field-row inline-flex items-center rounded-lg"
       data-active={active ? "true" : undefined}
-      style={{ padding: "4px 8px", minHeight: 26 }}
-      onClick={onClick}
-      // Keyboard operability without changing the element: only interactive
-      // when a click handler exists (a bare display row stays a plain div).
-      role={onClick ? "button" : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      onKeyDown={onClick ? handleActionKeys : undefined}
+      style={{ minHeight: 26 }}
     >
-      {icon}
-      {children || (
-        <span className="text-sm" style={{ color: "var(--text-muted)" }}>{label}</span>
-      )}
+      <button type="button" className="field-main flex items-center gap-2 rounded-lg" onClick={onClick}>
+        {icon}
+        {children || (
+          <span className="text-sm" style={{ color: "var(--text-muted)" }}>{label}</span>
+        )}
+      </button>
+      {onClear && children && <PillClearButton onClick={onClear} />}
     </div>
   );
-}
-
-/**
- * Enter/Space activate the row like a native button. Space must
- * preventDefault so the page doesn't scroll; the synthesized
- * `currentTarget.click()` re-enters the normal onClick path with a real
- * MouseEvent (no handler-signature contortions). Keys originating on
- * focusable children (e.g. an inner clear button) are left alone — the
- * child owns its own activation. (Mirrored in FieldPill.)
- */
-function handleActionKeys(e: KeyboardEvent<HTMLDivElement>) {
-  if (e.target !== e.currentTarget) return;
-  if (e.key !== "Enter" && e.key !== " ") return;
-  if (e.key === " ") e.preventDefault();
-  e.currentTarget.click();
 }

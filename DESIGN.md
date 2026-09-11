@@ -198,14 +198,13 @@ Depth is communicated by **background colour layering**, not shadows. The only s
 
 ## Components
 
-### `Button` — `app/ui/Button.js`
+### `Button` — `app/ui/Button.tsx`
 
-Variants: `primary` | `secondary` | `tertiary` | `destructive` | `text`. Sizes: `xs` | `sm` (default). Solid variants share `rounded-lg` (8px) and `gap-2` (8px) between leading icon and label.
+Variants: `primary` | `secondary` | `tertiary` | `destructive`. Sizes: `xs` | `sm` (default). Solid variants share `rounded-lg` (8px) and `gap-2` (8px) between leading icon and label.
 - **Primary**: `font-semibold`, uses `.btn-primary` CSS class. Default `action`, hover `actionHover`, active `actionActive`, disabled `actionDisabled`. Text always `actionText`.
 - **Secondary**: `font-normal`, uses `.btn-secondary` CSS class. `surface` background, `border` border, `text` colour. Hover `surfaceHover`, active `bgHover`. Disabled keeps the border but text becomes `textMuted`.
-- **Tertiary**: `font-normal`, uses `.btn-tertiary` CSS class. No fill and no visible border — the label alone. Rests at `textMuted` (the same tone as an inactive tab label) and brightens to `text` on hover. **It never takes a background, on hover or otherwise.** Carries a transparent 1px border so its box matches an adjacent secondary and a button row doesn't shift. Disabled stays `textMuted`.
-- **Destructive**: `font-semibold`, uses `.btn-destructive` CSS class. Default `danger`, hover `dangerHover`, active `dangerActive`, disabled `dangerDisabled`. Text always `textDark`. Use only for irreversible actions (delete, revoke).
-- **Text**: inline text-only button via `.text-btn`. Pair with `tone="action"` (default, `action` colour) or `tone="danger"` (`danger` colour). No padding, no background, no radius. Use sparingly for inline actions like Copy / Revoke. **This is not a fourth emphasis tier** — it's the base for coloured inline links, not a button weight.
+- **Tertiary**: `font-normal`, uses `.btn-tertiary` CSS class. No fill and no visible border — the label alone. Rests at `textMuted` (the same tone as an inactive tab label) and brightens to `text` on hover. **It never takes a background, on hover or otherwise.** Carries a transparent 1px border so its box matches an adjacent secondary and a button row doesn't shift. Disabled stays `textMuted`. `tone="danger"` (`.btn-tertiary--danger`) turns the label `danger`, `dangerHover` on hover, for inline low-emphasis destructive actions such as Revoke. `tone` exists only on tertiary; the type forbids it on the other variants. The old lilac `.text-btn` is not a variant; its six raw call sites are retrofitted onto tertiary in Phase 7.
+- **Destructive**: `font-semibold`, uses `.btn-destructive` CSS class. Default `danger`, hover `dangerHover`, active `dangerActive`, disabled `dangerDisabled`. Text always `textDark`. Use only for irreversible actions as the solid, confirming button (delete, the confirm step of a revoke). An inline revoke in a table row is tertiary `tone="danger"`, not destructive.
 
 **Emphasis is a three-tier ladder: primary > secondary > tertiary.** There is no "ghost" — tertiary *is* the ghost. Cancel/dismiss alongside another button uses `variant="tertiary"` at the same size.
 
@@ -274,14 +273,18 @@ Pill-shaped trigger that opens a popover (date picker, status filter, etc.). The
 </button>
 ```
 
-### Status pill — `.status-pill`, `.status-pill--filled`
+### Status pill — `Badge` (`app/ui/Badge.tsx`)
 
-Small uppercase-or-cased label communicating state. Two variants:
+Small cased label communicating state. `Badge` is the only status pill in the DS (2026-09-11). Two variants:
 
-- **`.status-pill`** (default, outlined): transparent background, 1px border in the status colour, text in the status colour. Use inline alongside text or chips.
-- **`.status-pill--filled`**: filled in the status colour, text in `textDark`. Use as a louder header-level status (e.g. the "Declining" pill on `PortfolioInsightsHero`). Same proportions as the default variant: `padding: 2px 4px`, `rounded.sm` (6px), `12px` text.
+- **Outlined** (default): transparent background, 0.5px border and text in the colour. Two sizes: **md** 14px/20px, `padding: 2px 4px` (the kanban card chip, default) and **sm** 12px/16px, `padding: 1px 4px` (the task drawer status picker). Weight 400, `rounded.md` (6px).
+- **Filled**: the colour fills the pill, text in `textDark`. One size, md, the board header health and blocked pills. Same proportions as outlined md.
 
-Status → token mapping (used by Vector trend / portfolio status):
+Colour comes from one of two props, never both: `color` (the closed union `success` / `danger` / `alert` / `action` / `muted` / `mint` / `sky` / `candy`) or `status` (a task status; Badge owns the mapping: Not started → `muted`, In progress → `mint`, Under investigation → `sky`, On hold → `candy`, Blocked → `danger`, Done → `success`). Call sites never re-derive status colours.
+
+The CSS classes (`.status-pill`, `--filled`, `--md`, `--sm`) stay for the hand-rolled pills until Phase 7 retrofits them: the task status chips in `TaskCardView`, `TaskDrawer`, `PortalTaskCard`, `AIDraftInbox` and `CreateTaskModal`, `InsightStatusPill`, and the board header pills.
+
+Insight status → token mapping (used by Vector trend / portfolio status):
 - `Declining` → `danger`
 - `At risk` → `alert`
 - `On track` → `success`
@@ -345,7 +348,7 @@ The visual language for AI-generated panels. Used by both the vendor onboarding 
 - **`InsightCardHeader`** — `padding 16/16/12`. Slots: `title` (uppercase 16px label after the Vector sparkle), `statusPill` (rendered next to the title), `onRegenerate` (the `↻` icon button on the right). Disables the regenerate button while streaming.
 - **`InsightDivider`** — 1px `borderSubtle` rule; sits between header and the first row, and between rows.
 - **`InsightSection`** — section wrapper. Title is 14px semibold uppercase `textMuted` letter-spacing 0.5px, followed by an `.ai-divider` (the AI-gradient hairline). Section grid placement is controlled by classes `oi-section--{summary|risks|wins|focus|week}` defined in `globals.css`.
-- **`InsightStatusPill`** — `audience="vendor"` (default) maps `Declining`/`At risk`/`On track`/`Improving` → `danger`/`alert`/`success`/`mint`. `audience="customer"` maps `On track`/`Needs your input`/`In progress` → `success`/`alert`/`mint`. Both render as `.status-pill--filled`.
+- **`InsightStatusPill`** — `audience="vendor"` (default) maps `Declining`/`At risk`/`On track`/`Improving` → `danger`/`alert`/`success`/`mint`. `audience="customer"` maps `On track`/`Needs your input`/`In progress` → `success`/`alert`/`mint`. Both render as `.status-pill--filled` today; Phase 7 folds them onto `Badge` filled.
 - **`WinRow`** — single win, green `CheckCircle` + headline + muted detail. Use the `position` prop (`top`/`middle`/`bottom`/`only`) to round corners when stacking multiple rows into a single bordered group.
 - **`ThisWeekRow`** — single weekly priority, `PriorityIcon` + summary text. Same `position` API as `WinRow`.
 - **`RiskCard`** — vendor only. Severity pill on top (`high`/`medium`/`low` → `danger`/`alert`/`textMuted`) with the risk summary below. Stacks horizontally with `position` for shared rounded corners.
@@ -361,10 +364,11 @@ When extending: add a new `oi-section--<name>` class in `globals.css` to place a
 
 - **Layer surfaces** for depth, not shadows. Add `1px solid border` if more separation is needed.
 - **Use `textSecondary` as the hover step** from `textMuted` on navigation surfaces.
-- **Use `MenuList` + `MenuOption`** for every dropdown — even one-off menus.
+- **Use `MenuList` + `MenuOption`** for every dropdown — even one-off menus and plain pick-one-value fields. There is no native `<select>` in the DS.
 - **Reach for `rounded-full` only for avatar circles.** Everything else uses `rounded` or larger.
 - **Use the avatar palette** (`mint / rose / sunset / lilac / sky / candy`) for company / contact initials only.
 - **Add an icon button's `isActive` state** when the menu it controls is open — the persistent active style tells the user "this opened the thing".
+- **Give a field pill or row with a removable value `onClear`.** The Clear (X) appears inline at the end of the row on hover, focus-within and while the field is open, and the field grows to fit it; it is part of `FieldPill` and `FieldRow` (a sibling button after the native main control), never hand-rolled at the call site. Date pickers open on the current month (or the selected date's month).
 
 ### Don't
 

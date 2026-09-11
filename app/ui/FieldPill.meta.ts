@@ -6,7 +6,8 @@ export const meta: DsMeta = {
     "Inline field selectors in a form row (CreateTaskModal): due date, priority, status, owner — the pill is the trigger, a CalendarDropdown/MenuList opens beneath it.",
     "Rows of equal-width fields — it is flex-1, so siblings in the same flex row share the width evenly.",
     "Pass `active` while the pill's dropdown is open: it holds the surfaceHover background so the trigger reads as pressed for the dropdown's lifetime.",
-    "`children` for real content (value text, clear button — see CreateTaskModal's PillClearButton pattern); `label` is only the muted empty-state fallback.",
+    "`children` for real content (the value text); `label` is only the muted empty-state fallback.",
+    "Pass `onClear` whenever the value can be removed: a Clear (X) button appears at the right edge on hover, focus-within and while active, and clears without toggling the pill. This is the app's due-date / owner pill pattern; do not hand-roll a clear button at the call site.",
   ],
   dontUseWhen: [
     "Drawer detail views — use FieldRow: borderless at rest, content-hugging, same API.",
@@ -14,10 +15,9 @@ export const meta: DsMeta = {
     "Menu triggers outside a field context — use MenuTriggerButton (app/ui/Menu).",
   ],
   a11y: [
-    "FIXED (was Lens 3 gap #5, mouse-only field editors): when `onClick` is present the pill carries role=\"button\" + tabIndex=0, Enter and Space activate it (Space preventDefaults so the page doesn't scroll), and :focus-visible draws the shared 2px focus-ring outline. Without `onClick` it stays a plain non-interactive div.",
-    "HONEST NOTE: it is still a <div> with a button role, not a native <button> — call-site layout (flex-1 pill rows) depends on the element. Don't add per-call-site tabIndex/keydown workarounds; the primitive owns the keyboard contract now.",
-    "Keys originating on focusable children (e.g. a clear button inside) are ignored by the pill — the child handles its own activation.",
-    "Hover and active states are CSS-driven (.field-pill / [data-active]) so they stay consistent across every call site.",
+    "The main control is a native <button type=\"button\"> (peer-review item 12 closed): Tab reaches it, Enter/Space activate it, :focus-visible draws the shared 2px focus-ring outline, and its accessible name is the icon-plus-text content. The wrapper div is non-interactive and only carries the box and states. Don't add per-call-site tabIndex/keydown workarounds.",
+    "The Clear (X) is a second native <button aria-label=\"Clear\">, a sibling after the main control, never nested inside it, so axe's nested-interactive rule passes. It is display:none at rest (no reserved space) and shown while the pill is hovered, focused within, or active: Tab to the main control reveals it, the next Tab reaches it, Enter/Space clear. No motion, so reduced-motion is unaffected.",
+    "Hover and active states are CSS-driven on the wrapper (.field-pill / [data-active]) so they stay consistent across every call site and cover the X as well as the main control.",
   ],
-  tokens: ["bgElevated", "bgHover", "surfaceHover", "buttonSecondaryBorder", "textMuted", "focusRing"],
+  tokens: ["bgElevated", "bgHover", "surfaceHover", "buttonSecondaryBorder", "textMuted", "text", "focusRing"],
 };

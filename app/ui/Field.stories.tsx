@@ -3,7 +3,6 @@ import { useState } from "react";
 import { expect, userEvent, within } from "storybook/test";
 import Field from "./Field";
 import TextField from "./TextField";
-import Select from "./Select";
 import Textarea from "./Textarea";
 import Button from "./Button";
 import { dsMetaDescription } from "./ds-meta";
@@ -89,19 +88,6 @@ export const Disabled: Story = {
   },
 };
 
-export const SelectControl: Story = {
-  args: {
-    label: "Owner",
-    children: (
-      <Select defaultValue="tom">
-        <option value="tom">Tom Okafor</option>
-        <option value="ada">Ada Nwosu</option>
-        <option value="mia">Mia Feldt</option>
-      </Select>
-    ),
-  },
-};
-
 export const TextareaControl: Story = {
   args: {
     label: "Description",
@@ -140,12 +126,6 @@ export const AllStates: Story = {
       </Field>
       <Field label="Workspace" help="Contact an admin to rename.">
         <TextField disabled defaultValue="Vector HQ" />
-      </Field>
-      <Field label="Owner">
-        <Select defaultValue="tom">
-          <option value="tom">Tom Okafor</option>
-          <option value="ada">Ada Nwosu</option>
-        </Select>
       </Field>
       <Field label="Description">
         <Textarea rows={3} defaultValue="Walk the customer through SSO setup." />

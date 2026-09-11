@@ -85,12 +85,9 @@ export const Hover: Story = { parameters: { pseudo: { hover: true } } };
 export const Active: Story = { name: "Active (open)", args: { active: true } };
 
 /**
- * NEW — pending Caroline's review. The focus ring on field editors is a new
- * visible state: with `onClick` the pill is role="button" + tabIndex=0 (the
- * Lens 3 "mouse-only field editors" gap, fixed), and :focus-visible draws
- * the shared 2px `focusRing` outline. The play walks the keyboard path:
- * Tab reaches the pill, Enter activates it, Space activates it too (with
- * preventDefault so the page doesn't scroll).
+ * The focus ring on field editors: the main control is a native button, so
+ * :focus-visible draws the shared 2px `focusRing` outline. The play walks the
+ * keyboard path: Tab reaches the pill, Enter activates it, Space too.
  */
 export const FocusVisible: Story = {
   parameters: { pseudo: { focusVisible: true } },
@@ -115,6 +112,34 @@ export const ClickBehaviour: Story = {
   play: async ({ args, canvasElement }) => {
     await userEvent.click(within(canvasElement).getByText("18 September 2026"));
     await expect(args.onClick).toHaveBeenCalledOnce();
+  },
+};
+
+/**
+ * A pill whose value can be removed: `onClear` adds an inline Clear (X) at the
+ * end of the row, absent at rest and shown on hover, focus-within or active,
+ * so the pill grows to fit it (the canvas shows the hover state). The play
+ * walks the keyboard path, since synthetic hover cannot set CSS :hover: Tab
+ * to the pill (reveals the X), Tab to the X, Enter clears, and onClick must
+ * NOT fire.
+ */
+export const WithClear: Story = {
+  name: "With clear (test)",
+  args: { onClear: fn() },
+  parameters: { pseudo: { hover: true } },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+    // Hidden (display:none) at rest, so it is queried only once focus reveals it.
+    await expect(canvas.queryByRole("button", { name: "Clear" })).not.toBeInTheDocument();
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: /Target/ })).toHaveFocus();
+    const clear = canvas.getByRole("button", { name: "Clear" });
+    await userEvent.tab();
+    await expect(clear).toHaveFocus();
+    await expect(clear).toBeVisible();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClear).toHaveBeenCalledOnce();
+    await expect(args.onClick).not.toHaveBeenCalled();
   },
 };
 

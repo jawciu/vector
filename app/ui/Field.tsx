@@ -6,7 +6,7 @@ import { cloneElement, useId, type ReactElement, type ReactNode } from "react";
  * Field — DS primitive, the form-row wrapper.
  *
  * Owns the label / help / error copy AND their wiring to exactly one control
- * child (TextField / Textarea / Select): useId generates the control id, and
+ * child (TextField / Textarea): useId generates the control id, and
  * cloneElement injects id + aria-describedby (help) + aria-invalid /
  * aria-errormessage (error). cloneElement was chosen over context or a
  * render-prop because it keeps the call site to the bare minimum:
@@ -33,7 +33,7 @@ interface ControlProps {
 
 export interface FieldProps {
   label: ReactNode;
-  /** Exactly one form control (TextField / Textarea / Select). */
+  /** Exactly one form control (TextField / Textarea). */
   children: ReactElement<ControlProps>;
   /** Persistent hint below the control (aria-describedby). */
   help?: ReactNode;

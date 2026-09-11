@@ -91,8 +91,8 @@ Order rationale: audit first (the "before" snapshot is unrepeatable), then TS + 
 ## Phase 5 — New primitives (2–3 days, each independently landable)
 Each ships as `.tsx` + stories + `.meta.ts` + play function, born under Phase-3 lint. In retrofit-leverage order:
 1. **`Modal.tsx`** — native `<dialog>` + `showModal()`: free focus trap/ESC/top-layer/`::backdrop` (styled with the scrim token), implicit `role="dialog"`/`aria-modal`, `aria-labelledby` wired. Radius `rounded-xl` (12px — resolves the 20-vs-12 inconsistency in favour of the documented scale; visible change, documented as intentional). Gotchas: `showModal` synced to `open` prop via effect; scrim-click checks click target is the dialog itself.
-2. **`Field.tsx` + `Input.tsx` + `Textarea.tsx` + `Select.tsx`** — Field owns label/help/error + `htmlFor` (`useId`); controls carry error state + `aria-invalid`; styles extracted from the best current hand-rolled instance into `.input` classes (consistent with the CSS-class architecture).
-3. **`Spinner.tsx`** (feeds Button loading), **`Badge.tsx`** (absorbs StatusBadge patterns).
+2. **`Field.tsx` + `TextField.tsx` + `Textarea.tsx`** (shipped as Input + a Select that was later removed, see Phase 7) — Field owns label/help/error + `htmlFor` (`useId`); controls carry error state + `aria-invalid`; styles extracted from the best current hand-rolled instance into `.input` classes (consistent with the CSS-class architecture).
+3. **`Spinner.tsx`** (feeds Button loading), **`Badge.tsx`** (the only status pill; the dead StatusBadge.js was deleted 2026-09-11).
 4. **Move Menu** → `app/ui/Menu.tsx` with a re-export shim at `app/components/Menu.js` (0 call sites change).
 5. Toast: deferred, listed in DESIGN.md "planned" only — no ghost components.
 - **Exit/verify:** all in Storybook with full state stories; Modal play function asserts focus containment + ESC; `audit:ds` shows storyCoverage/tsCoverage rising; `tsc --noEmit` clean.
@@ -105,31 +105,43 @@ Each ships as `.tsx` + stories + `.meta.ts` + play function, born under Phase-3 
 - **Vercel: separate project** on the same repo (framework Other, build `npm run build:ds && npx storybook build`, output `storybook-static`) → e.g. `ds.vector.quest`. **Gotcha:** root `vercel.json` cron leaks into the new project — move the cron to the main project's dashboard and drop it from `vercel.json`. Optional Ignored Build Step so the DS project only rebuilds on DS paths.
 - **Exit/verify:** two consecutive CI runs green with no baseline churn; public Storybook URL live (`curl …/index.json`).
 
-## Phase 7 — Targeted retrofit, stage one (2–3 days, one PR per offender class, audit numbers in each PR)
-1. **Modals:** the 5 scrim shells (`CreateTaskModal.js:237`, `CreateOnboardingModal.js:178`, `MemberModal.js:115`, `FollowUpModal.js:171`, plus `OnboardingActions.js` — caught by the Phase-0 audit script, missed by the manual pass) → `<Modal>`, their form bodies simultaneously → Field/Input/Textarea/Select. Kills ~700 duplicated lines + the a11y gap in one stroke. Before/after screenshots for the case study.
-2. **Inputs:** remaining hand-rolled ones (TaskDrawer, search fields, ContactsPanel) → primitives; `.search-input` absorbed as an Input variant.
-3. **Buttons:** 47 `.btn-*`-classed raw buttons are mechanical swaps (class name literally names the variant); triage the ~23 bespoke (convert what maps; eslint-disable + reason for the genuinely bespoke).
-4. After each PR: audit ratchet proves monotonic improvement; `npm run test:e2e` (modals sit in critical create-flows).
-5. Finish: ratchet raw-element lint warn→error in cleaned directories; refresh committed baseline to the new floor.
-- **Exit:** buttonCoverage ≥ ~80%, inputCoverage ≥ ~90%, 1 modal implementation, dialog semantics everywhere, e2e + VRT green.
+## Phase 7 — Staged rollout, one component per PR (replaces "stage one / stage two", Caroline 2026-09-11)
 
-## Phase 8 — Full sweep, stage two (3–5 days, incremental — Caroline's 2026-08-08 addition)
-After stage one proves the system, converge the whole app. One PR per surface/directory; audit ratchet + VRT + e2e green on each; can interleave with Phases 9–10.
-1. Remaining raw `<button>`s → `<Button>`/`<IconButton>` (floor: only eslint-disabled bespoke cases with a written rationale survive).
-2. Remaining hand-rolled `<input>`/`<textarea>`/`<select>` → Field primitives.
-3. **Icons:** the ~112 scattered inline SVGs consolidated into the `Icons.tsx` registry (auto-generated grid story); genuine one-off illustrations may stay inline with a disable + reason.
-4. **Inline styles:** token-based `var(--…)` styles migrate to the Phase-2 utilities (`bg-action` …); hardcoded geometry (`borderRadius: 20`, `padding: 24`) → radius/spacing tokens. Realistic floor: dnd-kit transforms and truly dynamic values stay inline — measure the floor, don't chase zero.
-5. Ratchet every `vector/*` rule warn→error repo-wide; delete the legacy `:root` alias block from the `build-theme.mjs` output; refresh the committed audit baseline to the final floor.
-- **Exit/verify:** scorecard at floor (rawHex 0 outside allowlist, button/input/icon coverage ≈100%, inlineStyles at the measured dynamic-only floor), lint at error everywhere, aliases gone, `npm run test:e2e` + VRT green.
+**Why staged:** merging the DS layer changes nothing users see (nothing in `app/ui` is imported by a screen until its retrofit), and Vercel builds a preview URL for every PR. So each component goes to production on its own, and Caroline reviews ONE component across the app on the preview, never the whole app at once. The old Phase 7 (targeted) and Phase 8 (full sweep) content is folded into the slices below; Phase 9 interleaves.
 
-## Phase 9 — Agent scaffolding refresh (½–1 day)
+**Every slice follows the same loop:** approve in Storybook → retrofit its call sites → PR → Caroline reviews the Vercel preview → merge → deploy. **Exit per slice:** audit ratchet green (baseline refreshed in the same PR, with her OK), `npm run test:e2e` green, keyboard play test on every touched primitive, VRT green once Phase 6 exists, 0 console errors, her sign-off on the preview.
+
+0. **Foundation merge (first, soon):** everything on `design-system` today: Storybook, primitives, lint rules, CI, the Phase 2 token pipeline. The only user-visible change is the Phase 2 margin-reset fix (15 dormant `m-*` utilities activated, screenshot-verified 2026-08-09): that is what she reviews on the preview. The ratchet baseline refresh (held 2026-09-11) lands in this PR.
+1. **Button:** 47 `.btn-*`-classed raw buttons are mechanical swaps; the 6 raw `.text-btn` sites (ContactsPanel ×3 incl. Revoke → `tone="danger"`, PortalDrawer upload, ActionsTab + MeetingsTab Clear) → tertiary, then delete `.text-btn*` CSS; triage the ~23 bespoke (convert what maps; eslint-disable + reason for the rest).
+2. **Badge:** the 7 hand-rolled status pills (TaskCardView, TaskDrawer picker, PortalTaskCard, AIDraftInbox, CreateTaskModal, InsightStatusPill fold-in, board-header health/blocked) → `<Badge status|color variant size>`; delete the inline colour lookups. Visible change to expect: the overview insight pills go from 12px/500 to 14px/400 (her "become the same" call).
+3. **Popover + keyboard + Select** (the big one, sub-sliced):
+   3a. Internal `Popover` (anchoring, outside click, Escape, focus return) + a list-keyboard hook (arrows, Home/End, type-ahead, Enter/Space, Tab closes) UNDER the existing MenuList/MenuOption/MenuTriggerButton API: 14 consumers unchanged, no visual change, keyboard works everywhere at once.
+   3b. `Select` (value picker): `trigger="inline" | "boxed"` (FieldRow / FieldPill become its triggers), `role=combobox` trigger + `listbox`/`option` list; stories + meta; zero consumers yet.
+   3c. `multiple` (aria-multiselectable, checkbox visual) + `searchable` (combobox input, aria-activedescendant, empty state); retire the experimental MenuList `multiselect` / MenuOption `checked` pair (nothing renders it).
+   3d. Narrow `Menu` to action menus (`role=menu`/`menuitem`); old names stay as deprecated aliases + the `app/components/Menu.js` shim.
+   3e. Migrate one surface class per PR: TaskDrawer inline pickers → modal boxed pickers → Members (drawer + modal) → the native Status select in OnboardingActions.js → AIDraftInbox's copied pills → meatballs onto Menu → Sidebar user menu + notification bells. CalendarDropdown moves onto the shared Popover here.
+   Open (Caroline): "Showing" filter pills as a third trigger or a Filter component · rename `active`→`open`/`selected` first · Field wrapping a Select · AIDraftInbox disabled/read-only pills as disabled Select or Badge.
+4. **Modal + form fields:** the 5 scrim shells (`CreateTaskModal.js`, `CreateOnboardingModal.js`, `MemberModal.js`, `FollowUpModal.js`, `OnboardingActions.js`) → `<Modal>`, their form bodies → Field/TextField/Textarea; remaining hand-rolled inputs (TaskDrawer, search fields → SearchField, ContactsPanel). Kills ~700 duplicated lines + the dialog a11y gap. Before/after screenshots for the case study.
+5. **Pill clear:** the 3 local PillClearButton copies (TaskDrawer, MemberModal, CreateOnboardingModal) → `onClear` on FieldRow/FieldPill.
+6. **Icons:** the ~112 scattered inline SVGs → the `Icons.tsx` registry (auto-generated grid story); genuine one-off illustrations stay inline with a disable + reason.
+7. **Inline styles + geometry sweep, per directory:** token `var(--…)` styles → the Phase 2 utilities; hardcoded geometry → radius/spacing tokens (floor: dnd-kit transforms and truly dynamic values stay inline; measure the floor, don't chase zero); ratchet every `vector/*` rule warn→error in each cleaned directory; delete the legacy `:root` alias block from `build-theme.mjs` output at the end.
+8. **Keyboard walk of every screen** (Tab/Shift+Tab reach everything interactive, no traps, every dropdown/modal/drawer operable without a mouse) as the closing slice.
+
+- **Order rationale:** 0 first (unblocks previews and CI); 1 and 2 are mechanical and low-risk, good rehearsals of the loop; 3a before anything that opens a dropdown (keyboard is a hard rule, and the Status retrofit must not lose the native select's keyboard behaviour); 4 after 3 so the modal form bodies land on the final Select; 6 and 7 are sweeps and can interleave with Phase 9.
+- **Exit (whole phase):** scorecard at floor (rawHex 0 outside allowlist, button/input/icon coverage ≈100%, inlineStyles at the measured dynamic-only floor, 1 modal implementation, dialog semantics everywhere), lint at error everywhere, aliases gone, every DS primitive keyboard-operable with a play test, e2e + VRT green, keyboard walk clean.
+
+## Phase 8 — (merged into Phase 7 as slices 6 to 8, 2026-09-11)
+
+Kept as a heading so cross-references resolve. The full-sweep work (icons, inline styles, lint warn→error, alias block, final baseline) is slices 6 and 7 above; the keyboard walk is slice 8.
+
+## Phase 9 — Agent scaffolding refresh (½–1 day; interleaves with Phase 7, ideally straight after slice 0 so the agents doing slices 1 to 8 benefit)
 - **style-right skill regenerated FROM tokens:** `build:ds` rewrites its token table between `<!-- TOKENS:START/END -->` markers — the stale-hex drift class becomes structurally impossible. Mirror to `.cursor/rules`.
 - **design-system skill** rewritten around the four-layer doctrine + the contract line: *"if the state you need has no story, you're off-road — add the story first"*; points at `*.meta.ts` for use-when; prefers `bg-action` utilities over inline `var()`.
 - **New `skills/storybook`:** run/build, story anatomy (story + meta.ts + play), querying index.json/ds-manifest.json, VRT baseline update (docker), the no-vrt tag.
 - **CLAUDE.md:** Menu path update, audit ratchet in workflow, new-primitive checklist (tsx + unions + states + story-per-state + meta + play + a11y + VRT baseline), decision-journal entry for the radius resolution.
 - **Agent-navigation package (added 2026-09-10 after a review of how agents fail on flat component folders — they read every file, burn tokens, and still pick by name alone; the fix is letting them narrow before they read):**
   1. **`DsMeta` gains `intent`** — closed union `'action' | 'input' | 'navigation' | 'data-display' | 'feedback'`, one line per primitive. Groups the index below and can drive the Storybook sidebar. Deliberately NOT an atomic-level axis (atom/molecule/…): with ~25 primitives that are all atoms or molecules it adds a question with no discriminating power.
-  2. **`DsMeta` gains `pairsWith?: string[]`** — the components this one is built to sit with (Field ↔ TextField/Textarea/Select, Modal ↔ Button). No `dataShape` field: the TypeScript props already say that.
+  2. **`DsMeta` gains `pairsWith?: string[]`** — the components this one is built to sit with (Field ↔ TextField/Textarea, Modal ↔ Button). No `dataShape` field: the TypeScript props already say that.
   3. **Generated `app/ui/INDEX.md`** — `build:ds` writes one table (name · intent · status · first `useWhen` line · path) from the `*.meta.ts` files, grouped by intent, between `<!-- INDEX:START/END -->` markers. An agent reads one file to orient instead of 25 meta files. Generated from source, never hand-maintained, so it cannot drift (a hand-kept index is the same drift class as the stale hexes). Depends on 1.
   4. **`metaCoverage` metric in `audit-ds.mjs`** — `<n>/<total>` primitives in `app/ui` with a colocated `*.meta.ts`, under the ratchet. "Every file in app/ui MUST have one" stops being prose.
   5. **Two doctrine additions for the skill rewrites above:** the design-system skill teaches the two orienting questions — *what job does this need to do* (pick the intent) → *is there a blessed primitive for it* (read INDEX.md, then its meta) — before any code is read; the `review` skill (stale: still points at `app/components/Menu.js` and pre-Phase-2 token names) is rewritten to check the DsMeta contract and to report every refusal as *problem · evidence · suggested fix*.
@@ -160,7 +172,7 @@ After stage one proves the system, converge the whole app. One PR per surface/di
 - `DESIGN.md` — type scale + scrim token + drift fixes
 - `eslint.config.mjs` + `eslint-rules/*.mjs` — token enforcement
 - `app/ui/Button.js → .tsx` — pattern-setter
-- `app/ui/Modal.tsx`, `Field/Input/Textarea/Select.tsx`, `Spinner.tsx`, `Badge.tsx`, `Menu.tsx` — new primitives
+- `app/ui/Modal.tsx`, `Field/TextField/Textarea.tsx`, `Spinner.tsx`, `Badge.tsx`, `Menu.tsx` — new primitives
 - `.storybook/` — new; `playwright.vrt.config.ts` + `vrt/stories.spec.ts` — new
 - `.github/workflows/ci.yml` — lint/build/audit/storybook/vrt jobs
 - `skills/style-right`, `skills/design-system`, `skills/storybook` (new), `CLAUDE.md` — scaffolding refresh

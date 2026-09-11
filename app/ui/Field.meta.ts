@@ -4,7 +4,7 @@ export const meta: DsMeta = {
   status: "experimental",
   useWhen: [
     "Any labelled form row: create/edit modal bodies, settings forms, the Phase 7 retrofit of the ~39 hand-rolled inputs.",
-    "Wrapping exactly one TextField / Textarea / Select — Field owns the label, help and error copy plus all id/aria wiring.",
+    "Wrapping exactly one TextField / Textarea — Field owns the label, help and error copy plus all id/aria wiring.",
     "Validation errors: pass `error` and Field flips the control invalid and announces the message — don't hand-roll a red div.",
   ],
   dontUseWhen: [

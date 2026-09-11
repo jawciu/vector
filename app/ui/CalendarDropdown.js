@@ -10,7 +10,9 @@ import { useEffect, useRef } from "react";
  *
  * Props:
  *   value            — selected date string (YYYY-MM-DD) or ""
- *   viewDate         — Date object controlling which month is displayed
+ *   viewDate         — Date object controlling which month is displayed;
+ *                      hosts start it at today (or the value's month) so the
+ *                      picker opens on the current month
  *   onViewDateChange — callback to update viewDate
  *   onChange          — called with YYYY-MM-DD string when a day is picked
  *   onClear          — called when "Clear" is clicked

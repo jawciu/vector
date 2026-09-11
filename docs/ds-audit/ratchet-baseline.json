@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-08-17",
-  "scannedFiles": 85,
+  "generatedAt": "2026-09-11",
+  "scannedFiles": 84,
   "metrics": {
     "rawHexTotal": 15,
     "rawHexDistinct": 3,
     "rawRgba": 26,
-    "inlineStyles": 1091,
+    "inlineStyles": 1090,
     "arbitraryTw": 34,
-    "hardcodedGeometry": 1007,
+    "hardcodedGeometry": 1000,
     "rawButtons": 86,
     "primitiveButtons": 55,
     "buttonCoveragePct": 39,
@@ -17,11 +17,11 @@
     "scatteredSvg": 100,
     "centralSvg": 44,
     "iconCoveragePct": 30.6,
-    "uiComponents": 25,
-    "storyFiles": 25,
+    "uiComponents": 24,
+    "storyFiles": 24,
     "storyCoveragePct": 100,
-    "tsUiFiles": 22,
-    "tsCoveragePct": 88,
+    "tsUiFiles": 21,
+    "tsCoveragePct": 87.5,
     "dialogsMissingA11y": 5
   },
   "details": {

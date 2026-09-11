@@ -51,9 +51,9 @@ const isDsScaffolding = (rel) => /\.(stories|meta)\.|^\.storybook\//.test(rel);
 
 // Primitive names that count as "blessed" button-likes / form controls.
 const PRIMITIVE_BUTTONS = ["Button", "IconButton", "MenuTriggerButton", "MenuOption"];
-// None exist yet — coverage starts at 0. Add "Field" here ONLY once app/ui/Field.tsx
-// ships: FollowUpModal.js + TeamPanel.js have a LOCAL <Field> that must not count.
-const PRIMITIVE_INPUTS = ["Input", "Textarea", "Select"];
+// Coverage starts at 0 until Phase 7 adopts these. Never add "Field" here:
+// FollowUpModal.js + TeamPanel.js have a LOCAL <Field> that must not count.
+const PRIMITIVE_INPUTS = ["TextField", "Textarea"];
 
 // ---------------------------------------------------------------------------
 // File collection
