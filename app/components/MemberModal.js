@@ -3,32 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import Button from "../ui/Button";
 import FieldPill from "../ui/FieldPill";
-import { MembersIcon } from "../ui/Icons";
+import { CloseIcon, MembersIcon } from "../ui/Icons";
 import { MenuList, MenuOption } from "./Menu";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import { CONTACT_ROLES } from "@/lib/constants";
 import IconButton from "@/app/ui/IconButton";
-
-function CloseIcon({ size = 12 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 12 12" fill="none" style={{ color: "var(--text-muted)" }}>
-      <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function PillClearButton({ onClick }) {
-  return (
-    // eslint-disable-next-line no-restricted-syntax -- bare icon toggle inside a field row, no DS equivalent yet
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex items-center justify-center shrink-0 ml-2! cursor-pointer border-none bg-transparent p-0"
-    >
-      <CloseIcon size={9} />
-    </button>
-  );
-}
 
 export default function MemberModal({ open, mode, contact, onboardingId, onClose, onSaved }) {
   const [formData, setFormData] = useState({ name: "", email: "", role: "" });
@@ -134,12 +113,8 @@ export default function MemberModal({ open, mode, contact, onboardingId, onClose
           <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
             {title}
           </span>
-          <IconButton
-            aria-label="Close"
-            onClick={onClose}
-            style={{ background: "none", border: "none", cursor: "pointer" }}
-          >
-            <CloseIcon />
+          <IconButton aria-label="Close" onClick={onClose}>
+            <CloseIcon size={12} />
           </IconButton>
         </div>
 
@@ -195,6 +170,7 @@ export default function MemberModal({ open, mode, contact, onboardingId, onClose
               icon={<MembersIcon style={{ flexShrink: 0 }} />}
               active={roleOpen}
               onClick={() => setRoleOpen((o) => !o)}
+              onClear={formData.role ? () => handleChange("role", "") : undefined}
             >
               <span
                 className="text-sm flex-1"
@@ -202,14 +178,6 @@ export default function MemberModal({ open, mode, contact, onboardingId, onClose
               >
                 {formData.role || "Role"}
               </span>
-              {formData.role && (
-                <PillClearButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleChange("role", "");
-                  }}
-                />
-              )}
             </FieldPill>
             {roleOpen && (
               <MenuList style={{ background: "var(--bg-elevated)", width: "100%" }}>

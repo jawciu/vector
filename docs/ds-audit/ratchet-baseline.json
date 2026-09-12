@@ -1,22 +1,22 @@
 {
-  "generatedAt": "2026-09-11",
+  "generatedAt": "2026-09-12",
   "scannedFiles": 84,
   "metrics": {
     "rawHexTotal": 15,
     "rawHexDistinct": 3,
     "rawRgba": 26,
-    "inlineStyles": 1082,
+    "inlineStyles": 1058,
     "arbitraryTw": 34,
-    "hardcodedGeometry": 992,
-    "rawButtons": 39,
-    "primitiveButtons": 102,
-    "buttonCoveragePct": 72.3,
+    "hardcodedGeometry": 975,
+    "rawButtons": 32,
+    "primitiveButtons": 103,
+    "buttonCoveragePct": 76.3,
     "rawInputs": 39,
     "primitiveInputs": 0,
     "inputCoveragePct": 0,
-    "scatteredSvg": 100,
-    "centralSvg": 45,
-    "iconCoveragePct": 31,
+    "scatteredSvg": 82,
+    "centralSvg": 43,
+    "iconCoveragePct": 34.4,
     "uiComponents": 24,
     "storyFiles": 24,
     "storyCoveragePct": 100,
@@ -59,23 +59,23 @@
     "worstInlineStyleFiles": [
       {
         "file": "app/components/AIDraftInbox.js",
-        "count": 158
+        "count": 156
       },
       {
         "file": "app/components/TaskDrawer.js",
-        "count": 89
-      },
-      {
-        "file": "app/components/CreateTaskModal.js",
-        "count": 56
+        "count": 86
       },
       {
         "file": "app/components/PipelineTimeline.js",
+        "count": 55
+      },
+      {
+        "file": "app/components/CreateTaskModal.js",
         "count": 54
       },
       {
         "file": "app/portal/[onboardingId]/PortalDrawer.js",
-        "count": 49
+        "count": 47
       },
       {
         "file": "app/admin/ai/page.js",
@@ -93,7 +93,7 @@
     "worstRawButtonFiles": [
       {
         "file": "app/components/AIDraftInbox.js",
-        "count": 9
+        "count": 8
       },
       {
         "file": "app/components/PipelineTimeline.js",
@@ -104,24 +104,24 @@
         "count": 3
       },
       {
-        "file": "app/components/TaskDrawer.js",
-        "count": 3
-      },
-      {
-        "file": "app/components/CreateOnboardingModal.js",
-        "count": 2
-      },
-      {
-        "file": "app/components/CreateTaskModal.js",
-        "count": 2
-      },
-      {
         "file": "app/components/MeetingsTab.js",
         "count": 2
       },
       {
         "file": "app/components/NotificationBell.js",
         "count": 2
+      },
+      {
+        "file": "app/components/TaskDrawer.js",
+        "count": 2
+      },
+      {
+        "file": "app/components/TestWebhookPanel.js",
+        "count": 2
+      },
+      {
+        "file": "app/components/ContactsPanel.js",
+        "count": 1
       }
     ],
     "dialogFiles": [

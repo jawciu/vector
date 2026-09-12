@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { MenuList, MenuOption } from "./Menu";
 import Button from "@/app/ui/Button";
+import { ChevronRightIcon } from "@/app/ui/Icons";
 
 /**
  * Admin tool — POSTs a fixture payload at our own Miniti webhook, then
@@ -431,7 +432,15 @@ function Collapsible({ label, summary, json }) {
           gap: 8,
         }}
       >
-        <span style={{ color: "var(--text-muted)" }}>{open ? "▾" : "▸"}</span>
+        <ChevronRightIcon
+          size={8}
+          style={{
+            color: "var(--text-muted)",
+            flexShrink: 0,
+            transform: open ? "rotate(90deg)" : "none",
+            transition: "transform 0.15s ease",
+          }}
+        />
         <strong>{label}:</strong>
         <span style={{ color: "var(--text-secondary)", fontWeight: 400 }}>{summary}</span>
       </button>

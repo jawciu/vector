@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import Tooltip from "@/app/ui/Tooltip";
 import {
+  CopyIcon,
   DependenciesIcon,
   CalendarIcon,
   PriorityIcon,
@@ -18,6 +19,7 @@ import TaskIdChip from "@/app/ui/TaskIdChip";
 import MeetingDrawer from "./MeetingDrawer";
 import { TASK_STATUSES, STATUS_COLORS } from "@/lib/constants";
 import Button from "@/app/ui/Button";
+import IconButton from "@/app/ui/IconButton";
 
 /**
  * "Vector suggests" inbox — list of PendingAIChange rows.
@@ -670,11 +672,7 @@ function BulkActionBar({ count, onReject, onClear }) {
         >
           Clear
         </Button>
-        <Button
-          onClick={onReject}
-          variant="secondary"
-          style={{ padding: "4px 10px", fontSize: 12, color: "var(--danger)" }}
-        >
+        <Button onClick={onReject} variant="destructive" size="xs">
           Reject selected
         </Button>
       </div>
@@ -1332,29 +1330,14 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
           <FieldBlock
             label="Message"
             actions={
-              // eslint-disable-next-line no-restricted-syntax -- 16px icon, IconButton is fixed at 20px
-              <button
-                type="button"
+              <IconButton
                 onClick={handleCopyBody}
                 disabled={!body.trim()}
                 aria-label={copied ? "Copied" : "Copy message"}
                 title={copied ? "Copied" : "Copy message"}
-                className="icon-btn"
-                style={{
-                  padding: 0,
-                  width: 16,
-                  height: 16,
-                  background: "none",
-                  border: "none",
-                  color: copied ? "var(--success)" : "var(--text-muted)",
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
               >
                 <CopyIcon />
-              </button>
+              </IconButton>
             }
           >
             <textarea
@@ -1472,15 +1455,6 @@ export function ChevronRight() {
   return (
     <svg width="6" height="11" viewBox="0 0 6 11" fill="none" aria-hidden style={{ color: "var(--text-muted)", flexShrink: 0 }}>
       <path d="M1 1l3.5 4.5L1 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function CopyIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden xmlns="http://www.w3.org/2000/svg">
-      <rect x="3.5" y="3.5" width="8" height="9.5" rx="1.5" stroke="currentColor" strokeWidth="1.1" />
-      <path d="M2.5 10V2.5C2.5 1.67157 3.17157 1 4 1H9.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
     </svg>
   );
 }
@@ -2447,7 +2421,7 @@ function SelectCheckbox({ selected, onToggle, disabled }) {
   const [hovered, setHovered] = useState(false);
   const strokeColor = hovered && !disabled ? "var(--action)" : "var(--icon-tertiary)";
   return (
-    // eslint-disable-next-line no-restricted-syntax -- checkbox control, retrofits onto Checkbox later
+    // eslint-disable-next-line no-restricted-syntax -- circle + ghost check, not the square DS Checkbox; a retrofit would change the shape
     <button
       type="button"
       role="checkbox"

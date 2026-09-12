@@ -171,7 +171,8 @@ export default function StuckEventsList({ initialEvents }) {
                   onClick={() => handleReprocess(event.id)}
                   disabled={busy}
                   variant="secondary"
-                  style={{ padding: "4px 10px", fontSize: 12, opacity: busy ? 0.5 : 1 }}
+                  size="xs"
+                  style={{ opacity: busy ? 0.5 : 1 }}
                 >
                   {busy ? "…" : "Reprocess"}
                 </Button>

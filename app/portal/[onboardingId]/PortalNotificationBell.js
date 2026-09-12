@@ -107,7 +107,7 @@ export default function PortalNotificationBell() {
   return (
     <div ref={containerRef} className="relative">
       <IconButton
-        data-active={open ? "true" : undefined}
+        isActive={open}
         onClick={toggle}
         aria-label="Notifications"
         aria-haspopup="true"

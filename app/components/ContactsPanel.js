@@ -3,6 +3,8 @@
 import React, { useState, useRef, useCallback, useMemo } from "react";
 import Button from "../ui/Button";
 import IconButton from "../ui/IconButton";
+import { PlusIcon, ThreeDotsIcon } from "../ui/Icons";
+import DsCheckbox from "../ui/Checkbox";
 import Tooltip from "../ui/Tooltip";
 import { MenuList, MenuOption } from "./Menu";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
@@ -41,9 +43,16 @@ function activeLinkFor(contactId, magicLinks) {
   );
 }
 
-function Checkbox({ checked, indeterminate, disabled, onClick, ariaLabel, title }) {
+/**
+ * Select-all checkbox ONLY. The per-row boxes render `DsCheckbox`
+ * (app/ui/Checkbox) — this local copy survives because the DS primitive has
+ * no indeterminate state yet, which the header needs. Everything else here
+ * (16px hit area, iconTertiary → action outline, action-filled cutout) is
+ * pixel-identical to it.
+ */
+function SelectAllCheckbox({ checked, indeterminate, disabled, onClick, ariaLabel, title }) {
   return (
-    // eslint-disable-next-line no-restricted-syntax -- checkbox control, retrofits onto Checkbox later
+    // eslint-disable-next-line no-restricted-syntax -- select-all only; DS Checkbox has no indeterminate state yet
     <button
       type="button"
       className="group member-checkbox"
@@ -350,7 +359,7 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
           Members
         </h3>
         <Button variant="primary" size="sm" onClick={openAddModal}>
-          + Add member
+          <PlusIcon />Add member
         </Button>
       </div>
 
@@ -394,7 +403,7 @@ export default function ContactsPanel({ onboardingId, contacts, onContactsChange
             }}
           >
             {i === 0 ? (
-              <Checkbox
+              <SelectAllCheckbox
                 checked={allEligibleSelected}
                 indeterminate={someEligibleSelected}
                 disabled={eligibleIds.length === 0}
@@ -502,13 +511,14 @@ function ContactRow({
     <React.Fragment>
       {/* Checkbox */}
       <span style={cellStyle(0, isLast)}>
-        <Checkbox
-          checked={checked}
-          disabled={checkboxDisabled}
-          onClick={onToggleSelect}
-          ariaLabel={`Select ${contact.name}`}
-          title={checkboxDisabled ? "Portal already active — revoke to regenerate" : undefined}
-        />
+        <span title={checkboxDisabled ? "Portal already active — revoke to regenerate" : undefined}>
+          <DsCheckbox
+            checked={checked}
+            disabled={checkboxDisabled}
+            onChange={onToggleSelect}
+            aria-label={`Select ${contact.name}`}
+          />
+        </span>
       </span>
       {/* Name */}
       <span style={{ ...cellStyle(1, isLast), color: "var(--text)" }}>
@@ -620,13 +630,11 @@ function ContactRow({
           <IconButton
             onClick={onToggleMenu}
             isActive={menuOpen}
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
             aria-label="Member actions"
           >
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-              <circle cx="8" cy="3" r="1.5" />
-              <circle cx="8" cy="8" r="1.5" />
-              <circle cx="8" cy="13" r="1.5" />
-            </svg>
+            <ThreeDotsIcon />
           </IconButton>
           {menuOpen && (
             <MenuList

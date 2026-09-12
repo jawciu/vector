@@ -43,7 +43,7 @@ function CalendarHost({ value = "", onChange, onClear, onClose }: HostProps) {
   return (
     <div style={{ minHeight: 400, width: 320 }}>
       <div className="relative">
-        <FieldPill icon={<CalendarIcon style={{ flexShrink: 0 }} />} active onClick={() => {}} onClear={selected ? clear : undefined}>
+        <FieldPill icon={<CalendarIcon style={{ flexShrink: 0 }} />} active popup="dialog" onClick={() => {}} onClear={selected ? clear : undefined}>
           <span className="text-sm" style={{ color: "var(--text-muted)" }}>Target</span>
           {selected && (
             <span className="text-sm" style={{ color: "var(--text)" }}>{formatDate(selected)}</span>
@@ -114,6 +114,7 @@ export const Interactive: Story = {
             <FieldPill
               icon={<CalendarIcon style={{ flexShrink: 0 }} />}
               active={open}
+              popup="dialog"
               onClick={() => setOpen((o) => !o)}
               onClear={selected ? clear : undefined}
             >

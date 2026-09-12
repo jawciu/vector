@@ -5,11 +5,11 @@ export const meta: DsMeta = {
   useWhen: [
     "Icon-only actions: meatball/overflow menus, plus (add task), close buttons, delete-a-row.",
     "Pass `isActive` while the menu/popover it controls is open — applies `.icon-btn--active` (surfaceHover fill, full text colour) so the trigger stays lit.",
-    "Inner SVGs at 11–12px using `currentColor` so the icon inherits the state colour (see DESIGN.md).",
+    "Registry icons from app/ui/Icons.tsx at their 14px default, using `currentColor` so the glyph inherits the state colour (see DESIGN.md). Never draw a fresh inline SVG at the call site.",
     "NEW (pending Caroline's review): `tone=\"danger\"` for destructive icon actions (delete a row) — glyph at danger stepping to dangerHover, mirroring .btn-tertiary--danger (danger → dangerHover); hover/active fills stay the neutral bgHover/surfaceHover.",
   ],
   dontUseWhen: [
-    "The action has a visible text label — use Button (any variant, including `text`).",
+    "The action has a visible text label — use Button.",
     "Avatars or anything circular — `rounded-full` is for avatar circles ONLY (CLAUDE.md); IconButton is fixed `w-5 h-5 rounded`.",
     "Menu/dropdown triggers that show a label — use MenuTriggerButton (app/components/Menu.js).",
     "Larger tap targets or toolbar buttons — the 20×20 box is fixed by design; don't restyle it, ask for a size variant first.",

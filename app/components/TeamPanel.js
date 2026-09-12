@@ -155,8 +155,9 @@ export default function TeamPanel({ initialUsers, currentVendorUserId }) {
                   <Button
                     onClick={() => handleDelete(u.id)}
                     disabled={deletingId === u.id}
-                    variant="secondary"
-                    style={{ padding: "4px 10px", fontSize: 12, opacity: deletingId === u.id ? 0.5 : 1 }}
+                    variant="tertiary"
+                    tone="danger"
+                    size="xs"
                   >
                     {deletingId === u.id ? "…" : "Remove"}
                   </Button>

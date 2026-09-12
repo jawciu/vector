@@ -4,32 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import Button from "../ui/Button";
 import FieldPill from "../ui/FieldPill";
 import CalendarDropdown from "../ui/CalendarDropdown";
-import { CalendarIcon, OwnerIcon, MembersIcon } from "../ui/Icons";
+import { CalendarIcon, CloseIcon, OwnerIcon, MembersIcon } from "../ui/Icons";
 import { MenuList, MenuOption } from "./Menu";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import CompanyAvatar from "@/app/ui/CompanyAvatar";
 import IconButton from "@/app/ui/IconButton";
-
-function CloseIcon({ size = 12 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 12 12" fill="none" style={{ color: "var(--text-muted)" }}>
-      <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function PillClearButton({ onClick }) {
-  return (
-    // eslint-disable-next-line no-restricted-syntax -- bare icon toggle inside a field row, no DS equivalent yet
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex items-center justify-center shrink-0 ml-2! cursor-pointer border-none bg-transparent p-0"
-    >
-      <CloseIcon size={9} />
-    </button>
-  );
-}
 
 export default function CreateOnboardingModal({ open, onClose, onCreated }) {
   const [companies, setCompanies] = useState([]);
@@ -197,12 +176,8 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
           <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
             New workspace
           </span>
-          <IconButton
-            aria-label="Close"
-            onClick={handleClose}
-            style={{ background: "none", border: "none", cursor: "pointer" }}
-          >
-            <CloseIcon />
+          <IconButton aria-label="Close" onClick={handleClose}>
+            <CloseIcon size={12} />
           </IconButton>
         </div>
 
@@ -242,6 +217,7 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
                 icon={<MembersIcon style={{ flexShrink: 0 }} />}
                 active={companyOpen}
                 onClick={() => setCompanyOpen((o) => !o)}
+                onClear={selectedCompany ? () => setSelectedCompanyId("") : undefined}
               >
                 {selectedCompany ? (
                   <div className="flex items-center gap-1.5 flex-1">
@@ -255,12 +231,6 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
                     <span className="text-sm" style={{ color: "var(--text)" }}>
                       {selectedCompany.name}
                     </span>
-                    <PillClearButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedCompanyId("");
-                      }}
-                    />
                   </div>
                 ) : (
                   <span
@@ -328,7 +298,7 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
           )}
 
           {/* Domain — used to match meeting attendees to this company (Miniti integration) */}
-          <FieldPill icon={<DomainIcon style={{ flexShrink: 0 }} />}>
+          <FieldPill icon={<DomainIcon style={{ flexShrink: 0 }} />} onClear={domain ? () => setDomain("") : undefined}>
             <input
               type="text"
               placeholder="Domain"
@@ -344,18 +314,10 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
                 padding: 0,
               }}
             />
-            {domain && (
-              <PillClearButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDomain("");
-                }}
-              />
-            )}
           </FieldPill>
 
           {/* Owner */}
-          <FieldPill icon={<OwnerIcon style={{ flexShrink: 0 }} />}>
+          <FieldPill icon={<OwnerIcon style={{ flexShrink: 0 }} />} onClear={owner ? () => setOwner("") : undefined}>
             <input
               type="text"
               placeholder="Owner"
@@ -369,14 +331,6 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
                 padding: 0,
               }}
             />
-            {owner && (
-              <PillClearButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOwner("");
-                }}
-              />
-            )}
           </FieldPill>
 
           {/* Target go-live */}
@@ -384,7 +338,9 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
             <FieldPill
               icon={<CalendarIcon style={{ flexShrink: 0 }} />}
               active={calendarOpen}
+              popup="dialog"
               onClick={() => setCalendarOpen((o) => !o)}
+              onClear={targetGoLive ? () => setTargetGoLive("") : undefined}
             >
               <span
                 className="text-sm flex-1"
@@ -398,14 +354,6 @@ export default function CreateOnboardingModal({ open, onClose, onCreated }) {
                     })
                   : "Target go-live"}
               </span>
-              {targetGoLive && (
-                <PillClearButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setTargetGoLive("");
-                  }}
-                />
-              )}
             </FieldPill>
             {calendarOpen && (
               <CalendarDropdown

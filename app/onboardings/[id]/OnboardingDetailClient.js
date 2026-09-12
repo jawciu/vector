@@ -21,6 +21,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { computeHealth } from "@/lib/health";
 import Button from "@/app/ui/Button";
+import { PlusIcon } from "@/app/ui/Icons";
 import TaskCard from "@/app/components/TaskCard";
 import CreateTaskModal from "@/app/components/CreateTaskModal";
 import CompanyAvatar from "@/app/ui/CompanyAvatar";
@@ -750,7 +751,7 @@ export default function OnboardingDetailClient({
                         size="xs"
                         onClick={() => setAddingPhase(true)}
                       >
-                        + Add section
+                        <PlusIcon />Add section
                       </Button>
                     )}
                   </div>

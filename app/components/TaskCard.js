@@ -33,8 +33,7 @@ export default function TaskCard({ task, onTaskUpdated, onCardClick, isOverlay }
     },
   };
 
-  async function handleToggleDone(e) {
-    e.stopPropagation();
+  async function handleToggleDone() {
     if (completing) return;
 
     const goingToDone = task.status !== "Done";

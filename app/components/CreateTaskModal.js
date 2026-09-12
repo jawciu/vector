@@ -5,7 +5,7 @@ import Button from "../ui/Button";
 import FieldPill from "../ui/FieldPill";
 import FieldRow from "../ui/FieldRow";
 import CalendarDropdown from "../ui/CalendarDropdown";
-import { CalendarIcon, PriorityIcon, StatusIcon, OwnerIcon, AssigneeIcon, MembersIcon, DependenciesIcon } from "../ui/Icons";
+import { CalendarIcon, CloseIcon, PriorityIcon, StatusIcon, OwnerIcon, AssigneeIcon, MembersIcon, DependenciesIcon } from "../ui/Icons";
 import TaskIdChip from "../ui/TaskIdChip";
 import { MenuList, MenuOption } from "./Menu";
 import { TASK_STATUSES, PRIORITIES, STATUS_COLORS } from "@/lib/constants";
@@ -18,27 +18,6 @@ function ChevronIcon() {
     <svg width="6" height="11" viewBox="0 0 6 11" fill="none" style={{ color: "var(--text-muted)" }}>
       <path d="M1 1L5 5.5L1 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-function CloseIcon({ size = 12 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 12 12" fill="none" style={{ color: "var(--text-muted)" }}>
-      <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function PillClearButton({ onClick }) {
-  return (
-    // eslint-disable-next-line no-restricted-syntax -- bare icon toggle inside a field row, no DS equivalent yet
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex items-center justify-center shrink-0 ml-2! cursor-pointer border-none bg-transparent p-0"
-    >
-      <CloseIcon size={9} />
-    </button>
   );
 }
 
@@ -271,12 +250,8 @@ export default function CreateTaskModal({
             <ChevronIcon />
             <span className="text-sm" style={{ color: "var(--text)" }}>New task</span>
           </div>
-          <IconButton
-            aria-label="Close"
-            onClick={handleClose}
-            style={{ background: "none", border: "none", cursor: "pointer" }}
-          >
-            <CloseIcon />
+          <IconButton aria-label="Close" onClick={handleClose}>
+            <CloseIcon size={12} />
           </IconButton>
         </div>
 
@@ -333,16 +308,15 @@ export default function CreateTaskModal({
               <FieldPill
                 icon={<CalendarIcon style={{ flexShrink: 0 }} />}
                 active={calendarOpen}
+                popup="dialog"
                 onClick={() => toggleDropdown("calendar", calendarOpen, setCalendarOpen)}
+                onClear={formData.due ? () => handleChange("due", "") : undefined}
               >
                 <span className="text-sm flex-1" style={{ color: formData.due || calendarOpen ? "var(--text)" : "var(--text-muted)" }}>
                   {formData.due
                     ? new Date(formData.due + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
                     : "Target"}
                 </span>
-                {formData.due && (
-                  <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("due", ""); }} />
-                )}
               </FieldPill>
               {calendarOpen && (
                 <CalendarDropdown
@@ -362,13 +336,11 @@ export default function CreateTaskModal({
                 icon={<PriorityIcon priority={formData.priority} style={{ flexShrink: 0 }} />}
                 active={priorityOpen}
                 onClick={() => toggleDropdown("priority", priorityOpen, setPriorityOpen)}
+                onClear={formData.priority ? () => handleChange("priority", null) : undefined}
               >
                 <span className="text-sm capitalize flex-1" style={{ color: formData.priority || priorityOpen ? "var(--text)" : "var(--text-muted)" }}>
                   {formData.priority || "Priority"}
                 </span>
-                {formData.priority && (
-                  <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("priority", null); }} />
-                )}
               </FieldPill>
               {priorityOpen && (
                 <MenuList style={{ background: "var(--bg-elevated)", width: "100%" }}>
@@ -392,13 +364,11 @@ export default function CreateTaskModal({
                 icon={<StatusIcon style={{ flexShrink: 0 }} />}
                 active={statusOpen}
                 onClick={() => toggleDropdown("status", statusOpen, setStatusOpen)}
+                onClear={formData.status !== "Not started" ? () => handleChange("status", "Not started") : undefined}
               >
                 <span className="text-sm flex-1" style={{ color: formData.status === "Not started" && !statusOpen ? "var(--text-muted)" : "var(--text)" }}>
                   {formData.status}
                 </span>
-                {formData.status !== "Not started" && (
-                  <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("status", "Not started"); }} />
-                )}
               </FieldPill>
               {statusOpen && (
                 <MenuList style={{ background: "var(--bg-elevated)", width: "100%" }}>
@@ -430,6 +400,7 @@ export default function CreateTaskModal({
               icon={<OwnerIcon style={{ flexShrink: 0 }} />}
               active={ownerOpen}
               onClick={() => toggleDropdown("owner", ownerOpen, setOwnerOpen)}
+              onClear={formData.owner ? () => setFormData((p) => ({ ...p, owner: "", ownerId: null })) : undefined}
             >
               <span className="text-sm" style={{ color: ownerOpen ? "var(--text)" : "var(--text-muted)" }}>Owner</span>
               {formData.owner && (
@@ -441,7 +412,6 @@ export default function CreateTaskModal({
                     {avatarInitials(formData.owner)}
                   </span>
                   <span className="text-sm" style={{ color: "var(--text)" }}>{formData.owner}</span>
-                  <PillClearButton onClick={(e) => { e.stopPropagation(); setFormData((p) => ({ ...p, owner: "", ownerId: null })); }} />
                 </div>
               )}
             </FieldPill>
@@ -487,6 +457,7 @@ export default function CreateTaskModal({
               icon={<AssigneeIcon style={{ flexShrink: 0 }} />}
               active={assigneeOpen}
               onClick={() => toggleDropdown("assignee", assigneeOpen, setAssigneeOpen)}
+              onClear={formData.assigneeContactId ? () => handleChange("assigneeContactId", null) : undefined}
             >
               <span className="text-sm" style={{ color: assigneeOpen ? "var(--text)" : "var(--text-muted)" }}>Assignee</span>
               {formData.assigneeContactId && (() => {
@@ -501,7 +472,6 @@ export default function CreateTaskModal({
                       {avatarInitials(selected.name)}
                     </span>
                     <span className="text-sm" style={{ color: "var(--text)" }}>{selected.name}</span>
-                    <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("assigneeContactId", null); }} />
                   </div>
                 );
               })()}
@@ -544,6 +514,7 @@ export default function CreateTaskModal({
             <FieldPill
               icon={<MembersIcon style={{ flexShrink: 0 }} />}
               active={membersOpen}
+              onClear={formData.members.length > 0 ? () => handleChange("members", []) : undefined}
               onClick={() => {
                 const wasOpen = membersOpen;
                 toggleDropdown("members", membersOpen, setMembersOpen);
@@ -552,28 +523,25 @@ export default function CreateTaskModal({
             >
               <span className="text-sm" style={{ color: membersOpen ? "var(--text)" : "var(--text-muted)" }}>Members</span>
               {formData.members.length > 0 && (
-                <>
-                  <div className="flex items-center">
-                    {formData.members.slice(0, 5).map((m, i) => (
-                      <span
-                        key={m}
-                        className="flex shrink-0 w-5 h-5 rounded-full items-center justify-center text-[8px] font-semibold"
-                        style={{ background: avatarColor(m), color: "var(--text-dark)", marginLeft: i > 0 ? -6 : 0, zIndex: 5 - i, position: "relative" }}
-                      >
-                        {avatarInitials(m)}
-                      </span>
-                    ))}
-                    {formData.members.length > 5 && (
-                      <div
-                        className="flex items-center justify-center text-[8px] font-semibold rounded-full"
-                        style={{ width: 20, height: 20, background: "var(--surface-hover)", color: "var(--text-muted)", marginLeft: -6, position: "relative" }}
-                      >
-                        +{formData.members.length - 5}
-                      </div>
-                    )}
-                  </div>
-                  <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("members", []); }} />
-                </>
+                <div className="flex items-center">
+                  {formData.members.slice(0, 5).map((m, i) => (
+                    <span
+                      key={m}
+                      className="flex shrink-0 w-5 h-5 rounded-full items-center justify-center text-[8px] font-semibold"
+                      style={{ background: avatarColor(m), color: "var(--text-dark)", marginLeft: i > 0 ? -6 : 0, zIndex: 5 - i, position: "relative" }}
+                    >
+                      {avatarInitials(m)}
+                    </span>
+                  ))}
+                  {formData.members.length > 5 && (
+                    <div
+                      className="flex items-center justify-center text-[8px] font-semibold rounded-full"
+                      style={{ width: 20, height: 20, background: "var(--surface-hover)", color: "var(--text-muted)", marginLeft: -6, position: "relative" }}
+                    >
+                      +{formData.members.length - 5}
+                    </div>
+                  )}
+                </div>
               )}
             </FieldPill>
             {membersOpen && (
@@ -670,17 +638,15 @@ export default function CreateTaskModal({
               icon={<DependenciesIcon style={{ flexShrink: 0 }} />}
               active={dependenciesOpen}
               onClick={() => toggleDropdown("dependencies", dependenciesOpen, setDependenciesOpen)}
+              onClear={formData.blockedByTaskId ? () => handleChange("blockedByTaskId", null) : undefined}
             >
               {formData.blockedByTaskId ? (() => {
                 const dep = allTasks.find((t) => t.id === formData.blockedByTaskId);
                 return (
-                  <div className="flex items-center justify-between flex-1">
-                    <span className="text-sm truncate" style={{ color: "var(--text)" }}>
-                      {dep && <TaskIdChip task={dep} />}
-                      {dep?.title || "Task"}
-                    </span>
-                    <PillClearButton onClick={(e) => { e.stopPropagation(); handleChange("blockedByTaskId", null); }} />
-                  </div>
+                  <span className="text-sm truncate flex-1" style={{ color: "var(--text)" }}>
+                    {dep && <TaskIdChip task={dep} />}
+                    {dep?.title || "Task"}
+                  </span>
                 );
               })() : (
                 <span className="text-sm" style={{ color: dependenciesOpen ? "var(--text)" : "var(--text-muted)" }}>Dependencies</span>

@@ -11,7 +11,7 @@ export const meta: DsMeta = {
   ],
   a11y: [
     "`aria-label` is required by the props type — a search box has no visible label, so the accessible name must come from somewhere.",
-    "The magnifier and clear-X svgs are aria-hidden; the clear button carries aria-label=\"Clear search\" (the shipped wording).",
+    "The magnifier and clear-X svgs are registry icons and aria-hidden; the clear control is an `IconButton` carrying aria-label=\"Clear search\" (the shipped wording), so it inherits the shared hover/active/focus-visible states.",
     "Focus ring is the wrapper's :focus-within `action` border — the inner input is outline-none by design (the wrapper owns all visuals).",
   ],
   tokens: [

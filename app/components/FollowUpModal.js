@@ -5,6 +5,7 @@ import Sparkle from "@/app/ui/Sparkle";
 import TaskIdChip from "@/app/ui/TaskIdChip";
 import Button from "@/app/ui/Button";
 import IconButton from "@/app/ui/IconButton";
+import { CloseIcon, RefreshIcon } from "@/app/ui/Icons";
 
 /**
  * "Draft follow-up with Vector" modal — opens from the task drawer.
@@ -209,9 +210,7 @@ export default function FollowUpModal({ open, onClose, taskId, taskTitle, taskCo
             </h2>
           </div>
           <IconButton aria-label="Close" onClick={onClose} className="shrink-0">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            <CloseIcon size={12} />
           </IconButton>
         </div>
 
@@ -334,7 +333,7 @@ export default function FollowUpModal({ open, onClose, taskId, taskTitle, taskCo
               variant="secondary"
               style={{ padding: "4px 12px", fontSize: 13, opacity: streaming ? 0.5 : 1 }}
             >
-              {streaming ? "…" : "↻ Regenerate"}
+              {streaming ? "…" : <><RefreshIcon /> Regenerate</>}
             </Button>
             <Button
               onClick={() => handleCopy(`Subject: ${subject}\n\n${body}`, "all")}

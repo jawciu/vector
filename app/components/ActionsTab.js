@@ -173,8 +173,8 @@ export default function ActionsTab({
         {isPending && visibleDrafts.length > 0 && (
           <Button
             onClick={handleDismissAll}
-            variant="secondary"
-            style={{ padding: "4px 10px", fontSize: 13, whiteSpace: "nowrap" }}
+            variant="destructive"
+            className="whitespace-nowrap"
           >
             Dismiss all
           </Button>

@@ -212,7 +212,7 @@ export default function NotificationBell() {
   return (
     <div ref={containerRef} className="relative">
       <IconButton
-        data-active={open ? "true" : undefined}
+        isActive={open}
         onClick={() => setOpen((v) => !v)}
         aria-label="Notifications"
         aria-haspopup="true"

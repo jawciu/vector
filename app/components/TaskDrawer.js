@@ -111,22 +111,6 @@ function DownloadIcon() {
   );
 }
 
-function PillClearButton({ onClick }) {
-  return (
-    // eslint-disable-next-line no-restricted-syntax -- fourth local PillClearButton copy, replaced by FieldRow onClear in slice 5
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex items-center justify-center flex-shrink-0"
-      style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
-    >
-      <svg width="9" height="9" viewBox="0 0 12 12" fill="none" style={{ color: "var(--text-muted)" }}>
-        <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    </button>
-  );
-}
-
 function formatTimestamp(iso) {
   const date = new Date(iso);
   const now = new Date();
@@ -271,9 +255,16 @@ function ToolbarSeparator() {
   );
 }
 
-function ToolbarButton({ title, onClick, children }) {
+/**
+ * One notes-toolbar control.
+ *   label — the accessible name: plain words, no markdown syntax.
+ *   title — the hover tooltip, which may show the markdown it inserts.
+ * Typography lives on the inner glyph, never on IconButton's className
+ * (that hatch is layout-only, see IconButton's JSDoc).
+ */
+function ToolbarButton({ label, title, onClick, children }) {
   return (
-    <IconButton aria-label={title} title={title} onClick={onClick} className="text-xs">
+    <IconButton aria-label={label} title={title ?? label} onClick={onClick}>
       {children}
     </IconButton>
   );
@@ -297,7 +288,7 @@ function NotesToolbar({ notesValue, setNotesValue, notesRef }) {
       }}
     >
       {/* + new line */}
-      <ToolbarButton title="New line" onClick={() => fmt("newline")}>
+      <ToolbarButton label="New line" onClick={() => fmt("newline")}>
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M6 2v8M2 6h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
@@ -306,29 +297,29 @@ function NotesToolbar({ notesValue, setNotesValue, notesRef }) {
       <ToolbarSeparator />
 
       {/* Bold */}
-      <ToolbarButton title="Bold (**text**)" onClick={() => fmt("bold")}>
+      <ToolbarButton label="Bold" title="Bold (**text**)" onClick={() => fmt("bold")}>
         <span style={{ fontWeight: 700, fontSize: 13, lineHeight: 1 }}>B</span>
       </ToolbarButton>
 
       {/* Italic */}
-      <ToolbarButton title="Italic (_text_)" onClick={() => fmt("italic")}>
+      <ToolbarButton label="Italic" title="Italic (_text_)" onClick={() => fmt("italic")}>
         <span style={{ fontStyle: "italic", fontSize: 13, lineHeight: 1 }}>I</span>
       </ToolbarButton>
 
       {/* Underline */}
-      <ToolbarButton title="Underline (<u>text</u>)" onClick={() => fmt("underline")}>
+      <ToolbarButton label="Underline" title="Underline (<u>text</u>)" onClick={() => fmt("underline")}>
         <span style={{ textDecoration: "underline", fontSize: 13, lineHeight: 1 }}>U</span>
       </ToolbarButton>
 
       {/* Strikethrough */}
-      <ToolbarButton title="Strikethrough (~~text~~)" onClick={() => fmt("strikethrough")}>
+      <ToolbarButton label="Strikethrough" title="Strikethrough (~~text~~)" onClick={() => fmt("strikethrough")}>
         <span style={{ textDecoration: "line-through", fontSize: 13, lineHeight: 1 }}>S</span>
       </ToolbarButton>
 
       <ToolbarSeparator />
 
       {/* Bullet list */}
-      <ToolbarButton title="Bullet list (- item)" onClick={() => fmt("bullet")}>
+      <ToolbarButton label="Bulleted list" title="Bulleted list (- item)" onClick={() => fmt("bullet")}>
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           <circle cx="1.5" cy="3" r="1" fill="currentColor" />
           <circle cx="1.5" cy="6" r="1" fill="currentColor" />
@@ -340,7 +331,7 @@ function NotesToolbar({ notesValue, setNotesValue, notesRef }) {
       </ToolbarButton>
 
       {/* Numbered list */}
-      <ToolbarButton title="Numbered list (1. item)" onClick={() => fmt("numbered")}>
+      <ToolbarButton label="Numbered list" title="Numbered list (1. item)" onClick={() => fmt("numbered")}>
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           {/* 1 */}
           <path d="M1.5 2.5V5" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" />
@@ -355,7 +346,7 @@ function NotesToolbar({ notesValue, setNotesValue, notesRef }) {
       </ToolbarButton>
 
       {/* Blockquote */}
-      <ToolbarButton title="Blockquote (> text)" onClick={() => fmt("blockquote")}>
+      <ToolbarButton label="Blockquote" title="Blockquote (&gt; text)" onClick={() => fmt("blockquote")}>
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           <line x1="1.5" y1="2" x2="1.5" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           <line x1="4" y1="4" x2="11" y2="4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
@@ -367,7 +358,7 @@ function NotesToolbar({ notesValue, setNotesValue, notesRef }) {
       <ToolbarSeparator />
 
       {/* Link */}
-      <ToolbarButton title="Link ([text](url))" onClick={() => fmt("link")}>
+      <ToolbarButton label="Link" title="Link ([text](url))" onClick={() => fmt("link")}>
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path
             d="M5 7.5a3 3 0 0 0 4.243 0l1.5-1.5a3 3 0 0 0-4.243-4.243L5.75 2.5"
@@ -381,7 +372,7 @@ function NotesToolbar({ notesValue, setNotesValue, notesRef }) {
       </ToolbarButton>
 
       {/* Inline code */}
-      <ToolbarButton title="Inline code (`code`)" onClick={() => fmt("code")}>
+      <ToolbarButton label="Inline code" title="Inline code (`code`)" onClick={() => fmt("code")}>
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M4 3L1 6l3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M8 3l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -389,7 +380,7 @@ function NotesToolbar({ notesValue, setNotesValue, notesRef }) {
       </ToolbarButton>
 
       {/* Code block */}
-      <ToolbarButton title="Code block (```code```)" onClick={() => fmt("codeblock")}>
+      <ToolbarButton label="Code block" title="Code block (```code```)" onClick={() => fmt("codeblock")}>
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           <rect x="0.5" y="0.5" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="1" />
           <path d="M3 4.5L1.5 6l1.5 1.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
@@ -401,8 +392,8 @@ function NotesToolbar({ notesValue, setNotesValue, notesRef }) {
       <ToolbarSeparator />
 
       {/* Sparkle / AI placeholder */}
-      <ToolbarButton title="AI assist (coming soon)" onClick={() => fmt("sparkle")}>
-        <span style={{ fontSize: 12, lineHeight: 1 }}>✦</span>
+      <ToolbarButton label="AI assist" title="AI assist (coming soon)" onClick={() => fmt("sparkle")}>
+        <span className="text-xs leading-none">✦</span>
       </ToolbarButton>
     </div>
   );
@@ -429,13 +420,6 @@ const TaskDrawer = forwardRef(function TaskDrawer({
   const [doneBtnAnimating, setDoneBtnAnimating] = useState(false);
 
   // Hover states for field rows (show X on hover)
-  const [dueDateHovered, setDueDateHovered] = useState(false);
-  const [statusHovered, setStatusHovered] = useState(false);
-  const [priorityHovered, setPriorityHovered] = useState(false);
-  const [ownerHovered, setOwnerHovered] = useState(false);
-  const [assigneeHovered, setAssigneeHovered] = useState(false);
-  const [membersHovered, setMembersHovered] = useState(false);
-  const [depsHovered, setDepsHovered] = useState(false);
 
   // Inline editing state
   const [editingTitle, setEditingTitle] = useState(false);
@@ -778,20 +762,19 @@ const TaskDrawer = forwardRef(function TaskDrawer({
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
 
           {/* Due date */}
-          <div ref={calendarRef} className="relative" onMouseEnter={() => setDueDateHovered(true)} onMouseLeave={() => setDueDateHovered(false)}>
+          <div ref={calendarRef} className="relative">
             <FieldRow
               icon={<CalendarIcon style={{ flexShrink: 0 }} />}
               active={calendarOpen}
+              popup="dialog"
               onClick={() => toggleDropdown(calendarOpen, setCalendarOpen)}
+              onClear={localTask.due ? () => { patchTask({ due: "" }); setCalendarOpen(false); } : undefined}
             >
               <span className="text-sm" style={{ color: "var(--text-muted)" }}>Target</span>
               {localTask.due && (
                 <span className="text-sm" style={{ color: "var(--text)" }}>
                   {new Date(localTask.due + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
                 </span>
-              )}
-              {localTask.due && (dueDateHovered || calendarOpen) && (
-                <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ due: "" }); setCalendarOpen(false); }} />
               )}
             </FieldRow>
             {calendarOpen && (
@@ -807,11 +790,12 @@ const TaskDrawer = forwardRef(function TaskDrawer({
           </div>
 
           {/* Status */}
-          <div ref={statusRef} className="relative" onMouseEnter={() => setStatusHovered(true)} onMouseLeave={() => setStatusHovered(false)}>
+          <div ref={statusRef} className="relative">
             <FieldRow
               icon={<StatusIcon style={{ flexShrink: 0 }} />}
               active={statusOpen}
               onClick={() => toggleDropdown(statusOpen, setStatusOpen)}
+              onClear={() => { patchTask({ status: "Not started" }); setStatusOpen(false); }}
             >
               <span className="text-sm" style={{ color: "var(--text-muted)" }}>Status</span>
               <span
@@ -826,9 +810,6 @@ const TaskDrawer = forwardRef(function TaskDrawer({
               >
                 {localTask.status}
               </span>
-              {(statusHovered || statusOpen) && (
-                <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ status: "Not started" }); setStatusOpen(false); }} />
-              )}
             </FieldRow>
             {statusOpen && (
               <MenuList style={{ minWidth: "100%" }}>
@@ -854,18 +835,16 @@ const TaskDrawer = forwardRef(function TaskDrawer({
           </div>
 
           {/* Priority */}
-          <div ref={priorityRef} className="relative" onMouseEnter={() => setPriorityHovered(true)} onMouseLeave={() => setPriorityHovered(false)}>
+          <div ref={priorityRef} className="relative">
             <FieldRow
               icon={<PriorityIcon priority={localTask.priority} style={{ flexShrink: 0 }} />}
               active={priorityOpen}
               onClick={() => toggleDropdown(priorityOpen, setPriorityOpen)}
+              onClear={localTask.priority ? () => { patchTask({ priority: null }); setPriorityOpen(false); } : undefined}
             >
               <span className="text-sm" style={{ color: "var(--text-muted)" }}>Priority</span>
               {localTask.priority && (
                 <span className="text-sm capitalize" style={{ color: "var(--text)" }}>{localTask.priority}</span>
-              )}
-              {localTask.priority && (priorityHovered || priorityOpen) && (
-                <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ priority: null }); setPriorityOpen(false); }} />
               )}
             </FieldRow>
             {priorityOpen && (
@@ -889,18 +868,18 @@ const TaskDrawer = forwardRef(function TaskDrawer({
 
           {/* Owner — must be a VendorUser (Vector team). The picker writes
               ownerId (FK) and keeps the owner string in sync for display. */}
-          <div ref={ownerRef} className="relative" onMouseEnter={() => setOwnerHovered(true)} onMouseLeave={() => setOwnerHovered(false)}>
+          <div ref={ownerRef} className="relative">
             <FieldRow
               icon={<OwnerIcon style={{ flexShrink: 0 }} />}
               active={ownerOpen}
               onClick={() => toggleDropdown(ownerOpen, setOwnerOpen)}
+              onClear={localTask.owner ? () => { patchTask({ owner: "", ownerId: null }); setOwnerOpen(false); } : undefined}
             >
               <span className="text-sm" style={{ color: "var(--text-muted)" }}>Owner</span>
               {localTask.owner && (
                 <div className="flex items-center gap-1.5">
                   <Avatar name={localTask.owner} size={20} />
                   <span className="text-sm" style={{ color: "var(--text)" }}>{localTask.owner}</span>
-                  {(ownerHovered || ownerOpen) && <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ owner: "", ownerId: null }); setOwnerOpen(false); }} />}
                 </div>
               )}
             </FieldRow>
@@ -936,27 +915,22 @@ const TaskDrawer = forwardRef(function TaskDrawer({
           </div>
 
           {/* Assignee (customer-side) */}
-          <div ref={assigneeRef} className="relative" onMouseEnter={() => setAssigneeHovered(true)} onMouseLeave={() => setAssigneeHovered(false)}>
+          <div ref={assigneeRef} className="relative">
             <FieldRow
               icon={<AssigneeIcon style={{ flexShrink: 0 }} />}
               active={assigneeOpen}
               onClick={() => toggleDropdown(assigneeOpen, setAssigneeOpen)}
+              onClear={localTask.assigneeContact ? () => {
+                patchTask({ assigneeContactId: null });
+                setLocalTask((prev) => ({ ...prev, assigneeContact: null, assigneeContactId: null }));
+                setAssigneeOpen(false);
+              } : undefined}
             >
               <span className="text-sm" style={{ color: "var(--text-muted)" }}>Assignee</span>
               {localTask.assigneeContact && (
                 <div className="flex items-center gap-1.5">
                   <Avatar name={localTask.assigneeContact.name} size={20} />
                   <span className="text-sm" style={{ color: "var(--text)" }}>{localTask.assigneeContact.name}</span>
-                  {(assigneeHovered || assigneeOpen) && (
-                    <PillClearButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        patchTask({ assigneeContactId: null });
-                        setLocalTask((prev) => ({ ...prev, assigneeContact: null, assigneeContactId: null }));
-                        setAssigneeOpen(false);
-                      }}
-                    />
-                  )}
                 </div>
               )}
             </FieldRow>
@@ -999,10 +973,11 @@ const TaskDrawer = forwardRef(function TaskDrawer({
           </div>
 
           {/* Members */}
-          <div ref={membersRef} className="relative" onMouseEnter={() => setMembersHovered(true)} onMouseLeave={() => setMembersHovered(false)}>
+          <div ref={membersRef} className="relative">
             <FieldRow
               icon={<MembersIcon style={{ flexShrink: 0 }} />}
               active={membersOpen}
+              onClear={localTask.members && localTask.members.length > 0 ? () => { patchTask({ members: [] }); setMembersOpen(false); setMembersSearch(""); } : undefined}
               onClick={() => {
                 const wasOpen = membersOpen;
                 toggleDropdown(membersOpen, setMembersOpen);
@@ -1011,28 +986,22 @@ const TaskDrawer = forwardRef(function TaskDrawer({
             >
               <span className="text-sm" style={{ color: "var(--text-muted)" }}>Members</span>
               {localTask.members && localTask.members.length > 0 && (
-                <>
-                  {/* Avatar stack — negative margins for overlap */}
-                  <div className="flex items-center">
-                    {localTask.members.slice(0, 5).map((m, i) => (
-                      <div key={m} style={{ marginLeft: i > 0 ? -6 : 0, zIndex: 5 - i, position: "relative" }}>
-                        <Avatar name={m} size={20} />
-                      </div>
-                    ))}
-                    {localTask.members.length > 5 && (
-                      <div
-                        className="flex items-center justify-center text-[8px] font-semibold rounded-full"
-                        style={{ width: 16, height: 16, background: "var(--surface-hover)", color: "var(--text-muted)", marginLeft: -6 }}
-                      >
-                        +{localTask.members.length - 5}
-                      </div>
-                    )}
-                  </div>
-                  {/* X sits outside the avatar stack so it's never hidden */}
-                  {(membersHovered || membersOpen) && (
-                    <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ members: [] }); setMembersOpen(false); setMembersSearch(""); }} />
+                /* Avatar stack — negative margins for overlap */
+                <div className="flex items-center">
+                  {localTask.members.slice(0, 5).map((m, i) => (
+                    <div key={m} style={{ marginLeft: i > 0 ? -6 : 0, zIndex: 5 - i, position: "relative" }}>
+                      <Avatar name={m} size={20} />
+                    </div>
+                  ))}
+                  {localTask.members.length > 5 && (
+                    <div
+                      className="flex items-center justify-center text-[8px] font-semibold rounded-full"
+                      style={{ width: 16, height: 16, background: "var(--surface-hover)", color: "var(--text-muted)", marginLeft: -6 }}
+                    >
+                      +{localTask.members.length - 5}
+                    </div>
                   )}
-                </>
+                </div>
               )}
             </FieldRow>
             {membersOpen && (
@@ -1115,11 +1084,12 @@ const TaskDrawer = forwardRef(function TaskDrawer({
           </div>
 
           {/* Dependencies */}
-          <div ref={depsRef} className="relative" onMouseEnter={() => setDepsHovered(true)} onMouseLeave={() => setDepsHovered(false)}>
+          <div ref={depsRef} className="relative">
             <FieldRow
               icon={<DependenciesIcon style={{ flexShrink: 0 }} />}
               active={depsOpen}
               onClick={() => toggleDropdown(depsOpen, setDepsOpen)}
+              onClear={localTask.blockedByTaskId ? () => { patchTask({ blockedByTaskId: null }); setDepsOpen(false); } : undefined}
             >
               <span className="text-sm" style={{ color: "var(--text-muted)" }}>Dependencies</span>
               {localTask.blockedByTaskId && (() => {
@@ -1130,7 +1100,6 @@ const TaskDrawer = forwardRef(function TaskDrawer({
                       {dep && <TaskIdChip task={dep} />}
                       {dep?.title || "Task"}
                     </span>
-                    {(depsHovered || depsOpen) && <PillClearButton onClick={(e) => { e.stopPropagation(); patchTask({ blockedByTaskId: null }); setDepsOpen(false); }} />}
                   </div>
                 );
               })()}

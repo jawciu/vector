@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { MenuList, MenuOption } from "./Menu";
 import IconButton from "@/app/ui/IconButton";
+import { PlusIcon, ThreeDotsIcon } from "@/app/ui/Icons";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 
 export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onAddTask, dragListeners }) {
@@ -121,13 +122,11 @@ export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onA
           onClick={() => setMenuOpen((o) => !o)}
           isActive={menuOpen}
           disabled={loading}
+          aria-haspopup="menu"
+          aria-expanded={menuOpen}
           aria-label="Phase options"
         >
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-            <circle cx="8" cy="3" r="1.5" />
-            <circle cx="8" cy="8" r="1.5" />
-            <circle cx="8" cy="13" r="1.5" />
-          </svg>
+          <ThreeDotsIcon />
         </IconButton>
 
         {menuOpen && (
@@ -147,10 +146,7 @@ export default function PhaseHeader({ phase, onPhaseUpdated, onPhaseDeleted, onA
         onClick={() => onAddTask && onAddTask()}
         aria-label="Add task"
       >
-        <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-          <line x1="5.5" y1="1" x2="5.5" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="1" y1="5.5" x2="10" y2="5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
+        <PlusIcon />
       </IconButton>
     </div>
   );

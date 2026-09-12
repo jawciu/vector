@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import Button from "../ui/Button";
 import IconButton from "../ui/IconButton";
+import { CloseIcon, ThreeDotsIcon } from "../ui/Icons";
 import { useRouter } from "next/navigation";
 import { MenuList, MenuOption } from "./Menu";
 import { useClickOutside, useEscapeKey } from "@/lib/hooks/useClickOutside";
@@ -154,13 +155,11 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
         <IconButton
           onClick={() => setMenuOpen((o) => !o)}
           isActive={menuOpen}
+          aria-haspopup="menu"
+          aria-expanded={menuOpen}
           aria-label="Workspace actions"
         >
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-            <circle cx="8" cy="3" r="1.5" />
-            <circle cx="8" cy="8" r="1.5" />
-            <circle cx="8" cy="13" r="1.5" />
-          </svg>
+          <ThreeDotsIcon />
         </IconButton>
 
         {menuOpen && (
@@ -225,9 +224,7 @@ export default function OnboardingActions({ onboarding, onUpdated }) {
                 Edit Onboarding
               </h2>
               <IconButton aria-label="Close" onClick={() => setEditOpen(false)}>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
+                <CloseIcon size={12} />
               </IconButton>
             </div>
 

@@ -1,12 +1,19 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import IconButton from "./IconButton";
+import { ChevronLeftIcon, ChevronRightIcon } from "./Icons";
 
 /**
  * CalendarDropdown — DS primitive
  *
  * Custom date picker styled to match the design system.
  * Positioned absolutely below its parent (use inside a relative container).
+ *
+ * The month chevrons are `IconButton`s (20x20, the DS icon-button size) with
+ * registry `ChevronLeftIcon` / `ChevronRightIcon` — they were bespoke 24px
+ * buttons carrying `.icon-btn` plus inline `background:none;border:none`,
+ * which beat the class's hover fill (slice 1, round 4).
  *
  * Props:
  *   value            — selected date string (YYYY-MM-DD) or ""
@@ -86,28 +93,18 @@ export default function CalendarDropdown({ value, viewDate, onViewDateChange, on
           {MONTHS[month]} {year}
         </span>
         <div className="flex items-center gap-1">
-          <button
-            type="button"
+          <IconButton
             aria-label="Previous month"
             onClick={() => onViewDateChange(new Date(year, month - 1, 1))}
-            className="flex items-center justify-center w-6 h-6 rounded icon-btn"
-            style={{ background: "none", border: "none", cursor: "pointer" }}
           >
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-              <path d="M7 1L3 5L7 9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-          <button
-            type="button"
+            <ChevronLeftIcon />
+          </IconButton>
+          <IconButton
             aria-label="Next month"
             onClick={() => onViewDateChange(new Date(year, month + 1, 1))}
-            className="flex items-center justify-center w-6 h-6 rounded icon-btn"
-            style={{ background: "none", border: "none", cursor: "pointer" }}
           >
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-              <path d="M3 1L7 5L3 9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+            <ChevronRightIcon />
+          </IconButton>
         </div>
       </div>
 

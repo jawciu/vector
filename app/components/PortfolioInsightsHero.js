@@ -5,7 +5,8 @@ import Link from "next/link";
 import CompanyAvatar from "@/app/ui/CompanyAvatar";
 import InlineProse from "@/app/ui/InlineProse";
 import Sparkle from "@/app/ui/Sparkle";
-import Button from "@/app/ui/Button";
+import IconButton from "@/app/ui/IconButton";
+import { RefreshIcon } from "@/app/ui/Icons";
 
 const SOFT_TTL_MS = 4 * 60 * 60 * 1000;
 
@@ -169,20 +170,14 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
             </span>
           )}
         </div>
-        <Button
+        <IconButton
           onClick={regenerate}
           disabled={isStreaming}
-          aria-label="Regenerate"
-          variant="secondary"
-          style={{
-            padding: "4px 10px",
-            opacity: isStreaming ? 0.5 : 1,
-            cursor: isStreaming ? "default" : "pointer",
-            fontSize: 12,
-          }}
+          aria-busy={isStreaming || undefined}
+          aria-label="Regenerate insights"
         >
-          {isStreaming ? "…" : "↻"}
-        </Button>
+          <RefreshIcon />
+        </IconButton>
       </div>
 
       <hr style={{ height: 1, width: "100%", border: 0, background: "var(--border-subtle)", margin: 0 }} />
