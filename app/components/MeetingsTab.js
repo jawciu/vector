@@ -6,6 +6,7 @@ import CalendarDropdown from "@/app/ui/CalendarDropdown";
 import { CalendarIcon } from "@/app/ui/Icons";
 import { AVATAR_IMAGES, avatarColor, avatarInitials } from "@/lib/avatar";
 import MeetingDrawer from "./MeetingDrawer";
+import Button from "@/app/ui/Button";
 
 /**
  * Per-onboarding "Meetings" tab.
@@ -76,17 +77,16 @@ export default function MeetingsTab({ meetings = [] }) {
           <SearchInput value={query} onChange={setQuery} />
           <DateFilterPill value={date} onChange={setDate} />
           {(query || date) && (
-            <button
-              type="button"
+            <Button
               onClick={() => {
                 setQuery("");
                 setDate("");
               }}
-              className="text-btn"
-              style={{ padding: "2px 6px", fontSize: 12, color: "var(--text-muted)" }}
+              variant="tertiary"
+              style={{ padding: "2px 6px", fontSize: 12 }}
             >
               Clear
-            </button>
+            </Button>
           )}
         </div>
         <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
@@ -129,6 +129,7 @@ function MeetingRow({ meeting, onClick }) {
   const dateLabel = formatDate(meeting.occurredAt);
   return (
     <li>
+      {/* eslint-disable-next-line no-restricted-syntax -- clickable card, not a DS button */}
       <button
         type="button"
         onClick={onClick}
@@ -252,6 +253,7 @@ function DateFilterPill({ value, onChange }) {
 
   return (
     <div ref={ref} className="relative">
+      {/* eslint-disable-next-line no-restricted-syntax -- filter pill trigger, becomes Select in slice 3 */}
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

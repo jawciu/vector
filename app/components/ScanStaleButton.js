@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Button from "@/app/ui/Button";
 
 /**
  * Manual trigger for the stale-task scanner. Calls
@@ -54,14 +55,14 @@ export default function ScanStaleButton() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-        <button
+        <Button
           onClick={handleClick}
           disabled={busy}
-          className="btn-primary text-sm rounded-lg"
+          variant="primary"
           style={{ padding: "6px 14px", fontSize: 13, fontWeight: 600, opacity: busy ? 0.6 : 1, minWidth: 160 }}
         >
           {busy ? `Scanning… ${elapsedSec}s` : "Scan now"}
-        </button>
+        </Button>
         <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
           Looks at your overdue and blocked tasks; queues drafts in <a href="/ai-drafts" style={{ color: "var(--action)" }}>Vector suggests</a>. Can take ~30s on busy weeks.
         </span>

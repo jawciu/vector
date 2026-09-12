@@ -82,7 +82,15 @@ export const Hover: Story = { parameters: { pseudo: { hover: true } } };
  * `surfaceHover` fill — one step lighter again than the hover fill, the same
  * hover → active direction as `.menu-option` and IconButton.
  */
-export const Active: Story = { name: "Active (open)", args: { active: true } };
+export const Active: Story = {
+  name: "Active (open)",
+  args: { active: true },
+  play: async ({ canvasElement }) => {
+    const trigger = within(canvasElement).getByRole("button", { expanded: true });
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(trigger).toHaveAttribute("aria-haspopup", "menu");
+  },
+};
 
 /**
  * The focus ring on field editors: the main control is a native button, so
@@ -147,11 +155,49 @@ export const WithClear: Story = {
 export const AllVariants: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12, width: 260 }}>
-      <FieldPill icon={<CalendarIcon style={{ flexShrink: 0 }} />} label="Target" />
-      <FieldPill icon={<CalendarIcon style={{ flexShrink: 0 }} />}>{canonicalFilled}</FieldPill>
-      <FieldPill icon={<CalendarIcon style={{ flexShrink: 0 }} />} active>
+      <FieldPill icon={<CalendarIcon style={{ flexShrink: 0 }} />} label="Target" onClick={() => {}} />
+      <FieldPill icon={<CalendarIcon style={{ flexShrink: 0 }} />} onClick={() => {}}>{canonicalFilled}</FieldPill>
+      <FieldPill icon={<CalendarIcon style={{ flexShrink: 0 }} />} active onClick={() => {}}>
         {canonicalFilled}
       </FieldPill>
     </div>
   ),
+};
+
+/**
+ * CONTAINER mode — the pill holds a control instead of opening one. With no
+ * `onClick` the main area renders as a plain <div>, so an <input> can live
+ * inside it legally: inside a <button> the parser un-nests it (hydration
+ * error) and it is a keyboard trap risk. The pressable hover fill and the
+ * pointer cursor are off, `onClear` still works, and :focus-within still
+ * lights the field. This is CreateOnboardingModal's Domain / Owner pill; it
+ * becomes the boxed TextField in slice 4.
+ */
+export const AsContainer: Story = {
+  name: "As container (test)",
+  args: { onClick: undefined, children: undefined },
+  render: () => (
+    <FieldPill icon={canonicalIcon}>
+      <input
+        type="text"
+        aria-label="Domain"
+        placeholder="Domain"
+        className="text-sm w-full outline-none"
+        style={{ background: "transparent", border: "none", color: "var(--text)", padding: 0 }}
+      />
+    </FieldPill>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByLabelText("Domain");
+    // The main area is a static container, NOT a button, so the input is legal.
+    const main = canvasElement.querySelector(".field-main")!;
+    await expect(main.tagName).toBe("DIV");
+    await expect(canvasElement.querySelectorAll("button input")).toHaveLength(0);
+    // The input is the only tab stop and takes focus on click.
+    await userEvent.click(input);
+    await expect(input).toHaveFocus();
+    await userEvent.type(input, "raycast.com");
+    await expect(input).toHaveValue("raycast.com");
+  },
 };

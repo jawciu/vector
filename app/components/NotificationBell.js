@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
 import { createClient } from "@/lib/supabase/client";
+import IconButton from "@/app/ui/IconButton";
+import Button from "@/app/ui/Button";
 
 function BellIcon() {
   return (
@@ -209,17 +211,15 @@ export default function NotificationBell() {
 
   return (
     <div ref={containerRef} className="relative">
-      <button
-        type="button"
-        className="icon-btn w-5 h-5 rounded flex items-center justify-center"
-        data-active={open ? "true" : undefined}
+      <IconButton
+        isActive={open}
         onClick={() => setOpen((v) => !v)}
         aria-label="Notifications"
         aria-haspopup="true"
         aria-expanded={open}
       >
         <BellIcon />
-      </button>
+      </IconButton>
       {data.unreadCount > 0 && (
         <span
           aria-hidden
@@ -262,15 +262,9 @@ export default function NotificationBell() {
               Notifications
             </span>
             {data.unreadCount > 0 && (
-              <button
-                type="button"
-                onClick={markAllRead}
-                className="text-xs transition-colors"
-                style={{ color: "var(--text-muted)" }}
-                disabled={loading}
-              >
+              <Button variant="tertiary" size="xs" onClick={markAllRead} disabled={loading}>
                 Mark all read
-              </button>
+              </Button>
             )}
           </header>
 
@@ -292,6 +286,7 @@ export default function NotificationBell() {
                   const summaryColor = isRead ? "var(--text-muted)" : "var(--text-secondary)";
                   return (
                     <li key={g.groupKey}>
+                      {/* eslint-disable-next-line no-restricted-syntax -- notification row, not a DS button */}
                       <button
                         type="button"
                         onClick={() => handleGroupClick(g)}
@@ -372,6 +367,7 @@ export default function NotificationBell() {
                         >
                           {g.events.map((e) => (
                             <li key={e.notificationId}>
+                              {/* eslint-disable-next-line no-restricted-syntax -- notification row, not a DS button */}
                               <button
                                 type="button"
                                 onClick={() => handleSubEventClick(g, e)}

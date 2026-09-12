@@ -63,6 +63,7 @@ export default function PeoplePicker({ value, onChange, placeholder, people }) {
         >
           {filteredPeople.length > 0 ? (
             filteredPeople.map((person, idx) => (
+              // eslint-disable-next-line no-restricted-syntax -- picker row, becomes a Select option in slice 3
               <button
                 key={idx}
                 type="button"

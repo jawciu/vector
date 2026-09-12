@@ -157,6 +157,7 @@ export default function PortalShell({
         }}
       >
         {PORTAL_TABS.map(({ id, label, icon }) => (
+          // eslint-disable-next-line no-restricted-syntax -- portal tab bar, TabBar retrofit later
           <button
             key={id}
             onClick={() => setActiveTab(id)}

@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Button from "@/app/ui/Button";
 
 export default function SignOut() {
   const router = useRouter();
@@ -39,12 +40,11 @@ export default function SignOut() {
   if (!mounted || !user) return null;
 
   return (
-    <button
-      type="button"
+    <Button
       onClick={handleSignOut}
-      className="btn-primary w-full h-9 text-center px-3 py-2 rounded-lg text-sm font-bold"
+      variant="primary" className="w-full h-9 justify-center text-center px-3 py-2 font-bold"
     >
       Sign out
-    </button>
+    </Button>
   );
 }

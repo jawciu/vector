@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import Tooltip from "@/app/ui/Tooltip";
 import {
+  CopyIcon,
   DependenciesIcon,
   CalendarIcon,
   PriorityIcon,
@@ -17,6 +18,8 @@ import Sparkle from "@/app/ui/Sparkle";
 import TaskIdChip from "@/app/ui/TaskIdChip";
 import MeetingDrawer from "./MeetingDrawer";
 import { TASK_STATUSES, STATUS_COLORS } from "@/lib/constants";
+import Button from "@/app/ui/Button";
+import IconButton from "@/app/ui/IconButton";
 
 /**
  * "Vector suggests" inbox — list of PendingAIChange rows.
@@ -457,6 +460,7 @@ function DraftColumn({
 function MeetingPill({ title, onClick }) {
   return (
     <div className="meeting-separator">
+      {/* eslint-disable-next-line no-restricted-syntax -- clickable row, not a DS button */}
       <button
         type="button"
         onClick={onClick}
@@ -541,6 +545,7 @@ function DraftGroup({
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
             <span style={{ color: "var(--text-muted)" }}>From meeting:</span>
+            {/* eslint-disable-next-line no-restricted-syntax -- task reference chip, not a DS button */}
             <button
               type="button"
               onClick={() => onMeetingClick?.(group.eventId)}
@@ -660,20 +665,16 @@ function BulkActionBar({ count, onReject, onClear }) {
         <strong>{count}</strong> selected
       </span>
       <div style={{ display: "flex", gap: 8 }}>
-        <button
+        <Button
           onClick={onClear}
-          className="btn-secondary text-sm rounded-lg"
+          variant="secondary"
           style={{ padding: "4px 10px", fontSize: 12 }}
         >
           Clear
-        </button>
-        <button
-          onClick={onReject}
-          className="btn-secondary text-sm rounded-lg"
-          style={{ padding: "4px 10px", fontSize: 12, color: "var(--danger)" }}
-        >
+        </Button>
+        <Button onClick={onReject} variant="destructive" size="xs">
           Reject selected
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -801,29 +802,26 @@ export function DraftCard({
 
       {isPending && (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <button
-            type="button"
+          <Button
             onClick={editing ? cancelEdit : onReject}
             disabled={busy}
-            className="btn-tertiary"
+            variant="tertiary"
             style={{ padding: "4px 8px", fontSize: 14, opacity: busy ? 0.5 : 1 }}
           >
             {editing ? "Cancel" : "Dismiss"}
-          </button>
+          </Button>
           <div style={{ display: "flex", gap: 8 }}>
             {editable && !editing && (
-              <button
-                type="button"
+              <Button
                 onClick={openEdit}
                 disabled={busy}
-                className="btn-tertiary text-sm rounded-lg"
+                variant="tertiary"
                 style={{ padding: "4px 10px", fontSize: 14, opacity: busy ? 0.5 : 1 }}
               >
                 Edit
-              </button>
+              </Button>
             )}
-            <button
-              type="button"
+            <Button
               onClick={() => {
                 onApprove(editing ? overrides : {});
                 if (editing) setEditing(false);
@@ -832,11 +830,11 @@ export function DraftCard({
               aria-disabled={busy || selected}
               aria-label={selected ? "Unselect to approve individually" : undefined}
               title={selected ? "Unselect to approve individually" : undefined}
-              className="btn-secondary text-sm rounded-lg"
+              variant="secondary"
               style={{ padding: "4px 14px", fontSize: 14, opacity: busy || selected ? 0.5 : 1 }}
             >
               {busy ? "…" : "Approve"}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -986,6 +984,7 @@ function StatusOverrideEditor({ value, onChange, disabled }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>New status</span>
       <div ref={ref} className="relative" style={{ width: "100%" }}>
+        {/* eslint-disable-next-line no-restricted-syntax -- dropdown trigger, becomes Select in slice 3 */}
         <button
           type="button"
           onClick={() => !disabled && setOpen((o) => !o)}
@@ -1074,6 +1073,7 @@ function PriorityOverrideEditor({ value, onChange, disabled }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>New priority</span>
       <div ref={ref} className="relative" style={{ width: "100%" }}>
+        {/* eslint-disable-next-line no-restricted-syntax -- dropdown trigger, becomes Select in slice 3 */}
         <button
           type="button"
           onClick={() => !disabled && setOpen((o) => !o)}
@@ -1330,28 +1330,14 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
           <FieldBlock
             label="Message"
             actions={
-              <button
-                type="button"
+              <IconButton
                 onClick={handleCopyBody}
                 disabled={!body.trim()}
                 aria-label={copied ? "Copied" : "Copy message"}
                 title={copied ? "Copied" : "Copy message"}
-                className="icon-btn"
-                style={{
-                  padding: 0,
-                  width: 16,
-                  height: 16,
-                  background: "none",
-                  border: "none",
-                  color: copied ? "var(--success)" : "var(--text-muted)",
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
               >
                 <CopyIcon />
-              </button>
+              </IconButton>
             }
           >
             <textarea
@@ -1392,10 +1378,10 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
       {/* Action row */}
       {isPending && (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <button
+          <Button
             onClick={onReject}
             disabled={busy}
-            className="btn-tertiary"
+            variant="tertiary"
             style={{
               padding: "4px 8px",
               fontSize: 14,
@@ -1403,7 +1389,7 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
             }}
           >
             Dismiss
-          </button>
+          </Button>
           <div style={{ display: "flex", gap: 8 }}>
             <a
               href={mailto}
@@ -1412,10 +1398,10 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
             >
               Open in mail
             </a>
-            <button
+            <Button
               onClick={() => onApprove({ subject, body })}
               disabled={!canSend}
-              className="btn-secondary text-sm rounded-lg"
+              variant="secondary"
               style={{
                 padding: "4px 10px",
                 fontSize: 14,
@@ -1424,7 +1410,7 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, on
               title="Publishes the message body as a Comment visible in the customer portal."
             >
               {busy ? "…" : "Comment"}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -1469,15 +1455,6 @@ export function ChevronRight() {
   return (
     <svg width="6" height="11" viewBox="0 0 6 11" fill="none" aria-hidden style={{ color: "var(--text-muted)", flexShrink: 0 }}>
       <path d="M1 1l3.5 4.5L1 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function CopyIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden xmlns="http://www.w3.org/2000/svg">
-      <rect x="3.5" y="3.5" width="8" height="9.5" rx="1.5" stroke="currentColor" strokeWidth="1.1" />
-      <path d="M2.5 10V2.5C2.5 1.67157 3.17157 1 4 1H9.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
     </svg>
   );
 }
@@ -1697,11 +1674,10 @@ export function CreateTaskCard({
 
       {isPending && (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <button
-            type="button"
+          <Button
             onClick={handleDismissOrExitEdit}
             disabled={busy || saving}
-            className="btn-tertiary"
+            variant="tertiary"
             style={{
               padding: "4px 8px",
               fontSize: 14,
@@ -1709,7 +1685,7 @@ export function CreateTaskCard({
             }}
           >
             {cardMode === "edit" ? "Exit edit" : "Dismiss"}
-          </button>
+          </Button>
           <div style={{ display: "flex", gap: 8 }}>
             {/* Row-level action hierarchy: Create task (secondary) > Edit task
                 (ghost) > Dismiss (tertiary text). Deliberately NO primary here —
@@ -1717,38 +1693,35 @@ export function CreateTaskCard({
                 filled button would carry no hierarchy and would drown out the
                 page-level primary. Carbon/Atlassian: one primary per page. */}
             {cardMode === "compact" ? (
-              <button
-                type="button"
+              <Button
                 onClick={() => setCardMode("edit")}
                 disabled={busy}
-                className="btn-tertiary text-sm rounded-lg"
+                variant="tertiary"
                 style={{ padding: "4px 10px", fontSize: 14 }}
               >
                 Edit task
-              </button>
+              </Button>
             ) : (
-              <button
-                type="button"
+              <Button
                 onClick={handleSaveDraft}
                 disabled={busy || saving || !dirty}
-                className="btn-tertiary text-sm rounded-lg"
+                variant="tertiary"
                 style={{ padding: "4px 10px", fontSize: 14, opacity: !dirty || saving ? 0.5 : 1 }}
               >
                 {saving ? "…" : "Save draft"}
-              </button>
+              </Button>
             )}
-            <button
-              type="button"
+            <Button
               onClick={handleCreate}
               disabled={busy || saving || selected}
               aria-disabled={busy || saving || selected}
               aria-label={selected ? "Unselect to approve individually" : undefined}
               title={selected ? "Unselect to approve individually" : undefined}
-              className="btn-secondary text-sm rounded-lg"
+              variant="secondary"
               style={{ padding: "4px 10px", fontSize: 14, opacity: busy || selected ? 0.5 : 1 }}
             >
               {busy ? "…" : "Create task"}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -2113,6 +2086,7 @@ function SelectPill({ icon, label, valueLabel, options, selected, onSelect, disa
 
   return (
     <div ref={ref} className="relative" style={{ width: "100%" }}>
+      {/* eslint-disable-next-line no-restricted-syntax -- dropdown trigger, becomes Select in slice 3 */}
       <button
         type="button"
         onClick={() => !disabled && setOpen((o) => !o)}
@@ -2174,6 +2148,7 @@ function DueDatePill({ value, onChange, disabled }) {
 
   return (
     <div ref={ref} className="relative" style={{ flex: 1, minWidth: 140 }}>
+      {/* eslint-disable-next-line no-restricted-syntax -- dropdown trigger, becomes Select in slice 3 */}
       <button
         type="button"
         onClick={() => !disabled && setOpen((o) => !o)}
@@ -2234,6 +2209,7 @@ function PriorityPill({ value, onChange, disabled }) {
 
   return (
     <div ref={ref} className="relative" style={{ flex: 1, minWidth: 140 }}>
+      {/* eslint-disable-next-line no-restricted-syntax -- dropdown trigger, becomes Select in slice 3 */}
       <button
         type="button"
         onClick={() => !disabled && setOpen((o) => !o)}
@@ -2445,6 +2421,7 @@ function SelectCheckbox({ selected, onToggle, disabled }) {
   const [hovered, setHovered] = useState(false);
   const strokeColor = hovered && !disabled ? "var(--action)" : "var(--icon-tertiary)";
   return (
+    // eslint-disable-next-line no-restricted-syntax -- circle + ghost check, not the square DS Checkbox; a retrofit would change the shape
     <button
       type="button"
       role="checkbox"

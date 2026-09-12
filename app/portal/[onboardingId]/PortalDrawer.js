@@ -3,20 +3,11 @@
 import { useState, useEffect, useRef, forwardRef } from "react";
 import Button from "@/app/ui/Button";
 import IconButton from "@/app/ui/IconButton";
-import { CalendarIcon, StatusIcon, OwnerIcon, PriorityIcon } from "@/app/ui/Icons";
+import { CalendarIcon, PanelCloseIcon, StatusIcon, OwnerIcon, PriorityIcon, TrashIcon } from "@/app/ui/Icons";
 import FieldRow from "@/app/ui/FieldRow";
 import TaskIdChip from "@/app/ui/TaskIdChip";
 import { STATUS_COLORS, TASK_STATUSES } from "@/lib/constants";
 import { MenuList, MenuOption } from "@/app/components/Menu";
-
-function CloseIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-      <path d="M1.32129 10.1182L6.2296 5.40892L1.32129 0.600098" stroke="currentColor" strokeWidth="1.06126" strokeLinecap="round" />
-      <path d="M9.67871 0.583496L9.67871 10.4167" stroke="currentColor" strokeWidth="1.06126" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 function formatTimestamp(iso) {
   const date = new Date(iso);
@@ -44,15 +35,6 @@ function DownloadIcon() {
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
       <path d="M7 2v7M4 6l3 3 3-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M2.5 11.5h9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <path d="M2.5 3.75h9M5.25 3.75V2.75a1 1 0 011-1h1.5a1 1 0 011 1v1M4 3.75v7.5a1 1 0 001 1h4a1 1 0 001-1v-7.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M6 6v4M8 6v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -302,6 +284,7 @@ const PortalDrawer = forwardRef(function PortalDrawer({
       >
         {/* Row: Mark as done + Close */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          {/* eslint-disable-next-line no-restricted-syntax -- state toggle that sheds the secondary skin once done */}
           <button
             type="button"
             onClick={handleMarkDone}
@@ -326,15 +309,9 @@ const PortalDrawer = forwardRef(function PortalDrawer({
             <span>{isDone ? "Done" : "Mark as done"}</span>
           </button>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex items-center justify-center w-5 h-5 rounded icon-btn"
-            aria-label="Close"
-            style={{ background: "none", border: "none", cursor: "pointer" }}
-          >
-            <CloseIcon />
-          </button>
+          <IconButton onClick={onClose} aria-label="Close">
+            <PanelCloseIcon />
+          </IconButton>
         </div>
 
         {/* Title (read-only) */}
@@ -475,21 +452,18 @@ const PortalDrawer = forwardRef(function PortalDrawer({
                   <span className="text-xs" style={{ color: "var(--text-muted)" }}>
                     {(f.fileSize / 1024).toFixed(0)} KB
                   </span>
-                  <a
+                  <IconButton
                     href={`/api/portal/tasks/${localTask.id}/files/${f.id}`}
-                    className="icon-btn flex items-center justify-center w-5 h-5 rounded"
                     aria-label={`Download ${f.fileName}`}
-                    style={{ color: "var(--text-muted)", textDecoration: "none" }}
                   >
                     <DownloadIcon />
-                  </a>
+                  </IconButton>
                   <IconButton
                     onClick={() => handleDeleteFile(f)}
                     aria-label={`Delete ${f.fileName}`}
+                    tone="danger"
                   >
-                    <span style={{ color: "var(--text-muted)", display: "flex" }}>
-                      <TrashIcon />
-                    </span>
+                    <TrashIcon />
                   </IconButton>
                 </div>
               ))}
@@ -503,10 +477,10 @@ const PortalDrawer = forwardRef(function PortalDrawer({
             onChange={handleFileUpload}
             style={{ display: "none" }}
           />
-          <button
+          <Button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="text-btn-action flex items-center gap-1.5 text-sm font-medium rounded"
+            variant="tertiary" className="flex items-center gap-1.5 font-medium"
             style={{
               background: "none",
               border: "none",
@@ -520,7 +494,7 @@ const PortalDrawer = forwardRef(function PortalDrawer({
               <path d="M2.5 11.5h9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
             {uploading ? "Uploading…" : "Upload file"}
-          </button>
+          </Button>
           {uploadError && (
             <p className="text-xs" style={{ color: "var(--danger)" }}>{uploadError}</p>
           )}

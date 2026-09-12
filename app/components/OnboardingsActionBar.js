@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
 import { MenuTriggerButton, MenuList, MenuOption } from "./Menu";
 import Button from "../ui/Button";
+import { PlusIcon } from "../ui/Icons";
 import CreateOnboardingModal from "./CreateOnboardingModal";
 
 const FILTERS = ["Active", "Completed", "Paused", "Archived", "All"];
@@ -86,7 +87,7 @@ export default function OnboardingsActionBar() {
           )}
         </div>
         <Button variant="primary" size="sm" onClick={() => setModalOpen(true)}>
-          + Add workspace
+          <PlusIcon />Add workspace
         </Button>
       </div>
       <CreateOnboardingModal
