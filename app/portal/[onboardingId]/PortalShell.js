@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import TabBar from "../../ui/TabBar";
 import CompanyAvatar from "../../ui/CompanyAvatar";
 import PortalNotificationBell from "./PortalNotificationBell";
+import PortalDrawer from "./PortalDrawer";
 import PortalOverview from "./PortalOverview";
 import PortalTasks from "./PortalTasks";
 
@@ -44,7 +46,7 @@ const PORTAL_TABS = [
 
 export default function PortalShell({
   data,
-  tasks,
+  tasks: initialTasks,
   contactName,
   contactId,
   insightSnapshot,
@@ -52,6 +54,41 @@ export default function PortalShell({
   cachedInsight,
 }) {
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Tasks and the task drawer live here, not in the tabs, so both Overview and
+  // All Tasks open the SAME drawer instance and share one updated-task path.
+  const [tasks, setTasks] = useState(initialTasks);
+  const [drawerTask, setDrawerTask] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const drawerRef = useRef(null);
+  const router = useRouter();
+
+  const handleSessionExpired = useCallback(() => {
+    router.push("/portal/auth?error=expired");
+  }, [router]);
+
+  // Close drawer on outside click
+  useEffect(() => {
+    if (!drawerOpen) return;
+    function handleClick(e) {
+      if (drawerRef.current && drawerRef.current.contains(e.target)) return;
+      if (e.target.closest("[data-task-card]")) return;
+      setDrawerOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [drawerOpen]);
+
+  const handleOpenDrawer = useCallback((task) => {
+    setDrawerTask(task);
+    setDrawerOpen(true);
+  }, []);
+
+  const handleTaskUpdated = useCallback((taskId, updatedTask) => {
+    setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, ...updatedTask } : t)));
+    // Keep the open drawer in step with the card it was opened from
+    setDrawerTask((prev) => (prev && prev.id === taskId ? { ...prev, ...updatedTask } : prev));
+  }, []);
 
   return (
     <div className="w-full flex flex-col h-full">
@@ -90,13 +127,24 @@ export default function PortalShell({
               data={data}
               tasks={tasks}
               contactId={contactId}
+              onTaskUpdated={handleTaskUpdated}
+              onCardClick={handleOpenDrawer}
+              onSessionExpired={handleSessionExpired}
               snapshot={insightSnapshot}
               contextHash={insightContextHash}
               cachedInsight={cachedInsight}
             />
           </div>
         )}
-        {activeTab === "all-tasks" && <PortalTasks tasks={tasks} myOnly={false} contactName={contactName} />}
+        {activeTab === "all-tasks" && (
+          <PortalTasks
+            tasks={tasks}
+            myOnly={false}
+            onTaskUpdated={handleTaskUpdated}
+            onCardClick={handleOpenDrawer}
+            onSessionExpired={handleSessionExpired}
+          />
+        )}
       </div>
 
       {/* Bottom nav — mobile only */}
@@ -127,6 +175,17 @@ export default function PortalShell({
           </button>
         ))}
       </nav>
+
+      {/* Single task drawer, shared by both tabs */}
+      <PortalDrawer
+        ref={drawerRef}
+        task={drawerTask}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onTaskUpdated={handleTaskUpdated}
+        contactName={contactName}
+        onSessionExpired={handleSessionExpired}
+      />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import InlineProse from "@/app/ui/InlineProse";
 import {
   InsightCard,
@@ -132,17 +131,10 @@ function SummaryHeaderCard({ data }) {
  * filter dropdown the vendor side uses; always scoped to the current
  * portal contact (`isAssignedToMe`).
  */
-function YourTasksSection({ tasks, onSessionExpired }) {
+function YourTasksSection({ tasks, onTaskUpdated, onCardClick, onSessionExpired }) {
   const [filter, setFilter] = useState("active");
-  const [localTasks, setLocalTasks] = useState(tasks);
 
-  // Keep local state in sync if the parent re-fetches tasks (currently never,
-  // but cheap insurance and lets task toggles stick on this surface).
-  useEffect(() => {
-    setLocalTasks(tasks);
-  }, [tasks]);
-
-  const myTasks = localTasks.filter((t) => t.isAssignedToMe);
+  const myTasks = tasks.filter((t) => t.isAssignedToMe);
   const filtered = myTasks
     .filter((t) => taskMatchesFilter(t, filter))
     .sort((a, b) => {
@@ -150,12 +142,6 @@ function YourTasksSection({ tasks, onSessionExpired }) {
       const bDue = b.due ? new Date(b.due).getTime() : Infinity;
       return aDue - bDue;
     });
-
-  function handleTaskUpdated(taskId, updatedTask) {
-    setLocalTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, ...updatedTask } : t))
-    );
-  }
 
   return (
     <div
@@ -205,7 +191,8 @@ function YourTasksSection({ tasks, onSessionExpired }) {
             <PortalTaskCard
               key={task.id}
               task={task}
-              onTaskUpdated={handleTaskUpdated}
+              onTaskUpdated={onTaskUpdated}
+              onCardClick={onCardClick}
               onSessionExpired={onSessionExpired}
             />
           ))}
@@ -215,12 +202,16 @@ function YourTasksSection({ tasks, onSessionExpired }) {
   );
 }
 
-export default function PortalOverview({ data, tasks = [], snapshot, contextHash, cachedInsight }) {
-  const router = useRouter();
-  const handleSessionExpired = useCallback(() => {
-    router.push("/portal/auth?error=expired");
-  }, [router]);
-
+export default function PortalOverview({
+  data,
+  tasks = [],
+  snapshot,
+  contextHash,
+  cachedInsight,
+  onTaskUpdated,
+  onCardClick,
+  onSessionExpired,
+}) {
   const [payload, setPayload] = useState(() =>
     isPortalShape(cachedInsight?.payload) ? cachedInsight.payload : null
   );
@@ -328,7 +319,12 @@ export default function PortalOverview({ data, tasks = [], snapshot, contextHash
 
       {/* "Your tasks" sits above the AI overview on purpose: a customer opening
           the portal wants their own to-dos first, narrative second. */}
-      <YourTasksSection tasks={tasks} onSessionExpired={handleSessionExpired} />
+      <YourTasksSection
+        tasks={tasks}
+        onTaskUpdated={onTaskUpdated}
+        onCardClick={onCardClick}
+        onSessionExpired={onSessionExpired}
+      />
 
       <InsightCard isStreaming={isStreaming}>
         <InsightCardHeader

@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import PortalTaskCard from "./PortalTaskCard";
-import PortalDrawer from "./PortalDrawer";
 import TaskFilterMenu from "@/app/components/TaskFilterMenu";
 import { taskMatchesFilter, TASK_FILTER_OPTIONS } from "@/lib/taskFilters";
 
@@ -60,46 +58,8 @@ function EmptyState({ filter, myOnly }) {
   );
 }
 
-export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }) {
-  const [tasks, setTasks] = useState(initialTasks);
+export default function PortalTasks({ tasks, myOnly, onTaskUpdated, onCardClick, onSessionExpired }) {
   const [filter, setFilter] = useState("active");
-  const [drawerTask, setDrawerTask] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const drawerRef = useRef(null);
-  const router = useRouter();
-
-  function handleSessionExpired() {
-    router.push("/portal/auth?error=expired");
-  }
-
-  // Close drawer on outside click
-  useEffect(() => {
-    if (!drawerOpen) return;
-    function handleClick(e) {
-      if (drawerRef.current && drawerRef.current.contains(e.target)) return;
-      if (e.target.closest("[data-task-card]")) return;
-      setDrawerOpen(false);
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [drawerOpen]);
-
-  function handleOpenDrawer(task) {
-    setDrawerTask(task);
-    setDrawerOpen(true);
-  }
-
-  function handleTaskUpdated(taskId, updatedTask) {
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === taskId ? { ...t, ...updatedTask } : t
-      )
-    );
-    // Update drawer task if it's the same
-    if (drawerTask && drawerTask.id === taskId) {
-      setDrawerTask((prev) => ({ ...prev, ...updatedTask }));
-    }
-  }
 
   const filtered = tasks.filter((t) => {
     if (myOnly && !t.isAssignedToMe) return false;
@@ -189,9 +149,9 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
                     <PortalTaskCard
                       key={task.id}
                       task={task}
-                      onTaskUpdated={handleTaskUpdated}
-                      onCardClick={handleOpenDrawer}
-                      onSessionExpired={handleSessionExpired}
+                      onTaskUpdated={onTaskUpdated}
+                      onCardClick={onCardClick}
+                      onSessionExpired={onSessionExpired}
                     />
                   ))}
                 </div>
@@ -246,9 +206,9 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
                       <PortalTaskCard
                         key={task.id}
                         task={task}
-                        onTaskUpdated={handleTaskUpdated}
-                        onCardClick={handleOpenDrawer}
-                        onSessionExpired={handleSessionExpired}
+                        onTaskUpdated={onTaskUpdated}
+                        onCardClick={onCardClick}
+                        onSessionExpired={onSessionExpired}
                       />
                     ))}
                   </div>
@@ -258,17 +218,6 @@ export default function PortalTasks({ tasks: initialTasks, myOnly, contactName }
           </div>
         </>
       )}
-
-      {/* Task drawer */}
-      <PortalDrawer
-        ref={drawerRef}
-        task={drawerTask}
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        onTaskUpdated={handleTaskUpdated}
-        contactName={contactName}
-        onSessionExpired={handleSessionExpired}
-      />
     </div>
   );
 }
