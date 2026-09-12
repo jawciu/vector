@@ -212,6 +212,28 @@ _Newest first. Why, not just what._
 
 _Newest first._
 
+### 2026-09-11 (night) — HANDOFF. Slice 0 MERGED (PR #3). Slice 1 built + evaluator-approved, UNCOMMITTED in a worktree.
+
+**Where things are**
+- `main` = `d916f0b` (PR #3 merge). The DS layer is in production, unused by screens; only visible change was the Phase 2 margin fix (14 spots listed on the PR). Caroline merged it herself.
+- **Slice 1 (Button retrofit) lives in worktree `~/Code/onboarding-button`, branch `retrofit/button`, UNCOMMITTED, evaluator-signed-off after two rounds.** Numbers: raw buttons 86→46, primitive 55→95, coverage 39→67.4%, lint warnings 187→101, tsc/eslint/vitest 67/build/e2e 5/5 all green, ratchet baseline refreshed in the worktree. Screenshots + `after-styles.json` in the session scratchpad (gone next session; re-capture if needed).
+  **Next step is hers: "commit" → commit on `retrofit/button`, push, `gh pr create --base main` with the lilac→grey list in the body:** members panel (ContactsPanel: Copy + Send go tertiary grey, Revoke stays red, all three +2px border), customer portal drawer (PortalDrawer: Upload goes grey); ActionsTab + MeetingsTab Clear gain only a hover step. Then she reviews the Vercel preview and merges.
+- This checkout (`~/Code/onboarding`, branch `design-system`) is 0 ahead of main; ONLY this CLAUDE.md is modified (journal). Storybook was started from the agent's shell on :6006 and will die with the session; restart with `npm run storybook`.
+- Skip `storybook-static/` when linting locally (`--ignore-pattern 'storybook-static/**'`); it is gitignored build output full of lint errors CI never sees.
+
+**Decisions she still owes (none block the slice 1 PR)**
+1. Members table "Send": now tertiary grey it reads as a label, not a link (the column's only coloured affordance). Accept, or give tertiary an `action` tone for inline links.
+2. "Mark all read" (NotificationBell.js:264) and "+ Add section" (StuckEventsList.js:156 / FollowUpModal.js:372 area): convert to tertiary xs now (recommended) or leave for the sweep.
+3. Tab-style buttons (4 segmented controls): add a small TabBar slice after Badge (recommended); no slice owns them today.
+4. IconButton sizes: 4 app icon buttons are 24/24/28/16px vs the fixed 20px primitive (TaskDrawer toolbar, OnboardingActions close, FollowUpModal close, AIDraftInbox row). Add a size scale, or normalise the modal closes to 20 (recommended) and give the toolbar its own size. Also: IconButton stories draw a 12px placeholder glyph; the app's registry icons are 14px, so Storybook looks airier than prod. Fix the stories to use real Icons.tsx glyphs.
+5. The four Select questions (docs/DS-PLAN.md slice 3): filter pills as a third trigger · rename active→open/selected first · Field wrapping a Select · AI-inbox disabled pills as disabled Select vs Badge.
+6. Filled Badge: she confirmed 14px/400 (the header pill was never bold; the insight pill was the 500 one).
+
+**Agent rule added 2026-09-12 (incident):** an evaluator agent walking the app on a local dev server (which points at the REAL Supabase demo DB via `.env`) accidentally marked RAY-7..RAY-10 done while scripting, then reverted them. Board verified back to seed; nothing lost. Caroline's ruling (2026-09-12): agents MAY click around the demo data (ticks, statuses, pickers); `scripts/demo-snapshot.js` drift-checks and restores the board. Still off limits unless the task is about that flow: delete/revoke, uploads, sending anything. Run the snapshot restore after a session that changed state.
+**How this session worked (keep doing it):** builder agent (fork, full context) + independent evaluator agent (fresh Opus) per task; evaluator screenshots from Storybook via standalone Playwright from the repo root, measures instead of eyeballing, reports must-fix vs her-call; builder gets sent back with the numbered list. Never restart her Storybook mid-review; never edit .storybook/main.ts without telling her (needs a restart). Builders never commit. Retrofit slices run in a separate worktree so her checkout is untouched.
+
+**Her last message was garbled (voice capture); "onboarding follow up" may mean the FollowUpModal or a follow-up on onboarding. Ask.**
+
 ### 2026-08-08 — Agent-first DS: plan adopted + Phase 0 (baseline audit) done. UNCOMMITTED.
 
 **⚠ ALL DS WORK LIVES ON BRANCH `design-system` (created 2026-08-09, off main).** Caroline's call:
@@ -351,6 +373,11 @@ tests, build green, ratchet green vs `ratchet-baseline.json`. This is CI's FIRST
 4 jobs on GitHub. GOTCHA: a bare local `npm run lint` shows ~319 errors, ALL inside the gitignored
 `storybook-static/` build output; CI never sees it. Delete that folder or ignore it in eslint config.
 Storybook re-review still pending; Phase 6 still blocked on it.
+**2026-09-11 evening — SLICE 0 MERGED TO MAIN by Caroline (PR #3, merge `d916f0b`), production deploys via
+Vercel. The DS layer is live but unused by any screen; the only user-visible change is the Phase 2 margin
+fix (14 spots, listed on the PR). Slice 1 (Button retrofit) is being built in a separate worktree
+`~/Code/onboarding-button` on branch `retrofit/button`, uncommitted; its PR targets main. Everything
+else on `design-system` is now in main, so future DS work branches from main per slice.**
 **2026-09-11 — three Storybook fixes during her re-review (UNCOMMITTED):** (1) the docs pages of every
 component with pseudo-state stories re-rendered in a loop ("flashing") — the round-1 pseudo-globals
 reset decorator in `preview.tsx` emitted unconditionally, and on a docs page all stories render

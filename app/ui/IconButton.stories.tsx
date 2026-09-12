@@ -201,3 +201,29 @@ export const AllVariants: Story = {
     </div>
   ),
 };
+
+/**
+ * LINK mode — `href` renders an `<a>` with the identical skin, label and
+ * tone, and passes `download` / `target` / `rel` through. Caroline's ruling
+ * (2026-09-12): an icon-only link comes from the primitive too, never from a
+ * hand-copied `.icon-btn` class string. This is the file-row download in
+ * TaskDrawer and PortalDrawer. Use it for navigation and downloads only; an
+ * in-page action stays a button.
+ */
+export const AsLink: Story = {
+  name: "As link (test)",
+  render: () => (
+    <IconButton href="/api/tasks/1/files/2" download aria-label="Download brief.pdf">
+      <MeatballIcon />
+    </IconButton>
+  ),
+  play: async ({ canvasElement }) => {
+    const link = within(canvasElement).getByRole("link", { name: "Download brief.pdf" });
+    await expect(link.tagName).toBe("A");
+    await expect(link).toHaveAttribute("href", "/api/tasks/1/files/2");
+    await expect(link).toHaveAttribute("download");
+    await expect(link).toHaveClass("icon-btn", "w-5", "h-5", "rounded");
+    // No <button> is rendered in link mode.
+    await expect(canvasElement.querySelectorAll("button")).toHaveLength(0);
+  },
+};

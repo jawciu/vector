@@ -1204,14 +1204,12 @@ const TaskDrawer = forwardRef(function TaskDrawer({
                   <span className="text-xs" style={{ color: "var(--text-muted)" }}>
                     {(f.fileSize / 1024).toFixed(0)} KB
                   </span>
-                  <a
+                  <IconButton
                     href={`/api/tasks/${localTask.id}/files/${f.id}`}
-                    className="icon-btn flex items-center justify-center w-5 h-5 rounded"
                     aria-label={`Download ${f.fileName}`}
-                    style={{ color: "var(--text-muted)", textDecoration: "none" }}
                   >
                     <DownloadIcon />
-                  </a>
+                  </IconButton>
                 </div>
               ))}
             </div>

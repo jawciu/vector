@@ -5,12 +5,12 @@
     "rawHexTotal": 15,
     "rawHexDistinct": 3,
     "rawRgba": 26,
-    "inlineStyles": 1058,
+    "inlineStyles": 1056,
     "arbitraryTw": 34,
     "hardcodedGeometry": 975,
     "rawButtons": 32,
-    "primitiveButtons": 103,
-    "buttonCoveragePct": 76.3,
+    "primitiveButtons": 105,
+    "buttonCoveragePct": 76.6,
     "rawInputs": 39,
     "primitiveInputs": 0,
     "inputCoveragePct": 0,
@@ -63,7 +63,7 @@
       },
       {
         "file": "app/components/TaskDrawer.js",
-        "count": 86
+        "count": 85
       },
       {
         "file": "app/components/PipelineTimeline.js",
@@ -74,11 +74,11 @@
         "count": 54
       },
       {
-        "file": "app/portal/[onboardingId]/PortalDrawer.js",
-        "count": 47
+        "file": "app/admin/ai/page.js",
+        "count": 46
       },
       {
-        "file": "app/admin/ai/page.js",
+        "file": "app/portal/[onboardingId]/PortalDrawer.js",
         "count": 46
       },
       {

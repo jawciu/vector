@@ -550,3 +550,35 @@ look pressable. Both are the primitive's fault, so the fix is in the DS.
   build green · storybook build green · ratchet green, baseline refreshed ·
   live drawer walk 0 console errors, 0 nested buttons, 0 `button input`.
 
+### Round 7 · 2026-09-12 — IconButton gains link mode
+
+Caroline's ruling: an icon-only LINK must come from the primitive too. The
+two file-row downloads (TaskDrawer, PortalDrawer) were the last holdouts,
+each an `<a>` with a hand-copied `.icon-btn` class string.
+
+- **`href` picks the element.** `IconButton` renders `<a href>` when `href`
+  is set and `<button type="button">` otherwise, with identical classes,
+  `aria-label` and `tone`; `download` / `target` / `rel` pass through. The
+  props are a discriminated union (`href?: never` on the button side), so
+  button-only attributes cannot leak onto the anchor and anchor-only
+  attributes cannot leak onto the button.
+- **Both downloads converted**, losing their class strings and their inline
+  `color` / `textDecoration`. That inline colour had been silently killing the
+  hover: measured live, the link now steps textMuted to `text` with the
+  `bgHover` fill like every other icon control, and the file still downloads.
+- **New lint `vector/no-raw-icon-button`** (eslint-rules/index.mjs, warn in
+  feature code, app/ui exempt): any HOST element whose literal or template
+  `className` carries `icon-btn`. The raw-`<button>` selector never saw
+  links, which is how these two drifted. Only direct string classNames are
+  inspected, so IconButton's own `cn(...)` is untouched. Smoke-tested against
+  a throwaway `<a className="icon-btn …">`: reported. Zero hits left in app.
+- **Story "As link (test)"** asserting `<a href>` with the icon-btn classes,
+  `download` forwarded, and no `<button>` rendered. Meta, JSDoc and the
+  DESIGN.md IconButton section updated. Sidebar collapse toggle and the two
+  16px bell glyphs left alone, her call.
+- **Numbers:** button coverage 103/135 (76.3%) → **105/137 (76.6%)**, raw
+  buttons still 32, icons 43/125 (34.4%), inline `<svg>` 82.
+- **Gates:** tsc clean · eslint 0 errors / 101 warnings · 67/67 vitest ·
+  build green · storybook build green · ratchet green, baseline refreshed ·
+  live on :3010 the download fires and the row shows 0 console errors.
+

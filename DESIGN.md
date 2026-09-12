@@ -216,7 +216,9 @@ All button variants share a `:focus-visible` outline (`2px solid focusRing`, `2p
 
 ### `IconButton` — `app/ui/IconButton.js`
 
-Small square icon-only buttons (meatball menus, plus icons, close buttons). Fixed at `w-5 h-5` (20×20px). `rounded` (NOT `rounded-full`). Uses `.icon-btn` CSS class. Add `isActive` while the menu it controls is open — applies `.icon-btn--active` (`surfaceHover` background + full `text` colour). Disabled state suppresses hover and dims to `iconTertiary`.
+Small square icon-only controls (meatball menus, plus icons, close buttons, icon-only download links). Fixed at `w-5 h-5` (20×20px). `rounded` (NOT `rounded-full`). Uses `.icon-btn` CSS class. Add `isActive` while the menu it controls is open — applies `.icon-btn--active` (`surfaceHover` background + full `text` colour). Disabled state suppresses hover and dims to `iconTertiary`.
+
+**An icon-only LINK is this component too:** pass `href` and it renders an `<a>` with the identical skin, `aria-label` and `tone`, forwarding `download` / `target` / `rel`. Never hand-copy the `.icon-btn` class string onto an `<a>` (the `vector/no-raw-icon-button` rule reports it). The props are a discriminated union, so button-only attributes cannot leak onto the anchor and vice versa.
 
 Inner SVGs come from the icon registry (`app/ui/Icons.tsx`) and render at its 14px default, in `currentColor` — never a fresh inline SVG at the call site. The two 16px notification bells are the one deliberate exception.
 

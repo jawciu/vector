@@ -452,14 +452,12 @@ const PortalDrawer = forwardRef(function PortalDrawer({
                   <span className="text-xs" style={{ color: "var(--text-muted)" }}>
                     {(f.fileSize / 1024).toFixed(0)} KB
                   </span>
-                  <a
+                  <IconButton
                     href={`/api/portal/tasks/${localTask.id}/files/${f.id}`}
-                    className="icon-btn flex items-center justify-center w-5 h-5 rounded"
                     aria-label={`Download ${f.fileName}`}
-                    style={{ color: "var(--text-muted)", textDecoration: "none" }}
                   >
                     <DownloadIcon />
-                  </a>
+                  </IconButton>
                   <IconButton
                     onClick={() => handleDeleteFile(f)}
                     aria-label={`Delete ${f.fileName}`}
