@@ -247,7 +247,25 @@ const PortalDrawer = forwardRef(function PortalDrawer({
     }
   }
 
-  if (!localTask) return null;
+  const shellStyle = {
+    position: "fixed",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: 520,
+    background: "var(--bg)",
+    borderLeft: "1px solid var(--border)",
+    display: "flex",
+    flexDirection: "column",
+    zIndex: 40,
+    overflow: "hidden",
+  };
+
+  // Keep the shell mounted (closed, offscreen) when there is no task, so the
+  // first open slides in instead of appearing. Same fix as the vendor drawer.
+  if (!localTask) {
+    return <div ref={ref} className="task-drawer" style={shellStyle} aria-hidden />;
+  }
 
   const isDone = localTask.status === "Done";
   const statusColor = STATUS_COLORS[localTask.status] || "var(--text-muted)";
@@ -257,19 +275,7 @@ const PortalDrawer = forwardRef(function PortalDrawer({
     <div
       ref={ref}
       className={`task-drawer${open ? " task-drawer--open" : ""}`}
-      style={{
-        position: "fixed",
-        top: 0,
-        right: 0,
-        bottom: 0,
-        width: 520,
-        background: "var(--bg)",
-        borderLeft: "1px solid var(--border)",
-        display: "flex",
-        flexDirection: "column",
-        zIndex: 40,
-        overflow: "hidden",
-      }}
+      style={shellStyle}
     >
       {/* Sticky header: actions + title */}
       <div
