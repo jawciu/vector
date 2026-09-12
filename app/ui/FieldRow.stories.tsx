@@ -72,7 +72,15 @@ export const Hover: Story = { parameters: { pseudo: { hover: true } } };
  * `buttonSecondaryBorder` border appear — one step stronger than hover, the
  * same hover → active direction as `.menu-option` and IconButton.
  */
-export const Active: Story = { name: "Active (open)", args: { active: true } };
+export const Active: Story = {
+  name: "Active (open)",
+  args: { active: true },
+  play: async ({ canvasElement }) => {
+    const trigger = within(canvasElement).getByRole("button", { expanded: true });
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(trigger).toHaveAttribute("aria-haspopup", "menu");
+  },
+};
 
 /**
  * The focus ring on field editors: the main control is a native button, so
@@ -136,11 +144,45 @@ export const WithClear: Story = {
 export const AllVariants: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "flex-start" }}>
-      <FieldRow icon={<CalendarIcon style={{ flexShrink: 0 }} />} label="Target" />
-      <FieldRow icon={<CalendarIcon style={{ flexShrink: 0 }} />}>{canonicalFilled}</FieldRow>
-      <FieldRow icon={<CalendarIcon style={{ flexShrink: 0 }} />} active>
+      <FieldRow icon={<CalendarIcon style={{ flexShrink: 0 }} />} label="Target" onClick={() => {}} />
+      <FieldRow icon={<CalendarIcon style={{ flexShrink: 0 }} />} onClick={() => {}}>{canonicalFilled}</FieldRow>
+      <FieldRow icon={<CalendarIcon style={{ flexShrink: 0 }} />} active onClick={() => {}}>
         {canonicalFilled}
       </FieldRow>
     </div>
   ),
+};
+
+/**
+ * CONTAINER mode — no `onClick`, so the main area is a plain <div>: a
+ * read-only label+value row (PortalDrawer's customer-facing Target /
+ * Priority / Owner) or a row holding a control. It has no tab stop of its
+ * own, no pointer cursor and no pressable hover, so it stops promising a
+ * press that never happens; an <input> placed here is legal, where inside a
+ * <button> the parser would un-nest it.
+ */
+export const AsContainer: Story = {
+  name: "As container (test)",
+  args: { onClick: undefined, children: undefined },
+  render: () => (
+    <FieldRow icon={canonicalIcon}>
+      <span className="text-sm" style={{ color: "var(--text-muted)" }}>Domain</span>
+      <input
+        type="text"
+        aria-label="Domain"
+        placeholder="raycast.com"
+        className="text-sm outline-none"
+        style={{ background: "transparent", border: "none", color: "var(--text)", padding: 0 }}
+      />
+    </FieldRow>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByLabelText("Domain");
+    const main = canvasElement.querySelector(".field-main")!;
+    await expect(main.tagName).toBe("DIV");
+    await expect(canvasElement.querySelectorAll("button input")).toHaveLength(0);
+    await userEvent.click(input);
+    await expect(input).toHaveFocus();
+  },
 };

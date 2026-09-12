@@ -1,6 +1,8 @@
 "use client";
 
 import { cn } from "./cn";
+import IconButton from "./IconButton";
+import { CloseIcon, SearchIcon } from "./Icons";
 
 /**
  * SearchField — DS primitive, the search box.
@@ -15,10 +17,13 @@ import { cn } from "./cn";
  * Controlled only: `value` + `onChange(nextValue)` (both call sites already
  * used the string-callback shape).
  *
+ * Both glyphs come from the icon registry (`SearchIcon`, `CloseIcon`).
+ *
  * NEW — pending Caroline's review (nothing in the app renders these yet):
- * 1. `onClear`: when provided and the field is non-empty, a clear X button
- *    appears. The shipped ActionsTab search used a TEXT "Clear" button
- *    (`.text-btn`); the X-icon affordance is the new design decision.
+ * 1. `onClear`: when provided and the field is non-empty, a clear X
+ *    `IconButton` (20x20, the DS icon-button size) appears. The shipped
+ *    ActionsTab search used a TEXT "Clear" button (`.text-btn`); the X-icon
+ *    affordance is the new design decision.
  * 2. `disabled`: the shipped searches can't be disabled; here the wrapper
  *    washes to 50% opacity (matching `.input:disabled`).
  *
@@ -64,19 +69,7 @@ export default function SearchField({
         ...(disabled ? { opacity: 0.5 } : null),
       }}
     >
-      {/* TODO(icons sweep): swap for Icons.SearchIcon once it exists —
-          exact svg harvested from ActionsTab.js SearchInput */}
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 14 14"
-        fill="none"
-        aria-hidden="true"
-        style={{ color: "var(--text-muted)", flexShrink: 0 }}
-      >
-        <circle cx="6" cy="6" r="4.25" stroke="currentColor" strokeWidth="1.2" />
-        <path d="M9.5 9.5L12 12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      </svg>
+      <SearchIcon style={{ color: "var(--text-muted)", flexShrink: 0 }} />
       <input
         type="text"
         id={id}
@@ -96,26 +89,14 @@ export default function SearchField({
         }}
       />
       {onClear && value !== "" && (
-        <button
-          type="button"
-          onClick={onClear}
+        <IconButton
           aria-label="Clear search"
+          onClick={onClear}
           disabled={disabled}
-          style={{
-            background: "none",
-            border: "none",
-            padding: 4,
-            margin: -4,
-            display: "flex",
-            cursor: disabled ? "default" : "pointer",
-            color: "var(--text-muted)",
-          }}
+          className="shrink-0"
         >
-          {/* TODO(icons sweep): swap for Icons.CloseIcon once it exists */}
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-            <path d="M1 1L9 9M9 1L1 9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-          </svg>
-        </button>
+          <CloseIcon />
+        </IconButton>
       )}
     </div>
   );

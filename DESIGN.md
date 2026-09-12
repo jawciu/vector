@@ -203,10 +203,10 @@ Depth is communicated by **background colour layering**, not shadows. The only s
 Variants: `primary` | `secondary` | `tertiary` | `destructive`. Sizes: `xs` | `sm` (default). Solid variants share `rounded-lg` (8px) and `gap-2` (8px) between leading icon and label.
 - **Primary**: `font-semibold`, uses `.btn-primary` CSS class. Default `action`, hover `actionHover`, active `actionActive`, disabled `actionDisabled`. Text always `actionText`.
 - **Secondary**: `font-normal`, uses `.btn-secondary` CSS class. `surface` background, `border` border, `text` colour. Hover `surfaceHover`, active `bgHover`. Disabled keeps the border but text becomes `textMuted`.
-- **Tertiary**: `font-normal`, uses `.btn-tertiary` CSS class. No fill and no visible border — the label alone. Rests at `textMuted` (the same tone as an inactive tab label) and brightens to `text` on hover. **It never takes a background, on hover or otherwise.** Carries a transparent 1px border so its box matches an adjacent secondary and a button row doesn't shift. Disabled stays `textMuted`. `tone="danger"` (`.btn-tertiary--danger`) turns the label `danger`, `dangerHover` on hover, for inline low-emphasis destructive actions such as Revoke. `tone` exists only on tertiary; the type forbids it on the other variants. The old lilac `.text-btn` is not a variant; its six raw call sites are retrofitted onto tertiary in Phase 7.
+- **Tertiary**: `font-normal`, uses `.btn-tertiary` CSS class. No fill and no visible border — the label alone. Rests at `textMuted` (the same tone as an inactive tab label) and brightens to `text` on hover. **It never takes a background, on hover or otherwise.** Carries a transparent 1px border so its box matches an adjacent secondary and a button row doesn't shift. Disabled stays `textMuted`. `tone="danger"` (`.btn-tertiary--danger`) turns the label `danger`, `dangerHover` on hover, for inline low-emphasis destructive actions such as Revoke. `tone` exists only on tertiary; the type forbids it on the other variants.
 - **Destructive**: `font-semibold`, uses `.btn-destructive` CSS class. Default `danger`, hover `dangerHover`, active `dangerActive`, disabled `dangerDisabled`. Text always `textDark`. Use only for irreversible actions as the solid, confirming button (delete, the confirm step of a revoke). An inline revoke in a table row is tertiary `tone="danger"`, not destructive.
 
-**Emphasis is a three-tier ladder: primary > secondary > tertiary.** There is no "ghost" — tertiary *is* the ghost. Cancel/dismiss alongside another button uses `variant="tertiary"` at the same size.
+**Emphasis is a three-tier ladder: primary > secondary > tertiary.** There is no "ghost" — tertiary *is* the ghost. Inline cancel/dismiss alongside another button uses `variant="tertiary"` at the same size. **Modal footers are the exception (Caroline, 2026-09-12): Cancel is `secondary` there**, so the two footer buttons read as a pair. A per-card `Dismiss` that rejects a draft stays neutral tertiary on purpose: it is a low-stakes, reversible-by-regenerating action, not a delete.
 
 **Only one primary per page or page section.** A filled button that repeats — one per row down a list — carries no hierarchy, because if every row shouts, no row is louder. Worse, it steals the distinction from the page's real primary action. So for **repeated row-level actions in a list or table, use secondary for the accept action and tertiary for everything else**, and reserve the single primary for a page-level action (a header CTA, a bulk "Approve all"), or for the primary action inside a modal/drawer flow. The AI draft inbox (`AIDraftInbox.js`) is the reference implementation: zero primaries, `Create task` / `Comment` / `Approve` are secondary, `Dismiss` / `Edit task` / `Open in mail` are tertiary. This follows IBM Carbon ("only one primary button per page"; "for data lists… low emphasis buttons may be a better choice") and Atlassian ("primary buttons should only appear once per area").
 
@@ -216,9 +216,15 @@ All button variants share a `:focus-visible` outline (`2px solid focusRing`, `2p
 
 ### `IconButton` — `app/ui/IconButton.js`
 
-Small square icon-only buttons (meatball menus, plus icons, close buttons). Fixed at `w-5 h-5` (20×20px). `rounded` (NOT `rounded-full`). Uses `.icon-btn` CSS class. Add `isActive` while the menu it controls is open — applies `.icon-btn--active` (`surfaceHover` background + full `text` colour). Disabled state suppresses hover and dims to `iconTertiary`.
+Small square icon-only controls (meatball menus, plus icons, close buttons, icon-only download links). Fixed at `w-5 h-5` (20×20px). `rounded` (NOT `rounded-full`). Uses `.icon-btn` CSS class. Add `isActive` while the menu it controls is open — applies `.icon-btn--active` (`surfaceHover` background + full `text` colour). Disabled state suppresses hover and dims to `iconTertiary`.
 
-Inner SVGs should be 11–12px and use `currentColor`.
+**An icon-only LINK is this component too:** pass `href` and it renders an `<a>` with the identical skin, `aria-label` and `tone`, forwarding `download` / `target` / `rel`. Never hand-copy the `.icon-btn` class string onto an `<a>` (the `vector/no-raw-icon-button` rule reports it). The props are a discriminated union, so button-only attributes cannot leak onto the anchor and vice versa.
+
+Inner SVGs come from the icon registry (`app/ui/Icons.tsx`) and render at its 14px default, in `currentColor` — never a fresh inline SVG at the call site. The two 16px notification bells are the one deliberate exception.
+
+**Never pass `style={{ background: "none", border: "none" }}` to an IconButton.** Inline styles beat `.icon-btn:hover`, so the button silently loses its hover fill; `.icon-btn` already sets its own background and border. `className` is for layout only (see the component's JSDoc).
+
+**A control that opens a menu carries `aria-haspopup` and `aria-expanded`** alongside its lit state (`isActive` on IconButton, `active` on FieldPill / FieldRow, which set both for you from `active` and a `popup` prop) — the visual active state and the announced one have to agree. `aria-haspopup` is `"menu"` by default, `"dialog"` for a date picker, `"listbox"` for a value list.
 
 ### Menu primitives — `app/components/Menu.js`
 
@@ -368,6 +374,7 @@ When extending: add a new `oi-section--<name>` class in `globals.css` to place a
 - **Reach for `rounded-full` only for avatar circles.** Everything else uses `rounded` or larger.
 - **Use the avatar palette** (`mint / rose / sunset / lilac / sky / candy`) for company / contact initials only.
 - **Add an icon button's `isActive` state** when the menu it controls is open — the persistent active style tells the user "this opened the thing".
+- **Use registry icons, and reach for a `Button` variant instead of a colour override.** A destructive action is `variant="destructive"` (solid, for the confirming step) or `variant="tertiary" tone="danger"` (inline row action) — never a secondary button with `style={{ color: "var(--danger)" }}`.
 - **Give a field pill or row with a removable value `onClear`.** The Clear (X) appears inline at the end of the row on hover, focus-within and while the field is open, and the field grows to fit it; it is part of `FieldPill` and `FieldRow` (a sibling button after the native main control), never hand-rolled at the call site. Date pickers open on the current month (or the selected date's month).
 
 ### Don't

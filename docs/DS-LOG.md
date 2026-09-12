@@ -378,3 +378,207 @@ baseline refreshes with her approval of this round, as before.
 **Verified:** tsc clean · eslint app/ui + .storybook 0 errors/warnings ·
 66/66 tests · build green · build-storybook green: **176 stories / 31 docs
 pages / 25 components · storyCoverage 100% · tsCoverage 88%**.
+
+## Slice 1, Button retrofit · 2026-09-11 · branch `retrofit/button`
+
+First slice of the staged rollout (DS-PLAN Phase 7). Every raw `<button>` in
+feature code was triaged: 47 converted, 39 left with a written reason
+(plus one hand-rolled secondary inside app/ui/InsightCard.js converted).
+
+- **Converted, mechanical (27):** every `className="btn-…"` button became
+  `<Button variant size>` with the class name as the variant; extra layout
+  classes pass through `className` (cn-merged), inline styles pass through
+  untouched, so the render is identical.
+- **Converted, text buttons (6):** the lilac `.text-btn` sites became
+  `variant="tertiary"` (Revoke gets `tone="danger"`): ContactsPanel Copy /
+  Send / Revoke, PortalDrawer Upload, ActionsTab + MeetingsTab Clear. The
+  `.text-btn*` CSS and its focus-visible selector are deleted. The three
+  ContactsPanel ones keep `className="p-0"` so the table row does not grow.
+  Intended visible change, measured before/after on a live server: Copy, Send
+  and Upload go from lilac to the tertiary grey with a hover step to `text`;
+  Copy / Send / Revoke gain tertiary's transparent 1px border (20px → 22px
+  tall); the two Clear buttons gain the hover step. Every converted `.btn-*`
+  button measured identical (font, weight, padding, colours, box).
+- **Converted, icon buttons (6):** the 20px close buttons in
+  CreateOnboardingModal, CreateTaskModal, MemberModal and PortalDrawer, and
+  the two notification bells, became `<IconButton aria-label>`.
+- **Left raw, with an eslint-disable and a reason (47):** dropdown and
+  filter-pill triggers and menu rows (Select, slice 3); checkbox and task-tick
+  controls; segmented controls and tab bars; list rows, cards and chips that
+  are clickable but are not buttons in the DS sense; bare disclosure toggles;
+  the 16px copy icon in AIDraftInbox; the done toggles that shed the
+  secondary skin. The muted micro text links were
+  converted to `tertiary xs` on Caroline's call: Mark all read, + Add
+  section, Show/Hide debug, the follow-up Copy. Show/Hide debug and Copy
+  dropped their 11px overrides and render at the xs default (12px, py-0.5
+  px-2); + Add section dropped its 14px semibold look and is plain tertiary xs too. The Cancel beside
+  the Add-phase button became `tertiary xs` (DESIGN.md: cancel alongside
+  another button is tertiary at the same size).
+- **Icon buttons normalised (Caroline's call):** the twelve notes toolbar
+  icons in TaskDrawer (24px → 20px; toolbar padding 4 → 6px so the row stays
+  33px), the OnboardingActions modal close (24 → 20px) and the FollowUpModal
+  close (28 → 20px) are `<IconButton>`; the dead `.toolbar-btn` CSS is gone.
+  The 16px copy icon in AIDraftInbox stays bespoke for now. The overview
+  insight card's regenerate control is an `IconButton` with a new registry
+  `RefreshIcon` (was a secondary Button carrying a text glyph).
+- **Numbers:** raw buttons 86 → 39, primitive buttons 55 → 102, button
+  coverage 39% → 72.3%. ESLint warnings 187 → 101. Ratchet baseline refreshed.
+- **Verified:** tsc clean · eslint 0 errors · 67/67 tests · production build
+  green · ratchet green.
+
+### Round 4 · 2026-09-12 (three-evaluator sweep)
+
+- **Hydration bug fixed (regression from the FieldPill/FieldRow rebuild).**
+  TaskDrawer and the three modals each kept a local `PillClearButton` and
+  passed it as a CHILD of FieldRow/FieldPill, which since the rebuild puts it
+  inside the wrapper's native `button.field-main` — a nested button, which the
+  HTML parser un-nests, so every drawer open threw a hydration error. All 20
+  call sites now use the `onClear` prop (passed conditionally so the X only
+  exists when there is a value to clear); the four local copies and the seven
+  `*Hovered` state pairs that existed only to reveal them are gone. Walked on
+  a live server: `document.querySelectorAll("button button").length === 0` on
+  every screen.
+- **Icon-only controls onto IconButton (20×20):** CalendarDropdown's month
+  chevrons (were 24px + inline `background:none;border:none`, which beat
+  `.icon-btn:hover`), SearchField's clear-search X, AIDraftInbox's copy-message
+  (was 16px with an inline colour). Four more closes dropped the same dead
+  inline style (CreateOnboardingModal, CreateTaskModal, MemberModal,
+  PortalDrawer); PortalDrawer's close now uses the vendor Drawer's
+  `PanelCloseIcon`.
+- **Inline SVGs and typed glyphs onto the registry:** three meatballs →
+  `ThreeDotsIcon`, PhaseHeader's plus and three typed `"+ Add …"` labels →
+  `<PlusIcon />` + text, PipelineTimeline's local RefreshIcon → registry,
+  PortalDrawer's local TrashIcon → **new registry `TrashIcon`**, and the three
+  `▾ / ▸` disclosure glyphs → `ChevronRightIcon` with a rotation. Six local
+  icon components deleted.
+- **Destructive rendered neutral, fixed:** TeamPanel Remove →
+  `tertiary tone="danger"` (twin of ContactsPanel Revoke); AIDraftInbox
+  "Reject selected" and ActionsTab "Dismiss all" → `variant="destructive"`,
+  inline danger colours dropped.
+- **A11y:** the three meatball triggers gained `aria-haspopup="menu"` +
+  `aria-expanded`; the notes toolbar's twelve aria-labels are plain words
+  ("Bold", "Bulleted list") with the markdown syntax left in `title` only, and
+  `text-xs` came off IconButton's layout-only className hatch.
+- **Onto the shipped primitives:** the kanban and portal task ticks →
+  `TaskTick`, the Members table row checkbox → `Checkbox`. Measured
+  before/after: tick 22×22 box / 4px padding / -2px -4px -4px margin / 14px
+  svg / `iconTertiary`; checkbox 16×16 / 14px svg / `iconTertiary` — identical,
+  plus a focus ring neither had. The done bounce still fires (the primitive
+  owns it now) and the tick's click still does not open the drawer (a
+  `stopPropagation` span at the call site replaces the handler's own call).
+- **Two items deliberately NOT done, both visual-parity stops:**
+  ContactsPanel's **select-all** checkbox keeps its local copy because the DS
+  `Checkbox` has no indeterminate state (its own meta already says so); it is
+  renamed `SelectAllCheckbox` so its scope is obvious. AIDraftInbox's
+  `SelectCheckbox` is a **circle + ghost check** (the kanban tick shape tinted
+  `action`, not `success`), so moving it to `Checkbox` would turn a circle into
+  a rounded square — a real visual change, not a retrofit.
+- **Numbers:** raw buttons 39 → **32**, primitive buttons 102 → **103**, button
+  coverage 72.3% → **76.3%**; inline `<svg>` in feature code 100 → **83**, icon
+  coverage 31% → **33.6%**; inline styles 1080 → 1058, hardcoded geometry
+  990 → 975. ESLint warnings unchanged at 101, 0 errors.
+- **Verified:** tsc clean · eslint 0 errors / 101 warnings · 67/67 vitest ·
+  5/5 Playwright e2e on :3010 · production build green · ratchet green (no
+  regressions, baseline refreshed) · live walk of 27 screens with 0 console
+  errors and 0 nested buttons.
+
+### Round 5 · 2026-09-12 — FieldPill / FieldRow gain a container mode
+
+Round 4 found the second half of the same bug: `CreateOnboardingModal`'s
+Domain and Owner pills put an `<input>` inside `button.field-main`, and
+`PortalDrawer`'s read-only Target / Priority / Owner rows made a plain value
+look pressable. Both are the primitive's fault, so the fix is in the DS.
+
+- **`onClick` now picks the element.** With `onClick` the main area is a
+  native `<button>` (unchanged). Without it, it is a `<div>` carrying the same
+  `.field-main` classes: an `<input>` inside a `<button>` is invalid HTML (the
+  parser un-nests it, so it hydration-mismatches) and a keyboard trap risk.
+  `onClear` still works as the sibling button in both modes.
+- **The pressable affordances follow the element.** The wrapper gets
+  `data-static` when there is no `onClick`, and `.field-pill:hover` /
+  `.field-row:hover` are gated on `:not([data-static])`; `cursor: pointer`
+  moved from `.field-main` to `button.field-main`. `:focus-within` still
+  lights a container, so a focused inner input reads as active.
+- **Typed as two modes.** `FieldPillProps` / `FieldRowProps` are a union of a
+  trigger variant (`onClick` required) and a container variant
+  (`onClick?: never`). TypeScript cannot see an interactive child, so the
+  mutual exclusion is spelled out in the JSDoc and both metas: a pill that
+  holds an input is a container, not a trigger, and becomes the boxed
+  TextField in slice 4.
+- **Stories:** "As container (test)" on both, asserting the main area is a
+  `DIV`, `button input` is empty, and the input takes focus and typing.
+  `AllVariants` on both now passes `onClick` so the shot stays the trigger form.
+- **Verified on :3010:** Domain / Owner pills measure identical at rest (30px
+  tall, `bgElevated` fill, same hairline, same 4px 8px padding); typing works,
+  Clear works, Tab goes Domain then Owner with no trap; the only intended
+  change is the lost pointer cursor and hover lift. `button input`,
+  `button button` and `button a|select|textarea` all 0 across the four modals,
+  the task drawer and the open calendar, 0 console errors.
+- **Gates:** tsc clean · eslint 0 errors / 101 warnings · 67/67 vitest ·
+  build green · storybook build green · ratchet green, baseline refreshed.
+
+### Round 6 · 2026-09-12 — final evaluator sweep
+
+- **Docs that lied:** `IconButton.meta` still sent people to Button's deleted
+  `text` variant, and both it and DESIGN.md still said inner glyphs are
+  11–12px when the registry default is 14px. Both corrected; the two 16px
+  notification bells stay as they are and are now named as the exception.
+  An orphaned `/* Notes toolbar buttons */` comment in globals.css (its CSS
+  went with `.toolbar-btn` in round 4) is gone.
+- **`CopyIcon` into the registry** from AIDraftInbox, same glyph, same 14px
+  default; the local copy is deleted. Icon centralisation 42/125 → **43/125
+  (34.4%)**, inline `<svg>` in feature code 83 → **82**.
+- **FieldPill / FieldRow triggers now announce their popup.** They set
+  `data-active` but nothing in the accessibility tree, which contradicted
+  DESIGN.md's own rule. `aria-expanded` now mirrors `active` whenever `active`
+  is a boolean, and a new `popup?: "menu" | "listbox" | "dialog"` prop
+  (default `"menu"`, `never` in container mode) sets `aria-haspopup`; the four
+  CalendarDropdown hosts pass `popup="dialog"`. Metas, JSDoc, both "Active
+  (open)" stories (now asserting both attributes) and the DESIGN.md rule
+  updated. Measured live on :3010: closed `aria-expanded="false"`, open
+  `"true"`, Target `haspopup="dialog"`, Status and Priority `"menu"`.
+- **NOT done, reported instead:** the two raw `#5D565D` member-picker
+  checkboxes (TaskDrawer, CreateTaskModal) cannot become `<Checkbox>`. They
+  are decorative SVGs inside the row's own `<button>`, and `Checkbox` renders
+  a `<button role="checkbox">`, so the swap would nest a button in a button —
+  the exact hydration bug rounds 4 and 5 removed. It also changes colour: the
+  shipped checked tick is a cutout showing the row surface (`bgElevated`
+  #1d1c24, or `surfaceHover` #26242f when selected) while the DS one paints
+  `actionText` #18181e behind it. Both go away when the row becomes a Select
+  option in slice 3, which is what the existing eslint-disable already says.
+- **Gates:** tsc clean · eslint 0 errors / 101 warnings · 67/67 vitest ·
+  build green · storybook build green · ratchet green, baseline refreshed ·
+  live drawer walk 0 console errors, 0 nested buttons, 0 `button input`.
+
+### Round 7 · 2026-09-12 — IconButton gains link mode
+
+Caroline's ruling: an icon-only LINK must come from the primitive too. The
+two file-row downloads (TaskDrawer, PortalDrawer) were the last holdouts,
+each an `<a>` with a hand-copied `.icon-btn` class string.
+
+- **`href` picks the element.** `IconButton` renders `<a href>` when `href`
+  is set and `<button type="button">` otherwise, with identical classes,
+  `aria-label` and `tone`; `download` / `target` / `rel` pass through. The
+  props are a discriminated union (`href?: never` on the button side), so
+  button-only attributes cannot leak onto the anchor and anchor-only
+  attributes cannot leak onto the button.
+- **Both downloads converted**, losing their class strings and their inline
+  `color` / `textDecoration`. That inline colour had been silently killing the
+  hover: measured live, the link now steps textMuted to `text` with the
+  `bgHover` fill like every other icon control, and the file still downloads.
+- **New lint `vector/no-raw-icon-button`** (eslint-rules/index.mjs, warn in
+  feature code, app/ui exempt): any HOST element whose literal or template
+  `className` carries `icon-btn`. The raw-`<button>` selector never saw
+  links, which is how these two drifted. Only direct string classNames are
+  inspected, so IconButton's own `cn(...)` is untouched. Smoke-tested against
+  a throwaway `<a className="icon-btn …">`: reported. Zero hits left in app.
+- **Story "As link (test)"** asserting `<a href>` with the icon-btn classes,
+  `download` forwarded, and no `<button>` rendered. Meta, JSDoc and the
+  DESIGN.md IconButton section updated. Sidebar collapse toggle and the two
+  16px bell glyphs left alone, her call.
+- **Numbers:** button coverage 103/135 (76.3%) → **105/137 (76.6%)**, raw
+  buttons still 32, icons 43/125 (34.4%), inline `<svg>` 82.
+- **Gates:** tsc clean · eslint 0 errors / 101 warnings · 67/67 vitest ·
+  build green · storybook build green · ratchet green, baseline refreshed ·
+  live on :3010 the download fires and the row shows 0 console errors.
+

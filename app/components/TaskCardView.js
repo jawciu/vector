@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { CalendarIcon, PriorityIcon, DependenciesIcon } from "../ui/Icons";
 import TaskIdChip from "../ui/TaskIdChip";
+import TaskTick from "../ui/TaskTick";
 import { AVATAR_IMAGES, avatarColor, avatarInitials } from "@/lib/avatar";
 import { STATUS_COLORS } from "@/lib/constants";
 
@@ -21,8 +22,9 @@ import { STATUS_COLORS } from "@/lib/constants";
  *   - isCompleting   Optional. While true the card shows the "going to Done"
  *                    bounce animation. Owned by the parent (kanban TaskCard).
  *   - onCardClick    Optional. Called with the task on outer-card click.
- *   - onToggleDone   Optional. Called with the click event when the checkbox
- *                    is pressed. If omitted, the checkbox is non-interactive
+ *   - onToggleDone   Optional. Called with no arguments when the tick is
+ *                    pressed; the wrapper already stops the click reaching
+ *                    the card. If omitted, the tick is non-interactive
  *                    (e.g. inside the read-only InsightsPanel).
  *   - wrapperProps   Optional. Spread onto the outer div — the kanban passes
  *                    in dnd-kit's `ref`, `attributes`, `listeners`, and
@@ -60,57 +62,6 @@ function getDaysLeft(dateStr) {
   return Math.round((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-function CheckboxButton({ isDone, isCompleting, onClick }) {
-  const [hovered, setHovered] = useState(false);
-  const interactive = typeof onClick === "function";
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className={`flex-shrink-0${isCompleting ? " checkbox-bounce" : ""}`}
-      style={{
-        background: "none",
-        border: "none",
-        padding: "4px",
-        margin: "-4px",
-        marginTop: -2,
-        cursor: interactive ? "pointer" : "default",
-        display: "flex",
-      }}
-      aria-label={isDone ? "Mark as incomplete" : "Mark as done"}
-      disabled={!interactive}
-    >
-      {isDone ? (
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M7 0C10.866 0 14 3.13401 14 7C14 10.866 10.866 14 7 14C3.13401 14 0 10.866 0 7C0 3.13401 3.13401 0 7 0ZM10.8125 4.10938C10.5969 3.93687 10.2819 3.97187 10.1094 4.1875L6.42773 8.78906L3.82031 6.61621C3.60827 6.43951 3.29304 6.46781 3.11621 6.67969C2.93951 6.89173 2.96781 7.20696 3.17969 7.38379L6.17969 9.88379L6.57129 10.2109L6.89062 9.8125L10.8906 4.8125C11.0631 4.59687 11.0281 4.28188 10.8125 4.10938Z"
-            fill="var(--success)"
-          />
-        </svg>
-      ) : (
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle
-            cx="7"
-            cy="7"
-            r="6.5"
-            stroke={hovered ? "var(--success)" : "var(--icon-tertiary)"}
-            style={{ transition: "stroke 0.15s ease" }}
-          />
-          <path
-            d="M3.5 7L6.5 9.5L10.5 4.5"
-            stroke={hovered ? "var(--success)" : "var(--icon-tertiary)"}
-            strokeLinecap="round"
-            style={{ transition: "stroke 0.15s ease" }}
-          />
-        </svg>
-      )}
-    </button>
-  );
-}
-
 export default function TaskCardView({
   task,
   isCompleting = false,
@@ -145,11 +96,16 @@ export default function TaskCardView({
     >
       {/* Row 1: Checkbox + Title */}
       <div className="flex items-start gap-2.5">
-        <CheckboxButton
-          isDone={isDone}
-          isCompleting={isCompleting}
-          onClick={onToggleDone}
-        />
+        {/* -m-1 -mt-0.5 are the shipped call-site negative margins; the span
+            keeps the tick's click off the card. */}
+        <span className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+          <TaskTick
+            checked={isDone}
+            onChange={onToggleDone ? () => onToggleDone() : undefined}
+            aria-label={isDone ? "Mark as incomplete" : "Mark as done"}
+            className="-m-1 -mt-0.5"
+          />
+        </span>
         <span
           className="text-sm flex-1 min-w-0 leading-snug"
           title={task.title}

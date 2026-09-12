@@ -48,6 +48,8 @@ const eslintConfig = defineConfig([
     files: ["app/**/*.{js,jsx,ts,tsx}"],
     ignores: ["app/api/**", "app/ui/**", "app/components/Menu.js"],
     rules: {
+      // The .icon-btn skin is IconButton's, links included (Caroline, 2026-09-12).
+      "vector/no-raw-icon-button": "warn",
       "no-restricted-syntax": [
         "warn",
         {

@@ -215,6 +215,7 @@ export default function Sidebar() {
     >
       {/* User dropdown trigger */}
       <div ref={dropdownRef} className="relative">
+        {/* eslint-disable-next-line no-restricted-syntax -- sidebar account row, not a DS button */}
         <button
           type="button"
           onClick={() => setDropdownOpen((open) => !open)}
@@ -263,6 +264,7 @@ export default function Sidebar() {
               width: collapsed ? 160 : "auto",
             }}
           >
+            {/* eslint-disable-next-line no-restricted-syntax -- sidebar menu row, becomes a Menu item in slice 3 */}
             <button
               type="button"
               onClick={handleSignOut}
@@ -346,6 +348,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Collapse / expand toggle */}
+      {/* eslint-disable-next-line no-restricted-syntax -- sidebar collapse control, not a DS button */}
       <button
         type="button"
         onClick={toggleCollapsed}

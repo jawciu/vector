@@ -80,10 +80,59 @@ const noArbitraryTailwind = {
   },
 };
 
+// Any HOST element (lowercase tag) that hand-copies the `.icon-btn` skin.
+// The raw-<button> rule in eslint.config.mjs never saw the icon-only LINKS
+// (an <a className="icon-btn …">), which is how two download links drifted
+// out of the DS. IconButton renders `href` as an <a> itself, so a call site
+// never needs the class string. Only DIRECT string/template className values
+// are inspected, so IconButton's own cn(...) call is untouched.
+const ICON_BTN = /(^|\s)icon-btn(\s|$|--)/;
+
+function classNameText(value) {
+  if (!value) return null;
+  if (value.type === "Literal") return typeof value.value === "string" ? value.value : null;
+  if (value.type === "JSXExpressionContainer" && value.expression.type === "TemplateLiteral") {
+    return value.expression.quasis.map((q) => q.value.raw).join(" ");
+  }
+  return null;
+}
+
+const noRawIconButton = {
+  meta: {
+    type: "problem",
+    docs: {
+      description:
+        "The .icon-btn skin belongs to app/ui/IconButton. Use the primitive (pass `href` for an icon-only link) instead of copying its classes onto a raw element.",
+    },
+    messages: {
+      rawIconButton:
+        "Element hand-copies the .icon-btn skin. Use <IconButton> from app/ui — pass `href` for an icon-only link or download; eslint-disable with a reason if genuinely bespoke.",
+    },
+    schema: [],
+  },
+  create(context) {
+    return {
+      JSXOpeningElement(node) {
+        // Host elements only: <IconButton> and friends are components.
+        if (node.name.type !== "JSXIdentifier") return;
+        if (!/^[a-z]/.test(node.name.name)) return;
+        for (const attr of node.attributes) {
+          if (attr.type !== "JSXAttribute" || attr.name.name !== "className") continue;
+          const text = classNameText(attr.value);
+          if (text && ICON_BTN.test(text)) {
+            context.report({ node: attr, messageId: "rawIconButton" });
+          }
+        }
+      },
+    };
+  },
+};
+
 const vector = {
   rules: {
     "no-raw-color": noRawColor,
     "no-arbitrary-tailwind": noArbitraryTailwind,
+    "no-raw-icon-button": noRawIconButton,
   },
 };
 

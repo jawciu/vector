@@ -260,6 +260,36 @@ export function DownloadIcon({ size = 14, className, style }: SizedIconProps) {
   );
 }
 
+/** Circular arrow: regenerate / refresh (InsightCard regenerate). */
+export function RefreshIcon({ size = 14, className, style }: SizedIconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={style} aria-hidden>
+      <path d="M11.5 7A4.5 4.5 0 1 1 9.9 3.6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M10 1.5v2.5H7.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** Two stacked sheets — copy to clipboard (AIDraftInbox follow-up message). */
+export function CopyIcon({ size = 14, className, style }: SizedIconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={style} aria-hidden>
+      <rect x="3.5" y="3.5" width="8" height="9.5" rx="1.5" stroke="currentColor" strokeWidth="1.1" />
+      <path d="M2.5 10V2.5C2.5 1.67157 3.17157 1 4 1H9.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** Bin — delete a file / attachment (PortalDrawer, TaskDrawer file rows). */
+export function TrashIcon({ size = 14, className, style }: SizedIconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={style} aria-hidden>
+      <path d="M2.5 3.75h9M5.25 3.75V2.75a1 1 0 011-1h1.5a1 1 0 011 1v1M4 3.75v7.5a1 1 0 001 1h4a1 1 0 001-1v-7.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6 6v4M8 6v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 /** Bare tick — the "mark done" button check (TaskDrawer, PortalDrawer). */
 export function CheckIcon({ size = 12, className, style }: SizedIconProps) {
   return (
@@ -472,6 +502,9 @@ export const GENERIC_ICONS: Record<string, AnyIcon> = {
   ClockIcon,
   FileIcon,
   DownloadIcon,
+  RefreshIcon,
+  CopyIcon,
+  TrashIcon,
   CheckIcon,
   CheckCircleIcon,
   CheckCircleSolidIcon,

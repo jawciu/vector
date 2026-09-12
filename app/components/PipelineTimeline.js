@@ -3,6 +3,8 @@
 import { useState, useMemo, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Button from "@/app/ui/Button";
+import { ChevronRightIcon, RefreshIcon } from "@/app/ui/Icons";
 
 /**
  * Admin /admin/ai → Pipeline tab. Full timeline of every Miniti event
@@ -57,6 +59,7 @@ export default function PipelineTimeline({ events = [] }) {
               : events.filter((e) => matchesFilter(e, f.id)).length;
             const active = filter === f.id;
             return (
+              // eslint-disable-next-line no-restricted-syntax -- segmented filter, TabBar retrofit later
               <button
                 key={f.id}
                 type="button"
@@ -76,11 +79,10 @@ export default function PipelineTimeline({ events = [] }) {
             );
           })}
         </div>
-        <button
-          type="button"
+        <Button
           onClick={handleRefresh}
           disabled={isRefreshing}
-          className="btn-secondary text-sm rounded-lg"
+          variant="secondary"
           style={{
             padding: "4px 10px",
             fontSize: 12,
@@ -92,9 +94,15 @@ export default function PipelineTimeline({ events = [] }) {
           }}
           aria-label="Refresh pipeline"
         >
-          <RefreshIcon spinning={isRefreshing} />
+          <RefreshIcon
+            size={12}
+            style={{
+              flexShrink: 0,
+              animation: isRefreshing ? "pipeline-refresh-spin 0.8s linear infinite" : "none",
+            }}
+          />
           {isRefreshing ? "Refreshing…" : "Refresh"}
-        </button>
+        </Button>
       </div>
 
       {filtered.length === 0 && (
@@ -141,6 +149,7 @@ function PipelineRow({ event, isOpen, onToggle }) {
         flexDirection: "column",
       }}
     >
+      {/* eslint-disable-next-line no-restricted-syntax -- bare disclosure toggle, no DS equivalent */}
       <button
         type="button"
         onClick={onToggle}
@@ -155,7 +164,15 @@ function PipelineRow({ event, isOpen, onToggle }) {
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flex: 1 }}>
-            <span style={{ color: "var(--text-muted)", fontSize: 11 }}>{isOpen ? "▾" : "▸"}</span>
+            <ChevronRightIcon
+              size={8}
+              style={{
+                color: "var(--text-muted)",
+                flexShrink: 0,
+                transform: isOpen ? "rotate(90deg)" : "none",
+                transition: "transform 0.15s ease",
+              }}
+            />
             <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {event.meetingTitle}
             </span>
@@ -411,6 +428,7 @@ function Collapsible({ label, json, content }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      {/* eslint-disable-next-line no-restricted-syntax -- bare disclosure toggle, no DS equivalent */}
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -424,7 +442,14 @@ function Collapsible({ label, json, content }) {
           gap: 4,
         }}
       >
-        <span>{open ? "▾" : "▸"}</span>
+        <ChevronRightIcon
+          size={8}
+          style={{
+            flexShrink: 0,
+            transform: open ? "rotate(90deg)" : "none",
+            transition: "transform 0.15s ease",
+          }}
+        />
         <span>{label}</span>
       </button>
       {open && (
@@ -474,30 +499,6 @@ export function TestRunBadge() {
       <FlaskIcon />
       Test
     </span>
-  );
-}
-
-function RefreshIcon({ spinning }) {
-  return (
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 14 14"
-      fill="none"
-      aria-hidden
-      style={{
-        flexShrink: 0,
-        animation: spinning ? "pipeline-refresh-spin 0.8s linear infinite" : "none",
-      }}
-    >
-      <path
-        d="M2 7a5 5 0 0 1 8.5-3.5L12 5M12 2v3h-3M12 7a5 5 0 0 1-8.5 3.5L2 9m0 3V9h3"
-        stroke="currentColor"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }
 
