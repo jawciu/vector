@@ -748,7 +748,6 @@ export default function OnboardingDetailClient({
                     ) : (
                       <Button
                         variant="tertiary"
-                        size="xs"
                         onClick={() => setAddingPhase(true)}
                       >
                         <PlusIcon />Add section
