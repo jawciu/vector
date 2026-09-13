@@ -191,7 +191,11 @@ export default function Sidebar() {
   async function handleSignOut() {
     const supabase = await createClient();
     if (!supabase) return;
-    await supabase.auth.signOut();
+    // scope: "local" clears this browser only. The default is "global", which
+    // revokes every session for the account, and the public demo shares one
+    // account: one visitor signing out would kill everyone else's session
+    // (their tab keeps an unexpired token, so it renders but every API call 401s).
+    await supabase.auth.signOut({ scope: "local" });
     setDropdownOpen(false);
     router.push("/login");
     router.refresh();
