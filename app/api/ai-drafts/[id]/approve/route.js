@@ -18,6 +18,7 @@ import {
   markAIChangeApplied,
   markAIChangeRejected,
   getTaskOnboardingId,
+  getVendorUserById,
   createTask,
   updateTask,
   createComment,
@@ -82,6 +83,23 @@ export async function POST(request, { params }) {
       // / notes alongside the basic fields. createTask already accepts all of
       // these, so it's a clean pass-through (validation against the context
       // happened server-side at draft-creation time in processMinitiEvent).
+
+      // A draft bakes `ownerId` into its payload at creation time, so the
+      // VendorUser can be deleted between drafting and approval. VendorUser 4
+      // was, when Maya was merged into 8: that merge patched the JSON owner on
+      // draft_followup rows only, leaving create_task drafts pointing at a dead
+      // id. `Task.ownerId` is a real FK, so a dangling id makes the insert throw
+      // P2003 and the whole approve 500s with a raw Prisma message. Resolve it
+      // against the live table and drop it if it is gone, mirroring the
+      // ON DELETE SET NULL rule the same column already carries on
+      // PendingAIChange: an orphaned owner becomes no owner, and the task still
+      // gets created. `assigneeContactId` and `blockedByTaskId` are the same
+      // shape and are currently clean, but would fail the same way.
+      let ownerId = merged.ownerId ?? null;
+      if (ownerId != null && !(await getVendorUserById(ownerId))) {
+        ownerId = null;
+      }
+
       const taskData = {
         onboardingId: draft.onboardingId,
         phaseId: merged.phaseId,
@@ -90,7 +108,7 @@ export async function POST(request, { params }) {
         status: "Not started",
         due: merged.dueDate || "",
         priority: merged.priority ?? null,
-        ownerId: merged.ownerId ?? null,
+        ownerId,
         assigneeContactId: merged.assigneeContactId ?? null,
         blockedByTaskId: merged.blockedByTaskId ?? null,
         notes: merged.notes ?? "",
