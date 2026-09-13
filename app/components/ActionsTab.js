@@ -29,6 +29,7 @@ export default function ActionsTab({
   contacts = [],
   phases = [],
   openTasks = [],
+  onTaskCreated = null,
 }) {
   const [status, setStatus] = useState("pending");
   const [drafts, setDrafts] = useState(null);
@@ -200,6 +201,7 @@ export default function ActionsTab({
           contacts={contacts}
           phases={phases}
           openTasks={openTasks}
+          onTaskCreated={onTaskCreated}
         />
       )}
     </div>

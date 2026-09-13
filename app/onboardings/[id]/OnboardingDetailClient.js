@@ -70,7 +70,7 @@ function SortableColumn({ id, children }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
+    <div ref={setNodeRef} data-col-id={id} style={style} {...attributes}>
       {typeof children === "function" ? children(listeners) : children}
     </div>
   );
@@ -152,6 +152,10 @@ export default function OnboardingDetailClient({
     };
   }, [onboarding.id]);
   const drawerRef = useRef(null);
+  const boardScrollRef = useRef(null);
+  // Which deep-linked task we have already scrolled to, so the effect below
+  // can re-run freely without re-scrolling or fighting its own state updates.
+  const deepLinkScrolledRef = useRef(null);
   const tasksRef = useRef(tasks);
   tasksRef.current = tasks;
   const phasesRef = useRef(phases);
@@ -184,18 +188,53 @@ export default function OnboardingDetailClient({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [drawerOpen, closeDrawer]);
 
-  // Deep-link: ?task=<id> opens the task drawer (used by notification inbox).
+  // Deep-link: ?task=<id> opens the task drawer (used by the notification
+  // inbox, and by the AI draft inbox's "Created RAY-40 in ..." toast).
   useEffect(() => {
     const raw = searchParams.get("task");
-    if (!raw) return;
+    if (!raw) {
+      deepLinkScrolledRef.current = null;
+      return;
+    }
     const id = Number(raw);
     if (Number.isNaN(id)) return;
     const target = tasksRef.current.find((t) => t.id === id);
     if (!target) return;
-    if (drawerTask?.id === id && drawerOpen) return;
-    setDrawerTask(target);
-    setDrawerOpen(true);
-  }, [searchParams, drawerTask, drawerOpen]);
+    if (!(drawerTask?.id === id && drawerOpen)) {
+      setDrawerTask(target);
+      setDrawerOpen(true);
+    }
+
+    // The board scrolls horizontally, and a newly created task often lands in
+    // a phase past the right-hand edge, so opening the drawer alone still
+    // leaves the card off screen. Centre its column.
+    //
+    // Wait for `mounted`: until it flips, the board renders bare, and flipping
+    // it re-parents the same markup under DndContext. React remounts that
+    // subtree, so the scroller is a brand new node and any scrollLeft set
+    // before then is thrown away.
+    if (!mounted) return;
+    // Guarded by a ref rather than cancelled in cleanup, because the setState
+    // calls above are in this effect's own dependencies: it re-runs at once,
+    // and a cleanup would cancel the scroll before it ever ran.
+    if (deepLinkScrolledRef.current === id) return;
+    deepLinkScrolledRef.current = id;
+
+    // Measured from bounding rects, not offsetLeft, since the scroller is not
+    // the columns' offsetParent.
+    requestAnimationFrame(() => {
+      const container = boardScrollRef.current;
+      const col = container?.querySelector(`[data-col-id="col-${target.phaseId}"]`);
+      if (!container || !col) return;
+      const cRect = container.getBoundingClientRect();
+      const colRect = col.getBoundingClientRect();
+      const delta = colRect.left - cRect.left - (cRect.width - colRect.width) / 2;
+      container.scrollTo({
+        left: Math.max(0, container.scrollLeft + delta),
+        behavior: "smooth",
+      });
+    });
+  }, [searchParams, drawerTask, drawerOpen, mounted]);
 
   const activeTab = searchParams.get("tab") || "overview";
   const taskFilter = searchParams.get("filter") || "active";
@@ -633,7 +672,7 @@ export default function OnboardingDetailClient({
             const columnIds = columns.map(({ phase }) => `col-${phase.id}`);
 
             const boardContent = (
-              <div style={{ overflowX: "auto", flex: 1, minHeight: 0 }}>
+              <div ref={boardScrollRef} style={{ overflowX: "auto", flex: 1, minHeight: 0 }}>
                 <div
                   style={{
                     display: "flex",
@@ -814,6 +853,7 @@ export default function OnboardingDetailClient({
             contacts={contacts}
             phases={phases}
             openTasks={tasks.filter((t) => t.status !== "Done")}
+            onTaskCreated={handleTaskCreated}
           />
         </div>
       )}

@@ -19,6 +19,7 @@ import {
   markAIChangeRejected,
   getTaskOnboardingId,
   getVendorUserById,
+  getPhasesForOnboarding,
   createTask,
   updateTask,
   createComment,
@@ -76,6 +77,10 @@ export async function POST(request, { params }) {
     }
 
     let appliedTaskId = null;
+    // Only create_task fills this in. It tells the inbox what was made and
+    // where it landed, so the toast can name the task and link to its column
+    // instead of leaving the row to just vanish.
+    let created = null;
 
     if (draft.action === "create_task") {
       const merged = { ...draft.payload, ...overrides };
@@ -115,6 +120,18 @@ export async function POST(request, { params }) {
       };
       const task = await createTask(taskData, { actor });
       appliedTaskId = task.id;
+
+      const phases = await getPhasesForOnboarding(draft.onboardingId);
+      const phase = phases.find((ph) => ph.id === task.phaseId) ?? null;
+      // `task` is the same shape POST /api/tasks returns, which is what the
+      // board's onTaskCreated already consumes, so the inbox can push it
+      // straight into the board's state. phaseName rides alongside for the
+      // toast rather than being baked into the task object.
+      created = {
+        task,
+        phaseName: phase?.name ?? null,
+        onboardingId: draft.onboardingId,
+      };
     } else if (draft.action === "match_existing") {
       const merged = { ...draft.payload, ...overrides };
       const targetId = draft.payload?.taskId;
@@ -186,7 +203,7 @@ export async function POST(request, { params }) {
 
     await markAIChangeApplied(draftId, { resolvedBy: vu.id, appliedTaskId });
 
-    return NextResponse.json({ ok: true, appliedTaskId });
+    return NextResponse.json({ ok: true, appliedTaskId, created });
   } catch (err) {
     console.error("[POST /api/ai-drafts/[id]/approve]", err);
     return NextResponse.json(

@@ -25,6 +25,7 @@ vi.mock("@/lib/db", () => ({
   markAIChangeRejected: vi.fn(async () => {}),
   getTaskOnboardingId: vi.fn(),
   getVendorUserById: vi.fn(),
+  getPhasesForOnboarding: vi.fn(async () => []),
   createTask: vi.fn(async () => ({ id: 999 })),
   updateTask: vi.fn(),
   createComment: vi.fn(),
@@ -34,6 +35,7 @@ vi.mock("@/lib/db", () => ({
 import {
   getPendingAIChange,
   getVendorUserById,
+  getPhasesForOnboarding,
   createTask,
   markAIChangeApplied,
 } from "@/lib/db";
@@ -62,7 +64,17 @@ function draftWithOwner(ownerId) {
 describe("POST /api/ai-drafts/[id]/approve — create_task ownerId resolution", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    createTask.mockResolvedValue({ id: 999 });
+    createTask.mockResolvedValue({
+      id: 999,
+      taskId: "RAY-40",
+      number: 40,
+      title: "Escalate to Priya",
+      phaseId: 338,
+    });
+    getPhasesForOnboarding.mockResolvedValue([
+      { id: 337, name: "Security, Governance & Access" },
+      { id: 338, name: "Training, Rollout & Go-live" },
+    ]);
   });
 
   it("drops a dangling payload.ownerId instead of letting the FK insert fail", async () => {
@@ -116,5 +128,37 @@ describe("POST /api/ai-drafts/[id]/approve — create_task ownerId resolution", 
 
     expect(res.status).toBe(200);
     expect(createTask.mock.calls[0][0]).toMatchObject({ ownerId: null });
+  });
+
+  it("returns the created task and its phase name so the inbox can toast and link", async () => {
+    // The approved row just vanished before this: nothing told the user which
+    // column the task landed in, and the board never learned about it.
+    getPendingAIChange.mockResolvedValue(draftWithOwner(6));
+    getVendorUserById.mockResolvedValue({ id: 6, name: "Ines Ferreira" });
+
+    const res = await POST(req(), { params });
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.created.phaseName).toBe("Training, Rollout & Go-live");
+    expect(body.created.onboardingId).toBe(63);
+    // Same shape POST /api/tasks returns, so the board's onTaskCreated can
+    // consume it directly rather than refetching.
+    expect(body.created.task).toMatchObject({
+      id: 999,
+      taskId: "RAY-40",
+      phaseId: 338,
+    });
+  });
+
+  it("leaves phaseName null when the phase cannot be resolved", async () => {
+    getPendingAIChange.mockResolvedValue(draftWithOwner(6));
+    getVendorUserById.mockResolvedValue({ id: 6, name: "Ines Ferreira" });
+    getPhasesForOnboarding.mockResolvedValue([]);
+
+    const body = await (await POST(req(), { params })).json();
+
+    expect(body.created.phaseName).toBeNull();
+    expect(body.created.task.id).toBe(999);
   });
 });

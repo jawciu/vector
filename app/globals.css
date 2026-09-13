@@ -1487,6 +1487,100 @@ html.grabbing, html.grabbing * {
   .dg-arrow-draw { animation: none; stroke-dashoffset: 0; }
   .dg-head-fade { animation: none; opacity: 1; }
 }
+/* Toast (app/ui/Toast.tsx) — transient bottom-right confirmation.
+ * Deliberately NOT full width: it is a card in the corner, not a banner.
+ * The stack is click-through so it never blocks the page under it; each
+ * card opts pointer events back in. Motion is a 200ms slide + fade on the
+ * standard ease, reduced to a plain fade under prefers-reduced-motion. */
+.toast-stack {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 240px;
+  max-width: 360px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-floating);
+  color: var(--text);
+  font-size: 13px;
+  animation: toast-in 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.toast--leaving {
+  animation: toast-out 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.toast__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  height: 18px;
+  color: var(--success);
+}
+
+/* Two lines maximum: past that it is not a toast, it is a message. */
+.toast__message {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.toast__action {
+  flex-shrink: 0;
+  align-self: center;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  color: var(--action);
+  text-decoration: none;
+}
+
+.toast__action:hover {
+  color: var(--action-hover);
+  text-decoration: underline;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toast-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(16px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes toast-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes toast-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+}
+
 /* ---------------------------------------------------------------------------
    Meeting drawer (app/components/MeetingDrawer.js)
 

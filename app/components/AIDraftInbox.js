@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
+import { ToastStack, useToasts } from "@/app/ui/Toast";
 import Tooltip from "@/app/ui/Tooltip";
 import {
   CopyIcon,
@@ -51,19 +52,18 @@ export default function AIDraftInbox({
   contacts = [],
   phases = [],
   openTasks = [],
+  onTaskCreated = null,
 }) {
   const [drafts, setDrafts] = useState(initialDrafts);
   const [busyIds, setBusyIds] = useState(new Set());
   const [errors, setErrors] = useState({});
   const [selectedIds, setSelectedIds] = useState(new Set());
-  const [toast, setToast] = useState(null);
+  const { toasts, push: pushToast, dismiss: dismissToast } = useToasts();
   const [drawerEventId, setDrawerEventId] = useState(null);
-  const toastTimer = useRef(null);
 
-  function flashToast(message) {
-    setToast(message);
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(null), 4000);
+  // Toast owns its own timing, hover-pause and exit animation.
+  function flashToast(message, action = null) {
+    pushToast(message, action);
   }
 
   const isPending = mode === "pending";
@@ -138,6 +138,7 @@ export default function AIDraftInbox({
         const errBody = await res.json().catch(() => ({}));
         throw new Error(errBody.error || `Approve failed (${res.status})`);
       }
+      const result = await res.json().catch(() => ({}));
       setDrafts((prev) => prev.filter((d) => d.id !== draft.id));
       setSelectedIds((prev) => {
         const next = new Set(prev);
@@ -145,7 +146,24 @@ export default function AIDraftInbox({
         return next;
       });
       if (draft.action === "draft_followup") {
-        flashToast("Sent — comment posted on task");
+        flashToast("Sent, comment posted on task");
+      } else if (draft.action === "create_task" && result.created?.task) {
+        // An approved create_task used to just make its row disappear, with
+        // nothing saying where the task went. It can land in a column that is
+        // off the right-hand edge of the board, so name the phase and offer a
+        // link that scrolls straight to it.
+        const { task, phaseName, onboardingId } = result.created;
+        // When this inbox is mounted inside the onboarding's own Actions tab,
+        // the board is already on screen holding its tasks in client state, so
+        // push the new one in. Without this the card only appears on reload.
+        if (onTaskCreated) onTaskCreated(task);
+        const label = task.taskId || "task";
+        flashToast(
+          phaseName ? `Created ${label} in ${phaseName}` : `Created ${label}`,
+          onboardingId && task.id
+            ? { href: `/onboardings/${onboardingId}?tab=tasks&task=${task.id}`, label: "View" }
+            : null
+        );
       }
     } catch (err) {
       setErrors((e) => ({ ...e, [draft.id]: err.message }));
@@ -192,7 +210,7 @@ export default function AIDraftInbox({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32, position: "relative" }}>
-      {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
+      <ToastStack toasts={toasts} onDismiss={dismissToast} />
       {isPending && selectedIds.size > 0 && (
         <BulkActionBar
           count={selectedIds.size}
@@ -614,37 +632,6 @@ function DraftGroup({
 }
 
 /** Transient confirmation banner — shown for ~4s after Send-to-portal. */
-function Toast({ message, onDismiss }) {
-  return (
-    <div
-      role="status"
-      aria-live="polite"
-      onClick={onDismiss}
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 6,
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        padding: "8px 12px",
-        background: "var(--bg-elevated)",
-        border: "1px solid var(--success, #5cd6a5)",
-        borderRadius: 8,
-        fontSize: 13,
-        color: "var(--text)",
-        cursor: "pointer",
-      }}
-    >
-      <span style={{ color: "var(--success, #5cd6a5)" }}>✓</span>
-      <span>{message}</span>
-      <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--text-muted)" }}>
-        See <a href="/ai-drafts?status=applied" style={{ color: "var(--action)" }} onClick={(e) => e.stopPropagation()}>Applied</a>
-      </span>
-    </div>
-  );
-}
-
 function BulkActionBar({ count, onReject, onClear }) {
   return (
     <div
@@ -1537,6 +1524,7 @@ export function CreateTaskCard({
   contacts = [],
   phases = [],
   openTasks = [],
+  onTaskCreated = null,
 }) {
   const isPending = mode === "pending";
   const original = useMemo(() => normaliseCreateTaskPayload(draft.payload), [draft.payload]);
