@@ -1730,6 +1730,18 @@ html.grabbing, html.grabbing * {
   gap: 8px;
 }
 
+/* The draft's kind, as the same glyph the Actions inbox uses for it. Sized to
+   sit on the title's first line. */
+.mtg-draft-kind {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+}
+
 .mtg-draft-main {
   flex: 1;
   min-width: 0;
@@ -1751,7 +1763,7 @@ html.grabbing, html.grabbing * {
   gap: 8px;
 }
 
-/* Transcript. Collapsed by default — it is the source, not the summary.
+/* Transcript. Open by default, hideable.
    Every turn is indented the same amount and only customer turns show the
    rule, so the speaker column stays aligned while the sides stay legible. */
 .mtg-turns {

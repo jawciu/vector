@@ -15,8 +15,9 @@ import { cn } from "./cn";
  *   color  — a closed union of status tokens.
  *   status — a task status; Badge owns the status → colour mapping, so no
  *     call site re-derives it.
- *   health — a computeHealth state; same idea, and health is always outlined
- *     (the filled pill of those colours is the AI trend pill).
+ *   health — a computeHealth state; same idea. Outlined in the list and the
+ *     board header; filled in the AI card header, where it sits beside the
+ *     filled trend pill and the two are meant to match in weight.
  * The props union makes two of them together, or size on filled, a type error.
  *
  * Phase 7 retrofit targets (all hand-rolled today): the task status chips in
@@ -38,9 +39,10 @@ export type BadgeColor =
 export type HealthStatus = "On track" | "At risk" | "Blocked";
 
 /**
- * Health is ALWAYS outlined. The AI insight trend pill is filled and uses
- * these same three colours, so the fill is what tells the two apart at a
- * glance: computed health outlined, model-judged trend filled with an arrow.
+ * The AI insight trend pill uses these same three colours. Where the two sit
+ * together (the AI card header) both are filled and the ARROW is what tells
+ * the trend apart from health; on its own (list, board header) health stays
+ * outlined. Caroline's call, 2026-09-13.
  */
 export const HEALTH_COLOR: Record<HealthStatus, BadgeColor> = {
   "On track": "success",

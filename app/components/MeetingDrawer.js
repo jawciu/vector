@@ -10,6 +10,7 @@ import CompanyAvatar from "@/app/ui/CompanyAvatar";
 import Sparkle from "@/app/ui/Sparkle";
 import TaskIdChip from "@/app/ui/TaskIdChip";
 import Tooltip from "@/app/ui/Tooltip";
+import { ActionIcon } from "./DraftActionIcon";
 import { CalendarIcon, ClockIcon } from "@/app/ui/Icons";
 import { AVATAR_IMAGES, avatarColor, avatarInitials } from "@/lib/avatar";
 
@@ -28,11 +29,13 @@ import { AVATAR_IMAGES, avatarColor, avatarInitials } from "@/lib/avatar";
  *               marked by the company logo.
  *   summary   — AI prose under the gradient rule, capped at 70ch.
  *   actions   — the extracted claims as cards: numbered marker, claim at
- *               14/500, firmness as a Badge, the source quote behind a
+ *               14/500, the source quote behind a
  *               "Show quote" toggle, and the task code when the item became
  *               a task.
- *   drafts    — AIDraftInbox's row shape: action Badge, title, status Badge.
- *   transcript— collapsed by default; it is the source, not the summary.
+ *   drafts    — AIDraftInbox's row shape: its per-kind ActionIcon, title,
+ *               status Badge.
+ *   transcript— open by default, with a Hide toggle for when the reader only
+ *               wants the extracted layers above it.
  *
  * The three AI-authored sections carry the Vector sparkle and the
  * `.ai-divider` gradient rule; the transcript carries a plain rule. Layout
@@ -164,15 +167,6 @@ function MeetingBody({ meeting }) {
             ))}
           </div>
         )}
-        {meeting.onboardingId != null && (
-          <Link
-            className="mtg-jump"
-            href={`/onboardings/${meeting.onboardingId}?tab=meetings`}
-          >
-            Open in Meetings tab
-            <span aria-hidden="true">→</span>
-          </Link>
-        )}
       </header>
 
       {meeting.summary && (
@@ -253,7 +247,6 @@ function Section({ title, count, ai = false, action, children }) {
  */
 function ActionItem({ index, item, taskCode, onboardingId }) {
   const [showQuote, setShowQuote] = useState(false);
-  const firm = item.firmness === "firm";
   const hasQuote = Boolean(item.sourceQuote);
 
   return (
@@ -264,11 +257,6 @@ function ActionItem({ index, item, taskCode, onboardingId }) {
       <div className="mtg-item-main">
         <div className="mtg-item-top">
           <span className="mtg-item-claim">{item.claim}</span>
-          {item.firmness && (
-            <Badge color={firm ? "success" : "alert"} size="sm">
-              {item.firmness}
-            </Badge>
-          )}
         </div>
         {(hasQuote || taskCode) && (
           <div className="mtg-item-actions">
@@ -307,9 +295,9 @@ function DraftRow({ draft, onboardingId }) {
   const pending = draft.status === "pending";
   return (
     <li className="mtg-draft">
-      <Badge color="muted" size="sm">
-        {draftActionLabel(draft.action)}
-      </Badge>
+      <span className="mtg-draft-kind" title={draftActionLabel(draft.action)}>
+        <ActionIcon action={draft.action} payload={draft.payload} />
+      </span>
       <div className="mtg-draft-main">
         <span className="mtg-draft-title">{draft.title ?? "Untitled draft"}</span>
         {(draft.taskId || pending) && (
@@ -339,7 +327,7 @@ function DraftRow({ draft, onboardingId }) {
 }
 
 function Transcript({ transcript, attendees, customerDomain }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const empty = transcript.length === 0;
 
   return (
@@ -445,7 +433,7 @@ const DRAFT_STATUS_COLOR = {
   rejected: "danger",
 };
 
-/** Mirrors AIDraftInbox's action vocabulary, lower-cased for a Badge. */
+/** Mirrors AIDraftInbox's action vocabulary; the icon's tooltip label. */
 const DRAFT_ACTION_LABEL = {
   create_task: "task",
   match_existing: "update",
