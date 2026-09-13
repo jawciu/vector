@@ -317,15 +317,6 @@ export default function PortalOverview({
     <div className="flex flex-col gap-4">
       <SummaryHeaderCard data={data} />
 
-      {/* "Your tasks" sits above the AI overview on purpose: a customer opening
-          the portal wants their own to-dos first, narrative second. */}
-      <YourTasksSection
-        tasks={tasks}
-        onTaskUpdated={onTaskUpdated}
-        onCardClick={onCardClick}
-        onSessionExpired={onSessionExpired}
-      />
-
       <InsightCard isStreaming={isStreaming}>
         <InsightCardHeader
           title="Overview"
@@ -409,6 +400,14 @@ export default function PortalOverview({
           </InsightSection>
         </div>
       </InsightCard>
+
+      {/* AI overview first, then the customer's tasks (Caroline, 2026-09-13). */}
+      <YourTasksSection
+        tasks={tasks}
+        onTaskUpdated={onTaskUpdated}
+        onCardClick={onCardClick}
+        onSessionExpired={onSessionExpired}
+      />
     </div>
   );
 }
