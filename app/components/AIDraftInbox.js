@@ -50,6 +50,7 @@ export default function AIDraftInbox({
   contacts = [],
   phases = [],
   openTasks = [],
+  onTaskCreated = null,
 }) {
   const [drafts, setDrafts] = useState(initialDrafts);
   const [busyIds, setBusyIds] = useState(new Set());
@@ -59,10 +60,11 @@ export default function AIDraftInbox({
   const [drawerEventId, setDrawerEventId] = useState(null);
   const toastTimer = useRef(null);
 
-  function flashToast(message) {
-    setToast(message);
+  function flashToast(message, action = null) {
+    setToast({ message, action });
     if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(null), 4000);
+    // A toast carrying a "View" link needs long enough to actually click it.
+    toastTimer.current = setTimeout(() => setToast(null), action ? 9000 : 4000);
   }
 
   const isPending = mode === "pending";
@@ -137,6 +139,7 @@ export default function AIDraftInbox({
         const errBody = await res.json().catch(() => ({}));
         throw new Error(errBody.error || `Approve failed (${res.status})`);
       }
+      const result = await res.json().catch(() => ({}));
       setDrafts((prev) => prev.filter((d) => d.id !== draft.id));
       setSelectedIds((prev) => {
         const next = new Set(prev);
@@ -144,7 +147,24 @@ export default function AIDraftInbox({
         return next;
       });
       if (draft.action === "draft_followup") {
-        flashToast("Sent — comment posted on task");
+        flashToast("Sent, comment posted on task");
+      } else if (draft.action === "create_task" && result.created?.task) {
+        // An approved create_task used to just make its row disappear, with
+        // nothing saying where the task went. It can land in a column that is
+        // off the right-hand edge of the board, so name the phase and offer a
+        // link that scrolls straight to it.
+        const { task, phaseName, onboardingId } = result.created;
+        // When this inbox is mounted inside the onboarding's own Actions tab,
+        // the board is already on screen holding its tasks in client state, so
+        // push the new one in. Without this the card only appears on reload.
+        if (onTaskCreated) onTaskCreated(task);
+        const label = task.taskId || "task";
+        flashToast(
+          phaseName ? `Created ${label} in ${phaseName}` : `Created ${label}`,
+          onboardingId && task.id
+            ? { href: `/onboardings/${onboardingId}?tab=tasks&task=${task.id}`, label: "View" }
+            : null
+        );
       }
     } catch (err) {
       setErrors((e) => ({ ...e, [draft.id]: err.message }));
@@ -191,7 +211,9 @@ export default function AIDraftInbox({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32, position: "relative" }}>
-      {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
+      {toast && (
+        <Toast message={toast.message} action={toast.action} onDismiss={() => setToast(null)} />
+      )}
       {isPending && selectedIds.size > 0 && (
         <BulkActionBar
           count={selectedIds.size}
@@ -613,7 +635,7 @@ function DraftGroup({
 }
 
 /** Transient confirmation banner — shown for ~4s after Send-to-portal. */
-function Toast({ message, onDismiss }) {
+function Toast({ message, action = null, onDismiss }) {
   return (
     <div
       role="status"
@@ -638,7 +660,22 @@ function Toast({ message, onDismiss }) {
       <span style={{ color: "var(--success, #5cd6a5)" }}>✓</span>
       <span>{message}</span>
       <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--text-muted)" }}>
-        See <a href="/ai-drafts?status=applied" style={{ color: "var(--action)" }} onClick={(e) => e.stopPropagation()}>Applied</a>
+        {action ? (
+          // Link, not a plain <a>: on the onboarding's own Actions tab this is
+          // a client-side hop to the Tasks tab, so the board scrolls to the new
+          // column without a page load.
+          <Link
+            href={action.href}
+            style={{ color: "var(--action)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {action.label}
+          </Link>
+        ) : (
+          <>
+            See <a href="/ai-drafts?status=applied" style={{ color: "var(--action)" }} onClick={(e) => e.stopPropagation()}>Applied</a>
+          </>
+        )}
       </span>
     </div>
   );
@@ -1536,6 +1573,7 @@ export function CreateTaskCard({
   contacts = [],
   phases = [],
   openTasks = [],
+  onTaskCreated = null,
 }) {
   const isPending = mode === "pending";
   const original = useMemo(() => normaliseCreateTaskPayload(draft.payload), [draft.payload]);
