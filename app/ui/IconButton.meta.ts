@@ -14,7 +14,7 @@ export const meta: DsMeta = {
     "Avatars or anything circular — `rounded-full` is for avatar circles ONLY (CLAUDE.md); IconButton is fixed `w-5 h-5 rounded`.",
     "Menu/dropdown triggers that show a label — use MenuTriggerButton (app/components/Menu.js).",
     "An in-page action dressed as a link — `href` is for real navigation and downloads only. The props are a discriminated union, so button attributes (onClick, disabled, type) are a compile error in link mode and anchor attributes are a compile error in button mode.",
-    "Larger tap targets or toolbar buttons — the 20×20 box is fixed by design; don't restyle it, ask for a size variant first.",
+    "Anything bigger than `size=\"md\"` (28px box, 16px glyph, the header bells) — there is no large size yet; ask for one rather than restyling.",
   ],
   a11y: [
     "`aria-label` is REQUIRED (enforced by the props type) — it is the button's entire accessible name; icons are decorative.",

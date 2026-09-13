@@ -40,6 +40,8 @@ import { cn } from "./cn";
  */
 
 export type IconButtonTone = "action" | "danger";
+/** sm: 20px box, 14px glyph (default, everywhere). md: 28px box, 16px glyph (header bells). */
+export type IconButtonSize = "sm" | "md";
 
 interface IconButtonSharedProps {
   /** Required — icon-only controls have no visible text to name them. */
@@ -48,6 +50,8 @@ interface IconButtonSharedProps {
   isActive?: boolean;
   /** "danger" for destructive icon actions. */
   tone?: IconButtonTone;
+  /** Box + glyph size; "sm" unless a surface needs the bigger tap target. */
+  size?: IconButtonSize;
   className?: string;
 }
 
@@ -66,9 +70,10 @@ type IconButtonLinkProps = IconButtonSharedProps &
 export type IconButtonProps = IconButtonButtonProps | IconButtonLinkProps;
 
 export default function IconButton(props: IconButtonProps) {
-  const { isActive, tone = "action", className, children, ...rest } = props;
+  const { isActive, tone = "action", size = "sm", className, children, ...rest } = props;
   const classes = cn(
-    "icon-btn flex items-center justify-center w-5 h-5 rounded",
+    "icon-btn flex items-center justify-center rounded",
+    size === "md" ? "icon-btn--md w-7 h-7" : "w-5 h-5",
     tone === "danger" && "icon-btn--danger",
     isActive && "icon-btn--active",
     className
