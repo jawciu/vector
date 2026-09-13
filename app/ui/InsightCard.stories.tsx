@@ -29,6 +29,7 @@ const InsightCard = InsightCardJs as unknown as ComponentType<{
 }>;
 const InsightCardHeader = InsightCardHeaderJs as unknown as ComponentType<{
   title: ReactNode;
+  healthPill?: ReactNode;
   statusPill?: ReactNode;
   isStreaming?: boolean;
   payload?: unknown;
@@ -178,12 +179,18 @@ export const ComposedOverview: Story = {
  * `isStreaming` — the rotating ai-gradient border (`.is-streaming`) plus the
  * header's disabled regenerate button and "regenerating…" note (shown when a
  * previous payload is still on screen). Reduced motion pauses the spin.
+ *
+ * Note the header: a `statusPill` IS passed here and deliberately does not
+ * render. The trend is the previous answer until the new one lands, so it
+ * would be read as current. The health pill keeps its place, because health
+ * is computed rather than generated.
  */
 export const Streaming: Story = {
   render: () => (
     <InsightCard isStreaming>
       <InsightCardHeader
         title="Acme Logistics"
+        healthPill={<Badge health="At risk">At risk</Badge>}
         statusPill={<InsightStatusPill status="declining" />}
         isStreaming
         payload={{}}
