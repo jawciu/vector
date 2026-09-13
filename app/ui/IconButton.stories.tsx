@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, userEvent, within } from "storybook/test";
 import IconButton from "./IconButton";
+import { ThreeDotsIcon, PlusIcon, TrashIcon as RegistryTrashIcon } from "./Icons";
 import { dsMetaDescription } from "./ds-meta";
 import { meta as dsMeta } from "./IconButton.meta";
 
@@ -46,6 +47,10 @@ const config: Meta<typeof IconButton> = {
     onClick: fn(),
     children: <MeatballIcon />,
   },
+  argTypes: {
+    size: { control: "radio", options: ["sm", "md"] },
+    tone: { control: "radio", options: ["action", "danger"] },
+  },
 };
 export default config;
 
@@ -61,6 +66,23 @@ type Story = StoryObj<typeof IconButton>;
 export const Default: Story = {};
 
 /** Hover: `bgHover` fill appears and the glyph lifts from `textMuted` to `text`. */
+/** The two sizes side by side, with registry icons: sm is the default everywhere, md is the header bells. */
+export const Sizes: Story = {
+  render: () => (
+    <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+      {(["sm", "md"] as const).map((size) => (
+        <div key={size} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 12, color: "var(--text-muted)", width: 22 }}>{size}</span>
+          <IconButton size={size} aria-label="Task actions" onClick={fn()}><ThreeDotsIcon /></IconButton>
+          <IconButton size={size} aria-label="Add task" onClick={fn()}><PlusIcon /></IconButton>
+          <IconButton size={size} aria-label="Delete" tone="danger" onClick={fn()}><RegistryTrashIcon /></IconButton>
+          <IconButton size={size} aria-label="Open" isActive onClick={fn()}><ThreeDotsIcon /></IconButton>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
 export const Hover: Story = { parameters: { pseudo: { hover: true } } };
 
 /**

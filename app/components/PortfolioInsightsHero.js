@@ -17,7 +17,10 @@ const SOFT_TTL_MS = 4 * 60 * 60 * 1000;
  * (Summary / Risk focus or Focus this week / Wins) separated by AI-gradient
  * dividers. Streams via SSE through /api/insights/portfolio/all.
  */
-export default function PortfolioInsightsHero({ snapshot, contextHash, cachedInsight }) {
+// `logos` maps onboarding id → company logo path, from the same rows as the table
+// below, so the AI cards show real logos. Kept out of the snapshot on purpose:
+// the snapshot is hashed for cache invalidation and sent to the model.
+export default function PortfolioInsightsHero({ snapshot, contextHash, cachedInsight, logos }) {
   const companyById = useMemo(() => {
     const m = new Map();
     for (const o of snapshot?.onboardings ?? []) m.set(o.id, o.company);
@@ -218,6 +221,7 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
                     key={item.onboardingId}
                     onboardingId={item.onboardingId}
                     company={companyById.get(item.onboardingId) ?? `Onboarding #${item.onboardingId}`}
+                    logoUrl={logos?.[item.onboardingId] ?? null}
                     issues={item.issues ?? []}
                     position={cardPosition(i, priorityItems.length)}
                   />
@@ -235,6 +239,7 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
                   <WinRow
                     key={`${w.onboardingId}-${i}`}
                     company={companyById.get(w.onboardingId) ?? w.headline}
+                    logoUrl={logos?.[w.onboardingId] ?? null}
                     detail={w.detail}
                     position={i === 0 ? "top" : "bottom"}
                     isLast={i === wins.length - 1}
@@ -271,7 +276,7 @@ function Section({ title, className, children }) {
   );
 }
 
-function PriorityCard({ onboardingId, company, issues, position }) {
+function PriorityCard({ onboardingId, company, logoUrl, issues, position }) {
   const radius = {
     left: { borderTopLeftRadius: 12, borderBottomLeftRadius: 12 },
     middle: {},
@@ -304,7 +309,7 @@ function PriorityCard({ onboardingId, company, issues, position }) {
           borderBottom: "1px solid var(--border)",
         }}
       >
-        <CompanyAvatar name={company} size={16} />
+        <CompanyAvatar name={company} logoUrl={logoUrl} size={16} />
         <span style={{ fontSize: 14, fontWeight: 500, color: "var(--text)", lineHeight: "20px" }}>
           {company}
         </span>
@@ -323,7 +328,7 @@ function PriorityCard({ onboardingId, company, issues, position }) {
   );
 }
 
-function WinRow({ company, detail, position }) {
+function WinRow({ company, logoUrl, detail, position }) {
   const radius =
     position === "top"
       ? { borderTopLeftRadius: 12, borderTopRightRadius: 12 }
@@ -345,7 +350,7 @@ function WinRow({ company, detail, position }) {
       }}
     >
       <div style={{ paddingTop: 2 }}>
-        <CompanyAvatar name={company} size={16} />
+        <CompanyAvatar name={company} logoUrl={logoUrl} size={16} />
       </div>
       <p style={{ margin: 0, fontSize: 14, fontWeight: 500, lineHeight: "20px", color: "var(--text)" }}>
         {company}{" "}

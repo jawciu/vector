@@ -69,6 +69,7 @@ export default async function OnboardingsListPage({ searchParams }) {
       {portfolioSnapshot && portfolioSnapshot.onboardings.length > 0 && (
         <PortfolioInsightsHero
           snapshot={portfolioSnapshot}
+          logos={Object.fromEntries(onboardings.map((ob) => [ob.id, ob.companyLogoUrl ?? null]))}
           contextHash={portfolioContextHash}
           cachedInsight={cachedPortfolioInsightSerialised}
         />

@@ -107,6 +107,12 @@ a {
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
+/* md size: 28px box, 16px glyph (registry icons default to 14px). */
+.icon-btn--md svg {
+  width: 16px;
+  height: 16px;
+}
+
 .icon-btn:hover:not(:disabled) {
   background-color: var(--bg-hover);
   color: var(--text);

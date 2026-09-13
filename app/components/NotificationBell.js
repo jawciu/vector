@@ -212,6 +212,7 @@ export default function NotificationBell() {
   return (
     <div ref={containerRef} className="relative">
       <IconButton
+        size="md"
         isActive={open}
         onClick={() => setOpen((v) => !v)}
         aria-label="Notifications"
