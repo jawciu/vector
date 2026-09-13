@@ -169,8 +169,10 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
           </div>
           <span className="oi-header-pills">
             {/* Portfolio level shows the trend only (Caroline, 2026-09-13); the
-                per-onboarding health lives in the table below. */}
-            {portfolioStatus && <InsightStatusPill status={portfolioStatus} />}
+                per-onboarding health lives in the table below. Hidden while
+                streaming: the pill would be showing the PREVIOUS answer, which
+                reads as the new one. "regenerating…" stands in its place. */}
+            {!isStreaming && portfolioStatus && <InsightStatusPill status={portfolioStatus} />}
           </span>
           {isStreaming && payload && (
             <span style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>

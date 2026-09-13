@@ -6,6 +6,7 @@ export const meta: DsMeta = {
     "AI insight surfaces — the vendor onboarding overview (InsightsPanel) and the customer portal overview (PortalOverview) compose these same primitives so both read as one product.",
     "Compose, don't wrap: `InsightCard` shell → `InsightCardHeader` (sparkle + company name + `InsightStatusPill` + the regenerate `IconButton`) → `oi-row` grids of `InsightSection`s holding `RiskCard`/`WinRow`/`FocusTodayItem`/`ThisWeekRow`/`EmptyMessage`.",
     "Onboarding headers show a pair: `healthPill` (an outlined `Badge health={…}`) then `statusPill` (the filled trend). Showing them together is what stops the trend being read as health. The portfolio header shows the trend only (there is no portfolio-level health; the table below carries each onboarding's).",
+    "While `isStreaming`, the header drops the `statusPill` on its own and leaves \"regenerating…\" in its place: the trend on screen is the PREVIOUS answer and reads as the new one. `healthPill` stays, since health is computed, not generated. Consumers do not need to guard it.",
     "Pass `isStreaming` to the shell while the insight request is in flight — it owns the rotating gradient border (`.is-streaming`); the streaming/payload state machine stays with the consumer.",
     "Placing a new section: add an `oi-section--<name>` grid-area class in globals.css and slot it into the existing rows.",
   ],

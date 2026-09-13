@@ -58,11 +58,16 @@ export function InsightCardHeader({ title, healthPill, statusPill, isStreaming, 
           {/* Health (outlined, computed) sits beside the trend (filled, AI)
               so the two signals read as two things, not one. Layout is a
               class, not an inline style, to keep this header on one style
-              block. */}
-          {healthPill || statusPill ? (
+              block.
+
+              While streaming, the trend pill is HIDDEN and "regenerating…"
+              stands in its place: the pill would otherwise show the previous
+              answer, which reads as the new one. Health is computed, not
+              generated, so it stays put and the header never collapses. */}
+          {healthPill || (statusPill && !isStreaming) ? (
             <span className="oi-header-pills">
               {healthPill}
-              {statusPill}
+              {isStreaming ? null : statusPill}
             </span>
           ) : null}
           {isStreaming && payload && (
