@@ -93,7 +93,7 @@ export async function POST(req, { params }) {
           }
         }
         const final = await claudeStream.finalMessage();
-        const payload = parseInsightPayload(final);
+        const payload = parseInsightPayload(final, scope);
         const durationMs = Date.now() - startedAt;
 
         controller.enqueue(

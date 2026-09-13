@@ -9,11 +9,11 @@ const STATUSES = Object.keys(STATUS_COLOR) as BadgeStatus[];
 /** Example label per colour so the grid reads like real product copy. */
 const LABELS: Record<BadgeColor, string> = {
   success: "On track",
-  danger: "Declining",
+  danger: "Blocked",
   alert: "At risk",
   action: "New",
   muted: "Not started",
-  mint: "Improving",
+  mint: "In progress",
   sky: "Under investigation",
   candy: "On hold",
 };
@@ -55,7 +55,7 @@ export const Outlined: Story = {};
 /** Outlined sm: the task drawer status picker chip. */
 export const OutlinedSmall: Story = { name: "Outlined small", args: { size: "sm" } };
 
-/** Filled: the board header health and blocked pills. */
+/** Filled: the board header blocked-count pill, and the AI trend pill. Health is never filled. */
 export const Filled: Story = { args: { variant: "filled" } };
 
 /** Task status in: Badge picks the colour. */

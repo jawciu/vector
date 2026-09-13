@@ -145,13 +145,15 @@ Destructive ramp: delete, revoke, error states, blocked tasks. Destructive butto
 
 ## Status
 
-Reserved for state, never decoration. Status pill mapping: Declining → `danger`,
-At risk → `alert`, On track → `success`, Improving → `mint`.
+Reserved for state, never decoration. Health pill mapping: Blocked → `danger`,
+At risk → `alert`, On track → `success`. The AI insight trend pill reuses those
+same three (declining / steady / improving) and is told apart by its arrow, not
+by a colour of its own.
 
 <Row>
   <Swatch token="success" note="Completion, positive state (checkmark wins, Done tags)" />
   <Swatch token="danger" note="Destructive and error (shared with the danger ramp)" />
-  <Swatch token="alert" note="Warning, caution (At risk)" />
+  <Swatch token="alert" note="Warning, caution (health At risk)" />
 </Row>
 
 ## Accent and utility

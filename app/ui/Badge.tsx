@@ -9,17 +9,19 @@ import { cn } from "./cn";
  *     md (default) 14px, the kanban card chip. sm 12px, the task drawer
  *     status picker.
  *   filled — the colour fills the pill, text goes textDark. One size,
- *     matching the board header health / blocked pills.
+ *     matching the board header blocked pill and the AI trend pill.
  *
  * Colour comes from ONE of:
  *   color  — a closed union of status tokens.
  *   status — a task status; Badge owns the status → colour mapping, so no
  *     call site re-derives it.
- * The props union makes color + status, or size on filled, a type error.
+ *   health — a computeHealth state; same idea, and health is always outlined
+ *     (the filled pill of those colours is the AI trend pill).
+ * The props union makes two of them together, or size on filled, a type error.
  *
  * Phase 7 retrofit targets (all hand-rolled today): the task status chips in
  * TaskCardView, TaskDrawer, PortalTaskCard, AIDraftInbox, CreateTaskModal;
- * InsightStatusPill; the board header health + blocked pills.
+ * InsightStatusPill; the board header blocked pill and the list's health pill.
  */
 
 export type BadgeColor =
@@ -31,6 +33,20 @@ export type BadgeColor =
   | "mint"
   | "sky"
   | "candy";
+
+/** Mirrors the states computeHealth returns (lib/health.js, pinned by Badge.test.js). */
+export type HealthStatus = "On track" | "At risk" | "Blocked";
+
+/**
+ * Health is ALWAYS outlined. The AI insight trend pill is filled and uses
+ * these same three colours, so the fill is what tells the two apart at a
+ * glance: computed health outlined, model-judged trend filled with an arrow.
+ */
+export const HEALTH_COLOR: Record<HealthStatus, BadgeColor> = {
+  "On track": "success",
+  "At risk": "alert",
+  Blocked: "danger",
+};
 
 /** Mirrors TASK_STATUSES in lib/constants.js (pinned by Badge.test.js). */
 export type BadgeStatus =
@@ -76,8 +92,9 @@ const FILLED_CLASSES: Record<BadgeColor, string> = {
 export type BadgeSize = "sm" | "md";
 
 type ColourProps =
-  | { color?: BadgeColor; status?: never }
-  | { status: BadgeStatus; color?: never };
+  | { color?: BadgeColor; status?: never; health?: never }
+  | { status: BadgeStatus; color?: never; health?: never }
+  | { health: HealthStatus; color?: never; status?: never };
 
 type VariantProps =
   | { variant?: "outlined"; size?: BadgeSize }
@@ -87,7 +104,11 @@ export type BadgeProps = { children: ReactNode } & ColourProps & VariantProps;
 
 export default function Badge(props: BadgeProps) {
   const { children, variant = "outlined" } = props;
-  const color = props.status ? (STATUS_COLOR[props.status] ?? "muted") : (props.color ?? "muted");
+  const color = props.status
+    ? (STATUS_COLOR[props.status] ?? "muted")
+    : props.health
+    ? (HEALTH_COLOR[props.health] ?? "muted")
+    : (props.color ?? "muted");
   const size = variant === "filled" ? "md" : (props.size ?? "md");
   return (
     <span

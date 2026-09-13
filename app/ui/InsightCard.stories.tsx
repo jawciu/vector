@@ -13,6 +13,7 @@ import {
   EmptyMessage,
 } from "./InsightCard";
 import InlineProse from "./InlineProse";
+import Badge from "./Badge";
 import { dsMetaDescription } from "./ds-meta";
 import { meta as dsMeta } from "./InsightCard.meta";
 
@@ -105,7 +106,7 @@ export const ComposedOverview: Story = {
     <InsightCard>
       <InsightCardHeader
         title="Acme Logistics"
-        statusPill={<InsightStatusPill status="At risk" />}
+        statusPill={<InsightStatusPill status="declining" />}
         onRegenerate={() => {}}
       />
       <div className="oi-row oi-row--top">
@@ -183,7 +184,7 @@ export const Streaming: Story = {
     <InsightCard isStreaming>
       <InsightCardHeader
         title="Acme Logistics"
-        statusPill={<InsightStatusPill status="At risk" />}
+        statusPill={<InsightStatusPill status="declining" />}
         isStreaming
         payload={{}}
         onRegenerate={() => {}}
@@ -202,16 +203,63 @@ export const Streaming: Story = {
   ),
 };
 
+/**
+ * The vendor pill states a trend, and only a trend. Health (On track / At
+ * risk / Blocked) is computed by `lib/health.js` and rendered by its own
+ * pills, so nothing here may borrow those words.
+ *
+ * The two families share the same three colours on purpose, so the FILL and
+ * the ARROW are the whole difference: health is outlined, the trend is filled
+ * with an arrow (up-right improving, flat steady, down-right declining). The
+ * AI card headers show both together, health first, 8px apart, which is the
+ * bottom row below. The direction is also
+ * in the accessible name ("Trend: improving") via hidden text, because the
+ * arrow is silent to a screen reader.
+ *
+ * Insights cached before the rename still hold the old vocabulary:
+ * `normaliseTrend` maps them on the way in, silently, so an old card never
+ * crashes and never shows a health word. `At risk` → declining,
+ * `On track` → steady.
+ */
+export const TrendPills: Story = {
+  render: () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <VariantLabel>trend (AI)</VariantLabel>
+        <InsightStatusPill status="improving" />
+        <InsightStatusPill status="steady" />
+        <InsightStatusPill status="declining" />
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <VariantLabel>health (computed)</VariantLabel>
+        <Badge health="On track">On track</Badge>
+        <Badge health="At risk">At risk</Badge>
+        <Badge health="Blocked">Blocked</Badge>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <VariantLabel>side by side</VariantLabel>
+        <span className="oi-header-pills">
+          <Badge health="At risk">At risk</Badge>
+          <InsightStatusPill status="improving" />
+        </span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <VariantLabel>legacy cached</VariantLabel>
+        <InsightStatusPill status="At risk" />
+      </div>
+    </div>
+  ),
+};
+
 /** Both pill vocabularies. Unknown statuses fall back to a muted pill. */
 export const StatusPillVariants: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <VariantLabel>vendor</VariantLabel>
-        <InsightStatusPill status="Declining" />
-        <InsightStatusPill status="At risk" />
-        <InsightStatusPill status="On track" />
-        <InsightStatusPill status="Improving" />
+        <InsightStatusPill status="improving" />
+        <InsightStatusPill status="steady" />
+        <InsightStatusPill status="declining" />
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <VariantLabel>customer</VariantLabel>
