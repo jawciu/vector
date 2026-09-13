@@ -9,11 +9,11 @@ const STATUSES = Object.keys(STATUS_COLOR) as BadgeStatus[];
 /** Example label per colour so the grid reads like real product copy. */
 const LABELS: Record<BadgeColor, string> = {
   success: "On track",
-  danger: "Declining",
+  danger: "Blocked",
   alert: "At risk",
   action: "New",
   muted: "Not started",
-  mint: "Improving",
+  mint: "In progress",
   sky: "Under investigation",
   candy: "On hold",
 };

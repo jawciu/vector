@@ -105,7 +105,7 @@ export const ComposedOverview: Story = {
     <InsightCard>
       <InsightCardHeader
         title="Acme Logistics"
-        statusPill={<InsightStatusPill status="At risk" />}
+        statusPill={<InsightStatusPill status="declining" />}
         onRegenerate={() => {}}
       />
       <div className="oi-row oi-row--top">
@@ -183,7 +183,7 @@ export const Streaming: Story = {
     <InsightCard isStreaming>
       <InsightCardHeader
         title="Acme Logistics"
-        statusPill={<InsightStatusPill status="At risk" />}
+        statusPill={<InsightStatusPill status="declining" />}
         isStreaming
         payload={{}}
         onRegenerate={() => {}}
@@ -202,16 +202,40 @@ export const Streaming: Story = {
   ),
 };
 
+/**
+ * The vendor pill states a trend, and only a trend. Health (On track / At
+ * risk / Blocked) is computed by `lib/health.js` and rendered by its own
+ * pills, so nothing here may borrow those words. Insights cached before the
+ * rename still hold the old vocabulary: `normaliseTrend` maps them on the
+ * way in, silently, so an old card never crashes and never shows a health
+ * word. `At risk` → declining, `On track` → steady.
+ */
+export const TrendPills: Story = {
+  render: () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <VariantLabel>trend</VariantLabel>
+        <InsightStatusPill status="improving" />
+        <InsightStatusPill status="steady" />
+        <InsightStatusPill status="declining" />
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <VariantLabel>legacy cached</VariantLabel>
+        <InsightStatusPill status="At risk" />
+      </div>
+    </div>
+  ),
+};
+
 /** Both pill vocabularies. Unknown statuses fall back to a muted pill. */
 export const StatusPillVariants: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <VariantLabel>vendor</VariantLabel>
-        <InsightStatusPill status="Declining" />
-        <InsightStatusPill status="At risk" />
-        <InsightStatusPill status="On track" />
-        <InsightStatusPill status="Improving" />
+        <InsightStatusPill status="improving" />
+        <InsightStatusPill status="steady" />
+        <InsightStatusPill status="declining" />
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <VariantLabel>customer</VariantLabel>

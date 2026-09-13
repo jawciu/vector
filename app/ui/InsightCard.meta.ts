@@ -11,11 +11,12 @@ export const meta: DsMeta = {
   dontUseWhen: [
     "Non-AI content cards — the gradient dividers and streaming border are the 'AI produced this' signal; borrowing them dilutes it.",
     "A different card shell for an AI surface — never introduce one; extend this card's grid instead (DESIGN.md).",
-    "Status pills outside the two blessed vocabularies — `audience=\"vendor\"` (Declining/At risk/On track/Improving) and `audience=\"customer\"` (On track/Needs your input/In progress); unknown statuses fall back to a muted pill.",
+    "Status pills outside the two blessed vocabularies — `audience=\"vendor\"` is a TREND only (improving/steady/declining, rendered as \"Trend: …\") and `audience=\"customer\"` (On track/Needs your input/In progress); unknown statuses fall back to a muted pill.",
+    "Health in the vendor pill — health (On track/At risk/Blocked) is computed by `lib/health.js` and rendered by its own pills; the AI pill must never restate it. Legacy cached values are mapped onto a trend, not shown as-is.",
   ],
   a11y: [
     "The streaming border honours `prefers-reduced-motion` — the spin pauses, the crossfade still plays.",
-    "Status is conveyed by the pill's TEXT, not colour alone; the `.ai-divider` gradient rule is `role=\"separator\"` + `aria-hidden`.",
+    "Status is conveyed by the pill's TEXT, not colour alone, and the vendor pill spells out the \"Trend:\" prefix so the signal is never mistaken for health; the `.ai-divider` gradient rule is `role=\"separator\"` + `aria-hidden`.",
     "HONEST GAPS (audit Lens 3): the regenerate IconButton sets `aria-busy` and disables while streaming; the streaming label lives in the header text; WinRow/ThisWeekRow position styling is visual grouping only (no list semantics).",
   ],
   tokens: ["aiGradientFrom/aiGradientTo (the ai-gradient pair)", "buttonSecondaryBorder", "borderSubtle", "danger/alert/success/mint (status ramps)", "textMuted"],

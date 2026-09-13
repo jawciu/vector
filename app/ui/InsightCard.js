@@ -5,6 +5,7 @@ import TaskCardView from "../components/TaskCardView";
 import { PriorityIcon, RefreshIcon } from "./Icons";
 import Sparkle from "./Sparkle";
 import IconButton from "./IconButton";
+import { normaliseTrend } from "@/lib/insight-trend";
 
 /**
  * Insight card primitives — extracted from `InsightsPanel` so the customer
@@ -12,6 +13,10 @@ import IconButton from "./IconButton";
  *
  * The pieces are presentational; the streaming + payload state machine
  * stays with the consumer (vendor `InsightsPanel`, customer `PortalInsightCard`).
+ *
+ * `InsightStatusPill` states a TREND for the vendor audience ("Trend:
+ * improving" / "steady" / "declining"). Health is a separate, computed
+ * signal (`lib/health.js`) and never appears here.
  */
 
 export function InsightCard({ isStreaming, children, style }) {
@@ -109,11 +114,15 @@ export function InsightSection({ title, className, children }) {
   );
 }
 
+/**
+ * Vendor pills state a TREND, keyed by the lower-case values in
+ * `lib/insight-trend.js`. Health lives in `lib/health.js` and is rendered
+ * elsewhere, so nothing here may borrow its words.
+ */
 const VENDOR_STATUS_COLORS = {
-  Declining: "var(--danger)",
-  "At risk": "var(--alert)",
-  "On track": "var(--success)",
-  Improving: "var(--mint)",
+  improving: "var(--mint)",
+  steady: "var(--text-muted)",
+  declining: "var(--danger)",
 };
 
 const CUSTOMER_STATUS_COLORS = {
@@ -124,14 +133,20 @@ const CUSTOMER_STATUS_COLORS = {
 
 export function InsightStatusPill({ status, audience = "vendor" }) {
   if (!status) return null;
-  const map = audience === "customer" ? CUSTOMER_STATUS_COLORS : VENDOR_STATUS_COLORS;
-  const bg = map[status] ?? "var(--text-muted)";
+  // Customer pills keep their own vocabulary; vendor pills are trends, and
+  // insights cached before the rename still hold the old capitalised words.
+  const isCustomer = audience === "customer";
+  const trend = isCustomer ? null : normaliseTrend(status);
+  const label = isCustomer ? status : trend ? `Trend: ${trend}` : status;
+  const bg = isCustomer
+    ? CUSTOMER_STATUS_COLORS[status] ?? "var(--text-muted)"
+    : VENDOR_STATUS_COLORS[trend] ?? "var(--text-muted)";
   return (
     <span
       className="status-pill status-pill--filled"
       style={{ background: bg, fontSize: 14, lineHeight: "20px", fontWeight: 400, display: "inline" }}
     >
-      {status}
+      {label}
     </span>
   );
 }

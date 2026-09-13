@@ -7,6 +7,7 @@ import InlineProse from "@/app/ui/InlineProse";
 import Sparkle from "@/app/ui/Sparkle";
 import IconButton from "@/app/ui/IconButton";
 import { RefreshIcon } from "@/app/ui/Icons";
+import { InsightStatusPill } from "@/app/ui/InsightCard";
 
 const SOFT_TTL_MS = 4 * 60 * 60 * 1000;
 
@@ -166,7 +167,7 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
               Portfolio today
             </span>
           </div>
-          {portfolioStatus && <StatusPill status={portfolioStatus} />}
+          {portfolioStatus && <InsightStatusPill status={portfolioStatus} />}
           {isStreaming && payload && (
             <span style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>
               regenerating…
@@ -359,21 +360,6 @@ function WinRow({ company, logoUrl, detail, position }) {
         </span>
       </p>
     </div>
-  );
-}
-
-function StatusPill({ status }) {
-  const map = {
-    Declining: "var(--danger)",
-    "At risk": "var(--alert)",
-    "On track": "var(--success)",
-    Improving: "var(--mint)",
-  };
-  const bg = map[status] ?? "var(--text-muted)";
-  return (
-    <span className="status-pill status-pill--filled" style={{ background: bg }}>
-      {status}
-    </span>
   );
 }
 
