@@ -70,6 +70,69 @@ Two follow-on effects, both handled:
 Also fixed: `playwright.config.js` pins the dev server to port 3001 (`next dev` takes
 the first free port, so the suite only passed while another app held 3000).
 
+## Date shift (2026-09-13)
+
+Principle 1 says every date is computed relative to the run date. That held at
+seed time and then stopped holding, because the nightly reseed that re-ran the
+computation was switched off on 2026-07-10 (it destroyed the injected meetings
+and their AI drafts). Two months later the demo read as a dead account: go-lives
+in the past, "last activity 10 Jul", tasks 49 days overdue, nine of ten
+onboardings At risk.
+
+`scripts/demo-date-shift.mjs` (`npm run demo:shift -- --dry-run` /
+`-- --write`) fixes that without touching the shape of the data. It moves every
+date-bearing column on the seeded corpus forward by a whole number of days, so
+every interval is preserved: between two demo rows, and between a demo row and
+now. The seeded calibration therefore comes back on its own: no re-tuning, no
+reseed, no Claude calls.
+
+- **Anchor.** `dateAnchor` in `prisma/fixtures/demo-snapshot.json`, next to
+  `capturedAt` (which it defaults to). Delta is whole UTC days from the anchor
+  to today; delta 0 exits. A `--write` re-anchors the file to today, and the
+  nightly job commits it back. The anchor lives in that file rather than a
+  table because the file has to be rewritten anyway: the drift check keys
+  onboardings on `prefix|createdAt`, so a shifted database against an unshifted
+  snapshot reports every onboarding as deleted. One artifact, one commit, no
+  migration.
+- **The guard.** The cost of a file anchor is a lost commit: database forward,
+  file behind, next run shifts twice. `Onboarding.createdAt` is not editable
+  from the UI, so live and snapshot must agree; a uniform non-zero skew means
+  exactly that failure, and the script aborts (exit 3) telling you which anchor
+  to set. `--force` overrides.
+- **Scope.** Companies with a `logoUrl`, the same rule `demo-snapshot.js` uses.
+  Legacy/archived rows, the auth tables and the `AICall` cost log are never
+  touched. Unmatched `ExternalEvent`s only move if their `meeting.id` is one of
+  the fixtures, which is what keeps the legacy Acme test events out.
+- **Pre-anchor rows only.** Anything created after the anchor is visitor
+  activity or cron output; it is already recent and stays put. Timestamps that
+  record something that happened are clamped at `now()`, so a seeded draft a
+  visitor approved last week cannot land in the future. Forward-looking dates
+  (`targetGoLive`, `Phase.targetDate`, `Task.due`, `MagicLink.expiresAt`) always
+  move the full delta.
+- **Cached AI insights are deleted, not left to expire.** `hashSnapshot()`
+  deliberately excludes dates. It hashes overdue task ids, phase states and
+  health, all of which a uniform shift is designed to leave unchanged. So a
+  shifted onboarding can hash identically to its cached row and serve prose that
+  says "56 days past go-live". Deleting is the only honest option, and it costs
+  effectively nothing: every reader already treats a cache older than four hours
+  as stale and regenerates on view.
+- **Nightly.** `.github/workflows/demo-drift-check.yml` runs the shift with
+  `--write` at 03:00 UTC, commits the re-anchored snapshot (`[skip ci]`, so it
+  does not trigger a Vercel deploy), then runs the drift check as before. The
+  shift has to come first: the snapshot holds due dates, so checking before the
+  shift would flag every row.
+
+**What a shift cannot fix.** It restores dates, not statuses. Visitors have
+changed 22 task statuses since the 2026-07-12 snapshot (Raycast 11, ChowNow 5),
+so the shift alone lands on 6 On track / 4 At risk rather than the snapshot's
+own 5 / 4 / 1-Blocked. Raycast in particular has been unblocked down to 2 blocked
+tasks, so it reads At risk instead of Blocked. Recovering that needs a
+status-revert pass against the snapshot, which is a separate decision. The
+drift check reports the edits today and deliberately leaves them alone.
+Follow-up draft prose ("overdue by 5 days") and the `orchestratorInput` debug
+blobs also keep their old numbers; only `payload.meeting.date`,
+`payload.dueDate` and `payload.newDueDate` are structured enough to shift.
+
 ## Prod safety — code and data travel separately
 
 The deployed app and local dev share one Supabase database. Code changes are invisible
