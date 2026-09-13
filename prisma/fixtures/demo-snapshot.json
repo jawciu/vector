@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-13T12:57:20.917Z",
+  "capturedAt": "2026-09-13T12:57:52.898Z",
   "companies": [
     {
       "prefix": "ASH",
@@ -9524,7 +9524,7 @@
       "name": "Raycast",
       "domain": "raycast.com",
       "logoUrl": "/logos/raycast.png",
-      "taskCounter": 40,
+      "taskCounter": 41,
       "onboardings": [
         {
           "key": "RAY|2026-09-04T09:37:35.042Z",
@@ -10009,6 +10009,24 @@
               "members": [],
               "previousStatus": null,
               "blockedByNumber": 15
+            },
+            {
+              "key": "RAY-41",
+              "number": 41,
+              "title": "Send fct_installs schema and naming conventions doc to Theo",
+              "status": "Not started",
+              "due": "2026-09-14",
+              "priority": "medium",
+              "phaseName": "Semantic Layer & Modeling",
+              "description": "Felix to share the fct_installs schema and Raycast's naming conventions documentation with Theo so he can write accurate metrics definitions offline without having to guess at column names or conventions.",
+              "notes": "That helps. I can send you the fct_installs schema and our naming conventions doc so you're not guessing. Perfect, that's most of what I need.",
+              "sortOrder": 4,
+              "owner": null,
+              "ownerEmail": null,
+              "assigneeEmail": "felix@raycast.com",
+              "members": [],
+              "previousStatus": null,
+              "blockedByNumber": null
             }
           ],
           "comments": [
@@ -10608,6 +10626,22 @@
               "entityId": 1215,
               "actorType": "contact",
               "createdAt": "2026-09-13T12:44:23.549Z"
+            },
+            {
+              "key": "created|task|1584|2026-09-13T12:57:24.743Z",
+              "verb": "created",
+              "entityType": "task",
+              "entityId": 1584,
+              "actorType": "vendor",
+              "createdAt": "2026-09-13T12:57:24.743Z"
+            },
+            {
+              "key": "assigned|task|1584|2026-09-13T12:57:24.838Z",
+              "verb": "assigned",
+              "entityType": "task",
+              "entityId": 1584,
+              "actorType": "vendor",
+              "createdAt": "2026-09-13T12:57:24.838Z"
             }
           ],
           "notifications": [
@@ -10976,14 +11010,14 @@
             {
               "key": "create_task|2026-09-13T15:32:36.791Z|I can send you the fct_installs schema and our n",
               "action": "create_task",
-              "status": "pending",
+              "status": "applied",
               "confidence": "high",
               "sourceEventSourceId": "9F2C6D80-14AB-4E53-B7C1-6A3E9D2F5188",
               "sourceQuote": "I can send you the fct_installs schema and our naming conventions doc so you're not guessing.",
               "createdAt": "2026-09-13T15:32:36.791Z",
-              "resolvedAt": "2026-09-13T12:13:24.270Z",
+              "resolvedAt": "2026-09-13T12:57:25.546Z",
               "rejectedReason": null,
-              "appliedTaskNumber": null
+              "appliedTaskNumber": 41
             },
             {
               "key": "create_task|2026-09-13T15:32:36.808Z|Maya, can you take the action of raising this wi",
