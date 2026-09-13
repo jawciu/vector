@@ -55,10 +55,10 @@ export function InsightCardHeader({ title, healthPill, statusPill, isStreaming, 
               {title}
             </span>
           </div>
-          {/* Health (outlined, computed) sits beside the trend (filled, AI)
-              so the two signals read as two things, not one. Layout is a
-              class, not an inline style, to keep this header on one style
-              block.
+          {/* Health (computed) sits beside the trend (AI), both filled so
+              they match in weight; the trend's arrow keeps them apart.
+              Layout is a class, not an inline style, to keep this header on
+              one style block.
 
               While streaming, the trend pill is HIDDEN and "regenerating…"
               stands in its place: the pill would otherwise show the previous
