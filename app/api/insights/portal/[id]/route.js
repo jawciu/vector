@@ -87,7 +87,7 @@ export async function POST(req, { params }) {
           }
         }
         const final = await claudeStream.finalMessage();
-        const payload = parseInsightPayload(final);
+        const payload = parseInsightPayload(final, "portal");
         const durationMs = Date.now() - startedAt;
         const usage = final.usage ?? {};
 

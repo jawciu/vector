@@ -16,6 +16,7 @@
     "seed:activity": "npx tsx prisma/seed-recent-activity.js",
     "seed:notifications": "npx tsx prisma/seed-demo-notifications.js",
     "seed:ai-fixtures": "npx tsx prisma/seed-ai-test-fixtures.js",
+    "demo:shift": "node scripts/demo-date-shift.mjs",
     "prestorybook": "npm run build:ds",
     "storybook": "storybook dev -p 6006",
     "prebuild-storybook": "npm run build:ds",

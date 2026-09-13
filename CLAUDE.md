@@ -210,6 +210,28 @@ _Newest first. Why, not just what._
 
 ## Session Log / Handoff
 
+### 2026-09-13 — Meeting drawer trims + filled health pill (branch `feat/drawer-trims-filled-health`)
+- Caroline reviewed the drawer against screenshots and asked for four cuts, all in `MeetingDrawer.js`:
+  the "Open in Meetings tab" link under the attendees is gone (the drawer opens from the Meetings tab,
+  so it was a link to where you already are); the tentative/firm badge on action items is gone
+  (firmness stays in the data, it just is not shown); draft rows show the draft's kind as an icon
+  instead of a "task" Badge; the transcript is open by default with a Hide toggle.
+- The icon is the inbox's own `ActionIcon` (create task = the not-done circle-check, due date =
+  calendar, etc.), moved out of `AIDraftInbox.js` into **`app/components/DraftActionIcon.js`** so both
+  surfaces share one glyph per draft kind. It had to move: the inbox mounts the drawer, so importing
+  from the inbox would have made a cycle. `.mtg-draft-kind` (20px, `--text-muted`) in globals.css.
+- Verified: ESLint 0 errors, 110/110 vitest, rendered on Raycast (#63) weekly sync at 1440px.
+- **Also: the AI overview header's health pill is now FILLED** (`InsightsPanel.js`, one prop), so it
+  matches the filled trend pill beside it. This reverses the "health is ALWAYS outlined" rule that
+  was documented in Badge.tsx / Badge.meta.ts / Badge.stories.tsx / DESIGN.md; all four rewritten to
+  the new rule: health outlined where it stands alone (list, board header), filled in the AI header
+  where the trend's arrow is what tells the two apart. Caroline's call. Badge's types already allowed
+  `health` + `variant="filled"`, so no primitive change.
+- **Open intent (Caroline):** re-evaluate the filled-vs-outlined health split later. The list and
+  board header stay outlined for now on her say-so; the question is whether every surface should
+  agree, and which way. `TODO(caro)` at the call site in `InsightsPanel.js`.
+- Nothing committed (standing rule).
+
 _Newest first._
 
 ### 2026-09-11 (night) — HANDOFF. Slice 0 MERGED (PR #3). Slice 1 built + evaluator-approved, UNCOMMITTED in a worktree.

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import InlineProse from "../ui/InlineProse";
+import Badge from "../ui/Badge";
 import {
   InsightCard,
   InsightCardHeader,
@@ -21,7 +22,7 @@ const SOFT_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
  * AI Insights panel — onboarding scope ("Overview" tab).
  *
  * Layout:
- *   Header        : ✨ COMPANY NAME + status pill + regen
+ *   Header        : ✨ COMPANY NAME + health pill + trend pill + regen
  *   Top row       : Summary | Risks | Wins
  *   Bottom row    : Focus today (with task cards) | This week (priority chevrons)
  *
@@ -35,6 +36,7 @@ export default function InsightsPanel({
   contextHash,
   cachedInsight,
   companyName = "Overview",
+  health = null,
   tasks = [],
   onTaskClick,
 }) {
@@ -160,6 +162,12 @@ export default function InsightsPanel({
       <InsightCard isStreaming={isStreaming}>
         <InsightCardHeader
           title={companyName}
+          // TODO(caro): re-evaluate. Filled health here (2026-09-13) so it matches the
+          // filled trend pill beside it; the list and board header keep health
+          // outlined. Caroline wants to come back to whether the two surfaces
+          // should agree, and which way. See DESIGN.md "Health is outlined on
+          // its own, filled next to the trend".
+          healthPill={health ? <Badge health={health} variant="filled">{health}</Badge> : null}
           statusPill={portfolioStatus ? <InsightStatusPill status={portfolioStatus} /> : null}
           isStreaming={isStreaming}
           payload={payload}

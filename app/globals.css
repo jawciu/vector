@@ -948,6 +948,25 @@ button.field-main {
   font-weight: 400;
 }
 
+/* Insight card header: the health pill then the trend pill, 8px apart. */
+.oi-header-pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The insight pills sit inline beside a card title, so they opt out of the
+ * base class's inline-flex; the trend variant opts back in for its arrow. */
+.status-pill--insight {
+  display: inline;
+}
+
+.status-pill--trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* sm size: the task drawer status picker chip (12px, 1px 4px). Badge only. */
 .status-pill--sm {
   padding: 1px 4px;
@@ -1560,4 +1579,329 @@ html.grabbing, html.grabbing * {
     from { opacity: 1; }
     to { opacity: 0; }
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Meeting drawer (app/components/MeetingDrawer.js)
+
+   The panel used to be one 15px grey column: a mono title chip, a summary
+   paragraph, action items as bold-sentence-plus-italic-quote, and a fully
+   expanded transcript that owned two thirds of the scroll. Nothing scanned.
+
+   The rebuild carries hierarchy in three places, so the styles live here
+   rather than as inline objects at the call site:
+     1. One heading level per job — 18px title, 14px section titles (the
+        InsightSection tone: 600 weight, 0.5px tracking, muted), 14px body.
+     2. Section rules do the separating. AI-authored sections (summary,
+        action items, drafts) sit under `.ai-divider`, the gradient hairline
+        the insight cards use; the transcript is raw source, so it gets a
+        plain `border-subtle` rule. That contrast is the AI attribution.
+     3. Rhythm is 24px between sections, 12/8 inside them (DESIGN.md).
+   --------------------------------------------------------------------------- */
+
+.mtg-body {
+  flex: 1;
+  overflow: auto;
+  padding: 18px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Header. The right padding clears the Drawer primitive's close button. */
+.mtg-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 28px;
+}
+
+.mtg-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.mtg-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.mtg-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Attendee row. Vendor attendees get the round person avatar, customer
+   attendees the square company mark, so who is on which side reads at a
+   glance without a second label. Email lives in the tooltip. */
+.mtg-attendees {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mtg-attendee {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px 2px 2px;
+  border-radius: 6px;
+  background: var(--surface);
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.mtg-jump {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--action);
+}
+
+.mtg-jump:hover {
+  color: var(--action-hover);
+}
+
+/* Sections */
+.mtg-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mtg-section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mtg-section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 20px;
+}
+
+.mtg-section-titles {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mtg-section-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  line-height: 16.5px;
+  color: var(--text-muted);
+}
+
+.mtg-section-count {
+  font-size: 12px;
+  line-height: 16.5px;
+  color: var(--text-muted);
+}
+
+/* Plain rule for non-AI sections; the AI ones use .ai-divider instead. */
+.mtg-rule {
+  height: 1px;
+  width: 100%;
+  background: var(--border-subtle);
+}
+
+.mtg-prose {
+  margin: 0;
+  max-width: 70ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* Action items. One elevated card each: the drawer sits on `deeper-bg`, so
+   `bg-elevated` separates the items without a hairline per row. */
+.mtg-items,
+.mtg-drafts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mtg-items { gap: 8px; }
+.mtg-drafts { gap: 10px; }
+
+.mtg-item {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--bg-elevated);
+}
+
+/* A numbered marker, not a tick: these are extracted claims, and a tick
+   would promise a completion control the row does not have. */
+.mtg-item-index {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+  font-size: 11px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mtg-item-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mtg-item-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mtg-item-claim {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.mtg-item-top .status-pill,
+.mtg-draft .status-pill {
+  flex-shrink: 0;
+}
+
+.mtg-item-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: -8px; /* pull the tertiary button's own padding back to the text edge */
+}
+
+/* The quote behind "Show quote". Quieter than the claim and ruled off, so an
+   expanded item still reads claim-first. */
+.mtg-quote {
+  margin: 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--border);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* Drafts */
+.mtg-draft {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* The draft's kind, as the same glyph the Actions inbox uses for it. Sized to
+   sit on the title's first line. */
+.mtg-draft-kind {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+}
+
+.mtg-draft-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mtg-draft-title {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.mtg-draft-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Transcript. Open by default, hideable.
+   Every turn is indented the same amount and only customer turns show the
+   rule, so the speaker column stays aligned while the sides stay legible. */
+.mtg-turns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mtg-turn {
+  display: flex;
+  gap: 12px;
+  padding-left: 12px;
+  border-left: 2px solid transparent;
+}
+
+.mtg-turn--customer {
+  border-left-color: var(--border);
+}
+
+.mtg-turn-speaker {
+  flex-shrink: 0;
+  width: 88px;
+  font-family: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.mtg-turn-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.mtg-empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.mtg-error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--danger);
 }

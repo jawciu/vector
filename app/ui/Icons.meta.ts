@@ -15,7 +15,7 @@ export const meta: DsMeta = {
   ],
   a11y: [
     "Every icon renders `aria-hidden` — they are decorative and MUST be accompanied by visible or sr-only text; an icon never carries meaning alone.",
-    "Colour comes from `currentColor` inherited from the parent. (Legacy note: the original 7 field icons bake `var(--text-muted)` as an inline-style default — kept for their call sites; sweep icons are pure currentColor.) `PriorityIcon` is the exception — it colours its bars from tokens directly, so priority is also conveyed by the adjacent label, not the bars alone.",
+    "Colour comes from `currentColor` inherited from the parent. (Legacy note: the original 7 field icons bake `var(--text-muted)` as an inline-style default — kept for their call sites; sweep icons are pure currentColor.) `PriorityIcon` is the exception — it colours its bars from tokens directly, so priority is also conveyed by the adjacent label, not the bars alone. `TrendArrowIcon` is the other prop-driven glyph: one arrow rotated by `direction`, and the pill that uses it always names the direction in text too.",
     "Hardcoded hexes found during the sweep were converted to `currentColor` (the checked-checkbox tick was hardcoded to the action lilac); no raw colours live in the registry.",
   ],
   tokens: ["textMuted", "iconTertiary", "action"],

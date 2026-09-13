@@ -39,6 +39,7 @@ import { taskMatchesFilter } from "@/lib/taskFilters";
 import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 import { avatarColor, avatarInitials } from "@/lib/avatar";
 import Tooltip from "@/app/ui/Tooltip";
+import Badge from "@/app/ui/Badge";
 
 function SortableColumn({ id, children }) {
   const {
@@ -547,6 +548,7 @@ export default function OnboardingDetailClient({
           contextHash={insightContextHash}
           cachedInsight={cachedInsight}
           companyName={onboarding.companyName}
+          health={health}
           tasks={tasks}
           onTaskClick={handleOpenDrawer}
         />
@@ -600,16 +602,11 @@ export default function OnboardingDetailClient({
             <div className="flex items-center gap-2 flex-shrink-0">
               {health !== "On track" && (
                 <Tooltip lines={healthTooltipLines}>
-                  <span
-                    className="text-sm rounded-md health-pill"
-                    style={{
-                      background: health === "Blocked" ? "var(--danger)" : "var(--alert)",
-                      color: "var(--text-dark)",
-                      border: "0.5px solid transparent",
-                      padding: "2px 4px",
-                    }}
-                  >
-                    {health}
+                  {/* Health is outlined everywhere: the filled pill of these
+                      same colours is the AI trend pill, and the two must never
+                      be mistaken for each other. */}
+                  <span className="health-pill">
+                    <Badge health={health}>{health}</Badge>
                   </span>
                 </Tooltip>
               )}

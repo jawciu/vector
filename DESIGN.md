@@ -284,17 +284,32 @@ Pill-shaped trigger that opens a popover (date picker, status filter, etc.). The
 Small cased label communicating state. `Badge` is the only status pill in the DS (2026-09-11). Two variants:
 
 - **Outlined** (default): transparent background, 0.5px border and text in the colour. Two sizes: **md** 14px/20px, `padding: 2px 4px` (the kanban card chip, default) and **sm** 12px/16px, `padding: 1px 4px` (the task drawer status picker). Weight 400, `rounded.md` (6px).
-- **Filled**: the colour fills the pill, text in `textDark`. One size, md, the board header health and blocked pills. Same proportions as outlined md.
+- **Filled**: the colour fills the pill, text in `textDark`. One size, md, the board header blocked-count pill, the AI trend pill and the health pill in the AI card header. Same proportions as outlined md.
 
-Colour comes from one of two props, never both: `color` (the closed union `success` / `danger` / `alert` / `action` / `muted` / `mint` / `sky` / `candy`) or `status` (a task status; Badge owns the mapping: Not started → `muted`, In progress → `mint`, Under investigation → `sky`, On hold → `candy`, Blocked → `danger`, Done → `success`). Call sites never re-derive status colours.
+Colour comes from one of three props, never two: `color` (the closed union `success` / `danger` / `alert` / `action` / `muted` / `mint` / `sky` / `candy`), `status` (a task status; Badge owns the mapping: Not started → `muted`, In progress → `mint`, Under investigation → `sky`, On hold → `candy`, Blocked → `danger`, Done → `success`) or `health` (a `computeHealth` state: On track → `success`, At risk → `alert`, Blocked → `danger`). Call sites never re-derive status colours.
 
-The CSS classes (`.status-pill`, `--filled`, `--md`, `--sm`) stay for the hand-rolled pills until Phase 7 retrofits them: the task status chips in `TaskCardView`, `TaskDrawer`, `PortalTaskCard`, `AIDraftInbox` and `CreateTaskModal`, `InsightStatusPill`, and the board header pills.
+**Health is outlined on its own, filled next to the trend.** Computed health
+(`lib/health.js`) renders as an OUTLINED badge where it stands alone: the
+workspace list Status column and the board header. In an AI card header it sits
+beside the AI trend pill, health first then trend, 8px apart, and there BOTH are
+FILLED so the pair reads as one row of equal weight (2026-09-13; before that the
+header's health pill was outlined and looked like the trend's poor relation). The
+trend pill is always filled and always carries its arrow, on the same three
+colours, so in the header the arrow is what separates the model judgement from
+the computed state. Never un-fill a trend pill. (The board header's red
+blocked-COUNT pill stays filled: it is a count, not a health state.)
 
-Insight status → token mapping (used by Vector trend / portfolio status):
-- `Declining` → `danger`
-- `At risk` → `alert`
-- `On track` → `success`
-- `Improving` → `mint`
+The CSS classes (`.status-pill`, `--filled`, `--md`, `--sm`) stay for the hand-rolled pills until Phase 7 retrofits them: the task status chips in `TaskCardView`, `TaskDrawer`, `PortalTaskCard`, `AIDraftInbox` and `CreateTaskModal`, `InsightStatusPill`, the list's health pill and the board header blocked pill. `.status-pill--insight` / `--trend` / `.oi-header-pills` carry the insight pills' layout.
+
+Insight trend → token mapping (used by the vendor AI pill, onboarding and portfolio).
+The AI pill states the direction of travel only. Health (`On track` / `At risk` /
+`Blocked`) is computed by `lib/health.js` and has its own pills, so the two
+vocabularies never overlap. The COLOURS are shared on purpose, since green /
+amber / red already mean good, watch, bad here and a second ramp for the same
+ideas read as noise; the arrow is what separates the two pill families:
+- `improving` → `success` (arrow up-right)
+- `steady` → `alert` (arrow flat)
+- `declining` → `danger` (arrow down-right)
 
 ### `Toast` — `app/ui/Toast.tsx`
 
@@ -364,10 +379,10 @@ Underline-as-selection pattern. Inactive tabs are `textMuted`, hover bumps to `t
 The visual language for AI-generated panels. Used by both the vendor onboarding overview (`InsightsPanel`) and the customer portal overview (`PortalOverview`) so the two surfaces feel like the same product.
 
 - **`InsightCard`** — outer shell. 20px radius (bespoke — outside the `rounded` scale, whose `xl` is 12px; alignment pending the radius decision in Future plans), 1px `buttonSecondaryBorder`, `bg` background, `container-type: inline-size` so the section grid (`oi-row`) reflows at 1100px / 720px breakpoints. Pass `isStreaming` to enable the gradient sweep border animation (`.is-streaming`).
-- **`InsightCardHeader`** — `padding 16/16/12`. Slots: `title` (uppercase 16px label after the Vector sparkle), `statusPill` (rendered next to the title), `onRegenerate` (the `↻` icon button on the right). Disables the regenerate button while streaming.
+- **`InsightCardHeader`** — `padding 16/16/12`. Slots: `title` (uppercase 16px label after the Vector sparkle), `healthPill` then `statusPill` (rendered next to the title in a `.oi-header-pills` row, 8px apart: filled health, then filled trend with its arrow; while streaming the header hides `statusPill`, since the trend shown would be the previous answer, and "regenerating…" takes its place), `onRegenerate` (the `↻` icon button on the right). Disables the regenerate button while streaming.
 - **`InsightDivider`** — 1px `borderSubtle` rule; sits between header and the first row, and between rows.
 - **`InsightSection`** — section wrapper. Title is 14px semibold uppercase `textMuted` letter-spacing 0.5px, followed by an `.ai-divider` (the AI-gradient hairline). Section grid placement is controlled by classes `oi-section--{summary|risks|wins|focus|week}` defined in `globals.css`.
-- **`InsightStatusPill`** — `audience="vendor"` (default) maps `Declining`/`At risk`/`On track`/`Improving` → `danger`/`alert`/`success`/`mint`. `audience="customer"` maps `On track`/`Needs your input`/`In progress` → `success`/`alert`/`mint`. Both render as `.status-pill--filled` today; Phase 7 folds them onto `Badge` filled.
+- **`InsightStatusPill`** — `audience="vendor"` (default) renders a TREND: a `TrendArrowIcon` (up-right / flat / down-right) then the word, 4px apart, `improving`/`steady`/`declining` → `success`/`alert`/`danger`, the same three colours as health. Hidden text supplies the `Trend: ` prefix so the accessible name stays unambiguous. Legacy cached values are mapped on the way in (`Declining`→declining, `Improving`→improving, `At risk`→declining, `On track`→steady) by `normaliseTrend` in `lib/insight-trend.js`, silently. `audience="customer"` maps `On track`/`Needs your input`/`In progress` → `success`/`alert`/`mint`. Both render as `.status-pill--filled` today; Phase 7 folds them onto `Badge` filled.
 - **`WinRow`** — single win, green `CheckCircle` + headline + muted detail. Use the `position` prop (`top`/`middle`/`bottom`/`only`) to round corners when stacking multiple rows into a single bordered group.
 - **`ThisWeekRow`** — single weekly priority, `PriorityIcon` + summary text. Same `position` API as `WinRow`.
 - **`RiskCard`** — vendor only. Severity pill on top (`high`/`medium`/`low` → `danger`/`alert`/`textMuted`) with the risk summary below. Stacks horizontally with `position` for shared rounded corners.
