@@ -55,7 +55,7 @@ export const Outlined: Story = {};
 /** Outlined sm: the task drawer status picker chip. */
 export const OutlinedSmall: Story = { name: "Outlined small", args: { size: "sm" } };
 
-/** Filled: the board header health and blocked pills. */
+/** Filled: the board header blocked-count pill, and the AI trend pill. Health is never filled. */
 export const Filled: Story = { args: { variant: "filled" } };
 
 /** Task status in: Badge picks the colour. */

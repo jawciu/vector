@@ -948,6 +948,25 @@ button.field-main {
   font-weight: 400;
 }
 
+/* Insight card header: the health pill then the trend pill, 8px apart. */
+.oi-header-pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The insight pills sit inline beside a card title, so they opt out of the
+ * base class's inline-flex; the trend variant opts back in for its arrow. */
+.status-pill--insight {
+  display: inline;
+}
+
+.status-pill--trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* sm size: the task drawer status picker chip (12px, 1px 4px). Badge only. */
 .status-pill--sm {
   padding: 1px 4px;

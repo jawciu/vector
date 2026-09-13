@@ -14,7 +14,7 @@ const SOFT_TTL_MS = 4 * 60 * 60 * 1000;
 /**
  * AI hero card on the onboardings home dashboard.
  *
- * Layout: PORTFOLIO TODAY header + status pill, then three columns
+ * Layout: PORTFOLIO TODAY header + health-spread pill + trend pill, then three columns
  * (Summary / Risk focus or Focus this week / Wins) separated by AI-gradient
  * dividers. Streams via SSE through /api/insights/portfolio/all.
  */
@@ -167,7 +167,11 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
               Portfolio today
             </span>
           </div>
-          {portfolioStatus && <InsightStatusPill status={portfolioStatus} />}
+          <span className="oi-header-pills">
+            {/* Portfolio level shows the trend only (Caroline, 2026-09-13); the
+                per-onboarding health lives in the table below. */}
+            {portfolioStatus && <InsightStatusPill status={portfolioStatus} />}
+          </span>
           {isStreaming && payload && (
             <span style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>
               regenerating…

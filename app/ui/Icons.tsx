@@ -425,6 +425,44 @@ export function ChevronUpIcon({ size = 10, className, style }: SizedIconProps) {
   );
 }
 
+/** Trend direction — the AI insight pill's arrow. */
+export type TrendDirection = "improving" | "steady" | "declining";
+
+const TREND_ROTATION: Record<TrendDirection, number> = {
+  improving: -45,
+  steady: 0,
+  declining: 45,
+};
+
+interface TrendArrowIconProps extends SizedIconProps {
+  direction?: TrendDirection;
+}
+
+/**
+ * Arrow — the direction of travel on the AI insight pill (`InsightStatusPill`).
+ * One glyph rotated three ways: up-right for improving, flat for steady,
+ * down-right for declining. The arrow is what tells a trend pill apart from a
+ * health pill at a glance, so it is never optional there; it stays
+ * `aria-hidden` like every registry icon, and the pill supplies the words.
+ */
+export function TrendArrowIcon({ direction = "steady", size = 14, className, style }: TrendArrowIconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 14 14"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      style={{ transform: `rotate(${TREND_ROTATION[direction]}deg)`, ...style }}
+      aria-hidden
+    >
+      <path d="M2 7H11.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M8 3.5L11.5 7L8 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 /** Chevron left — month-back button (CalendarDropdown). */
 export function ChevronLeftIcon({ size = 10, className, style }: SizedIconProps) {
   return (
@@ -521,6 +559,7 @@ export const GENERIC_ICONS: Record<string, AnyIcon> = {
   ChevronUpIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  TrendArrowIcon,
   WorkspaceIcon,
   SettingsIcon,
   SparkleMonoIcon,

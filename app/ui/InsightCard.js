@@ -2,7 +2,7 @@
 
 import InlineProse from "./InlineProse";
 import TaskCardView from "../components/TaskCardView";
-import { PriorityIcon, RefreshIcon } from "./Icons";
+import { PriorityIcon, RefreshIcon, TrendArrowIcon } from "./Icons";
 import Sparkle from "./Sparkle";
 import IconButton from "./IconButton";
 import { normaliseTrend } from "@/lib/insight-trend";
@@ -14,9 +14,10 @@ import { normaliseTrend } from "@/lib/insight-trend";
  * The pieces are presentational; the streaming + payload state machine
  * stays with the consumer (vendor `InsightsPanel`, customer `PortalInsightCard`).
  *
- * `InsightStatusPill` states a TREND for the vendor audience ("Trend:
- * improving" / "steady" / "declining"). Health is a separate, computed
- * signal (`lib/health.js`) and never appears here.
+ * `InsightStatusPill` states a TREND for the vendor audience: an arrow plus
+ * "improving" / "steady" / "declining", in the same three health colours.
+ * Health itself is a separate, computed signal (`lib/health.js`) and never
+ * appears here.
  */
 
 export function InsightCard({ isStreaming, children, style }) {
@@ -27,7 +28,7 @@ export function InsightCard({ isStreaming, children, style }) {
   );
 }
 
-export function InsightCardHeader({ title, statusPill, isStreaming, payload, onRegenerate }) {
+export function InsightCardHeader({ title, healthPill, statusPill, isStreaming, payload, onRegenerate }) {
   return (
     <>
       <div
@@ -54,7 +55,16 @@ export function InsightCardHeader({ title, statusPill, isStreaming, payload, onR
               {title}
             </span>
           </div>
-          {statusPill}
+          {/* Health (outlined, computed) sits beside the trend (filled, AI)
+              so the two signals read as two things, not one. Layout is a
+              class, not an inline style, to keep this header on one style
+              block. */}
+          {healthPill || statusPill ? (
+            <span className="oi-header-pills">
+              {healthPill}
+              {statusPill}
+            </span>
+          ) : null}
           {isStreaming && payload && (
             <span style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>
               regenerating…
@@ -118,10 +128,15 @@ export function InsightSection({ title, className, children }) {
  * Vendor pills state a TREND, keyed by the lower-case values in
  * `lib/insight-trend.js`. Health lives in `lib/health.js` and is rendered
  * elsewhere, so nothing here may borrow its words.
+ *
+ * The colours are deliberately the SAME three the health pill uses
+ * (`WorkspacesTable`): green / amber / red read as good, watch, bad, and a
+ * second ramp for the same ideas looked wrong next to them. The ARROW is what
+ * separates a trend pill from a health pill, so it always renders.
  */
 const VENDOR_STATUS_COLORS = {
-  improving: "var(--mint)",
-  steady: "var(--text-muted)",
+  improving: "var(--success)",
+  steady: "var(--alert)",
   declining: "var(--danger)",
 };
 
@@ -137,16 +152,22 @@ export function InsightStatusPill({ status, audience = "vendor" }) {
   // insights cached before the rename still hold the old capitalised words.
   const isCustomer = audience === "customer";
   const trend = isCustomer ? null : normaliseTrend(status);
-  const label = isCustomer ? status : trend ? `Trend: ${trend}` : status;
   const bg = isCustomer
     ? CUSTOMER_STATUS_COLORS[status] ?? "var(--text-muted)"
     : VENDOR_STATUS_COLORS[trend] ?? "var(--text-muted)";
+  // "Trend:" is carried by hidden text, not ink: the arrow says the direction
+  // and the word names it, but a screen reader still needs to hear which
+  // signal this is, since the pill sits beside health pills that read alike.
+  // Layout lives in globals.css (`--insight` / `--trend`) so the pill keeps a
+  // single inline style block.
   return (
     <span
-      className="status-pill status-pill--filled"
-      style={{ background: bg, fontSize: 14, lineHeight: "20px", fontWeight: 400, display: "inline" }}
+      className={`status-pill status-pill--filled status-pill--${trend ? "trend" : "insight"}`}
+      style={{ background: bg, fontSize: 14, lineHeight: "20px", fontWeight: 400 }}
     >
-      {label}
+      {trend ? <TrendArrowIcon direction={trend} /> : null}
+      {trend ? <span className="sr-only">Trend: </span> : null}
+      {trend ?? status}
     </span>
   );
 }
