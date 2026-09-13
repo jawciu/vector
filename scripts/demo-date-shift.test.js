@@ -138,6 +138,41 @@ describe("snapshot rewrite", () => {
     expect(twice).toEqual(once);
   });
 
+  it("shifts the collections a newer capture adds", () => {
+    const rich = {
+      capturedAt: "2026-09-13T00:00:00.000Z",
+      companies: [{
+        prefix: "RAY",
+        onboardings: [{
+          key: "RAY|2026-09-04T09:00:00.000Z",
+          createdAt: "2026-09-04T09:00:00.000Z",
+          updatedAt: "2026-09-11T09:00:00.000Z",
+          targetGoLive: null,
+          phases: [],
+          tasks: [],
+          contacts: [{ email: "a@b.c", lastSeenPortalAt: "2026-09-10T09:00:00.000Z", bouncedAt: null }],
+          comments: [{ key: "k", createdAt: "2026-09-01T09:00:00.000Z" }],
+          files: [{ key: "f", createdAt: "2026-09-02T09:00:00.000Z" }],
+          magicLinks: [{ token: "t", createdAt: "2026-09-03T09:00:00.000Z", expiresAt: "2026-10-03T09:00:00.000Z", revokedAt: null, lastUsedAt: null, sentAt: null }],
+          activity: [{ key: "a", createdAt: "2026-09-05T09:00:00.000Z" }],
+          notifications: [{ key: "n", createdAt: "2026-09-06T09:00:00.000Z", readAt: null, archivedAt: null }],
+          drafts: [{ key: "d", createdAt: "2026-09-07T09:00:00.000Z", resolvedAt: "2026-09-08T09:00:00.000Z" }],
+        }],
+      }],
+    };
+    const o = shiftSnapshot(rich, 10, "2026-09-23").companies[0].onboardings[0];
+    expect(o.updatedAt).toBe("2026-09-21T09:00:00.000Z");
+    expect(o.contacts[0].lastSeenPortalAt).toBe("2026-09-20T09:00:00.000Z");
+    expect(o.comments[0].createdAt).toBe("2026-09-11T09:00:00.000Z");
+    expect(o.files[0].createdAt).toBe("2026-09-12T09:00:00.000Z");
+    expect(o.magicLinks[0].expiresAt).toBe("2026-10-13T09:00:00.000Z");
+    expect(o.activity[0].createdAt).toBe("2026-09-15T09:00:00.000Z");
+    expect(o.notifications[0].createdAt).toBe("2026-09-16T09:00:00.000Z");
+    expect(o.drafts[0].resolvedAt).toBe("2026-09-18T09:00:00.000Z");
+    // The magic-link token is identity, not a date.
+    expect(o.magicLinks[0].token).toBe("t");
+  });
+
   it("leaves the original untouched", () => {
     shiftSnapshot(snapshot, 63, "2026-09-13");
     expect(snapshot.companies[0].onboardings[0].createdAt).toBe("2026-07-03T09:37:35.042Z");

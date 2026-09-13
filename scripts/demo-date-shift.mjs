@@ -120,20 +120,52 @@ export function shiftIso(value, days) {
  * `prefix|createdAt`, so they are recomputed rather than shifted as strings.
  */
 export function shiftSnapshot(snapshot, days, today) {
+  const s = (v) => shiftIso(v, days);
+  // Written field by field and defensively: an older snapshot carries fewer
+  // collections, and a newer one must not silently leave a date behind.
+  const maybe = (rows, fn) => (Array.isArray(rows) ? rows.map(fn) : rows);
   return {
     ...snapshot,
     dateAnchor: today,
     companies: snapshot.companies.map((c) => ({
       ...c,
       onboardings: c.onboardings.map((o) => {
-        const createdAt = shiftIso(o.createdAt, days);
+        const createdAt = s(o.createdAt);
         return {
           ...o,
           key: `${c.prefix}|${createdAt}`,
           createdAt,
-          targetGoLive: shiftIso(o.targetGoLive, days),
-          phases: o.phases.map((p) => ({ ...p, targetDate: shiftIso(p.targetDate, days) })),
+          updatedAt: s(o.updatedAt),
+          targetGoLive: s(o.targetGoLive),
+          phases: o.phases.map((p) => ({ ...p, targetDate: s(p.targetDate) })),
+          contacts: maybe(o.contacts, (ct) => ({
+            ...ct,
+            lastSeenPortalAt: s(ct.lastSeenPortalAt),
+            bouncedAt: s(ct.bouncedAt),
+          })),
           tasks: o.tasks.map((t) => ({ ...t, due: shiftDueString(t.due, days) })),
+          comments: maybe(o.comments, (cm) => ({ ...cm, createdAt: s(cm.createdAt) })),
+          files: maybe(o.files, (f) => ({ ...f, createdAt: s(f.createdAt) })),
+          magicLinks: maybe(o.magicLinks, (m) => ({
+            ...m,
+            createdAt: s(m.createdAt),
+            expiresAt: s(m.expiresAt),
+            revokedAt: s(m.revokedAt),
+            lastUsedAt: s(m.lastUsedAt),
+            sentAt: s(m.sentAt),
+          })),
+          activity: maybe(o.activity, (a) => ({ ...a, createdAt: s(a.createdAt) })),
+          notifications: maybe(o.notifications, (n) => ({
+            ...n,
+            createdAt: s(n.createdAt),
+            readAt: s(n.readAt),
+            archivedAt: s(n.archivedAt),
+          })),
+          drafts: maybe(o.drafts, (d) => ({
+            ...d,
+            createdAt: s(d.createdAt),
+            resolvedAt: s(d.resolvedAt),
+          })),
         };
       }),
     })),

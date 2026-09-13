@@ -133,6 +133,57 @@ Follow-up draft prose ("overdue by 5 days") and the `orchestratorInput` debug
 blobs also keep their old numbers; only `payload.meeting.date`,
 `payload.dueDate` and `payload.newDueDate` are structured enough to shift.
 
+## Self-healing state (2026-09-13)
+
+The shift keeps the dates honest. It does nothing about the boards themselves,
+and vector.quest is writable: people tick tasks, drag cards and approve drafts,
+and a demo day does a lot of that at once. Left alone the portfolio only ever
+gets greener. By the time of the shift, visitors had already ticked Raycast's
+blocked chain down to 2 blocked tasks, so the account that exists to show a
+stalled onboarding was reading At risk instead of Blocked.
+
+`scripts/demo-snapshot.js --restore-state` puts the seeded rows back the way
+the snapshot has them. Dry-run by default, `--write` to apply,
+`--only RAY,CHOW` to narrow it, per-table counts and the predicted health table
+either way.
+
+- **Resets**: task status, due, title, description, notes, priority, phase,
+  sort order, owner, assignee, previous status and dependency; phase name,
+  order, completion and target date; onboarding status, owner, go-live and
+  `updatedAt` (raw SQL, because `@updatedAt` would otherwise stamp every
+  account as active this second and kill the deliberately quiet ones); contact
+  name, role, portal visit and bounce.
+- **Deletes** the tasks, comments, files, magic links, activity and
+  notifications that are not in the snapshot, and the tasks that approved
+  drafts created.
+- **Drafts are reset, not deleted.** They are seeded content that cost
+  Anthropic credits to produce, so a visitor approving one is an edit to undo:
+  status goes back to pending and `appliedTaskId` is cleared. Drafts created
+  after the baseline (the stale-task scanner keeps running) are deleted.
+  ExternalEvents and the injected meeting pipeline are never touched.
+- **It only touches a category the snapshot actually holds.** `--capture` now
+  records comments, files, magic links, activity, notifications and drafts
+  alongside the existing companies/onboardings/phases/tasks/contacts, plus
+  `updatedAt`, contact portal dates, and task owner/assignee by email rather
+  than by id. Until the first extended capture those categories are reported as
+  inert rather than guessed at: with no baseline there is no way to tell a
+  visitor's comment from a seeded one.
+- **Natural keys throughout**, as everywhere else in this file: tasks by
+  `PREFIX-number`, magic links by token, comments and activity and drafts by a
+  composite of their stable fields with repeats numbered. Ids churn; these do
+  not.
+- **`demo-date-shift.mjs` shifts the new collections too**, so the two sides
+  stay in lockstep and restore-state never mistakes a shifted date for an edit.
+
+**Nightly order is shift, restore-state, check.** The snapshot holds due dates,
+so checking before the shift would flag every row; and restore-state compares
+against the snapshot, so it has to run after both sides have moved together.
+
+**Sequence to bless a new baseline** (do this once, in this order):
+`--restore-state --write` (all onboardings, which puts Raycast back to Blocked
+and ChowNow back to At risk), then `--capture`. Capturing before the restore
+would freeze today's drift as the thing to restore to.
+
 ## Prod safety — code and data travel separately
 
 The deployed app and local dev share one Supabase database. Code changes are invisible

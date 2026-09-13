@@ -1,10 +1,16 @@
 # Nightly date shift + drift check for the public demo at vector.quest.
 #
-# Step one rolls the seeded portfolio forward so it always reads as "today"
-# (scripts/demo-date-shift.mjs), then commits the re-anchored snapshot back to
-# main. Step two is the drift check that has always lived here. Order matters:
-# the snapshot holds due dates and go-live dates, so checking before the shift
-# would flag every row as changed.
+# Three steps, in this order:
+#   1. shift         roll every seeded date forward so the demo reads as
+#                    "today", then commit the re-anchored snapshot back to main
+#   2. restore-state put the seeded rows back the way the snapshot has them, so
+#                    a day of visitors clicking around does not slowly degrade
+#                    the boards (Raycast stays Blocked, ChowNow stays At risk)
+#   3. check         the drift report that has always lived here
+#
+# Order matters both ways. The snapshot holds due dates, so checking before the
+# shift would flag every row. And restore-state compares against the snapshot,
+# so it has to run after the shift has moved both sides in lockstep.
 #
 # vector.quest is writable by anyone, so visitors will tick tasks and drag cards.
 # That's fine — it's a demo, and a moved card is not worth fixing. What matters is
@@ -95,6 +101,20 @@ jobs:
           git commit -m "demo: roll the seeded portfolio forward to today [skip ci]"
           git push
 
+      # Undoes a day of visitor edits on the seeded rows: task statuses, phases,
+      # go-lives, contacts, and drafts a visitor approved or rejected. Deletes
+      # the tasks, comments, files, magic links, activity and notifications
+      # that are not in the snapshot, including the tasks that approved drafts
+      # created. ExternalEvents and the injected meeting pipeline are never
+      # touched, so the AI content survives.
+      - name: Put the seeded rows back
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -o pipefail
+          npx tsx scripts/demo-snapshot.js --restore-state --write | tee restore-state-report.txt
+
       - name: Compare live data against the snapshot
         id: drift
         env:
@@ -115,6 +135,12 @@ jobs:
             echo ""
             echo '```'
             cat shift-report.txt || echo "(no report)"
+            echo '```'
+            echo ""
+            echo "## Seeded rows put back"
+            echo ""
+            echo '```'
+            cat restore-state-report.txt || echo "(no report)"
             echo '```'
             echo ""
             echo "## Demo drift report"
