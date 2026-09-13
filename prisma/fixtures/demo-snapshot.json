@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-13T12:23:09.650Z",
+  "capturedAt": "2026-09-13T12:57:20.917Z",
   "companies": [
     {
       "prefix": "ASH",
@@ -9524,7 +9524,7 @@
       "name": "Raycast",
       "domain": "raycast.com",
       "logoUrl": "/logos/raycast.png",
-      "taskCounter": 39,
+      "taskCounter": 40,
       "onboardings": [
         {
           "key": "RAY|2026-09-04T09:37:35.042Z",
@@ -9762,7 +9762,7 @@
               "key": "RAY-10",
               "number": 10,
               "title": "Validate metric definitions with the data team",
-              "status": "Blocked",
+              "status": "Done",
               "due": "2026-10-03",
               "priority": "medium",
               "phaseName": "Semantic Layer & Modeling",
@@ -10072,7 +10072,7 @@
               "createdAt": "2026-09-10T21:29:09.123Z",
               "expiresAt": "2026-10-10T21:29:09.123Z",
               "revokedAt": null,
-              "lastUsedAt": "2026-09-13T11:51:26.742Z",
+              "lastUsedAt": "2026-09-13T12:44:22.794Z",
               "sentAt": "2026-09-10T21:29:09.794Z"
             },
             {
@@ -10600,6 +10600,14 @@
               "entityId": 1219,
               "actorType": "contact",
               "createdAt": "2026-09-13T11:51:26.866Z"
+            },
+            {
+              "key": "completed|task|1215|2026-09-13T12:44:23.549Z",
+              "verb": "completed",
+              "entityType": "task",
+              "entityId": 1215,
+              "actorType": "contact",
+              "createdAt": "2026-09-13T12:44:23.549Z"
             }
           ],
           "notifications": [
@@ -10738,6 +10746,14 @@
               "readAt": null,
               "archivedAt": null,
               "createdAt": "2026-09-13T11:51:26.901Z"
+            },
+            {
+              "key": "63:c122:2982172|vendor|2026-09-13T12:44:23.764Z",
+              "groupKey": "63:c122:2982172",
+              "recipientType": "vendor",
+              "readAt": null,
+              "archivedAt": null,
+              "createdAt": "2026-09-13T12:44:23.764Z"
             }
           ],
           "drafts": [
