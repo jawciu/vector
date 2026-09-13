@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
+import { ToastStack, useToasts } from "@/app/ui/Toast";
 import Tooltip from "@/app/ui/Tooltip";
 import {
   CopyIcon,
@@ -56,15 +57,12 @@ export default function AIDraftInbox({
   const [busyIds, setBusyIds] = useState(new Set());
   const [errors, setErrors] = useState({});
   const [selectedIds, setSelectedIds] = useState(new Set());
-  const [toast, setToast] = useState(null);
+  const { toasts, push: pushToast, dismiss: dismissToast } = useToasts();
   const [drawerEventId, setDrawerEventId] = useState(null);
-  const toastTimer = useRef(null);
 
+  // Toast owns its own timing, hover-pause and exit animation.
   function flashToast(message, action = null) {
-    setToast({ message, action });
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    // A toast carrying a "View" link needs long enough to actually click it.
-    toastTimer.current = setTimeout(() => setToast(null), action ? 9000 : 4000);
+    pushToast(message, action);
   }
 
   const isPending = mode === "pending";
@@ -211,9 +209,7 @@ export default function AIDraftInbox({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32, position: "relative" }}>
-      {toast && (
-        <Toast message={toast.message} action={toast.action} onDismiss={() => setToast(null)} />
-      )}
+      <ToastStack toasts={toasts} onDismiss={dismissToast} />
       {isPending && selectedIds.size > 0 && (
         <BulkActionBar
           count={selectedIds.size}
@@ -635,52 +631,6 @@ function DraftGroup({
 }
 
 /** Transient confirmation banner — shown for ~4s after Send-to-portal. */
-function Toast({ message, action = null, onDismiss }) {
-  return (
-    <div
-      role="status"
-      aria-live="polite"
-      onClick={onDismiss}
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 6,
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        padding: "8px 12px",
-        background: "var(--bg-elevated)",
-        border: "1px solid var(--success, #5cd6a5)",
-        borderRadius: 8,
-        fontSize: 13,
-        color: "var(--text)",
-        cursor: "pointer",
-      }}
-    >
-      <span style={{ color: "var(--success, #5cd6a5)" }}>✓</span>
-      <span>{message}</span>
-      <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--text-muted)" }}>
-        {action ? (
-          // Link, not a plain <a>: on the onboarding's own Actions tab this is
-          // a client-side hop to the Tasks tab, so the board scrolls to the new
-          // column without a page load.
-          <Link
-            href={action.href}
-            style={{ color: "var(--action)" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {action.label}
-          </Link>
-        ) : (
-          <>
-            See <a href="/ai-drafts?status=applied" style={{ color: "var(--action)" }} onClick={(e) => e.stopPropagation()}>Applied</a>
-          </>
-        )}
-      </span>
-    </div>
-  );
-}
-
 function BulkActionBar({ count, onReject, onClear }) {
   return (
     <div

@@ -296,6 +296,19 @@ Insight status → token mapping (used by Vector trend / portfolio status):
 - `On track` → `success`
 - `Improving` → `mint`
 
+### `Toast` — `app/ui/Toast.tsx`
+
+Transient confirmation that an action just completed. A card in the **bottom-right corner**, 24px from both edges, 240–360px wide: `surface` on a 1px `border`, `rounded-xl` (12px), `shadow.floating`, 12px/14px padding. A 14px `CheckIcon` in `success`, the message in `text` clamped to two lines, an optional action link in `action` (`actionHover` on hover), and a `sm` IconButton dismiss.
+
+**It is not a banner.** It never spans the width of the page, never sits in the document flow, and never pushes layout. A full-width sticky notice reads as page furniture and gets ignored; the corner card reads as a reply to what the user just did. (Caroline's ruling, 2026-09-13.)
+
+Motion: slide in 16px from the right plus a fade, 200ms on the standard `ease`; the reverse on dismiss. Under `prefers-reduced-motion` both become a plain fade. Auto-dismiss after **4s**, or **9s** when the card carries an action, and **hover pauses the timer** so a link cannot vanish under the pointer.
+
+Mount one `<ToastStack>` per surface and push into it from `useToasts()`. Cards stack upward with an 8px gap, **newest at the bottom**, capped at 3 so a burst of actions cannot cover the page.
+
+Use it for confirmations only. **Errors do not go in a toast** — it times out and is easy to miss, so a failure belongs in the inline error next to the control that failed. Anything needing a decision is a `Modal`.
+
+
 ### AI surface treatment
 
 When marking output as AI-generated (the Vector sparkle, AI section dividers inside an AI card, hover highlights on AI-actionable items), use the gradient:
