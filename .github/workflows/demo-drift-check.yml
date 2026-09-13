@@ -1,20 +1,40 @@
-# Nightly drift check for the public demo at vector.quest.
+# Nightly date shift + drift check for the public demo at vector.quest.
+#
+# Three steps, in this order:
+#   1. shift         roll every seeded date forward so the demo reads as
+#                    "today", then commit the re-anchored snapshot back to main
+#   2. restore-state put the seeded rows back the way the snapshot has them, so
+#                    a day of visitors clicking around does not slowly degrade
+#                    the boards (Raycast stays Blocked, ChowNow stays At risk)
+#   3. check         the drift report that has always lived here
+#
+# Order matters both ways. The snapshot holds due dates, so checking before the
+# shift would flag every row. And restore-state compares against the snapshot,
+# so it has to run after the shift has moved both sides in lockstep.
 #
 # vector.quest is writable by anyone, so visitors will tick tasks and drag cards.
 # That's fine — it's a demo, and a moved card is not worth fixing. What matters is
 # structural loss: a deleted company, onboarding, task, or contact.
 #
-# This job compares the live database against prisma/fixtures/demo-snapshot.json
-# and REPORTS. It never deletes and never writes. The run summary lists what was
-# edited, added, and deleted. The job FAILS (→ GitHub emails Caroline) only when
-# something was deleted, which is the signal to run a restore.
+# The drift step compares the live database against
+# prisma/fixtures/demo-snapshot.json and REPORTS. It never deletes. The run
+# summary lists what was edited, added, and deleted. The job FAILS (→ GitHub
+# emails Caroline) only when something was deleted, which is the signal to run
+# a restore. The shift step is the only one that writes, and it only ever moves
+# dates.
 #
 # To repair:  Actions → "Restore Demo Data" → Run workflow.
 #             (Or locally: node scripts/demo-snapshot.js --restore --write)
 # To rebaseline after deliberate changes:
 #             node scripts/demo-snapshot.js --capture && commit the JSON.
 #
-# Costs nothing — no Anthropic calls, read-only against Postgres.
+# The shift deletes the cached AI insights for the seeded onboardings, because
+# their prose quotes absolute day counts ("56 days past go-live"). They
+# regenerate on next view, which they would anyway. The readers treat any
+# cache older than four hours as stale.
+#
+# The snapshot commit carries [skip ci] so a daily housekeeping commit does not
+# trigger a Vercel production deploy.
 
 name: Demo Drift Check
 
@@ -27,10 +47,13 @@ concurrency:
   group: demo-drift-check
   cancel-in-progress: false
 
+permissions:
+  contents: write # to commit the re-anchored snapshot
+
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
 
@@ -50,6 +73,48 @@ jobs:
           DIRECT_DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: npx prisma generate
 
+      # Shifts every date-bearing column on the seeded corpus by the number of
+      # whole days since the anchor in prisma/fixtures/demo-snapshot.json, and
+      # rewrites that file with the shifted dates and a new anchor. No-op when
+      # the anchor is already today. Aborts if the database is ahead of the
+      # snapshot, which means a previous run's commit was lost.
+      - name: Roll the demo forward to today
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -o pipefail
+          node scripts/demo-date-shift.mjs --write | tee shift-report.txt
+
+      # The commit is what makes the shift idempotent. If it never lands the
+      # next run shifts again from the stale anchor, so this step must fail
+      # loudly rather than be tolerated.
+      - name: Commit the re-anchored snapshot
+        run: |
+          if git diff --quiet -- prisma/fixtures/demo-snapshot.json; then
+            echo "Snapshot unchanged, nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add prisma/fixtures/demo-snapshot.json
+          git commit -m "demo: roll the seeded portfolio forward to today [skip ci]"
+          git push
+
+      # Undoes a day of visitor edits on the seeded rows: task statuses, phases,
+      # go-lives, contacts, and drafts a visitor approved or rejected. Deletes
+      # the tasks, comments, files, magic links, activity and notifications
+      # that are not in the snapshot, including the tasks that approved drafts
+      # created. ExternalEvents and the injected meeting pipeline are never
+      # touched, so the AI content survives.
+      - name: Put the seeded rows back
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -o pipefail
+          npx tsx scripts/demo-snapshot.js --restore-state --write | tee restore-state-report.txt
+
       - name: Compare live data against the snapshot
         id: drift
         env:
@@ -63,12 +128,25 @@ jobs:
         continue-on-error: true
 
       - name: Publish report to the run summary
+        if: always()
         run: |
           {
+            echo "## Demo date shift"
+            echo ""
+            echo '```'
+            cat shift-report.txt || echo "(no report)"
+            echo '```'
+            echo ""
+            echo "## Seeded rows put back"
+            echo ""
+            echo '```'
+            cat restore-state-report.txt || echo "(no report)"
+            echo '```'
+            echo ""
             echo "## Demo drift report"
             echo ""
             echo '```'
-            cat drift-report.txt
+            cat drift-report.txt || echo "(no report)"
             echo '```'
             echo ""
             if [ "${{ steps.drift.outcome }}" = "failure" ]; then
