@@ -230,7 +230,53 @@ _Newest first. Why, not just what._
 - **Open intent (Caroline):** re-evaluate the filled-vs-outlined health split later. The list and
   board header stay outlined for now on her say-so; the question is whether every surface should
   agree, and which way. `TODO(caro)` at the call site in `InsightsPanel.js`.
-- Nothing committed (standing rule).
+- **Both merged on Caroline's instruction:** this work as PR #14 (merge 9d0dbc4). Then the approve
+  TOAST work from earlier today, which was sitting unmerged on `fix/approved-task-visibility` after
+  PR #9 (commits 6aaa853 approve toast + View link, 9731bc0 `app/ui/Toast.tsx` primitive), merged as
+  PR #15 (merge 86870ea) after merging main in (globals.css conflict: toast block vs drawer block,
+  both kept). Remote branches deleted; the `onboarding-drafts` worktree still sits on its old local
+  branch; `onboarding-meeting` is fast-forwarded to main.
+- **Beehiiv findings (questions, nothing changed):** (1) a portal task completion DID create
+  notifications (ids 69, 70) but `deriveNotifications` routes contact events to the onboarding's
+  OWNER only, and beehiiv's owner is Sam (vendor user 7), not Maya (8); earlier beehiiv rows went to
+  Maya, so the owner changed today. (2) There is no vendor-side toast on incoming notifications; the
+  realtime commit ed2410b explicitly left it "for polish". (3) Nightly `demo-drift-check.yml` at
+  03:00 UTC runs `demo-snapshot.js --restore-state --write` on every company with a logoUrl
+  (beehiiv included): task statuses go back to the snapshot, visitor-added activity/notifications
+  are deleted, approved drafts return to pending and their created tasks are deleted.
+- **Manual restore run at 18:14 UTC** (workflow_dispatch of demo-drift-check, run 34773991165): 49
+  changes applied, portfolio intact. Beehiiv back to snapshot (BEE-16/22 un-done, BEE-24/25 removed,
+  drafts pending again).
+- **Handoff / open, Caroline's calls (she signed off 18:20 UTC):**
+  - Beehiiv's owner is Sam (vendor user 7) IN THE SNAPSHOT (taken 12:57 today), so Maya never gets
+    Beehiiv portal notifications and every restore keeps it that way. If she wants Maya to see them:
+    change owner, re-capture (`node scripts/demo-snapshot.js --capture`), commit the JSON.
+  - Raycast reads At risk, not Blocked: 6 of 24 tasks blocked = 25%, threshold is 30%
+    (`lib/health.js`). Options given: lower threshold, block 2 more RAY tasks in the snapshot, or a
+    dependency-aware signal. She has not decided.
+  - Vendor-side toast on incoming notifications still unbuilt (left "for polish" in ed2410b); the
+    Toast primitive now exists on main, so it is a small job if wanted.
+  - Worktree hygiene: `onboarding-drafts` still on the deleted-remote branch
+    `fix/approved-task-visibility`; `onboarding-meeting` is on `feat/drawer-trims-filled-health`
+    (also deleted remotely) but fast-forwarded to main. Neither has uncommitted work except this
+    journal file.
+
+### 2026-09-14 — Nightly demo reset had never actually run; fixed before the talk
+- Caroline found Priya's Raycast tasks missing from the portal's start view. Cause: the nightly
+  `demo-drift-check.yml` run (fired 08:35 UTC) FAILED at step 1, the date shift, before reaching the
+  restore, so her evening practice (RAY-13/14/15/21/22 completed, six drafts approved) stuck. The
+  portal's default Active filter hides Done, hence "missing".
+- Root cause of the failure: CI runs `npx prisma generate` (Prisma 7.4), which now emits the generated
+  client's imports WITHOUT file extensions (`./enums`), and the shift step runs the script with plain
+  `node`, whose native TypeScript loader needs explicit extensions. The committed client (generated in
+  July) has `.ts` extensions, which is why it works locally. Yesterday's 18:14 manual run only passed
+  because the shift was a no-op (delta 0) and never imported Prisma. The restore step survives because
+  it runs through `tsx`. Reproduced locally: regenerate without the option → `./enums`; with it → `./enums.ts`.
+- Fix: `importFileExtension = "ts"` on the generator block in `prisma/schema.prisma`, regenerated
+  (only the inline schema string in `internal/class.ts` changed). Plain-node dry run of the shift now
+  passes locally.
+- Restored the demo by hand first (`npx tsx --env-file=.env scripts/demo-snapshot.js --restore-state
+  --write`): 5 RAY statuses back, 6 RAY tasks from approvals deleted, drafts pending again.
 
 _Newest first._
 

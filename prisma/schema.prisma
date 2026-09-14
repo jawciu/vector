@@ -5,8 +5,12 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  provider            = "prisma-client"
+  output              = "../lib/generated/prisma"
+  // Explicit .ts extensions so plain `node` (native type-stripping, used by the
+  // nightly demo-date-shift step) can resolve the generated imports. Prisma 7.4
+  // dropped them by default; tsx and Next never cared, node does.
+  importFileExtension = "ts"
 }
 
 datasource db {
