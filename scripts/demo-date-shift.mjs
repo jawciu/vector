@@ -124,6 +124,16 @@ export function shiftSnapshot(snapshot, days, today) {
   // Written field by field and defensively: an older snapshot carries fewer
   // collections, and a newer one must not silently leave a date behind.
   const maybe = (rows, fn) => (Array.isArray(rows) ? rows.map(fn) : rows);
+  // Child rows (comments, files, activity, notifications, drafts) are matched
+  // by demo-snapshot.js on a `key` that EMBEDS iso(createdAt). Shifting the
+  // date without the key made every seeded child row look like a visitor
+  // addition, and restore-state deleted all of them (2026-09-14). The key is
+  // rewritten together with the date, always.
+  const withKey = (row, from, to) =>
+    typeof row.key === "string" && from && to && from !== to
+      ? { ...row, key: row.key.split(from).join(to) }
+      : row;
+  const shiftRow = (row, fn) => withKey(fn(row), row.createdAt, s(row.createdAt));
   return {
     ...snapshot,
     dateAnchor: today,
@@ -144,8 +154,8 @@ export function shiftSnapshot(snapshot, days, today) {
             bouncedAt: s(ct.bouncedAt),
           })),
           tasks: o.tasks.map((t) => ({ ...t, due: shiftDueString(t.due, days) })),
-          comments: maybe(o.comments, (cm) => ({ ...cm, createdAt: s(cm.createdAt) })),
-          files: maybe(o.files, (f) => ({ ...f, createdAt: s(f.createdAt) })),
+          comments: maybe(o.comments, (cm) => shiftRow(cm, (r) => ({ ...r, createdAt: s(r.createdAt) }))),
+          files: maybe(o.files, (f) => shiftRow(f, (r) => ({ ...r, createdAt: s(r.createdAt) }))),
           magicLinks: maybe(o.magicLinks, (m) => ({
             ...m,
             createdAt: s(m.createdAt),
@@ -154,18 +164,18 @@ export function shiftSnapshot(snapshot, days, today) {
             lastUsedAt: s(m.lastUsedAt),
             sentAt: s(m.sentAt),
           })),
-          activity: maybe(o.activity, (a) => ({ ...a, createdAt: s(a.createdAt) })),
-          notifications: maybe(o.notifications, (n) => ({
-            ...n,
-            createdAt: s(n.createdAt),
-            readAt: s(n.readAt),
-            archivedAt: s(n.archivedAt),
-          })),
-          drafts: maybe(o.drafts, (d) => ({
-            ...d,
-            createdAt: s(d.createdAt),
-            resolvedAt: s(d.resolvedAt),
-          })),
+          activity: maybe(o.activity, (a) => shiftRow(a, (r) => ({ ...r, createdAt: s(r.createdAt) }))),
+          notifications: maybe(o.notifications, (n) => shiftRow(n, (r) => ({
+            ...r,
+            createdAt: s(r.createdAt),
+            readAt: s(r.readAt),
+            archivedAt: s(r.archivedAt),
+          }))),
+          drafts: maybe(o.drafts, (d) => shiftRow(d, (r) => ({
+            ...r,
+            createdAt: s(r.createdAt),
+            resolvedAt: s(r.resolvedAt),
+          }))),
         };
       }),
     })),

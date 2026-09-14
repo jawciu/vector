@@ -207,3 +207,45 @@ describe("placeholder compilation", () => {
     expect(() => compile("SELECT {{nope}}", ctx)).toThrow(/nope/);
   });
 });
+
+describe("shiftSnapshot keeps child keys in step with their dates", () => {
+  // demo-snapshot.js matches comments, activity, notifications, drafts and
+  // files on a key that embeds iso(createdAt). If the key is not rewritten
+  // with the date, restore-state deletes every seeded child row.
+  const snapshot = {
+    capturedAt: "2026-09-13T12:57:52.898Z",
+    companies: [{
+      prefix: "RAY",
+      onboardings: [{
+        key: "RAY|2026-09-04T09:37:35.042Z",
+        createdAt: "2026-09-04T09:37:35.042Z",
+        phases: [], tasks: [],
+        comments: [{ key: "RAY-1|2026-09-05T09:37:35.041Z|Maya Lindqvist", createdAt: "2026-09-05T09:37:35.041Z" }],
+        activity: [{ key: "created|task|1206|2026-09-04T14:25:35.041Z", createdAt: "2026-09-04T14:25:35.041Z" }],
+        notifications: [{ key: "63:c122:2972817|vendor|2026-09-11T13:34:49.924Z", groupKey: "63:c122:2972817", createdAt: "2026-09-11T13:34:49.924Z" }],
+        drafts: [{ key: "draft_followup|2026-08-03T08:38:47.125Z|overdue by 10 days#2", createdAt: "2026-08-03T08:38:47.125Z" }],
+        files: [{ key: "spec.pdf|2026-09-06T10:00:00.000Z", createdAt: "2026-09-06T10:00:00.000Z" }],
+      }],
+    }],
+  };
+  const out = shiftSnapshot(snapshot, 1, "2026-09-14");
+  const ob = out.companies[0].onboardings[0];
+
+  it("rewrites the comment, activity, draft and file keys", () => {
+    expect(ob.comments[0].key).toBe("RAY-1|2026-09-06T09:37:35.041Z|Maya Lindqvist");
+    expect(ob.activity[0].key).toBe("created|task|1206|2026-09-05T14:25:35.041Z");
+    expect(ob.drafts[0].key).toBe("draft_followup|2026-08-04T08:38:47.125Z|overdue by 10 days#2");
+    expect(ob.files[0].key).toBe("spec.pdf|2026-09-07T10:00:00.000Z");
+  });
+
+  it("rewrites only the date part of a notification key, the groupKey bucket is not shifted in the database", () => {
+    expect(ob.notifications[0].key).toBe("63:c122:2972817|vendor|2026-09-12T13:34:49.924Z");
+    expect(ob.notifications[0].groupKey).toBe("63:c122:2972817");
+  });
+
+  it("still shifts the dates themselves", () => {
+    expect(ob.comments[0].createdAt).toBe("2026-09-06T09:37:35.041Z");
+    expect(ob.createdAt).toBe("2026-09-05T09:37:35.042Z");
+    expect(ob.key).toBe("RAY|2026-09-05T09:37:35.042Z");
+  });
+});
