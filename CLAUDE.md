@@ -278,6 +278,28 @@ _Newest first. Why, not just what._
 - Restored the demo by hand first (`npx tsx --env-file=.env scripts/demo-snapshot.js --restore-state
   --write`): 5 RAY statuses back, 6 RAY tasks from approvals deleted, drafts pending again.
 
+**⚠️ INCIDENT, same morning: the demo's AI drafts, comments, activity, notifications and file were
+WIPED by a live workflow run I dispatched to "prove" the import fix (run 34828953151, ~09:40 UTC).**
+- Second, masked bug: `shiftSnapshot` in `scripts/demo-date-shift.mjs` shifted every child row's
+  `createdAt` in the snapshot but NOT its `key`, which embeds iso(createdAt). After the first real
+  shift (+1 day), restore-state matched none of the 184 drafts / 296 activity / 63 comments /
+  26 notifications / 1 file and deleted them all. Tasks, phases, contacts, onboardings, events survived.
+  No Supabase backup existed. Caroline: "you know you always need to dry run are you crazy".
+- **Rebuilt** (script kept at `.playwright-mcp/rebuild.mjs`, gitignored; dry-run = same code in a
+  rolled-back transaction): 120/120 meeting drafts re-materialised from `ExternalEvent.orchestratorOutput`
+  with statuses/dates/appliedTaskId from the snapshot; 63/63 comments verbatim; 280/296 activity rows
+  (16 pointed at task ids that no longer exist) with reconstructed metadata; 26/26 notifications matched
+  by timestamp (snapshot keys carried pre-shift buckets). Recipients = current onboarding owner.
+  The 64 historical follow-up drafts were UNRECOVERABLE (snapshot stores no payload): ran the scanner
+  via the cron route instead → 10 fresh follow-ups (RAY 6, FN 2, FLK 1, CHOW 1). The one File row is gone.
+- Re-captured the snapshot from the rebuilt DB (restore-state dry run: "Nothing to put back").
+- Fix + test for the key bug in this branch (`fix/demo-shift-keys`). **`demo-drift-check.yml` is
+  DISABLED (`gh workflow disable`) and must stay disabled until Caroline says otherwise.** Re-enable only
+  after a dry run of shift+restore against a capture: `node scripts/demo-date-shift.mjs` (no --write)
+  then `npx tsx scripts/demo-snapshot.js --restore-state` (no --write) and read both plans.
+- Rule now in her global CLAUDE.md + auto-memory: ALWAYS dry-run before writing to live data; never
+  dispatch a live workflow to prove a fix.
+
 _Newest first._
 
 ### 2026-09-11 (night) — HANDOFF. Slice 0 MERGED (PR #3). Slice 1 built + evaluator-approved, UNCOMMITTED in a worktree.
