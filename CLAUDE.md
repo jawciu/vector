@@ -210,6 +210,26 @@ _Newest first. Why, not just what._
 
 ## Session Log / Handoff
 
+### 2026-09-15 — Nightly demo reset: second bug fixed, pair proven in a rolled-back dry run, re-enabled
+- Caroline is sharing the live app publicly now, so visitors will change demo data and the nightly restore
+  is required again. Her instruction: double-check everything, fix what needs fixing, then put it back.
+- **Bug 2 (the magic-link revocations, confirmed):** the shift used `LEAST(col + interval, now())` on SIX
+  nullable columns. Postgres LEAST ignores NULL, so every NULL became now(): Notification.readAt/archivedAt
+  (all unread → read+archived), MagicLink.lastUsedAt/revokedAt (every live link revoked), ExternalEvent
+  .processedAt (ambiguous events → "processed"), PendingAIChange.resolvedAt (pending drafts stamped
+  resolved). Explains the 12:13 (09-13) and 08:38/09:38 (09-14) stamps. Fixed with a `keep()` helper
+  (`CASE WHEN col IS NULL THEN NULL ELSE LEAST(...) END`); test counts guarded vs bare LEAST per column.
+- **Definitive dry run of the pair** (`.playwright-mcp/pair-dryrun.mjs`, gitignored; run with
+  `node --import ./.playwright-mcp/resolve-hook.mjs`, the hook lets plain node import the extensionless
+  generated-client path): applies the shift SQL inside a Prisma interactive transaction, reads the shifted
+  live state in the same tx, runs the REAL `planRestoreState` against `shiftSnapshot(json)`, compares
+  null-column counts before/after, then throws to roll back. Result: null columns unchanged; restore plan
+  after the shift == the plan without the shift (only real visitor drift since capture). Rollback verified.
+- Runtime note: `demo-date-shift.mjs` runs under plain `node`, `demo-snapshot.js` under `tsx`; the two
+  cannot share a runner without the resolve hook (tsx mis-loads `lib/health.js` as CJS).
+- The nightly shift deletes all cached Insights, so the first visitor to each overview each day waits a few
+  seconds for regeneration (12 onboardings + portfolio, Sonnet). Accepted for now.
+
 ### 2026-09-13 — Meeting drawer trims + filled health pill (branch `feat/drawer-trims-filled-health`)
 - Caroline reviewed the drawer against screenshots and asked for four cuts, all in `MeetingDrawer.js`:
   the "Open in Meetings tab" link under the attendees is gone (the drawer opens from the Meetings tab,
@@ -299,6 +319,19 @@ WIPED by a live workflow run I dispatched to "prove" the import fix (run 3482895
   then `npx tsx scripts/demo-snapshot.js --restore-state` (no --write) and read both plans.
 - Rule now in her global CLAUDE.md + auto-memory: ALWAYS dry-run before writing to live data; never
   dispatch a live workflow to prove a fix.
+- **After the rebuild, three more fixes (all dry-run first):** (1) every Raycast magic link had
+  `revokedAt`/`lastUsedAt` stamped 2026-09-14T08:38Z, incl. three that were unrevoked in the snapshot;
+  restored those three (Priya 6e9ab3d4, Marta a3fc3ac1, Felix 6fa479e5). Cause unproven; the shift's
+  MagicLink SQL (`LEAST(x + iv, now())` on nullable columns?) is the suspect, check before re-enabling.
+  (2) 29 `completed` activity rows whose task is NOT Done (Caroline's 09-13 practice as Priya/Felix,
+  captured into the baseline before the restore reset the statuses) + their 10 notifications deleted;
+  they made the Raycast AI summary say "exceptional week, 20+ tasks completed". Now it says 9 days in,
+  6 blocked, BigQuery blocker cascading, no customer login. Snapshot re-captured again. (3) The shift
+  had deleted all 42 cached insights; warmed all 12 onboarding overviews + the portfolio hero by loading
+  them (each generated in 4–11s). The Raycast PORTAL insight is deliberately NOT warmed: logging in as
+  Priya would write link_activated + lastSeenPortalAt and change the "no customer login" story.
+- Global `/ai-drafts` shows only unmatched meetings by design; per-onboarding drafts are on each
+  onboarding's Actions tab. Verified rendering of Raycast Actions tab + follow-ups on current main.
 
 _Newest first._
 
