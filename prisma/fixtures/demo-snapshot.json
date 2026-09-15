@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-14T09:52:13.117Z",
+  "capturedAt": "2026-09-14T10:04:59.332Z",
   "companies": [
     {
       "prefix": "ASH",
@@ -526,14 +526,6 @@
           "files": [],
           "magicLinks": [],
           "activity": [
-            {
-              "key": "completed|task|1473|2026-08-07T17:59:14.149Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1473,
-              "actorType": "vendor",
-              "createdAt": "2026-08-07T17:59:14.149Z"
-            },
             {
               "key": "created|task|1459|2026-08-08T14:25:35.041Z",
               "verb": "created",
@@ -2230,46 +2222,6 @@
               "entityId": 1414,
               "actorType": "contact",
               "createdAt": "2026-09-13T14:49:15.496Z"
-            },
-            {
-              "key": "completed|task|1435|2026-09-14T10:41:10.476Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1435,
-              "actorType": "vendor",
-              "createdAt": "2026-09-14T10:41:10.476Z"
-            },
-            {
-              "key": "completed|task|1434|2026-09-14T10:41:11.697Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1434,
-              "actorType": "vendor",
-              "createdAt": "2026-09-14T10:41:11.697Z"
-            },
-            {
-              "key": "completed|task|1427|2026-09-14T10:41:16.830Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1427,
-              "actorType": "vendor",
-              "createdAt": "2026-09-14T10:41:16.830Z"
-            },
-            {
-              "key": "completed|task|1431|2026-09-14T10:41:35.581Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1431,
-              "actorType": "vendor",
-              "createdAt": "2026-09-14T10:41:35.581Z"
-            },
-            {
-              "key": "completed|task|1433|2026-09-14T10:42:01.341Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1433,
-              "actorType": "vendor",
-              "createdAt": "2026-09-14T10:42:01.341Z"
             },
             {
               "key": "health_flipped|onboarding|72|2026-09-14T10:42:01.696Z",
@@ -5224,14 +5176,6 @@
           "magicLinks": [],
           "activity": [
             {
-              "key": "completed|task|1319|2026-07-21T08:52:58.647Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1319,
-              "actorType": "vendor",
-              "createdAt": "2026-07-21T08:52:58.647Z"
-            },
-            {
               "key": "created|task|1298|2026-07-25T14:25:35.041Z",
               "verb": "created",
               "entityType": "task",
@@ -6307,14 +6251,6 @@
               "createdAt": "2026-08-02T09:37:35.041Z"
             },
             {
-              "key": "completed|task|1559|2026-08-09T12:50:15.810Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1559,
-              "actorType": "vendor",
-              "createdAt": "2026-08-09T12:50:15.810Z"
-            },
-            {
               "key": "completed|task|1279|2026-08-12T09:37:35.041Z",
               "verb": "completed",
               "entityType": "task",
@@ -7277,14 +7213,6 @@
               "entityId": 1546,
               "actorType": "vendor",
               "createdAt": "2026-07-25T14:33:00.000Z"
-            },
-            {
-              "key": "completed|task|1270|2026-08-01T11:43:58.824Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1270,
-              "actorType": "vendor",
-              "createdAt": "2026-08-01T11:43:58.824Z"
             },
             {
               "key": "commented|task|1273|2026-08-01T11:44:44.654Z",
@@ -9530,8 +9458,8 @@
               "contactEmail": "priya@raycast.com",
               "createdAt": "2026-09-11T21:29:09.123Z",
               "expiresAt": "2026-10-11T21:29:09.123Z",
-              "revokedAt": "2026-09-14T09:38:01.040Z",
-              "lastUsedAt": "2026-09-14T09:38:01.040Z",
+              "revokedAt": null,
+              "lastUsedAt": "2026-09-14T12:44:22.794Z",
               "sentAt": "2026-09-11T21:29:09.794Z"
             },
             {
@@ -9539,8 +9467,8 @@
               "contactEmail": "marta@raycast.com",
               "createdAt": "2026-09-11T21:29:12.601Z",
               "expiresAt": "2026-10-11T21:29:12.601Z",
-              "revokedAt": "2026-09-14T09:38:01.040Z",
-              "lastUsedAt": "2026-09-14T09:38:01.040Z",
+              "revokedAt": null,
+              "lastUsedAt": null,
               "sentAt": "2026-09-11T21:29:13.284Z"
             },
             {
@@ -9566,8 +9494,8 @@
               "contactEmail": "felix@raycast.com",
               "createdAt": "2026-09-13T07:01:28.632Z",
               "expiresAt": "2026-10-13T07:01:28.628Z",
-              "revokedAt": "2026-09-14T09:38:01.040Z",
-              "lastUsedAt": "2026-09-14T09:38:01.040Z",
+              "revokedAt": null,
+              "lastUsedAt": null,
               "sentAt": "2026-09-13T07:01:29.083Z"
             }
           ],
@@ -9669,14 +9597,6 @@
               "createdAt": "2026-09-11T09:37:35.041Z"
             },
             {
-              "key": "completed|task|1223|2026-09-11T21:29:34.763Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1223,
-              "actorType": "vendor",
-              "createdAt": "2026-09-11T21:29:34.763Z"
-            },
-            {
               "key": "health_flipped|onboarding|63|2026-09-11T21:29:35.122Z",
               "verb": "health_flipped",
               "entityType": "onboarding",
@@ -9733,54 +9653,6 @@
               "createdAt": "2026-09-12T21:11:06.700Z"
             },
             {
-              "key": "completed|task|1209|2026-09-13T07:40:58.704Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1209,
-              "actorType": "vendor",
-              "createdAt": "2026-09-13T07:40:58.704Z"
-            },
-            {
-              "key": "completed|task|1210|2026-09-13T07:41:18.177Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1210,
-              "actorType": "vendor",
-              "createdAt": "2026-09-13T07:41:18.177Z"
-            },
-            {
-              "key": "completed|task|1211|2026-09-13T07:41:19.345Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1211,
-              "actorType": "vendor",
-              "createdAt": "2026-09-13T07:41:19.345Z"
-            },
-            {
-              "key": "completed|task|1212|2026-09-13T08:07:13.366Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1212,
-              "actorType": "vendor",
-              "createdAt": "2026-09-13T08:07:13.366Z"
-            },
-            {
-              "key": "completed|task|1213|2026-09-13T08:07:15.570Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1213,
-              "actorType": "vendor",
-              "createdAt": "2026-09-13T08:07:15.570Z"
-            },
-            {
-              "key": "completed|task|1214|2026-09-13T08:09:09.594Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1214,
-              "actorType": "vendor",
-              "createdAt": "2026-09-13T08:09:09.594Z"
-            },
-            {
               "key": "completed|task|1215|2026-09-13T08:09:13.254Z",
               "verb": "completed",
               "entityType": "task",
@@ -9821,14 +9693,6 @@
               "createdAt": "2026-09-13T08:10:16.917Z"
             },
             {
-              "key": "completed|task|1216|2026-09-13T08:11:06.179Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1216,
-              "actorType": "vendor",
-              "createdAt": "2026-09-13T08:11:06.179Z"
-            },
-            {
               "key": "status_changed|task|1216|2026-09-13T08:11:09.736Z",
               "verb": "status_changed",
               "entityType": "task",
@@ -9851,86 +9715,6 @@
               "entityId": 1215,
               "actorType": "contact",
               "createdAt": "2026-09-14T11:09:32.657Z"
-            },
-            {
-              "key": "completed|task|1220|2026-09-14T11:09:55.018Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1220,
-              "actorType": "contact",
-              "createdAt": "2026-09-14T11:09:55.018Z"
-            },
-            {
-              "key": "completed|task|1218|2026-09-14T11:10:59.870Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1218,
-              "actorType": "contact",
-              "createdAt": "2026-09-14T11:10:59.870Z"
-            },
-            {
-              "key": "completed|task|1219|2026-09-14T11:38:50.893Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1219,
-              "actorType": "contact",
-              "createdAt": "2026-09-14T11:38:50.893Z"
-            },
-            {
-              "key": "completed|task|1212|2026-09-14T11:38:51.272Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1212,
-              "actorType": "contact",
-              "createdAt": "2026-09-14T11:38:51.272Z"
-            },
-            {
-              "key": "completed|task|1216|2026-09-14T11:38:51.609Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1216,
-              "actorType": "contact",
-              "createdAt": "2026-09-14T11:38:51.609Z"
-            },
-            {
-              "key": "completed|task|1221|2026-09-14T11:43:13.710Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1221,
-              "actorType": "contact",
-              "createdAt": "2026-09-14T11:43:13.710Z"
-            },
-            {
-              "key": "completed|task|1225|2026-09-14T11:44:00.571Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1225,
-              "actorType": "contact",
-              "createdAt": "2026-09-14T11:44:00.571Z"
-            },
-            {
-              "key": "completed|task|1226|2026-09-14T11:48:06.335Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1226,
-              "actorType": "contact",
-              "createdAt": "2026-09-14T11:48:06.335Z"
-            },
-            {
-              "key": "completed|task|1227|2026-09-14T11:48:09.999Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1227,
-              "actorType": "contact",
-              "createdAt": "2026-09-14T11:48:09.999Z"
-            },
-            {
-              "key": "completed|task|1219|2026-09-14T11:51:26.866Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1219,
-              "actorType": "contact",
-              "createdAt": "2026-09-14T11:51:26.866Z"
             },
             {
               "key": "completed|task|1215|2026-09-14T12:44:23.549Z",
@@ -10013,86 +9797,6 @@
               "readAt": null,
               "archivedAt": null,
               "createdAt": "2026-09-14T11:09:32.854Z"
-            },
-            {
-              "key": "63:c122:2982306|vendor|2026-09-14T11:09:55.206Z",
-              "groupKey": "63:c122:2982306",
-              "recipientType": "vendor",
-              "readAt": null,
-              "archivedAt": null,
-              "createdAt": "2026-09-14T11:09:55.206Z"
-            },
-            {
-              "key": "63:c122:2982307|vendor|2026-09-14T11:11:00.057Z",
-              "groupKey": "63:c122:2982307",
-              "recipientType": "vendor",
-              "readAt": null,
-              "archivedAt": null,
-              "createdAt": "2026-09-14T11:11:00.057Z"
-            },
-            {
-              "key": "63:c122:2982309|vendor|2026-09-14T11:38:51.019Z",
-              "groupKey": "63:c122:2982309",
-              "recipientType": "vendor",
-              "readAt": null,
-              "archivedAt": null,
-              "createdAt": "2026-09-14T11:38:51.019Z"
-            },
-            {
-              "key": "63:c122:2982309|vendor|2026-09-14T11:38:51.302Z",
-              "groupKey": "63:c122:2982309",
-              "recipientType": "vendor",
-              "readAt": null,
-              "archivedAt": null,
-              "createdAt": "2026-09-14T11:38:51.302Z"
-            },
-            {
-              "key": "63:c122:2982309|vendor|2026-09-14T11:38:51.640Z",
-              "groupKey": "63:c122:2982309",
-              "recipientType": "vendor",
-              "readAt": null,
-              "archivedAt": null,
-              "createdAt": "2026-09-14T11:38:51.640Z"
-            },
-            {
-              "key": "63:c122:2982310|vendor|2026-09-14T11:43:13.743Z",
-              "groupKey": "63:c122:2982310",
-              "recipientType": "vendor",
-              "readAt": null,
-              "archivedAt": null,
-              "createdAt": "2026-09-14T11:43:13.743Z"
-            },
-            {
-              "key": "63:c122:2982310|vendor|2026-09-14T11:44:00.606Z",
-              "groupKey": "63:c122:2982310",
-              "recipientType": "vendor",
-              "readAt": null,
-              "archivedAt": null,
-              "createdAt": "2026-09-14T11:44:00.606Z"
-            },
-            {
-              "key": "63:c122:2982310|vendor|2026-09-14T11:48:06.376Z",
-              "groupKey": "63:c122:2982310",
-              "recipientType": "vendor",
-              "readAt": null,
-              "archivedAt": null,
-              "createdAt": "2026-09-14T11:48:06.376Z"
-            },
-            {
-              "key": "63:c122:2982310|vendor|2026-09-14T11:48:10.031Z",
-              "groupKey": "63:c122:2982310",
-              "recipientType": "vendor",
-              "readAt": null,
-              "archivedAt": null,
-              "createdAt": "2026-09-14T11:48:10.031Z"
-            },
-            {
-              "key": "63:c122:2982311|vendor|2026-09-14T11:51:26.901Z",
-              "groupKey": "63:c122:2982311",
-              "recipientType": "vendor",
-              "readAt": null,
-              "archivedAt": null,
-              "createdAt": "2026-09-14T11:51:26.901Z"
             },
             {
               "key": "63:c122:2982316|vendor|2026-09-14T12:44:23.764Z",
@@ -11008,22 +10712,6 @@
               "entityId": 1548,
               "actorType": "vendor",
               "createdAt": "2026-08-22T17:36:00.000Z"
-            },
-            {
-              "key": "completed|task|1549|2026-08-24T14:19:37.558Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1549,
-              "actorType": "vendor",
-              "createdAt": "2026-08-24T14:19:37.558Z"
-            },
-            {
-              "key": "completed|task|1386|2026-08-24T14:19:44.031Z",
-              "verb": "completed",
-              "entityType": "task",
-              "entityId": 1386,
-              "actorType": "vendor",
-              "createdAt": "2026-08-24T14:19:44.031Z"
             },
             {
               "key": "completed|task|1375|2026-08-27T09:37:35.040Z",

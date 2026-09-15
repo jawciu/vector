@@ -11,6 +11,7 @@ import {
   shiftDueString,
   shiftIso,
   shiftSnapshot,
+  statements,
   utcMidnight,
 } from "./demo-date-shift.mjs";
 
@@ -248,4 +249,21 @@ describe("shiftSnapshot keeps child keys in step with their dates", () => {
     expect(ob.createdAt).toBe("2026-09-05T09:37:35.042Z");
     expect(ob.key).toBe("RAY|2026-09-05T09:37:35.042Z");
   });
+});
+
+describe("shift SQL never clamps a NULL timestamp to now()", () => {
+  // Postgres LEAST() ignores NULLs, so LEAST(NULL + iv, now()) is now(). On the
+  // nullable columns that meant: every live magic link revoked, every unread
+  // notification read + archived, every unprocessed event processed.
+  const sql = statements().map((s) => s.sql).join("\n");
+  const nullable = ['"readAt"', '"archivedAt"', '"lastUsedAt"', '"revokedAt"', '"processedAt"', '"resolvedAt"'];
+  const esc = (c) => c.replace(/"/g, '\\"');
+  for (const col of nullable) {
+    it(`guards every LEAST on ${col} with an IS NULL branch`, () => {
+      const least = (sql.match(new RegExp(`LEAST\\((?:n\\.)?${esc(col)}\\s*\\+`, "g")) ?? []).length;
+      const guarded = (sql.match(new RegExp(`CASE WHEN (?:n\\.)?${esc(col)} IS NULL THEN NULL ELSE LEAST\\((?:n\\.)?${esc(col)}\\s*\\+`, "g")) ?? []).length;
+      expect(least).toBeGreaterThan(0);
+      expect(guarded).toBe(least);
+    });
+  }
 });

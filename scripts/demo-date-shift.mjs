@@ -216,9 +216,15 @@ export function compile(sql, ctx) {
  * order. `iv` is the interval, `A` the anchor, `OB` / `CO` the demo
  * onboarding and company ids, `FX` the fixture meeting ids.
  */
-function statements() {
+export function statements() {
   const iv = `make_interval(days => {{delta}}::int)`;
   const A = `{{anchor}}::timestamptz`;
+  // Nullable timestamps: shift and clamp to now(), but a NULL stays NULL.
+  // Postgres LEAST() ignores NULLs, so a bare LEAST(x + iv, now()) turned every
+  // NULL into now(): it revoked every live magic link, marked every unread
+  // notification read + archived, and stamped unprocessed events as processed
+  // on each shift (2026-09-13/14). Never use LEAST on a nullable column here.
+  const keep = (col) => `CASE WHEN ${col} IS NULL THEN NULL ELSE LEAST(${col} + ${iv}, now()) END`;
   const OB = `{{obIds}}::int[]`;
   const CO = `{{companyIds}}::int[]`;
   const FX = `{{fixtureIds}}::text[]`;
@@ -269,8 +275,8 @@ function statements() {
       what: "createdAt, readAt, archivedAt",
       sql: `UPDATE "Notification" n SET
               "createdAt"  = n."createdAt" + ${iv},
-              "readAt"     = LEAST(n."readAt" + ${iv}, now()),
-              "archivedAt" = LEAST(n."archivedAt" + ${iv}, now())
+              "readAt"     = ${keep('n."readAt"')},
+              "archivedAt" = ${keep('n."archivedAt"')}
             FROM "ActivityLog" a
             WHERE a.id = n."activityLogId" AND a."onboardingId" = ANY(${OB})
               AND n."createdAt" <= ${A}`,
@@ -297,8 +303,8 @@ function statements() {
               "createdAt"  = "createdAt" + ${iv},
               "expiresAt"  = "expiresAt" + ${iv},
               "sentAt"     = "sentAt" + ${iv},
-              "lastUsedAt" = LEAST("lastUsedAt" + ${iv}, now()),
-              "revokedAt"  = LEAST("revokedAt" + ${iv}, now())
+              "lastUsedAt" = ${keep('"lastUsedAt"')},
+              "revokedAt"  = ${keep('"revokedAt"')}
             WHERE "onboardingId" = ANY(${OB}) AND "createdAt" <= ${A}`,
     },
     {
@@ -317,7 +323,7 @@ function statements() {
       sql: `UPDATE "ExternalEvent" SET
               "occurredAt"  = "occurredAt" + ${iv},
               "receivedAt"  = "receivedAt" + ${iv},
-              "processedAt" = LEAST("processedAt" + ${iv}, now()),
+              "processedAt" = ${keep('"processedAt"')},
               payload = CASE
                 WHEN payload #>> '{meeting,date}' IS NULL THEN payload
                 ELSE jsonb_set(payload, '{meeting,date}', to_jsonb(
@@ -339,7 +345,7 @@ function statements() {
       what: "createdAt, resolvedAt, payload.dueDate, payload.newDueDate",
       sql: `UPDATE "PendingAIChange" SET
               "createdAt"  = "createdAt" + ${iv},
-              "resolvedAt" = LEAST("resolvedAt" + ${iv}, now()),
+              "resolvedAt" = ${keep('"resolvedAt"')},
               payload = COALESCE((
                 SELECT jsonb_object_agg(e.k, CASE
                          WHEN e.k IN ('dueDate','newDueDate')
