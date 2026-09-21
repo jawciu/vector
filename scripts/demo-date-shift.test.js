@@ -267,3 +267,58 @@ describe("shift SQL never clamps a NULL timestamp to now()", () => {
     });
   }
 });
+
+describe("shiftSnapshot clamps with the same clock as the SQL", () => {
+  // The SQL clamps happened-already timestamps with LEAST(col + iv, {{now}}).
+  // The snapshot must clamp with the same value or restore-state sees a
+  // difference on those rows every single night.
+  const now = "2026-09-21T08:40:00.000Z";
+  const snapshot = {
+    capturedAt: "2026-09-20T00:00:00.000Z",
+    companies: [{
+      prefix: "RAY",
+      onboardings: [{
+        key: "RAY|2026-09-04T09:37:35.042Z", createdAt: "2026-09-04T09:37:35.042Z",
+        updatedAt: "2026-09-20T12:13:24.270Z", targetGoLive: "2026-11-20T09:37:35.042Z",
+        phases: [], tasks: [],
+        drafts: [
+          { key: "k1|2026-09-10T10:00:00.000Z|q", createdAt: "2026-09-10T10:00:00.000Z", resolvedAt: "2026-09-20T12:13:24.270Z" },
+          { key: "k2|2026-09-10T11:00:00.000Z|q", createdAt: "2026-09-10T11:00:00.000Z", resolvedAt: "2026-09-12T09:00:00.000Z" },
+          { key: "k3|2026-09-10T12:00:00.000Z|q", createdAt: "2026-09-10T12:00:00.000Z", resolvedAt: null },
+        ],
+        magicLinks: [{ token: "t", createdAt: "2026-09-10T10:00:00.000Z", expiresAt: "2026-10-10T10:00:00.000Z", revokedAt: null, lastUsedAt: "2026-09-20T23:00:00.000Z", sentAt: null }],
+      }],
+    }],
+  };
+  const ob = shiftSnapshot(snapshot, 1, "2026-09-21", now).companies[0].onboardings[0];
+
+  it("clamps a shifted timestamp that would land in the future", () => {
+    expect(ob.updatedAt).toBe(now);
+    expect(ob.drafts[0].resolvedAt).toBe(now);
+    expect(ob.magicLinks[0].lastUsedAt).toBe(now);
+  });
+
+  it("leaves past timestamps shifted and NULLs NULL", () => {
+    expect(ob.drafts[1].resolvedAt).toBe("2026-09-13T09:00:00.000Z");
+    expect(ob.drafts[2].resolvedAt).toBeNull();
+    expect(ob.magicLinks[0].revokedAt).toBeNull();
+  });
+
+  it("never clamps a future-by-design date", () => {
+    expect(ob.targetGoLive).toBe("2026-11-21T09:37:35.042Z");
+    expect(ob.magicLinks[0].expiresAt).toBe("2026-10-11T10:00:00.000Z");
+  });
+
+  it("does not clamp at all without a clock, as before", () => {
+    const plain = shiftSnapshot(snapshot, 1, "2026-09-21").companies[0].onboardings[0];
+    expect(plain.updatedAt).toBe("2026-09-21T12:13:24.270Z");
+  });
+});
+
+describe("shift SQL clamps with the caller's clock, not the database's", () => {
+  it("has no now() left in any statement", () => {
+    const sql = statements().map((s) => s.sql).join("\n");
+    expect(sql).not.toMatch(/now\(\)/);
+    expect(sql).toMatch(/\{\{now\}\}::timestamptz/);
+  });
+});

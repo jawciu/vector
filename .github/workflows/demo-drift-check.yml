@@ -40,7 +40,11 @@ name: Demo Drift Check
 
 on:
   schedule:
-    - cron: "0 3 * * *" # every day at 03:00 UTC
+    # 05:17 UTC = 06:17 UK in summer, 05:17 in winter: before anyone is looking.
+    # An odd minute on purpose. GitHub queues scheduled runs, and the top of the
+    # hour is the busiest slot: at "0 3 * * *" this ran between 07:52 and 08:40
+    # UTC every day of its first week, i.e. after UK visitors had arrived.
+    - cron: "17 5 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -127,6 +131,23 @@ jobs:
           npx tsx scripts/demo-snapshot.js --check | tee drift-report.txt
         continue-on-error: true
 
+      # The shift above deletes every cached AI insight on the seeded portfolio
+      # (their prose quotes absolute day counts). Re-generate them now, against
+      # the restored data, so the first visitor of the day opens an overview
+      # with content instead of "Generating…". Same snapshot, hash, request and
+      # persistence as the page itself; ~13 Sonnet calls, about $0.20 a night.
+      # Never allowed to fail the run: a cold overview still generates on view.
+      # Skips itself when the ANTHROPIC_API_KEY secret is absent.
+      - name: Warm the AI overviews
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set -o pipefail
+          npx tsx scripts/demo-warm-insights.js --write | tee warm-report.txt
+
       - name: Publish report to the run summary
         if: always()
         run: |
@@ -147,6 +168,12 @@ jobs:
             echo ""
             echo '```'
             cat drift-report.txt || echo "(no report)"
+            echo '```'
+            echo ""
+            echo "## AI overviews warmed"
+            echo ""
+            echo '```'
+            cat warm-report.txt || echo "(no report)"
             echo '```'
             echo ""
             if [ "${{ steps.drift.outcome }}" = "failure" ]; then
