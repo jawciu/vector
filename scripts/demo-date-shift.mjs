@@ -119,8 +119,17 @@ export function shiftIso(value, days) {
  * Shift every date the snapshot holds and re-anchor it. Onboarding keys are
  * `prefix|createdAt`, so they are recomputed rather than shifted as strings.
  */
-export function shiftSnapshot(snapshot, days, today) {
+export function shiftSnapshot(snapshot, days, today, now = null) {
   const s = (v) => shiftIso(v, days);
+  // Mirrors the SQL clamp (LEAST(col + interval, {{now}})) on the columns that
+  // record something that has already happened. Same `now` as the SQL, so the
+  // snapshot and the database agree exactly after a shift.
+  const nowMs = now == null ? null : new Date(now).getTime();
+  const clamp = (v) => {
+    const shifted = s(v);
+    if (shifted == null || nowMs == null) return shifted;
+    return new Date(shifted).getTime() > nowMs ? new Date(nowMs).toISOString() : shifted;
+  };
   // Written field by field and defensively: an older snapshot carries fewer
   // collections, and a newer one must not silently leave a date behind.
   const maybe = (rows, fn) => (Array.isArray(rows) ? rows.map(fn) : rows);
@@ -145,7 +154,7 @@ export function shiftSnapshot(snapshot, days, today) {
           ...o,
           key: `${c.prefix}|${createdAt}`,
           createdAt,
-          updatedAt: s(o.updatedAt),
+          updatedAt: clamp(o.updatedAt),
           targetGoLive: s(o.targetGoLive),
           phases: o.phases.map((p) => ({ ...p, targetDate: s(p.targetDate) })),
           contacts: maybe(o.contacts, (ct) => ({
@@ -160,21 +169,21 @@ export function shiftSnapshot(snapshot, days, today) {
             ...m,
             createdAt: s(m.createdAt),
             expiresAt: s(m.expiresAt),
-            revokedAt: s(m.revokedAt),
-            lastUsedAt: s(m.lastUsedAt),
+            revokedAt: clamp(m.revokedAt),
+            lastUsedAt: clamp(m.lastUsedAt),
             sentAt: s(m.sentAt),
           })),
           activity: maybe(o.activity, (a) => shiftRow(a, (r) => ({ ...r, createdAt: s(r.createdAt) }))),
           notifications: maybe(o.notifications, (n) => shiftRow(n, (r) => ({
             ...r,
             createdAt: s(r.createdAt),
-            readAt: s(r.readAt),
-            archivedAt: s(r.archivedAt),
+            readAt: clamp(r.readAt),
+            archivedAt: clamp(r.archivedAt),
           }))),
           drafts: maybe(o.drafts, (d) => shiftRow(d, (r) => ({
             ...r,
             createdAt: s(r.createdAt),
-            resolvedAt: s(r.resolvedAt),
+            resolvedAt: clamp(r.resolvedAt),
           }))),
         };
       }),
@@ -224,7 +233,13 @@ export function statements() {
   // NULL into now(): it revoked every live magic link, marked every unread
   // notification read + archived, and stamped unprocessed events as processed
   // on each shift (2026-09-13/14). Never use LEAST on a nullable column here.
-  const keep = (col) => `CASE WHEN ${col} IS NULL THEN NULL ELSE LEAST(${col} + ${iv}, now()) END`;
+  // The clamp uses {{now}}, a timestamp passed in from the caller, NOT the
+  // database's now(): shiftSnapshot clamps the snapshot with the very same
+  // value, so the two stay identical to the millisecond. With now() they
+  // differed by however long the run took, and restore-state rewrote the same
+  // handful of rows every night for no reason.
+  const NOW = `{{now}}::timestamptz`;
+  const keep = (col) => `CASE WHEN ${col} IS NULL THEN NULL ELSE LEAST(${col} + ${iv}, ${NOW}) END`;
   const OB = `{{obIds}}::int[]`;
   const CO = `{{companyIds}}::int[]`;
   const FX = `{{fixtureIds}}::text[]`;
@@ -236,7 +251,7 @@ export function statements() {
       sql: `UPDATE "Onboarding" SET
               "createdAt"    = "createdAt" + ${iv},
               "targetGoLive" = "targetGoLive" + ${iv},
-              "updatedAt"    = LEAST("updatedAt" + ${iv}, now())
+              "updatedAt"    = LEAST("updatedAt" + ${iv}, ${NOW})
             WHERE id = ANY(${OB}) AND "createdAt" <= ${A}`,
     },
     {
@@ -422,7 +437,8 @@ async function main() {
 
   const snapshot = loadSnapshot();
   const anchor = resolveAnchor(snapshot);
-  const today = isoDate(new Date());
+  const now = new Date(); // the one clock for this run: SQL clamp and snapshot clamp share it
+  const today = isoDate(now);
   const delta = daysBetweenUTC(anchor, today);
 
   console.log(`Anchor ${anchor} → today ${today}  (delta ${delta} day${delta === 1 ? "" : "s"})`);
@@ -475,6 +491,7 @@ async function main() {
       obIds,
       companyIds,
       fixtureIds,
+      now,
     };
     const stmts = statements().map((s) => ({ ...s, ...compile(s.sql, ctx) }));
 
@@ -524,7 +541,7 @@ async function main() {
     stmts.forEach((s, i) => console.log(`   ${String(results[i]).padStart(4)}  ${s.table} updated`));
     console.log(`   ${String(results[results.length - 1]).padStart(4)}  Insight rows deleted`);
 
-    writeFileSync(SNAPSHOT_PATH, `${JSON.stringify(shiftSnapshot(snapshot, delta, today), null, 2)}\n`);
+    writeFileSync(SNAPSHOT_PATH, `${JSON.stringify(shiftSnapshot(snapshot, delta, today, now), null, 2)}\n`);
     console.log(`\nSnapshot re-anchored to ${today} → ${SNAPSHOT_PATH}`);
     console.log("COMMIT THAT FILE. If it is not committed the next run shifts again from the old anchor.");
   } finally {

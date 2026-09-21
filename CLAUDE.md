@@ -210,6 +210,33 @@ _Newest first. Why, not just what._
 
 ## Session Log / Handoff
 
+### 2026-09-21 — Nightly demo job: earlier schedule, AI overviews warmed, clamp churn fixed
+- Caroline approved the 09-15 proposal ("go on do it"). Branch `feat/demo-warm-insights`.
+- **Schedule:** `demo-drift-check.yml` cron `0 3 * * *` → `17 5 * * *` (06:17 UK summer). Odd minute on
+  purpose: at the top of the hour GitHub fired it 07:52–08:40 UTC all week.
+- **Warm step** (new, after restore + drift check, `continue-on-error`): `npx tsx scripts/demo-warm-insights.js
+  --write`. Same snapshot builders + hashes as the pages, same request via new
+  `buildInsightRequest()` in `lib/ai/insights.js` (the streaming route now uses it too), same
+  `saveInsight` + `logAICall`. Warms portfolio/all + every seeded onboarding; NOT the portal insight
+  (needs a contact session). Dry-run by default; skips scopes already fresh; skips itself with no
+  ANTHROPIC_API_KEY. **Must run under tsx as a .js file**: a .mjs/.mts importer makes tsx mis-load
+  lib/*.js as CJS ("does not provide an export named").
+  First real run today: 12 generated, $0.16, 40s wall clock at concurrency 3. Verified in the browser:
+  Raycast overview rendered with ZERO requests to /api/insights (page hash == script hash); one manual
+  regenerate on Patch proved the refactored streaming route (200, streamed, re-rendered).
+  Panel behaviour worth knowing: a cache older than the 4h soft TTL is still SHOWN instantly and
+  refreshed in the background; only a MISSING cache shows the empty "Generating…" card. So one warm-up
+  a day is enough to never show an empty overview.
+- **Repo secret added:** `ANTHROPIC_API_KEY` (piped from local .env, never printed). Workflow triggers are
+  schedule + dispatch only; no workflow uses pull_request_target. Suggest to Caroline: a separate key
+  with a spend cap for CI.
+- **Clamp churn fixed:** SQL clamps used the DB's now(); the snapshot did not clamp at all, so 6 applied
+  drafts + 3 onboardings (FN, PEER, RAY) were "reset" every night. Now ONE clock: `{{now}}` param in the
+  SQL and the same value into `shiftSnapshot(..., now)`. Pair dry run with `--delta=1` (new flag on
+  `scripts/demo-pair-dryrun.mjs`, for days the job already ran): restore plan after shift = 0 ops.
+- Still open: Monday's Vercel scan-stale follow-ups on seeded companies are deleted by the next restore
+  (by design of "not in the baseline"); decide whether the scanner should skip seeded companies.
+
 ### 2026-09-15 — Nightly demo reset: second bug fixed, pair proven in a rolled-back dry run, re-enabled
 - Caroline is sharing the live app publicly now, so visitors will change demo data and the nightly restore
   is required again. Her instruction: double-check everything, fix what needs fixing, then put it back.
@@ -229,6 +256,25 @@ _Newest first. Why, not just what._
   cannot share a runner without the resolve hook (tsx mis-loads `lib/health.js` as CJS).
 - The nightly shift deletes all cached Insights, so the first visitor to each overview each day waits a few
   seconds for regeneration (12 onboardings + portfolio, Sonnet). Accepted for now.
+- **Merged as PR #18 (7dba59f). `demo-drift-check.yml` RE-ENABLED** (cron 03:00 UTC daily; GitHub has been
+  firing it late, ~08:35 UTC). Harness is now `scripts/demo-pair-dryrun.mjs` + `scripts/node-resolve-ts.mjs`:
+  run it before any future change to either demo script. First real nightly run to check: 2026-09-16.
+- **Status check 2026-09-21:** six scheduled runs 09-16 → 09-21, all green, fired 07:52–08:40 UTC (never
+  at 03:00). Logs read, not just conclusions: shift delta 1–2 days, restore applied 9–21 ops, drift check
+  "structurally intact" every night. Live counts identical to the 09-14 baseline (313 tasks, 130 drafts /
+  71 pending, 63 comments, 251 activity, 16 notifications), 0 pending drafts with a resolvedAt stamp, Priya's
+  link usable. Two benign things seen: (a) every night the restore "resets" the same 6 applied drafts
+  (applied → applied) + 3 onboardings' lastActivity (FN, PEER, RAY): the shift clamps live
+  resolvedAt/updatedAt to now() but shiftSnapshot does not clamp, so they disagree by a few hours and the
+  restore writes the snapshot value back. Cosmetic churn, no data effect; fix = clamp in shiftSnapshot too.
+  (b) Monday's Vercel scan-stale cron (08:00 UTC) created a follow-up that the restore deleted 40 min later
+  as "created after the baseline": on seeded companies the weekly scanner's output never survives a night.
+- **NOT built (proposed 09-15, no go-ahead):** move the cron to an odd minute ~05:17 UTC, and add an
+  insight WARM step to the same workflow (script calling the generator, not a browser agent; ~13 Sonnet
+  calls/day). Open question first: can lib/ai/insights.js generate outside the streaming route.
+- Env gotcha: cmux injects `NODE_OPTIONS=--require=<tmp>/cmux-claude-node-options/restore-node-options.cjs`;
+  after a long idle the tmp file is gone and every `node`/`npx` dies with MODULE_NOT_FOUND. Workaround:
+  `export NODE_OPTIONS="--max-old-space-size=4096"` in the command; real fix is restarting the cmux session.
 
 ### 2026-09-13 — Meeting drawer trims + filled health pill (branch `feat/drawer-trims-filled-health`)
 - Caroline reviewed the drawer against screenshots and asked for four cuts, all in `MeetingDrawer.js`:

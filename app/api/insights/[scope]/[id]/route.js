@@ -22,7 +22,7 @@ export const runtime = "edge";
 
 import { createClient } from "@/lib/supabase/server";
 import { anthropic } from "@/lib/ai/client";
-import { renderSystemPrompt, getInsightSchema, parseInsightPayload, buildUserMessage } from "@/lib/ai/insights";
+import { buildInsightRequest, parseInsightPayload } from "@/lib/ai/insights";
 
 export async function POST(req, { params }) {
   const { scope, id } = await params;
@@ -60,19 +60,7 @@ export async function POST(req, { params }) {
 
   let claudeStream;
   try {
-    claudeStream = anthropic.messages.stream({
-      model: "claude-sonnet-4-6",
-      max_tokens: 2000,
-      system: [
-        {
-          type: "text",
-          text: renderSystemPrompt(scope, today),
-          cache_control: { type: "ephemeral" },
-        },
-      ],
-      messages: [{ role: "user", content: buildUserMessage(snapshot) }],
-      output_config: { format: { type: "json_schema", schema: getInsightSchema(scope) } },
-    });
+    claudeStream = anthropic.messages.stream(buildInsightRequest(scope, snapshot, today));
   } catch (err) {
     return new Response(
       JSON.stringify({ error: `Claude call failed to start: ${err.message}` }),

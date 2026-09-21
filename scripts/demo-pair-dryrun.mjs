@@ -28,8 +28,10 @@ import { statements, compile, shiftSnapshot, resolveAnchor, daysBetweenUTC, isoD
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
 const snapshot = JSON.parse(readFileSync("prisma/fixtures/demo-snapshot.json", "utf8"));
 const anchor = resolveAnchor(snapshot);
-const today = isoDate(new Date());
-const delta = daysBetweenUTC(anchor, today);
+const now = new Date();
+const today = isoDate(now);
+const forced = process.argv.find((a) => a.startsWith("--delta="));
+const delta = forced ? Number(forced.split("=")[1]) : daysBetweenUTC(anchor, today);
 console.log(`anchor ${anchor} → today ${today}, delta ${delta}`);
 if (delta <= 0) { console.log("delta 0: nothing to test today"); process.exit(0); }
 
@@ -51,7 +53,7 @@ const nullCounts = async (db) => ({
 });
 
 const light = await prisma.company.findMany({ where: SEEDED, select: { id: true, prefix: true, onboardings: { select: { id: true } } } });
-const ctx = { delta, anchor: new Date(`${anchor}T23:59:59.999Z`), obIds: light.flatMap((c) => c.onboardings.map((o) => o.id)), companyIds: light.map((c) => c.id), fixtureIds: [] };
+const ctx = { delta, anchor: new Date(`${anchor}T23:59:59.999Z`), obIds: light.flatMap((c) => c.onboardings.map((o) => o.id)), companyIds: light.map((c) => c.id), fixtureIds: [], now };
 const stmts = statements().map((s) => ({ ...s, ...compile(s.sql, ctx) }));
 const before = await nullCounts(prisma);
 
@@ -65,7 +67,7 @@ try {
       tx.company.findMany({ where: SEEDED, orderBy: { prefix: "asc" }, include }),
       tx.vendorUser.findMany({ select: { id: true, email: true } }),
     ]);
-    const plan = planRestoreState(shiftSnapshot(snapshot, delta, today), companies, { vendorByEmail: new Map(vendors.map((v) => [v.email, v.id])) });
+    const plan = planRestoreState(shiftSnapshot(snapshot, delta, today, now), companies, { vendorByEmail: new Map(vendors.map((v) => [v.email, v.id])) });
     const byOp = {};
     for (const op of plan.ops) byOp[`${op.table} ${op.verb}`] = (byOp[`${op.table} ${op.verb}`] ?? 0) + 1;
     out = { rowsShifted: rows, nullColumns: { before, after }, restorePlanOps: plan.ops.length, restorePlanByOp: byOp, sample: plan.ops.slice(0, 8).map((o) => `${o.table} ${o.verb}: ${o.label}`) };
