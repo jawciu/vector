@@ -12,9 +12,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const description = "AI-powered B2B onboarding workspace for vendors and their customers.";
+
 export const metadata = {
+  metadataBase: new URL("https://vector.quest"),
   title: "Vector",
-  description: "Lightweight B2B onboarding workflow — track tasks, health, and follow-ups.",
+  description,
+  openGraph: {
+    title: "Vector",
+    description,
+    url: "/",
+    siteName: "Vector",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vector",
+    description,
+  },
 };
 
 export default function RootLayout({ children }) {
