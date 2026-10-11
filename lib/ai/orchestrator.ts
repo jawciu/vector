@@ -447,7 +447,10 @@ export async function runMinitiOrchestrator({
 
   const response = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 2000,
+    // A busy meeting proposes many drafts, each with a description, notes and
+    // source quote. 2000 was hit in practice and cut the last draft short, so
+    // leave plenty of headroom; the warning below flags it if it happens again.
+    max_tokens: 8000,
     // Same Pass 1 → same draft set, run after run. The decision logic
     // is rule-based enough that we want repeatable tool calls, not creative
     // re-interpretation each time.
@@ -467,6 +470,11 @@ export async function runMinitiOrchestrator({
     `[miniti] orchestrator (pass 2): ${response.content.length} content blocks, ` +
       `${calls.length} tool calls`
   );
+  if (response.stop_reason === "max_tokens") {
+    console.warn(
+      `[miniti] orchestrator (pass 2): hit max_tokens; the last draft may be incomplete`
+    );
+  }
 
   const durationMs = Date.now() - startedAt;
 
