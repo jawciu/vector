@@ -60,6 +60,12 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
+        with:
+          # main only accepts commits whose checks pass. This job's snapshot
+          # commit is pushed with a dedicated deploy key, which the "main:
+          # require passing checks" ruleset exempts. The bot's default token
+          # can't be exempted on a personal repo.
+          ssh-key: ${{ secrets.DEMO_PUSH_KEY }}
 
       - uses: actions/setup-node@v5
         with:
