@@ -41,7 +41,6 @@ export default async function PortalPage({ params }: { params: Promise<{ onboard
       data={data}
       tasks={tasks}
       contactName={session.contact.name}
-      contactId={session.contact.id}
       insightSnapshot={snapshot}
       insightContextHash={contextHash}
       cachedInsight={cachedInsightSerialised}

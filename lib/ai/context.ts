@@ -183,12 +183,9 @@ export async function buildOnboardingSnapshot(
   const velocity7d = Math.min(tasksDone, 7); // placeholder — refine later
 
   // Customer engagement — most-recent lastSeenPortalAt across contacts.
-  // BUG(ts): getContactsForOnboarding does not return `lastSeenPortalAt`, so
-  // this is always undefined and engagement always reads as "none". Typed as
-  // optional to preserve current behaviour; fix in a follow-up.
   const seenDates = contacts
-    .map((c) => (c as typeof c & { lastSeenPortalAt?: Date | string | null }).lastSeenPortalAt)
-    .filter((d): d is Date | string => Boolean(d));
+    .map((c) => c.lastSeenPortalAt)
+    .filter((d): d is NonNullable<typeof d> => Boolean(d));
   const customerLastSeenPortalAt = seenDates.length > 0
     ? new Date(Math.max(...seenDates.map((d) => new Date(d).getTime()))).toISOString()
     : null;
@@ -358,11 +355,7 @@ export async function buildPortfolioSnapshot({
   const now = today;
 
   const onboardings = list.map((ob) => {
-    // BUG(ts): getOnboardings does not return `targetGoLive`, so this is
-    // always null and daysToGoLive is always null. Typed as optional to
-    // preserve current behaviour; fix in a follow-up.
-    const obGoLive = (ob as typeof ob & { targetGoLive?: Date | string | null }).targetGoLive;
-    const targetGoLive = obGoLive ? new Date(obGoLive) : null;
+    const targetGoLive = ob.targetGoLive ? new Date(ob.targetGoLive) : null;
     const daysToGoLive = targetGoLive ? daysBetween(now, targetGoLive) : null;
     const lastActivityAt = ob.lastActivity ? new Date(ob.lastActivity) : null;
     const daysSinceLastActivity = lastActivityAt ? daysBetween(lastActivityAt, now) : null;

@@ -12,7 +12,7 @@ import {
   EmptyMessage,
 } from "@/app/ui/InsightCard";
 import TaskFilterMenu from "@/app/components/TaskFilterMenu";
-import { taskMatchesFilter } from "@/lib/taskFilters";
+import { taskMatchesFilter, TASK_FILTER_OPTIONS } from "@/lib/taskFilters";
 import { STATUS_COLORS } from "@/lib/constants";
 import PortalTaskCard from "./PortalTaskCard";
 import type { TaskPriority } from "@/app/ui/Icons";
@@ -42,7 +42,6 @@ interface TaskCallbacks {
 interface PortalOverviewProps extends TaskCallbacks {
   data: PortalOnboarding;
   tasks?: PortalTask[];
-  contactId?: number;
   snapshot: unknown;
   contextHash: string | null;
   cachedInsight: PortalCachedInsight | null;
@@ -167,6 +166,8 @@ function YourTasksSection({ tasks, onTaskUpdated, onCardClick, onSessionExpired 
   const [filter, setFilter] = useState("active");
 
   const myTasks = tasks.filter((t) => t.isAssignedToMe);
+  // Human label for the empty-state copy ("in progress", not "in-progress").
+  const filterLabel = (TASK_FILTER_OPTIONS.find((o) => o.id === filter)?.label ?? filter).toLowerCase();
   const filtered = myTasks
     .filter((t) => taskMatchesFilter(t, filter))
     .sort((a, b) => {
@@ -215,7 +216,7 @@ function YourTasksSection({ tasks, onTaskUpdated, onCardClick, onSessionExpired 
         <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0 }}>
           {myTasks.length === 0
             ? "Your vendor hasn't assigned any tasks to you yet."
-            : `No ${filter} tasks for you right now.`}
+            : `No ${filterLabel} tasks for you right now.`}
         </p>
       ) : (
         <div className="portal-task-grid">

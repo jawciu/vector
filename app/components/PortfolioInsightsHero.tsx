@@ -267,7 +267,6 @@ export default function PortfolioInsightsHero({ snapshot, contextHash, cachedIns
                     logoUrl={logos?.[w.onboardingId] ?? null}
                     detail={w.detail}
                     position={i === 0 ? "top" : "bottom"}
-                    isLast={i === wins.length - 1}
                   />
                 ))}
               </div>

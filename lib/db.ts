@@ -67,11 +67,23 @@ function mapTask<T extends MapTaskInput>(task: T | null | undefined): Mapped<T> 
   if (!task) return task;
   const prefix = task?.onboarding?.company?.prefix ?? null;
   const number = task?.number ?? null;
+  const blocker = (task as { blockedByTask?: MapTaskInput | null }).blockedByTask;
   return {
     ...task,
     taskId: prefix && number ? `${prefix}-${number}` : null,
+    // The blocker renders its own id chip on the card, so give it a taskId too.
+    ...(blocker && { blockedByTask: mapTask(blocker) }),
   };
 }
+
+/** Blocker fields the board card needs, including what mapTask composes taskId from. */
+const BLOCKED_BY_TASK_SELECT = {
+  id: true,
+  title: true,
+  status: true,
+  number: true,
+  onboarding: { select: { company: { select: { prefix: true } } } },
+};
 
 /**
  * Resolve a Supabase auth user to their VendorUser row, creating one on first call.
@@ -613,6 +625,7 @@ export async function getOnboardings(statusFilter?: string | null) {
       lastActivity: ob.updatedAt ? ob.updatedAt.toISOString() : null,
       owner: ob.owner || null,
       onboardingStatus: ob.status || "Active",
+      targetGoLive: ob.targetGoLive ? ob.targetGoLive.toISOString() : null,
     };
   });
 }
@@ -646,7 +659,7 @@ export async function getTasksForOnboarding(onboardingId: IdLike) {
   const tasks = await prisma.task.findMany({
     where: { onboardingId: id },
     include: {
-      blockedByTask: { select: { id: true, title: true, status: true } },
+      blockedByTask: { select: BLOCKED_BY_TASK_SELECT },
       assigneeContact: { select: { id: true, name: true } },
       files: { orderBy: { createdAt: "desc" } },
       onboarding: { select: { company: { select: { prefix: true } } } },
@@ -783,7 +796,7 @@ export async function createTask(
         number,
       },
       include: {
-        blockedByTask: { select: { id: true, title: true, status: true } },
+        blockedByTask: { select: BLOCKED_BY_TASK_SELECT },
         assigneeContact: { select: { id: true, name: true } },
         onboarding: { select: { company: { select: { prefix: true } } } },
       },
@@ -943,7 +956,7 @@ export async function updateTask(id: IdLike, data: UpdateTaskInput, { actor }: {
       }),
     },
     include: {
-      blockedByTask: { select: { id: true, title: true, status: true } },
+      blockedByTask: { select: BLOCKED_BY_TASK_SELECT },
       assigneeContact: { select: { id: true, name: true } },
       onboarding: { select: { company: { select: { prefix: true } } } },
     },
@@ -1067,7 +1080,7 @@ export async function reorderTask(taskId: IdLike, targetPhaseId: IdLike, newSort
   const reordered = await prisma.task.findUnique({
     where: { id },
     include: {
-      blockedByTask: { select: { id: true, title: true, status: true } },
+      blockedByTask: { select: BLOCKED_BY_TASK_SELECT },
       onboarding: { select: { company: { select: { prefix: true } } } },
     },
   });
@@ -1253,6 +1266,7 @@ export async function getContactsForOnboarding(onboardingId: IdLike) {
     email: c.email,
     role: c.role,
     bouncedAt: c.bouncedAt ? c.bouncedAt.toISOString() : null,
+    lastSeenPortalAt: c.lastSeenPortalAt ? c.lastSeenPortalAt.toISOString() : null,
   }));
 }
 
@@ -2530,6 +2544,9 @@ export async function getMeetingByEventId(eventId: IdLike) {
     siblingDrafts: r.pendingChanges.map((d) => ({
       id: d.id,
       action: d.action,
+      // ActionIcon branches match_existing drafts on the sub-action; only
+      // that field is needed, so the full payload stays server-side.
+      payload: { action: (d.payload as { action?: string } | null)?.action ?? null },
       status: d.status,
       title: (d.payload as DraftPayloadJson | null)?.title ?? (d.payload as DraftPayloadJson | null)?.subject ?? null,
       createdAt: d.createdAt.toISOString(),
@@ -2563,13 +2580,14 @@ export async function setExternalEventOrchestratorIO(
 ) {
   const eId = Number(id);
   if (Number.isNaN(eId)) return null;
+  // Prisma rejects a bare `null` for a nullable Json column; a failed pass
+  // is recorded as SQL NULL via Prisma.DbNull so callers can pass plain null.
+  const json = (v: unknown) =>
+    v === null ? Prisma.DbNull : (v as Prisma.InputJsonValue);
   const data: Prisma.ExternalEventUpdateInput = {};
-  // TODO(ts): callers pass plain objects (and `null` when Pass 1 failed). The
-  // casts keep the JS behaviour; a bare `null` on a Json? column is rejected
-  // by Prisma at runtime (it wants Prisma.DbNull), see the migration report.
-  if (input !== undefined) data.orchestratorInput = input as Prisma.InputJsonValue;
-  if (extraction !== undefined) data.orchestratorExtraction = extraction as Prisma.InputJsonValue;
-  if (output !== undefined) data.orchestratorOutput = output as Prisma.InputJsonValue;
+  if (input !== undefined) data.orchestratorInput = json(input);
+  if (extraction !== undefined) data.orchestratorExtraction = json(extraction);
+  if (output !== undefined) data.orchestratorOutput = json(output);
   if (Object.keys(data).length === 0) return null;
   return prisma.externalEvent.update({
     where: { id: eId },

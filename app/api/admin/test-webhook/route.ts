@@ -141,8 +141,8 @@ export async function POST(request: NextRequest) {
       ok: res.ok,
       status: res.status,
       fixture,
-      meetingId: payload.meeting.id,
-      meetingTitle: payload.meeting.title ?? null,
+      meetingId: payload?.meeting?.id ?? null,
+      meetingTitle: payload?.meeting?.title ?? null,
       response: responseBody,
     },
     { status: res.ok ? 200 : res.status }
