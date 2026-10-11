@@ -1,27 +1,27 @@
 {
-  "generatedAt": "2026-09-12",
-  "scannedFiles": 84,
+  "generatedAt": "2026-10-11",
+  "scannedFiles": 88,
   "metrics": {
-    "rawHexTotal": 15,
+    "rawHexTotal": 13,
     "rawHexDistinct": 3,
-    "rawRgba": 26,
-    "inlineStyles": 1056,
+    "rawRgba": 25,
+    "inlineStyles": 998,
     "arbitraryTw": 34,
-    "hardcodedGeometry": 975,
-    "rawButtons": 32,
-    "primitiveButtons": 105,
-    "buttonCoveragePct": 76.6,
+    "hardcodedGeometry": 895,
+    "rawButtons": 31,
+    "primitiveButtons": 104,
+    "buttonCoveragePct": 77,
     "rawInputs": 39,
     "primitiveInputs": 0,
     "inputCoveragePct": 0,
     "scatteredSvg": 82,
-    "centralSvg": 43,
-    "iconCoveragePct": 34.4,
-    "uiComponents": 24,
-    "storyFiles": 24,
+    "centralSvg": 44,
+    "iconCoveragePct": 34.9,
+    "uiComponents": 25,
+    "storyFiles": 25,
     "storyCoveragePct": 100,
-    "tsUiFiles": 21,
-    "tsCoveragePct": 87.5,
+    "tsUiFiles": 25,
+    "tsCoveragePct": 100,
     "dialogsMissingA11y": 5
   },
   "details": {
@@ -32,117 +32,117 @@
     ],
     "rawHexFiles": [
       {
-        "file": "app/components/AIDraftInbox.js",
-        "count": 4
-      },
-      {
-        "file": "app/components/CreateTaskModal.js",
+        "file": "app/components/CreateTaskModal.tsx",
         "count": 3
       },
       {
-        "file": "app/components/TaskDrawer.js",
+        "file": "app/components/TaskDrawer.tsx",
         "count": 3
       },
       {
-        "file": "app/admin/ai/page.js",
+        "file": "app/admin/ai/page.tsx",
         "count": 2
       },
       {
-        "file": "app/components/ContactsPanel.js",
+        "file": "app/components/AIDraftInbox.tsx",
         "count": 2
       },
       {
-        "file": "app/components/PipelineTimeline.js",
+        "file": "app/components/ContactsPanel.tsx",
+        "count": 2
+      },
+      {
+        "file": "app/components/PipelineTimeline.tsx",
         "count": 1
       }
     ],
     "worstInlineStyleFiles": [
       {
-        "file": "app/components/AIDraftInbox.js",
-        "count": 156
+        "file": "app/components/AIDraftInbox.tsx",
+        "count": 144
       },
       {
-        "file": "app/components/TaskDrawer.js",
+        "file": "app/components/TaskDrawer.tsx",
         "count": 85
       },
       {
-        "file": "app/components/PipelineTimeline.js",
+        "file": "app/components/PipelineTimeline.tsx",
         "count": 55
       },
       {
-        "file": "app/components/CreateTaskModal.js",
+        "file": "app/components/CreateTaskModal.tsx",
         "count": 54
       },
       {
-        "file": "app/admin/ai/page.js",
+        "file": "app/admin/ai/page.tsx",
         "count": 46
       },
       {
-        "file": "app/portal/[onboardingId]/PortalDrawer.js",
+        "file": "app/portal/[onboardingId]/PortalDrawer.tsx",
         "count": 46
       },
       {
-        "file": "app/components/TestWebhookPanel.js",
+        "file": "app/components/TestWebhookPanel.tsx",
         "count": 35
       },
       {
-        "file": "app/components/UnmatchedEvents.js",
+        "file": "app/components/UnmatchedEvents.tsx",
         "count": 29
       }
     ],
     "worstRawButtonFiles": [
       {
-        "file": "app/components/AIDraftInbox.js",
-        "count": 8
+        "file": "app/components/AIDraftInbox.tsx",
+        "count": 7
       },
       {
-        "file": "app/components/PipelineTimeline.js",
+        "file": "app/components/PipelineTimeline.tsx",
         "count": 3
       },
       {
-        "file": "app/components/Sidebar.js",
+        "file": "app/components/Sidebar.tsx",
         "count": 3
       },
       {
-        "file": "app/components/MeetingsTab.js",
+        "file": "app/components/MeetingsTab.tsx",
         "count": 2
       },
       {
-        "file": "app/components/NotificationBell.js",
+        "file": "app/components/NotificationBell.tsx",
         "count": 2
       },
       {
-        "file": "app/components/TaskDrawer.js",
+        "file": "app/components/TaskDrawer.tsx",
         "count": 2
       },
       {
-        "file": "app/components/TestWebhookPanel.js",
+        "file": "app/components/TestWebhookPanel.tsx",
         "count": 2
       },
       {
-        "file": "app/components/ContactsPanel.js",
+        "file": "app/components/ContactsPanel.tsx",
         "count": 1
       }
     ],
     "dialogFiles": [
       {
-        "file": "app/components/CreateOnboardingModal.js",
+        "file": "app/components/CreateOnboardingModal.tsx",
         "hasA11y": false
       },
       {
-        "file": "app/components/CreateTaskModal.js",
+        "file": "app/components/CreateTaskModal.tsx",
         "hasA11y": false
       },
       {
-        "file": "app/components/FollowUpModal.js",
+        "file": "app/components/FollowUpModal.tsx",
         "hasA11y": false
       },
       {
-        "file": "app/components/MemberModal.js",
+        "file": "app/components/MemberModal.tsx",
         "hasA11y": false
       },
       {
-        "file": "app/components/OnboardingActions.js",
+        "file": "app/components/OnboardingActions.tsx",
         "hasA11y": false
       }
     ]
