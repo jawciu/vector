@@ -1,7 +1,7 @@
 import { defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
 
-// Unit tests are *.test.js; Playwright e2e specs (*.spec.js in e2e/) are run
+// Unit tests are *.test.js / *.test.ts; Playwright e2e specs (*.spec.js in e2e/) are run
 // by `npm run test:e2e` and must not be picked up here.
 export default defineConfig({
   resolve: {
@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["**/*.test.js"],
+    include: ["**/*.test.{js,ts}"],
     exclude: ["node_modules/**", "e2e/**", ".next/**", "lib/generated/**"],
   },
 });

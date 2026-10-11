@@ -43,10 +43,10 @@ const eslintConfig = defineConfig([
 
   // Feature code should reach for the primitives, not raw elements.
   // app/ui is exempt (wrapping raw elements is a primitive's job), as is
-  // Menu.js (a de-facto primitive; moves into app/ui in DS-PLAN Phase 5).
+  // Menu.ts (a de-facto primitive; moves into app/ui in DS-PLAN Phase 5).
   {
     files: ["app/**/*.{js,jsx,ts,tsx}"],
-    ignores: ["app/api/**", "app/ui/**", "app/components/Menu.js"],
+    ignores: ["app/api/**", "app/ui/**", "app/components/Menu.ts"],
     rules: {
       // The .icon-btn skin is IconButton's, links included (Caroline, 2026-09-12).
       "vector/no-raw-icon-button": "warn",

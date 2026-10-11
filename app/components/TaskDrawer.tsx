@@ -1,0 +1,1381 @@
+"use client";
+
+import { useState, useEffect, useRef, forwardRef } from "react";
+import type { Dispatch, ReactNode, RefObject, SetStateAction } from "react";
+import type { User } from "@supabase/supabase-js";
+import type { TaskPriority } from "@/app/ui/Icons";
+import type { ClientContact, ClientTask, ClientVendorUser } from "./types";
+import Image from "next/image";
+import { createClient } from "@/lib/supabase/client";
+import Button from "@/app/ui/Button";
+import FieldPill from "@/app/ui/FieldPill";
+import FieldRow from "@/app/ui/FieldRow";
+import CalendarDropdown from "@/app/ui/CalendarDropdown";
+import Drawer from "@/app/ui/Drawer";
+import TaskIdChip from "@/app/ui/TaskIdChip";
+import IconButton from "@/app/ui/IconButton";
+import { FollowupSparkleIcon } from "./AIDraftInbox";
+import {
+  CalendarIcon,
+  PriorityIcon,
+  StatusIcon,
+  OwnerIcon,
+  AssigneeIcon,
+  MembersIcon,
+  DependenciesIcon,
+} from "@/app/ui/Icons";
+import { MenuList, MenuOption } from "./Menu";
+import FollowUpModal from "./FollowUpModal";
+import { TASK_STATUSES, PRIORITIES, STATUS_COLORS } from "@/lib/constants";
+import { AVATAR_IMAGES, avatarColor, avatarInitials } from "@/lib/avatar";
+
+type AvatarProps = {
+  name: string;
+  size?: number;
+};
+
+function Avatar({ name, size = 18 }: AvatarProps) {
+  if (AVATAR_IMAGES[name]) {
+    return (
+      <Image
+        src={AVATAR_IMAGES[name]}
+        alt={name}
+        title={name}
+        width={size}
+        height={size}
+        className="rounded-full flex-shrink-0 object-cover"
+      />
+    );
+  }
+  return (
+    <div
+      className="flex items-center justify-center text-[9px] font-semibold rounded-full flex-shrink-0"
+      style={{
+        width: size,
+        height: size,
+        background: avatarColor(name),
+        color: "var(--text-dark)",
+      }}
+      title={name}
+    >
+      {avatarInitials(name)}
+    </div>
+  );
+}
+
+function NotesIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
+      <g clipPath="url(#notes-drawer-clip)">
+        <path
+          d="M3.45675 3.89835H8.94754M3.45675 7.26357H10.6029M3.45675 10.494H7.72288M11.8948 2.83855L9.9266 0.85352C9.8046 0.731724 9.6598 0.635161 9.50047 0.56935C9.34114 0.503539 9.1704 0.46977 8.99801 0.469972H2.43732C2.26179 0.474361 2.09493 0.547188 1.97235 0.672907C1.84978 0.798626 1.7812 0.967278 1.78125 1.14286V12.9521C1.7812 13.1277 1.84978 13.2963 1.97235 13.4221C2.09493 13.5478 2.26179 13.6206 2.43732 13.625H11.6223C11.8007 13.625 11.9719 13.5541 12.0981 13.4279C12.2243 13.3017 12.2952 13.1306 12.2952 12.9521V3.76714C12.2932 3.59357 12.2568 3.42212 12.188 3.26273C12.1193 3.10333 12.0196 2.95915 11.8948 2.83855Z"
+          stroke="var(--text-muted)"
+          strokeWidth="0.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="notes-drawer-clip">
+          <rect width="14" height="14" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
+
+function CommentIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
+      <g clipPath="url(#comment-drawer-clip)">
+        <path
+          d="M1.83778 1.24799C1.88502 1.24523 1.93284 1.24385 1.98125 1.24385H10.5418C11.2073 1.24385 11.8455 1.50821 12.316 1.97876C12.7866 2.44931 13.0509 3.08752 13.0509 3.75298V9.36163C13.0509 9.41004 13.0496 9.45806 13.0468 9.50569C13.3195 9.3324 13.544 9.09307 13.6996 8.80986C13.8551 8.52666 13.9366 8.20877 13.9365 7.88567V3.75298C13.9365 3.30718 13.8487 2.86575 13.6781 2.45389C13.5075 2.04202 13.2575 1.66779 12.9422 1.35256C12.627 1.03734 12.2528 0.787283 11.8409 0.616683C11.429 0.446083 10.9876 0.358276 10.5418 0.358276H3.45721C3.13421 0.358284 2.81644 0.439831 2.53335 0.59536C2.25026 0.750889 2.01101 0.975366 1.83778 1.24799ZM2.8314 13.5652C2.93767 13.6183 3.04984 13.6419 3.16202 13.6419H3.16792C3.32142 13.6419 3.47492 13.5947 3.6048 13.4943L6.58034 11.2804H10.5418C11.5986 11.2804 12.4606 10.4184 12.4606 9.36163V3.75298C12.4606 2.6962 11.5986 1.83424 10.5418 1.83424H1.98125C0.924461 1.83424 0.0625 2.6962 0.0625 3.75298V9.36163C0.0625 10.4184 0.924461 11.2804 1.98125 11.2804H2.42404V12.9039C2.42404 13.1873 2.57754 13.4412 2.8314 13.5652ZM0.948076 3.75298C0.948076 3.18622 1.41448 2.71981 1.98125 2.71981H10.5418C11.1086 2.71981 11.575 3.18622 11.575 3.75298V9.36163C11.575 9.9284 11.1086 10.3948 10.5418 10.3948H6.28515L3.30961 12.6087V10.3948H1.98125C1.41448 10.3948 0.948076 9.9284 0.948076 9.36163V3.75298Z"
+          fill="var(--text-muted)"
+        />
+      </g>
+      <defs>
+        <clipPath id="comment-drawer-clip">
+          <rect width="14" height="14" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
+
+function FileIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
+      <path d="M8 1.5H4a1.5 1.5 0 00-1.5 1.5v8A1.5 1.5 0 004 12.5h6a1.5 1.5 0 001.5-1.5V5L8 1.5z" stroke="var(--text-muted)" strokeWidth="0.9" strokeLinejoin="round" />
+      <path d="M8 1.5V5h3.5" stroke="var(--text-muted)" strokeWidth="0.9" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M7 2v7M4 6l3 3 3-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M2.5 11.5h9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function formatTimestamp(iso: string) {
+  const date = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
+// --- Notes formatting toolbar helpers ---
+
+type NotesFormat =
+  | "newline"
+  | "bold"
+  | "italic"
+  | "underline"
+  | "strikethrough"
+  | "link"
+  | "code"
+  | "codeblock"
+  | "bullet"
+  | "numbered"
+  | "blockquote"
+  | "sparkle";
+
+function applyFormat(
+  format: NotesFormat,
+  notesValue: string,
+  setNotesValue: Dispatch<SetStateAction<string>>,
+  notesRef: RefObject<HTMLTextAreaElement | null>,
+) {
+  const textarea = notesRef.current;
+  if (!textarea) return;
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const selected = notesValue.slice(start, end);
+
+  let before = "";
+  let after = "";
+  let placeholder = "";
+  let newVal = notesValue;
+  let newCursor = start;
+
+  switch (format) {
+    case "bold":
+      before = "**"; after = "**"; placeholder = "bold"; break;
+    case "italic":
+      before = "_"; after = "_"; placeholder = "italic"; break;
+    case "underline":
+      before = "<u>"; after = "</u>"; placeholder = "text"; break;
+    case "strikethrough":
+      before = "~~"; after = "~~"; placeholder = "text"; break;
+    case "link": {
+      const linkText = selected || "text";
+      const insertion = `[${linkText}](url)`;
+      newVal = notesValue.slice(0, start) + insertion + notesValue.slice(end);
+      setNotesValue(newVal);
+      setTimeout(() => {
+        textarea.focus();
+        // Select "url" so the user can immediately type/paste the URL
+        const urlStart = start + 1 + linkText.length + 2;
+        textarea.setSelectionRange(urlStart, urlStart + 3);
+      }, 0);
+      return;
+    }
+    case "code":
+      before = "`"; after = "`"; placeholder = "code"; break;
+    case "codeblock": {
+      const innerText = selected || "code";
+      const insertion = "```\n" + innerText + "\n```";
+      newVal = notesValue.slice(0, start) + insertion + notesValue.slice(end);
+      setNotesValue(newVal);
+      setTimeout(() => {
+        textarea.focus();
+        // Select the inner placeholder so the user can type immediately
+        const innerStart = start + 4; // after "```\n"
+        textarea.setSelectionRange(innerStart, innerStart + innerText.length);
+      }, 0);
+      return;
+    }
+    case "bullet": {
+      // Prepend "- " to the current line
+      const lineStart = notesValue.lastIndexOf("\n", start - 1) + 1;
+      newVal = notesValue.slice(0, lineStart) + "- " + notesValue.slice(lineStart);
+      setNotesValue(newVal);
+      setTimeout(() => {
+        textarea.focus();
+        const offset = start + 2;
+        textarea.setSelectionRange(offset, offset);
+      }, 0);
+      return;
+    }
+    case "numbered": {
+      const lineStart = notesValue.lastIndexOf("\n", start - 1) + 1;
+      newVal = notesValue.slice(0, lineStart) + "1. " + notesValue.slice(lineStart);
+      setNotesValue(newVal);
+      setTimeout(() => {
+        textarea.focus();
+        const offset = start + 3;
+        textarea.setSelectionRange(offset, offset);
+      }, 0);
+      return;
+    }
+    case "blockquote": {
+      const lineStart = notesValue.lastIndexOf("\n", start - 1) + 1;
+      newVal = notesValue.slice(0, lineStart) + "> " + notesValue.slice(lineStart);
+      setNotesValue(newVal);
+      setTimeout(() => {
+        textarea.focus();
+        const offset = start + 2;
+        textarea.setSelectionRange(offset, offset);
+      }, 0);
+      return;
+    }
+    case "newline": {
+      newVal = notesValue.slice(0, start) + "\n" + notesValue.slice(end);
+      setNotesValue(newVal);
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start + 1, start + 1);
+      }, 0);
+      return;
+    }
+    case "sparkle":
+      // No-op placeholder
+      return;
+    default:
+      return;
+  }
+
+  const text = selected || placeholder;
+  newVal = notesValue.slice(0, start) + before + text + after + notesValue.slice(end);
+  setNotesValue(newVal);
+  setTimeout(() => {
+    textarea.focus();
+    if (!selected) {
+      // Select the placeholder so the user can type over it immediately
+      textarea.setSelectionRange(start + before.length, start + before.length + placeholder.length);
+    } else {
+      const cursor = start + before.length + text.length + after.length;
+      textarea.setSelectionRange(cursor, cursor);
+    }
+  }, 0);
+}
+
+function ToolbarSeparator() {
+  return (
+    <div
+      style={{
+        width: 1,
+        height: 14,
+        background: "var(--border)",
+        margin: "0 2px",
+        flexShrink: 0,
+        alignSelf: "center",
+      }}
+    />
+  );
+}
+
+/**
+ * One notes-toolbar control.
+ *   label — the accessible name: plain words, no markdown syntax.
+ *   title — the hover tooltip, which may show the markdown it inserts.
+ * Typography lives on the inner glyph, never on IconButton's className
+ * (that hatch is layout-only, see IconButton's JSDoc).
+ */
+type ToolbarButtonProps = {
+  label: string;
+  title?: string;
+  onClick: () => void;
+  children: ReactNode;
+};
+
+function ToolbarButton({ label, title, onClick, children }: ToolbarButtonProps) {
+  return (
+    <IconButton aria-label={label} title={title ?? label} onClick={onClick}>
+      {children}
+    </IconButton>
+  );
+}
+
+type NotesToolbarProps = {
+  notesValue: string;
+  setNotesValue: Dispatch<SetStateAction<string>>;
+  notesRef: RefObject<HTMLTextAreaElement | null>;
+};
+
+function NotesToolbar({ notesValue, setNotesValue, notesRef }: NotesToolbarProps) {
+  const fmt = (format: NotesFormat) => applyFormat(format, notesValue, setNotesValue, notesRef);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 2,
+        padding: "6px 8px",
+        borderBottom: "1px solid var(--border)",
+        background: "var(--bg)",
+        borderRadius: "8px 8px 0 0",
+        flexWrap: "nowrap",
+      }}
+    >
+      {/* + new line */}
+      <ToolbarButton label="New line" onClick={() => fmt("newline")}>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M6 2v8M2 6h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      </ToolbarButton>
+
+      <ToolbarSeparator />
+
+      {/* Bold */}
+      <ToolbarButton label="Bold" title="Bold (**text**)" onClick={() => fmt("bold")}>
+        <span style={{ fontWeight: 700, fontSize: 13, lineHeight: 1 }}>B</span>
+      </ToolbarButton>
+
+      {/* Italic */}
+      <ToolbarButton label="Italic" title="Italic (_text_)" onClick={() => fmt("italic")}>
+        <span style={{ fontStyle: "italic", fontSize: 13, lineHeight: 1 }}>I</span>
+      </ToolbarButton>
+
+      {/* Underline */}
+      <ToolbarButton label="Underline" title="Underline (<u>text</u>)" onClick={() => fmt("underline")}>
+        <span style={{ textDecoration: "underline", fontSize: 13, lineHeight: 1 }}>U</span>
+      </ToolbarButton>
+
+      {/* Strikethrough */}
+      <ToolbarButton label="Strikethrough" title="Strikethrough (~~text~~)" onClick={() => fmt("strikethrough")}>
+        <span style={{ textDecoration: "line-through", fontSize: 13, lineHeight: 1 }}>S</span>
+      </ToolbarButton>
+
+      <ToolbarSeparator />
+
+      {/* Bullet list */}
+      <ToolbarButton label="Bulleted list" title="Bulleted list (- item)" onClick={() => fmt("bullet")}>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <circle cx="1.5" cy="3" r="1" fill="currentColor" />
+          <circle cx="1.5" cy="6" r="1" fill="currentColor" />
+          <circle cx="1.5" cy="9" r="1" fill="currentColor" />
+          <line x1="4" y1="3" x2="11" y2="3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="4" y1="6" x2="11" y2="6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="4" y1="9" x2="11" y2="9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        </svg>
+      </ToolbarButton>
+
+      {/* Numbered list */}
+      <ToolbarButton label="Numbered list" title="Numbered list (1. item)" onClick={() => fmt("numbered")}>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          {/* 1 */}
+          <path d="M1.5 2.5V5" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" />
+          {/* 2 */}
+          <path d="M1 7.5c0-.6.9-1 .9-.3s-1 1.3-1 1.8h1.5" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" />
+          {/* 3 — just a dot for simplicity */}
+          <circle cx="1.5" cy="10" r="0.6" fill="currentColor" />
+          <line x1="4" y1="3" x2="11" y2="3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="4" y1="6" x2="11" y2="6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="4" y1="9" x2="11" y2="9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        </svg>
+      </ToolbarButton>
+
+      {/* Blockquote */}
+      <ToolbarButton label="Blockquote" title="Blockquote (&gt; text)" onClick={() => fmt("blockquote")}>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <line x1="1.5" y1="2" x2="1.5" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <line x1="4" y1="4" x2="11" y2="4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="4" y1="7" x2="11" y2="7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="4" y1="10" x2="9" y2="10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        </svg>
+      </ToolbarButton>
+
+      <ToolbarSeparator />
+
+      {/* Link */}
+      <ToolbarButton label="Link" title="Link ([text](url))" onClick={() => fmt("link")}>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path
+            d="M5 7.5a3 3 0 0 0 4.243 0l1.5-1.5a3 3 0 0 0-4.243-4.243L5.75 2.5"
+            stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"
+          />
+          <path
+            d="M7 4.5a3 3 0 0 0-4.243 0l-1.5 1.5a3 3 0 0 0 4.243 4.243L6.25 9.5"
+            stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"
+          />
+        </svg>
+      </ToolbarButton>
+
+      {/* Inline code */}
+      <ToolbarButton label="Inline code" title="Inline code (`code`)" onClick={() => fmt("code")}>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M4 3L1 6l3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M8 3l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </ToolbarButton>
+
+      {/* Code block */}
+      <ToolbarButton label="Code block" title="Code block (```code```)" onClick={() => fmt("codeblock")}>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <rect x="0.5" y="0.5" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="1" />
+          <path d="M3 4.5L1.5 6l1.5 1.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M5.5 8.5l1-5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+          <path d="M9 4.5L10.5 6 9 7.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </ToolbarButton>
+
+      <ToolbarSeparator />
+
+      {/* Sparkle / AI placeholder */}
+      <ToolbarButton label="AI assist" title="AI assist (coming soon)" onClick={() => fmt("sparkle")}>
+        <span className="text-xs leading-none">✦</span>
+      </ToolbarButton>
+    </div>
+  );
+}
+
+/** A task comment as /api/tasks/[id]/comments returns it. */
+type TaskComment = {
+  id: number;
+  author: string;
+  body: string;
+  createdAt: string;
+};
+
+type TaskDrawerProps = {
+  task: ClientTask | null;
+  open: boolean;
+  onClose: () => void;
+  onTaskUpdated?: (task: ClientTask) => void;
+  people?: string[];
+  vendorUsers?: ClientVendorUser[];
+  contacts?: ClientContact[];
+  allTasks?: ClientTask[];
+};
+
+const TaskDrawer = forwardRef<HTMLDivElement, TaskDrawerProps>(function TaskDrawer({
+  task,
+  open,
+  onClose,
+  onTaskUpdated,
+  people = [],
+  vendorUsers = [],
+  contacts = [],
+  allTasks = [],
+}, ref) {
+  const [localTask, setLocalTask] = useState(task);
+  const [comments, setComments] = useState<TaskComment[]>([]);
+  const [commentInput, setCommentInput] = useState("");
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [notesFocused, setNotesFocused] = useState(false);
+  const [commentFocused, setCommentFocused] = useState(false);
+  const [doneBtnAnimating, setDoneBtnAnimating] = useState(false);
+
+  // Hover states for field rows (show X on hover)
+
+  // Inline editing state
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [titleValue, setTitleValue] = useState("");
+
+  // Follow-up draft modal (Vector-generated email draft).
+  const [followUpOpen, setFollowUpOpen] = useState(false);
+  const [editingDesc, setEditingDesc] = useState(false);
+  const [descValue, setDescValue] = useState("");
+  const [notesValue, setNotesValue] = useState("");
+
+  // Dropdown states
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
+  const [priorityOpen, setPriorityOpen] = useState(false);
+  const [ownerOpen, setOwnerOpen] = useState(false);
+  const [assigneeOpen, setAssigneeOpen] = useState(false);
+  const [membersOpen, setMembersOpen] = useState(false);
+  const [membersSearch, setMembersSearch] = useState("");
+  const [depsOpen, setDepsOpen] = useState(false);
+  const [viewDate, setViewDate] = useState(new Date());
+
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const statusRef = useRef<HTMLDivElement>(null);
+  const priorityRef = useRef<HTMLDivElement>(null);
+  const ownerRef = useRef<HTMLDivElement>(null);
+  const assigneeRef = useRef<HTMLDivElement>(null);
+  const membersRef = useRef<HTMLDivElement>(null);
+  const membersSearchRef = useRef<HTMLInputElement>(null);
+  const depsRef = useRef<HTMLDivElement>(null);
+  const notesRef = useRef<HTMLTextAreaElement>(null);
+
+  // Sync local state when task changes
+  useEffect(() => {
+    if (task) {
+      setLocalTask(task);
+      setTitleValue(task.title || "");
+      setDescValue(task.description || "");
+      setNotesValue(task.notes || "");
+      closeAllDropdowns();
+      setEditingTitle(false);
+      setEditingDesc(false);
+    }
+  }, [task]);
+
+  // Load comments when drawer opens
+  useEffect(() => {
+    if (open && task) {
+      fetch(`/api/tasks/${task.id}/comments`)
+        .then((r) => r.json())
+        .then((data) => setComments(Array.isArray(data) ? data : []))
+        .catch(() => setComments([]));
+    }
+  }, [open, task]);
+
+  // Load current user for comment avatar
+  useEffect(() => {
+    createClient().then((supabase) => {
+      if (!supabase) return;
+      supabase.auth.getUser().then(({ data }: { data: { user: User | null } }) => {
+        if (data?.user) setCurrentUser(data.user);
+      });
+    });
+  }, []);
+
+  // ESC + outside-click are handled by the Drawer primitive (with
+  // useClickOutside=false here — OnboardingDetailClient owns the click
+  // logic so opening a sibling task swaps instead of closing).
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    if (!open) return;
+    function handler(e: MouseEvent) {
+      if (calendarOpen && calendarRef.current && !calendarRef.current.contains(e.target as Node)) setCalendarOpen(false);
+      if (statusOpen && statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false);
+      if (priorityOpen && priorityRef.current && !priorityRef.current.contains(e.target as Node)) setPriorityOpen(false);
+      if (ownerOpen && ownerRef.current && !ownerRef.current.contains(e.target as Node)) setOwnerOpen(false);
+      if (assigneeOpen && assigneeRef.current && !assigneeRef.current.contains(e.target as Node)) setAssigneeOpen(false);
+      if (membersOpen && membersRef.current && !membersRef.current.contains(e.target as Node)) { setMembersOpen(false); setMembersSearch(""); }
+      if (depsOpen && depsRef.current && !depsRef.current.contains(e.target as Node)) setDepsOpen(false);
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open, calendarOpen, statusOpen, priorityOpen, ownerOpen, assigneeOpen, membersOpen, depsOpen]);
+
+  function closeAllDropdowns() {
+    setCalendarOpen(false);
+    setStatusOpen(false);
+    setPriorityOpen(false);
+    setOwnerOpen(false);
+    setAssigneeOpen(false);
+    setMembersOpen(false);
+    setMembersSearch("");
+    setDepsOpen(false);
+  }
+
+  function toggleDropdown(current: boolean, setter: Dispatch<SetStateAction<boolean>>) {
+    const wasOpen = current;
+    closeAllDropdowns();
+    if (!wasOpen) setter(true);
+  }
+
+  async function patchTask(patch: Partial<ClientTask>) {
+    const res = await fetch(`/api/tasks/${localTask!.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    });
+    if (!res.ok) return;
+    const updated: ClientTask = await res.json();
+    setLocalTask(updated);
+    if (onTaskUpdated) onTaskUpdated(updated);
+    return updated;
+  }
+
+  async function handleMarkDone() {
+    setDoneBtnAnimating(true);
+    setTimeout(() => setDoneBtnAnimating(false), 450);
+    const goingToDone = localTask!.status !== "Done";
+    const patch = goingToDone
+      ? { status: "Done", previousStatus: localTask!.status }
+      : { status: localTask!.previousStatus || "Not started", previousStatus: null };
+    await patchTask(patch);
+  }
+
+  function handleTitleBlur() {
+    setEditingTitle(false);
+    if (titleValue.trim() && titleValue !== localTask!.title) {
+      patchTask({ title: titleValue.trim() });
+    }
+  }
+
+  function handleDescBlur() {
+    setEditingDesc(false);
+    if (descValue !== (localTask!.description || "")) {
+      patchTask({ description: descValue });
+    }
+  }
+
+  function handleNotesBlur() {
+    if (notesValue !== (localTask!.notes || "")) {
+      patchTask({ notes: notesValue });
+    }
+  }
+
+  async function handleSubmitComment() {
+    const trimmed = commentInput.trim();
+    if (!trimmed || submittingComment) return;
+    setSubmittingComment(true);
+    setCommentError(null);
+    try {
+      const res = await fetch(`/api/tasks/${localTask!.id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: trimmed }),
+      });
+      if (res.ok) {
+        const newComment = await res.json();
+        setComments((prev) => [...prev, newComment]);
+        setCommentInput("");
+        const updated = { ...localTask!, commentCount: (localTask!.commentCount || 0) + 1 };
+        setLocalTask(updated);
+        if (onTaskUpdated) onTaskUpdated(updated);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        console.error("Comment POST failed:", err);
+        setCommentError(err.error || "Failed to post comment");
+      }
+    } catch (e) {
+      console.error("Comment POST error:", e);
+      setCommentError("Network error. Please try again.");
+    } finally {
+      setSubmittingComment(false);
+    }
+  }
+
+  // Keep the Drawer shell mounted even before a task is selected, so the
+  // panel already exists offscreen at translateX(100%). Without this, the
+  // very first card click mounts the panel already carrying
+  // `.task-drawer--open`, so it appears instead of sliding in (there is no
+  // prior closed frame to transition from). Every later open worked because
+  // the panel stays mounted once localTask is set. See globals.css .task-drawer.
+  if (!localTask) {
+    return (
+      <Drawer
+        ref={ref}
+        open={false}
+        onClose={onClose}
+        width={520}
+        topOffset={44}
+        useClickOutside={false}
+      />
+    );
+  }
+
+  const isDone = localTask.status === "Done";
+  const statusColor = STATUS_COLORS[localTask.status] || "var(--text-muted)";
+  const hasComment = commentInput.trim().length > 0;
+
+  return (
+    <Drawer
+      ref={ref}
+      open={open}
+      onClose={onClose}
+      width={520}
+      topOffset={44}
+      useClickOutside={false}
+    >
+      {/* Sticky header: actions + title + description */}
+      <div
+        style={{
+          flexShrink: 0,
+          padding: "16px 20px 0",
+          display: "flex",
+          flexDirection: "column",
+          gap: 12,
+          background: "var(--bg)",
+        }}
+      >
+        {/* Row: Mark as done + Draft follow-up — close lives in the
+            Drawer primitive (top-right). Padding-right reserves space. */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, paddingRight: 32 }}>
+          {/* Mark as done button */}
+          {/* eslint-disable-next-line no-restricted-syntax -- state toggle that sheds the secondary skin once done */}
+          <button
+            type="button"
+            onClick={handleMarkDone}
+            className={`flex items-center gap-1 rounded-lg text-sm${isDone ? "" : " btn-secondary"}${doneBtnAnimating ? " done-btn-pop" : ""}`}
+            style={{
+              padding: "4px 8px",
+              cursor: "pointer",
+              color: isDone ? "var(--success)" : "var(--text)",
+              transition: "color 0.2s ease, border-color 0.2s ease",
+              ...(isDone && {
+                border: "1px solid var(--success)",
+              }),
+            }}
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              className={isDone && doneBtnAnimating ? "done-check-draw" : ""}
+            >
+              <path d="M2.5 6.5L5 9L9.5 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span>{isDone ? "Done" : "Mark as done"}</span>
+          </button>
+
+          {/* Draft follow-up with Vector — uses the AI-gradient sparkle
+              shared with the insights cards. */}
+          <Button
+            onClick={() => setFollowUpOpen(true)}
+            disabled={!localTask?.id}
+            variant="secondary" className="flex items-center gap-1"
+            style={{
+              padding: "4px 8px",
+              cursor: localTask?.id ? "pointer" : "default",
+            }}
+            title="Draft a follow-up email with Vector"
+          >
+            <FollowupSparkleIcon />
+            <span>Draft follow-up</span>
+          </Button>
+        </div>
+
+        {/* Title */}
+        {editingTitle ? (
+          <input
+            autoFocus
+            type="text"
+            value={titleValue}
+            onChange={(e) => setTitleValue(e.target.value)}
+            onBlur={handleTitleBlur}
+            onKeyDown={(e) => { if (e.key === "Enter") handleTitleBlur(); if (e.key === "Escape") { setTitleValue(localTask.title); setEditingTitle(false); } }}
+            className="w-full outline-none text-lg font-semibold"
+            style={{ background: "transparent", border: "none", color: "var(--text)", padding: 0, lineHeight: 1.3 }}
+          />
+        ) : (
+          <h2
+            onClick={() => setEditingTitle(true)}
+            className="text-lg font-semibold cursor-text"
+            style={{
+              color: isDone ? "var(--text-muted)" : "var(--text)",
+              textDecoration: isDone ? "line-through" : "none",
+              lineHeight: 1.3,
+            }}
+          >
+            <TaskIdChip task={localTask} />
+            {localTask.title}
+          </h2>
+        )}
+
+      </div>
+
+      {/* Scrollable body */}
+      <div
+        style={{
+          flex: 1,
+          padding: "20px 20px 32px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 24,
+          overflowY: "auto",
+        }}
+      >
+        {/* Description */}
+        {editingDesc ? (
+          <textarea
+            autoFocus
+            value={descValue}
+            onChange={(e) => setDescValue(e.target.value)}
+            onBlur={handleDescBlur}
+            onKeyDown={(e) => { if (e.key === "Escape") { setDescValue(localTask.description || ""); setEditingDesc(false); } }}
+            rows={3}
+            className="w-full outline-none text-sm resize-none"
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "var(--text)",
+              padding: 0,
+              lineHeight: 1.5,
+            }}
+          />
+        ) : (
+          <p
+            onClick={() => setEditingDesc(true)}
+            className="text-sm cursor-text"
+            style={{
+              color: localTask.description ? "var(--text-muted)" : "var(--icon-tertiary)",
+              lineHeight: 1.5,
+            }}
+          >
+            {localTask.description || "Add a description…"}
+          </p>
+        )}
+
+        {/* Fields */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
+
+          {/* Due date */}
+          <div ref={calendarRef} className="relative">
+            <FieldRow
+              icon={<CalendarIcon style={{ flexShrink: 0 }} />}
+              active={calendarOpen}
+              popup="dialog"
+              onClick={() => toggleDropdown(calendarOpen, setCalendarOpen)}
+              onClear={localTask.due ? () => { patchTask({ due: "" }); setCalendarOpen(false); } : undefined}
+            >
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Target</span>
+              {localTask.due && (
+                <span className="text-sm" style={{ color: "var(--text)" }}>
+                  {new Date(localTask.due + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+                </span>
+              )}
+            </FieldRow>
+            {calendarOpen && (
+              <CalendarDropdown
+                value={localTask.due}
+                viewDate={viewDate}
+                onViewDateChange={setViewDate}
+                onChange={(date) => { patchTask({ due: date }); setCalendarOpen(false); }}
+                onClear={() => { patchTask({ due: "" }); setCalendarOpen(false); }}
+                onClose={() => setCalendarOpen(false)}
+              />
+            )}
+          </div>
+
+          {/* Status */}
+          <div ref={statusRef} className="relative">
+            <FieldRow
+              icon={<StatusIcon style={{ flexShrink: 0 }} />}
+              active={statusOpen}
+              onClick={() => toggleDropdown(statusOpen, setStatusOpen)}
+              onClear={() => { patchTask({ status: "Not started" }); setStatusOpen(false); }}
+            >
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Status</span>
+              <span
+                className="text-sm rounded"
+                style={{
+                  color: statusColor,
+                  border: `0.5px solid ${statusColor}`,
+                  padding: "1px 4px",
+                  display: "inline-block",
+                  fontSize: 12,
+                }}
+              >
+                {localTask.status}
+              </span>
+            </FieldRow>
+            {statusOpen && (
+              <MenuList style={{ minWidth: "100%" }}>
+                {TASK_STATUSES.map((s) => (
+                  <MenuOption
+                    key={s}
+                    active={localTask.status === s}
+                    onClick={() => { patchTask({ status: s, ...(s === "Done" && { previousStatus: localTask.status }) }); setStatusOpen(false); }}
+                  >
+                    <span style={{
+                      color: STATUS_COLORS[s],
+                      border: `0.5px solid ${STATUS_COLORS[s]}`,
+                      padding: "1px 4px",
+                      borderRadius: 6,
+                      fontSize: 12,
+                    }}>
+                      {s}
+                    </span>
+                  </MenuOption>
+                ))}
+              </MenuList>
+            )}
+          </div>
+
+          {/* Priority */}
+          <div ref={priorityRef} className="relative">
+            <FieldRow
+              icon={<PriorityIcon priority={localTask.priority as TaskPriority | null | undefined} style={{ flexShrink: 0 }} />}
+              active={priorityOpen}
+              onClick={() => toggleDropdown(priorityOpen, setPriorityOpen)}
+              onClear={localTask.priority ? () => { patchTask({ priority: null }); setPriorityOpen(false); } : undefined}
+            >
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Priority</span>
+              {localTask.priority && (
+                <span className="text-sm capitalize" style={{ color: "var(--text)" }}>{localTask.priority}</span>
+              )}
+            </FieldRow>
+            {priorityOpen && (
+              <MenuList style={{ minWidth: "100%" }}>
+                {PRIORITIES.map((p) => (
+                  <MenuOption
+                    key={p}
+                    active={localTask.priority === p}
+                    onClick={() => { patchTask({ priority: localTask.priority === p ? null : p }); setPriorityOpen(false); }}
+                    className="capitalize"
+                  >
+                    <div className="flex items-center gap-2">
+                      <PriorityIcon priority={p as TaskPriority} />
+                      <span>{p}</span>
+                    </div>
+                  </MenuOption>
+                ))}
+              </MenuList>
+            )}
+          </div>
+
+          {/* Owner — must be a VendorUser (Vector team). The picker writes
+              ownerId (FK) and keeps the owner string in sync for display. */}
+          <div ref={ownerRef} className="relative">
+            <FieldRow
+              icon={<OwnerIcon style={{ flexShrink: 0 }} />}
+              active={ownerOpen}
+              onClick={() => toggleDropdown(ownerOpen, setOwnerOpen)}
+              onClear={localTask.owner ? () => { patchTask({ owner: "", ownerId: null }); setOwnerOpen(false); } : undefined}
+            >
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Owner</span>
+              {localTask.owner && (
+                <div className="flex items-center gap-1.5">
+                  <Avatar name={localTask.owner} size={20} />
+                  <span className="text-sm" style={{ color: "var(--text)" }}>{localTask.owner}</span>
+                </div>
+              )}
+            </FieldRow>
+            {ownerOpen && (
+              <MenuList style={{ minWidth: "100%", maxHeight: 200, overflowY: "auto" }}>
+                {vendorUsers.length === 0 ? (
+                  <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>
+                    No team members yet — add one in <a href="/settings" style={{ color: "var(--action)" }}>Settings</a>.
+                  </div>
+                ) : (
+                  vendorUsers.map((vu) => {
+                    const selected = localTask.ownerId === vu.id;
+                    return (
+                      <MenuOption
+                        key={vu.id}
+                        active={selected}
+                        onClick={() => {
+                          if (selected) patchTask({ owner: "", ownerId: null });
+                          else patchTask({ owner: vu.name, ownerId: vu.id });
+                          setOwnerOpen(false);
+                        }}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Avatar name={vu.name} size={20} />
+                          <span>{vu.name}</span>
+                        </div>
+                      </MenuOption>
+                    );
+                  })
+                )}
+              </MenuList>
+            )}
+          </div>
+
+          {/* Assignee (customer-side) */}
+          <div ref={assigneeRef} className="relative">
+            <FieldRow
+              icon={<AssigneeIcon style={{ flexShrink: 0 }} />}
+              active={assigneeOpen}
+              onClick={() => toggleDropdown(assigneeOpen, setAssigneeOpen)}
+              onClear={localTask.assigneeContact ? () => {
+                patchTask({ assigneeContactId: null });
+                setLocalTask((prev) => ({ ...prev!, assigneeContact: null, assigneeContactId: null }));
+                setAssigneeOpen(false);
+              } : undefined}
+            >
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Assignee</span>
+              {localTask.assigneeContact && (
+                <div className="flex items-center gap-1.5">
+                  <Avatar name={localTask.assigneeContact.name} size={20} />
+                  <span className="text-sm" style={{ color: "var(--text)" }}>{localTask.assigneeContact.name}</span>
+                </div>
+              )}
+            </FieldRow>
+            {assigneeOpen && (
+              <MenuList style={{ minWidth: "100%", maxHeight: 160, overflowY: "auto" }}>
+                {contacts.length === 0 ? (
+                  <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No contacts on this onboarding</div>
+                ) : (
+                  contacts.map((contact) => {
+                    const isActive = localTask.assigneeContactId === contact.id;
+                    return (
+                      <MenuOption
+                        key={contact.id}
+                        active={isActive}
+                        onClick={() => {
+                          if (isActive) {
+                            patchTask({ assigneeContactId: null });
+                            setLocalTask((prev) => ({ ...prev!, assigneeContact: null, assigneeContactId: null }));
+                          } else {
+                            patchTask({ assigneeContactId: contact.id });
+                            setLocalTask((prev) => ({
+                              ...prev!,
+                              assigneeContactId: contact.id,
+                              assigneeContact: { id: contact.id, name: contact.name },
+                            }));
+                          }
+                          setAssigneeOpen(false);
+                        }}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Avatar name={contact.name} size={20} />
+                          <span>{contact.name}</span>
+                        </div>
+                      </MenuOption>
+                    );
+                  })
+                )}
+              </MenuList>
+            )}
+          </div>
+
+          {/* Members */}
+          <div ref={membersRef} className="relative">
+            <FieldRow
+              icon={<MembersIcon style={{ flexShrink: 0 }} />}
+              active={membersOpen}
+              onClear={localTask.members && localTask.members.length > 0 ? () => { patchTask({ members: [] }); setMembersOpen(false); setMembersSearch(""); } : undefined}
+              onClick={() => {
+                const wasOpen = membersOpen;
+                toggleDropdown(membersOpen, setMembersOpen);
+                if (!wasOpen) setTimeout(() => membersSearchRef.current?.focus(), 0);
+              }}
+            >
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Members</span>
+              {localTask.members && localTask.members.length > 0 && (
+                /* Avatar stack — negative margins for overlap */
+                <div className="flex items-center">
+                  {localTask.members.slice(0, 5).map((m, i) => (
+                    <div key={m} style={{ marginLeft: i > 0 ? -6 : 0, zIndex: 5 - i, position: "relative" }}>
+                      <Avatar name={m} size={20} />
+                    </div>
+                  ))}
+                  {localTask.members.length > 5 && (
+                    <div
+                      className="flex items-center justify-center text-[8px] font-semibold rounded-full"
+                      style={{ width: 16, height: 16, background: "var(--surface-hover)", color: "var(--text-muted)", marginLeft: -6 }}
+                    >
+                      +{localTask.members.length - 5}
+                    </div>
+                  )}
+                </div>
+              )}
+            </FieldRow>
+            {membersOpen && (
+              <div
+                className="absolute left-0 z-10 rounded border flex flex-col shadow-lg"
+                style={{
+                  top: "calc(100% + 4px)",
+                  background: "var(--bg-elevated)",
+                  borderColor: "var(--border)",
+                  minWidth: 220,
+                }}
+              >
+                {/* Search */}
+                <div
+                  className="flex items-center gap-2.5 px-1.5 py-1.5"
+                  style={{ borderBottom: "1px solid var(--border)" }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
+                    <circle cx="6" cy="6" r="4.5" stroke="var(--text-muted)" strokeWidth="1.2" />
+                    <line x1="9.5" y1="9.5" x2="12.5" y2="12.5" stroke="var(--text-muted)" strokeWidth="1.2" strokeLinecap="round" />
+                  </svg>
+                  <input
+                    ref={membersSearchRef}
+                    type="text"
+                    placeholder="Search"
+                    value={membersSearch}
+                    onChange={(e) => setMembersSearch(e.target.value)}
+                    className="text-sm w-full outline-none"
+                    style={{ background: "transparent", border: "none", color: "var(--text)", padding: 0 }}
+                  />
+                </div>
+                {/* People list */}
+                <div className="flex flex-col gap-0.5 px-0.5 pt-1 pb-0.5" style={{ maxHeight: 200, overflowY: "auto" }}>
+                  {people.length === 0 ? (
+                    <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No people available</div>
+                  ) : (
+                    people
+                      .filter((p) => p.toLowerCase().includes(membersSearch.toLowerCase()))
+                      .map((person) => {
+                        const isMember = (localTask.members || []).includes(person);
+                        return (
+                          // eslint-disable-next-line no-restricted-syntax -- menu row, becomes a Select option in slice 3
+                          <button
+                            key={person}
+                            type="button"
+                            className="group menu-option flex w-full items-center gap-2.5 rounded p-1 text-left text-sm whitespace-nowrap transition-colors"
+                            style={{
+                              background: isMember ? "var(--surface-hover)" : undefined,
+                              color: isMember ? "var(--text)" : "var(--text-muted)",
+                            }}
+                            onClick={() => {
+                              const current = localTask.members || [];
+                              const updated = isMember ? current.filter((m) => m !== person) : [...current, person];
+                              patchTask({ members: updated });
+                            }}
+                          >
+                            {/* Checkbox */}
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+                              {isMember ? (
+                                <path d="M10 0C12.2091 0 14 1.79086 14 4V10C14 12.2091 12.2091 14 10 14H4C1.79086 14 9.66399e-08 12.2091 0 10V4C0 1.79086 1.79086 9.66384e-08 4 0H10ZM10.8125 4.10938C10.5969 3.93687 10.2819 3.97187 10.1094 4.1875L6.42773 8.78906L3.82031 6.61621C3.60827 6.43951 3.29304 6.46781 3.11621 6.67969C2.93951 6.89173 2.96781 7.20696 3.17969 7.38379L6.17969 9.88379L6.57129 10.2109L6.89062 9.8125L10.8906 4.8125C11.0631 4.59687 11.0281 4.28188 10.8125 4.10938Z" fill="#C098FF"/>
+                              ) : (
+                                <>
+                                  <rect x="0.5" y="0.5" width="13" height="13" rx="3.5" stroke="#5D565D" className="group-hover:hidden" />
+                                  <rect x="0.5" y="0.5" width="13" height="13" rx="3.5" stroke="#C098FF" className="hidden group-hover:block" />
+                                </>
+                              )}
+                            </svg>
+                            <Avatar name={person} size={18} />
+                            {person}
+                          </button>
+                        );
+                      })
+                  )}
+                  {people.length > 0 && people.filter((p) => p.toLowerCase().includes(membersSearch.toLowerCase())).length === 0 && (
+                    <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No matches</div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Dependencies */}
+          <div ref={depsRef} className="relative">
+            <FieldRow
+              icon={<DependenciesIcon style={{ flexShrink: 0 }} />}
+              active={depsOpen}
+              onClick={() => toggleDropdown(depsOpen, setDepsOpen)}
+              onClear={localTask.blockedByTaskId ? () => { patchTask({ blockedByTaskId: null }); setDepsOpen(false); } : undefined}
+            >
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Dependencies</span>
+              {localTask.blockedByTaskId && (() => {
+                const dep = allTasks.find((t) => t.id === localTask.blockedByTaskId);
+                return (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm" style={{ color: "var(--text)" }}>
+                      {dep && <TaskIdChip task={dep} />}
+                      {dep?.title || "Task"}
+                    </span>
+                  </div>
+                );
+              })()}
+            </FieldRow>
+            {depsOpen && (
+              <MenuList style={{ width: "max-content", minWidth: "100%", maxWidth: 360, maxHeight: 160, overflowY: "auto" }}>
+                {allTasks.filter((t) => t.id !== localTask.id).length === 0 ? (
+                  <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No other tasks</div>
+                ) : (
+                  allTasks
+                    .filter((t) => t.id !== localTask.id)
+                    .map((t) => (
+                      <MenuOption
+                        key={t.id}
+                        active={localTask.blockedByTaskId === t.id}
+                        onClick={() => {
+                          patchTask({ blockedByTaskId: localTask.blockedByTaskId === t.id ? null : t.id });
+                          setDepsOpen(false);
+                        }}
+                      >
+                        <span>
+                          <TaskIdChip task={t} />
+                          {t.title}
+                        </span>
+                      </MenuOption>
+                    ))
+                )}
+              </MenuList>
+            )}
+          </div>
+        </div>
+
+        {/* Notes */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div className="flex items-center gap-1.5" style={{ paddingLeft: 8 }}>
+            <NotesIcon />
+            <span className="text-sm" style={{ color: "var(--text-muted)" }}>Notes</span>
+          </div>
+          {/* Toolbar + textarea grouped with shared border */}
+          <div
+            style={{
+              border: `1px solid ${notesFocused ? "var(--action)" : "var(--border)"}`,
+              borderRadius: 8,
+              overflow: "hidden",
+              background: "var(--bg)",
+              transition: "border-color 0.15s ease",
+            }}
+          >
+            <NotesToolbar
+              notesValue={notesValue}
+              setNotesValue={setNotesValue}
+              notesRef={notesRef}
+            />
+            <textarea
+              ref={notesRef}
+              value={notesValue}
+              onChange={(e) => setNotesValue(e.target.value)}
+              onFocus={() => setNotesFocused(true)}
+              onBlur={() => { setNotesFocused(false); handleNotesBlur(); }}
+              placeholder="Write your notes here"
+              rows={5}
+              className="w-full text-sm resize-y outline-none"
+              style={{
+                background: "var(--bg)",
+                border: "none",
+                borderRadius: 0,
+                color: "var(--text)",
+                padding: "8px 12px",
+                lineHeight: 1.5,
+                fontFamily: "inherit",
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Files */}
+        {localTask.files && localTask.files.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div className="flex items-center gap-1.5" style={{ paddingLeft: 8 }}>
+              <FileIcon />
+              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Files</span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {localTask.files.map((f) => (
+                <div
+                  key={f.id}
+                  className="flex items-center gap-2 text-sm"
+                  style={{ paddingLeft: 8 }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--text)", flexShrink: 0 }}>
+                    <path d="M8 1.5H4a1.5 1.5 0 00-1.5 1.5v8A1.5 1.5 0 004 12.5h6a1.5 1.5 0 001.5-1.5V5L8 1.5z" stroke="currentColor" strokeWidth="0.9" strokeLinejoin="round" />
+                    <path d="M8 1.5V5h3.5" stroke="currentColor" strokeWidth="0.9" strokeLinejoin="round" />
+                  </svg>
+                  <a
+                    href={`/api/tasks/${localTask.id}/files/${f.id}`}
+                    className="flex-1 truncate"
+                    style={{ color: "var(--text)", textDecoration: "none" }}
+                  >
+                    {f.fileName}
+                  </a>
+                  <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    {(f.fileSize / 1024).toFixed(0)} KB
+                  </span>
+                  <IconButton
+                    href={`/api/tasks/${localTask.id}/files/${f.id}`}
+                    aria-label={`Download ${f.fileName}`}
+                  >
+                    <DownloadIcon />
+                  </IconButton>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Comments */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div className="flex items-center gap-1.5" style={{ paddingLeft: 8 }}>
+            <CommentIcon />
+            <span className="text-sm" style={{ color: "var(--text-muted)" }}>Comments</span>
+          </div>
+
+          {/* Existing comments */}
+          {comments.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {comments.map((c) => (
+                <div
+                  key={c.id}
+                  className="rounded-lg text-sm"
+                  style={{
+                    background: "var(--bg)",
+                    border: "1px solid var(--border)",
+                    padding: "8px 12px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Avatar name={c.author} size={20} />
+                    <span style={{ color: "var(--text)" }}>{c.author}</span>
+                    <span style={{ color: "var(--text-muted)", fontSize: 12 }}>{formatTimestamp(c.createdAt)}</span>
+                  </div>
+                  <p style={{ color: "var(--text)", paddingLeft: 24, wordBreak: "break-word" }}>{c.body}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add comment — avatar + textarea side by side */}
+          <div
+            className="rounded-lg"
+            style={{
+              background: "var(--bg)",
+              border: `1px solid ${commentFocused ? "var(--action)" : "var(--border)"}`,
+              padding: "8px 12px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+              transition: "border-color 0.15s ease",
+            }}
+          >
+            <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+              <Avatar
+                name={currentUser?.user_metadata?.full_name || currentUser?.email || "You"}
+                size={20}
+              />
+              <textarea
+                value={commentInput}
+                onChange={(e) => { setCommentInput(e.target.value); setCommentError(null); }}
+                onFocus={() => setCommentFocused(true)}
+                onBlur={() => setCommentFocused(false)}
+                onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmitComment(); }}
+                placeholder="Add a comment"
+                rows={2}
+                className="w-full text-sm resize-none outline-none"
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "var(--text)",
+                  fontFamily: "inherit",
+                  lineHeight: 1.5,
+                  flex: 1,
+                  minWidth: 0,
+                }}
+              />
+            </div>
+            {commentError && (
+              <p className="text-xs" style={{ color: "var(--danger)" }}>{commentError}</p>
+            )}
+            <div className="flex justify-end">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleSubmitComment}
+                disabled={!hasComment || submittingComment}
+              >
+                {submittingComment ? "Posting…" : "Comment"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Follow-up draft modal (mounted at drawer root so it overlays everything). */}
+      <FollowUpModal
+        open={followUpOpen}
+        onClose={() => setFollowUpOpen(false)}
+        taskId={localTask?.id}
+        taskTitle={localTask?.title}
+        taskCode={localTask?.taskId ?? null}
+      />
+    </Drawer>
+  );
+});
+
+export default TaskDrawer;
+

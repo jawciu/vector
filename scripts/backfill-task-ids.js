@@ -12,7 +12,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../lib/generated/prisma/client";
-import { derivePrefix } from "../lib/companies.js";
+import { derivePrefix } from "../lib/companies.ts";
 
 const dryRun = process.argv.includes("--dry-run");
 

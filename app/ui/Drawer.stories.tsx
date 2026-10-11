@@ -1,34 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import type { ComponentType, ReactNode } from "react";
 import { useState } from "react";
 import { expect, fn, userEvent, within } from "storybook/test";
-import DrawerJs from "./Drawer";
+import Drawer from "./Drawer";
 import Button from "./Button";
 import { dsMetaDescription } from "./ds-meta";
 import { meta as dsMeta } from "./Drawer.meta";
 
-/**
- * Drawer stays .js this phase, so TS infers its destructured props as
- * required `any`s. This interface restates the REAL API (from the component's
- * JSDoc) purely for story typing; delete it when Drawer converts to TSX.
- */
-interface DrawerProps {
-  open?: boolean;
-  onClose?: () => void;
-  /** px, default 520 */
-  width?: number;
-  /** px from viewport top, default 44 (clears the global nav) */
-  topOffset?: number;
-  /** default true; pass false when the parent owns outside-click logic */
-  useClickOutside?: boolean;
-  /** default true — the built-in chevron-back close button */
-  closeButton?: boolean;
-  className?: string;
-  /** default var(--deeper-bg) */
-  background?: string;
-  children?: ReactNode;
-}
-const Drawer = DrawerJs as unknown as ComponentType<DrawerProps>;
 
 /** Realistic drawer contents — a TaskDrawer-shaped body, not a lorem block. */
 function DrawerBody() {

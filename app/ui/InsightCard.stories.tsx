@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import type { ComponentType, CSSProperties, ReactNode } from "react";
+import type { ComponentType } from "react";
 import {
-  InsightCard as InsightCardJs,
-  InsightCardHeader as InsightCardHeaderJs,
+  InsightCard,
+  InsightCardHeader,
   InsightDivider,
   InsightSection,
   InsightStatusPill,
   RiskCard,
   WinRow,
-  FocusTodayItem as FocusTodayItemJs,
+  FocusTodayItem as FocusTodayItemTyped,
   ThisWeekRow,
   EmptyMessage,
 } from "./InsightCard";
@@ -18,24 +18,10 @@ import { dsMetaDescription } from "./ds-meta";
 import { meta as dsMeta } from "./InsightCard.meta";
 
 /**
- * InsightCard.js stays JS this phase, so TS infers destructured props as
- * required `any`s. These casts restate the real (optional) APIs purely for
- * story typing; delete them when the module converts to TSX.
+ * FOCUS_TASK below is a partial task (just what the card renders), so this
+ * cast loosens `task` for story use only. The rest of the module is typed.
  */
-const InsightCard = InsightCardJs as unknown as ComponentType<{
-  isStreaming?: boolean;
-  children?: ReactNode;
-  style?: CSSProperties;
-}>;
-const InsightCardHeader = InsightCardHeaderJs as unknown as ComponentType<{
-  title: ReactNode;
-  healthPill?: ReactNode;
-  statusPill?: ReactNode;
-  isStreaming?: boolean;
-  payload?: unknown;
-  onRegenerate?: () => void;
-}>;
-const FocusTodayItem = FocusTodayItemJs as unknown as ComponentType<{
+const FocusTodayItem = FocusTodayItemTyped as unknown as ComponentType<{
   index: number;
   reason: string;
   task?: Record<string, unknown> | null;

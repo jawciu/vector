@@ -33,10 +33,10 @@ import {
   hashSnapshot,
   buildPortfolioSnapshot,
   hashPortfolioSnapshot,
-} from "../lib/ai/context.js";
-import { buildInsightRequest, parseInsightPayload } from "../lib/ai/insights.js";
-import { anthropic, computeCost } from "../lib/ai/client.js";
-import { getOnboardings, getCachedInsight, saveInsight, logAICall } from "../lib/db.js";
+} from "../lib/ai/context.ts";
+import { buildInsightRequest, parseInsightPayload } from "../lib/ai/insights.ts";
+import { anthropic, computeCost } from "../lib/ai/client.ts";
+import { getOnboardings, getCachedInsight, saveInsight, logAICall } from "../lib/db.ts";
 
 const WRITE = process.argv.includes("--write");
 const FORCE = process.argv.includes("--force");
