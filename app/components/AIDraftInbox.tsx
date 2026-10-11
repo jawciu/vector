@@ -370,37 +370,8 @@ function groupBucketByMeeting(drafts: AIDraft[]) {
   return { meetingGroups, looseDrafts };
 }
 
-/** Group drafts by sourceEventId. Drafts without an event id form one
- *  group per draft (no grouping). */
-function groupDraftsByEvent(drafts: AIDraft[]): DraftEventGroup[] {
-  const byEvent = new Map<number, AIDraft[]>();
-  const singles: DraftEventGroup[] = [];
-  for (const d of drafts) {
-    if (d.sourceEventId == null) {
-      singles.push({ key: `single-${d.id}`, eventId: null, drafts: [d] });
-      continue;
-    }
-    const list = byEvent.get(d.sourceEventId) ?? [];
-    list.push(d);
-    byEvent.set(d.sourceEventId, list);
-  }
-  const grouped: (DraftEventGroup & { eventId: number })[] = [];
-  for (const [eventId, list] of byEvent.entries()) {
-    grouped.push({ key: `event-${eventId}`, eventId, drafts: list });
-  }
-  // Render order: single drafts, then event groups (by event id desc for newest first).
-  grouped.sort((a, b) => b.eventId - a.eventId);
-  return [...singles, ...grouped];
-}
-
 interface DateBucket {
   bucket: string;
-  drafts: AIDraft[];
-}
-
-interface DraftEventGroup {
-  key: string;
-  eventId: number | null;
   drafts: AIDraft[];
 }
 
@@ -473,7 +444,6 @@ function DraftColumn({
                   error={errors[draft.id]}
                   onApprove={(overrides) => onApprove(draft, overrides)}
                   onReject={() => onReject(draft, null)}
-                  onMeetingClick={onMeetingClick}
                 />
               ))
             : (() => {
@@ -507,7 +477,6 @@ function DraftColumn({
                               contacts,
                               phases,
                               openTasks,
-                              onMeetingClick,
                             })
                           )}
                         </div>
@@ -526,7 +495,6 @@ function DraftColumn({
                         contacts,
                         phases,
                         openTasks,
-                        onMeetingClick,
                       })
                     )}
                   </>
@@ -580,7 +548,6 @@ function renderActionCard(draft: AIDraft, ctx: DraftListContext) {
         contacts={ctx.contacts}
         phases={ctx.phases}
         openTasks={ctx.openTasks}
-        onMeetingClick={ctx.onMeetingClick}
       />
     );
   }
@@ -599,104 +566,6 @@ function renderActionCard(draft: AIDraft, ctx: DraftListContext) {
       vendorUsers={ctx.vendorUsers}
       contacts={ctx.contacts}
     />
-  );
-}
-
-interface DraftGroupProps extends DraftListContext {
-  group: DraftEventGroup;
-}
-
-function DraftGroup({
-  group,
-  mode,
-  busyIds,
-  errors,
-  selectedIds,
-  onToggleSelect,
-  onApprove,
-  onReject,
-  vendorUsers,
-  contacts,
-  phases,
-  openTasks,
-  onMeetingClick,
-}: DraftGroupProps) {
-  // Show a "From meeting: <title>" header above any group whose drafts
-  // came from a Miniti event. Click the title pill to open the
-  // MeetingDrawer with the full transcript.
-  const meetingTitle = group.eventId != null
-    ? group.drafts.find((d) => d.meetingTitle)?.meetingTitle ?? null
-    : null;
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {meetingTitle && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
-            <span style={{ color: "var(--text-muted)" }}>From meeting:</span>
-            {/* eslint-disable-next-line no-restricted-syntax -- task reference chip, not a DS button */}
-            <button
-              type="button"
-              onClick={() => onMeetingClick?.(group.eventId as number)}
-              className="task-ref"
-              style={{ border: "none", cursor: "pointer" }}
-              title="Open meeting transcript"
-            >
-              {meetingTitle}
-            </button>
-          </div>
-          <hr className="ai-divider" style={{ margin: 0 }} />
-        </div>
-      )}
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {group.drafts.map((draft) => {
-          if (draft.action === "draft_followup") {
-            return (
-              <FollowupCard
-                key={draft.id}
-                draft={draft}
-                mode={mode}
-                busy={busyIds.has(draft.id)}
-                error={errors[draft.id]}
-                onApprove={(overrides) => onApprove(draft, overrides)}
-                onReject={() => onReject(draft, null)}
-                onMeetingClick={onMeetingClick}
-              />
-            );
-          }
-          if (draft.action === "create_task") {
-            return (
-              <CreateTaskCard
-                key={draft.id}
-                draft={draft}
-                mode={mode}
-                busy={busyIds.has(draft.id)}
-                error={errors[draft.id]}
-                onApprove={(overrides) => onApprove(draft, overrides)}
-                onReject={() => onReject(draft, null)}
-                vendorUsers={vendorUsers}
-                contacts={contacts}
-                phases={phases}
-                openTasks={openTasks}
-                onMeetingClick={onMeetingClick}
-              />
-            );
-          }
-          return (
-            <DraftCard
-              key={draft.id}
-              draft={draft}
-              mode={mode}
-              busy={busyIds.has(draft.id)}
-              error={errors[draft.id]}
-              selected={selectedIds.has(draft.id)}
-              onToggleSelect={() => onToggleSelect(draft.id)}
-              onApprove={(overrides) => onApprove(draft, overrides)}
-              onReject={() => onReject(draft, null)}
-            />
-          );
-        })}
-      </div>
-    </div>
   );
 }
 
@@ -1333,11 +1202,9 @@ export interface FollowupCardProps {
   error?: string | null;
   onApprove: (overrides: DraftOverrides) => void;
   onReject: () => void;
-  /** Accepted for parity with the other cards; FollowupCard never reads it. */
-  onMeetingClick?: ((eventId: number) => void) | null;
 }
 
-export function FollowupCard({ draft, mode, busy, error, onApprove, onReject, onMeetingClick }: FollowupCardProps) {
+export function FollowupCard({ draft, mode, busy, error, onApprove, onReject }: FollowupCardProps) {
   const isPending = mode === "pending";
   const initial: DraftPayload = draft.payload ?? {};
   const [subject, setSubject] = useState(initial.subject ?? "");
@@ -1698,9 +1565,6 @@ export interface CreateTaskCardProps {
   contacts?: ContactOption[];
   phases?: PhaseOption[];
   openTasks?: OpenTaskOption[];
-  onTaskCreated?: ((task: CreatedTask) => void) | null;
-  /** Passed by the inbox but never read by CreateTaskCard. */
-  onMeetingClick?: ((eventId: number) => void) | null;
 }
 
 export function CreateTaskCard({
@@ -1716,7 +1580,6 @@ export function CreateTaskCard({
   contacts = [],
   phases = [],
   openTasks = [],
-  onTaskCreated = null,
 }: CreateTaskCardProps) {
   const isPending = mode === "pending";
   const original = useMemo(() => normaliseCreateTaskPayload(draft.payload), [draft.payload]);
@@ -2578,49 +2441,6 @@ function CheckCircleIcon() {
       <path d="M4.5 7L6.25 8.75L9.5 5.25" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
-}
-
-function describeAction(action: string, payload: DraftPayload) {
-  switch (action) {
-    case "create_task":
-      return `Create task: "${payload.title ?? "(untitled)"}"`;
-    case "match_existing": {
-      const sub = payload.action;
-      if (sub === "reassign") return `Reassign task #${payload.taskId}`;
-      if (sub === "reprioritise") return `Re-prioritise task #${payload.taskId} → ${payload.newPriority}`;
-      if (sub === "update_due_date") return `Update due date on task #${payload.taskId} → ${payload.newDueDate}`;
-      return `Update task #${payload.taskId}`;
-    }
-    case "update_status":
-      return `Mark task #${payload.taskId} as ${payload.newStatus}`;
-    case "draft_followup":
-      return `Follow up on task #${payload.taskId}`;
-    default:
-      return action;
-  }
-}
-
-function describeMeta(action: string, payload: DraftPayload) {
-  if (action === "create_task") {
-    // Legacy fallback path. New create_task drafts route through
-    // CreateTaskCard (not DraftCard), so this only fires for old or
-    // unhandled action types. payload.owner ("vendor"|"customer") was
-    // dropped from the orchestrator schema in favour of payload.ownerId
-    // / payload.assigneeContactId — no longer surfaced here.
-    const parts: string[] = [];
-    if (payload.dueDate) parts.push(`Due: ${payload.dueDate}`);
-    if (payload.priority) parts.push(`Priority: ${payload.priority}`);
-    return parts.join(" · ") || null;
-  }
-  if (action === "draft_followup") {
-    const parts: string[] = [];
-    if (Array.isArray(payload.reasons) && payload.reasons.length) {
-      parts.push(payload.reasons.join(" + "));
-    }
-    if (payload.tone) parts.push(`Tone: ${payload.tone}`);
-    return parts.join(" · ") || null;
-  }
-  return null;
 }
 
 /** Bulk-selection toggle, mirroring the Kanban board's CheckboxButton

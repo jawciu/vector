@@ -14,7 +14,6 @@ interface PortalShellProps {
   data: PortalOnboarding;
   tasks: PortalTask[];
   contactName: string;
-  contactId: number;
   insightSnapshot: unknown;
   insightContextHash: string | null;
   cachedInsight: PortalCachedInsight | null;
@@ -59,7 +58,6 @@ export default function PortalShell({
   data,
   tasks: initialTasks,
   contactName,
-  contactId,
   insightSnapshot,
   insightContextHash,
   cachedInsight,
@@ -137,7 +135,6 @@ export default function PortalShell({
             <PortalOverview
               data={data}
               tasks={tasks}
-              contactId={contactId}
               onTaskUpdated={handleTaskUpdated}
               onCardClick={handleOpenDrawer}
               onSessionExpired={handleSessionExpired}

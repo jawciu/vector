@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       kind,
     } = body ?? {};
 
-    if (!scope || !scopeId || !contextHash || !payload || !model || !usage) {
+    if (!scope || !scopeId || !contextHash || !payload || !model || !usage || durationMs == null) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }

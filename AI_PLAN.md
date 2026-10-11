@@ -468,7 +468,6 @@ model AICall {
 - [app/components/PortfolioInsightsHero.js](app/components/PortfolioInsightsHero.js) — home dashboard hero
 - [app/components/AIDraftInbox.js](app/components/AIDraftInbox.js) — draft cards (approve/reject)
 - [app/components/UnmatchedEvents.js](app/components/UnmatchedEvents.js) — "Needs your input" cards (assign)
-- [app/components/StuckEventsList.js](app/components/StuckEventsList.js) — admin reprocess UI
 
 ### Pages
 - [app/ai-drafts/page.js](app/ai-drafts/page.js) — Vector suggests inbox
