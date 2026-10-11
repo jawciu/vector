@@ -62,7 +62,7 @@ import "dotenv/config";
 import { readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { computeHealth } from "../lib/health.js";
+import { computeHealth } from "../lib/health.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SNAPSHOT_PATH = join(HERE, "../prisma/fixtures/demo-snapshot.json");

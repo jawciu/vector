@@ -1,0 +1,129 @@
+/**
+ * [POST /api/integrations/miniti/webhook?token=...] — receives Miniti meeting events.
+ *
+ * Per Ian's spec on 2026-04-28:
+ *   - 10s fire-and-forget timeout on Miniti's side, no retries, no signing.
+ *   - Receiver MUST be idempotent on `meeting.id`.
+ *   - Auth: token query param against MINITI_WEBHOOK_TOKEN.
+ *
+ * Flow:
+ *   1. Verify token query param (constant-time-ish)
+ *   2. Validate payload shape
+ *   3. Match meeting → onboarding (deterministic heuristics, no AI)
+ *   4. Idempotent insert of ExternalEvent (silently dedup duplicate meeting.id)
+ *   5. Ack 200 immediately — well under 10s
+ *   6. After response, run the orchestrator (Claude tool-use → drafts) via `after()`
+ *
+ * Node runtime (Prisma needs it). Webhook acks Miniti within ~200ms (well under
+ * their 10s timeout). The orchestrator runs in `after()` with `maxDuration = 60`,
+ * giving it ~58s to chew through the full transcript. If it gets killed mid-flight
+ * (deploy, crash) the ExternalEvent stays with `processedAt = null` and can be
+ * reprocessed manually from /admin/ai.
+ */
+
+import { NextResponse, after } from "next/server";
+import {
+  validateMinitiPayload,
+  matchMeetingToOnboarding,
+  processMinitiEvent,
+  runMeetingExtractionOnly,
+} from "@/lib/integrations/miniti";
+import { createExternalEvent, markExternalEventProcessed } from "@/lib/db";
+
+export const maxDuration = 60;
+
+export async function POST(request: Request) {
+  // 1. Auth — token query param.
+  const { searchParams } = new URL(request.url);
+  const token = searchParams.get("token");
+  const expected = process.env.MINITI_WEBHOOK_TOKEN;
+  if (!expected) {
+    console.error("[POST /api/integrations/miniti/webhook] MINITI_WEBHOOK_TOKEN not set");
+    return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
+  }
+  if (token !== expected) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // 2. Parse + validate payload.
+  let parsed;
+  try {
+    const body: Parameters<typeof validateMinitiPayload>[0] = await request.json();
+    parsed = validateMinitiPayload(body);
+  } catch (err) {
+    console.warn("[POST /api/integrations/miniti/webhook] invalid payload:", (err as Error).message);
+    return NextResponse.json({ error: `Invalid payload: ${(err as Error).message}` }, { status: 400 });
+  }
+  const { event, meeting } = parsed;
+
+  // 3. Match meeting → onboarding (heuristic, no AI).
+  let match;
+  try {
+    match = await matchMeetingToOnboarding(meeting);
+  } catch (err) {
+    console.error("[POST /api/integrations/miniti/webhook] match failed:", err);
+    match = { onboardingId: null, ambiguous: false, candidates: [] };
+  }
+
+  // 4. Idempotent insert of ExternalEvent.
+  let externalEvent;
+  try {
+    externalEvent = await createExternalEvent({
+      source: "miniti",
+      sourceId: meeting.id,
+      occurredAt: meeting.date,
+      payload: { event, meeting },
+      onboardingId: match.onboardingId,
+      matchAmbiguous: match.ambiguous,
+    });
+  } catch (err) {
+    console.error("[POST /api/integrations/miniti/webhook] event insert failed:", err);
+    return NextResponse.json({ error: "Failed to record event" }, { status: 500 });
+  }
+
+  // Dedup: createExternalEvent returns null on duplicate meeting.id.
+  if (!externalEvent) {
+    return NextResponse.json({ ok: true, deduped: true });
+  }
+
+  // 5. Schedule background work after response.
+  //
+  //   - Confident match → full orchestrator (Pass 1 + Pass 2 + drafts).
+  //   - Ambiguous match → standalone Pass 1 (transcript extraction) so
+  //     the pipeline timeline immediately shows what Vector saw in the
+  //     meeting. Pass 2 still has to wait for manual assignment because
+  //     it needs the onboarding's tasks/contacts/phases as context, but
+  //     processMinitiEvent will reuse the cached extraction at that point.
+  if (match.onboardingId && !match.ambiguous) {
+    after(async () => {
+      try {
+        // Truthy-checked in the `if` above; the closure loses the narrowing.
+        const result = await processMinitiEvent(externalEvent.id, match.onboardingId as number);
+        console.log(`[miniti] event ${externalEvent.id} processed: ${result.draftIds?.length ?? 0} drafts`);
+      } catch (err) {
+        console.error("[miniti orchestrator]", err);
+        await markExternalEventProcessed(externalEvent.id, { error: String((err as Error).message ?? err) }).catch(() => {});
+      }
+    });
+  } else if (match.ambiguous) {
+    after(async () => {
+      try {
+        const { extraction } = await runMeetingExtractionOnly(externalEvent.id, meeting);
+        console.log(
+          `[miniti] event ${externalEvent.id} ambiguous: pass 1 ${extraction ? "ok" : "failed"}`
+        );
+      } catch (err) {
+        console.error("[miniti standalone extraction]", err);
+      }
+    });
+  }
+
+  // 6. Ack fast — Miniti has 10s timeout and won't retry.
+  return NextResponse.json({
+    ok: true,
+    eventId: externalEvent.id,
+    onboardingId: match.onboardingId,
+    matchedBy: match.matchedBy,
+    ambiguous: match.ambiguous,
+  });
+}

@@ -52,7 +52,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { computeHealth } from "../lib/health.js";
+import { computeHealth } from "../lib/health.ts";
 import { PrismaClient } from "../lib/generated/prisma/client";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });

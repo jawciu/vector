@@ -1,0 +1,239 @@
+"use client";
+
+import { useState } from "react";
+import PortalTaskCard from "./PortalTaskCard";
+import TaskFilterMenu from "@/app/components/TaskFilterMenu";
+import { taskMatchesFilter, TASK_FILTER_OPTIONS } from "@/lib/taskFilters";
+import type { PortalTask, PortalTaskUpdatedHandler } from "./types";
+
+interface PortalTasksProps {
+  tasks: PortalTask[];
+  myOnly: boolean;
+  onTaskUpdated: PortalTaskUpdatedHandler;
+  onCardClick: (task: PortalTask) => void;
+  onSessionExpired: () => void;
+}
+
+interface PhaseGroup {
+  id: number;
+  name: string;
+  sortOrder: number;
+  tasks: PortalTask[];
+}
+
+function EmptyState({ filter, myOnly }: { filter: string; myOnly: boolean }) {
+  const messages = {
+    active: {
+      title: myOnly ? "No active tasks assigned to you" : "No active tasks",
+      body: myOnly
+        ? "When tasks are assigned to you, they\u2019ll appear here."
+        : "All tasks are either done or haven\u2019t been created yet.",
+    },
+    done: {
+      title: myOnly ? "No completed tasks yet" : "No completed tasks",
+      body: "Mark tasks as done by checking the checkbox next to them.",
+    },
+    all: {
+      title: myOnly ? "No tasks assigned to you" : "No tasks yet",
+      body: myOnly
+        ? "Your vendor hasn\u2019t assigned any tasks to you yet."
+        : "Tasks will appear here once your vendor sets up the onboarding.",
+    },
+  };
+
+  let msg = messages[filter as keyof typeof messages];
+  if (!msg) {
+    const opt = TASK_FILTER_OPTIONS.find((o) => o.id === filter);
+    const label = opt?.label?.toLowerCase() || "matching";
+    msg = {
+      title: myOnly ? `No ${label} tasks assigned to you` : `No ${label} tasks`,
+      body: "Try a different filter to see other tasks.",
+    };
+  }
+
+  return (
+    <div className="text-center" style={{ padding: "40px 16px" }}>
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        style={{ color: "var(--text-muted)", margin: "0 auto 12px" }}
+      >
+        <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M3 10h18" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M8 14h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+      <p className="text-sm font-medium" style={{ color: "var(--text)", marginBottom: 4 }}>
+        {msg.title}
+      </p>
+      <p className="text-xs" style={{ color: "var(--text-muted)", lineHeight: 1.5 }}>
+        {msg.body}
+      </p>
+    </div>
+  );
+}
+
+export default function PortalTasks({ tasks, myOnly, onTaskUpdated, onCardClick, onSessionExpired }: PortalTasksProps) {
+  const [filter, setFilter] = useState("active");
+
+  const filtered = tasks.filter((t) => {
+    if (myOnly && !t.isAssignedToMe) return false;
+    return taskMatchesFilter(t, filter);
+  });
+
+  // Build columns from phases
+  const phaseMap = new Map<number, PhaseGroup>();
+  const phaseOrder: PhaseGroup[] = [];
+  for (const task of filtered) {
+    const key = task.phase?.id || 0;
+    if (!phaseMap.has(key)) {
+      const group: PhaseGroup = {
+        id: key,
+        name: task.phase?.name || "No phase",
+        sortOrder: task.phase?.sortOrder ?? 999,
+        tasks: [],
+      };
+      phaseMap.set(key, group);
+      phaseOrder.push(group);
+    }
+    phaseMap.get(key)!.tasks.push(task);
+  }
+  phaseOrder.sort((a, b) => a.sortOrder - b.sortOrder);
+
+  // Sort tasks within each column
+  for (const col of phaseOrder) {
+    col.tasks.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  }
+
+  // Also build all phases (including empty ones) for columns
+  const allPhaseIds = new Set<number>();
+  for (const t of tasks) {
+    if (t.phase?.id) allPhaseIds.add(t.phase.id);
+  }
+  const allPhases: { id: number; name: string; sortOrder: number }[] = [];
+  const seenPhases = new Set<number>();
+  for (const t of tasks) {
+    const pid = t.phase?.id || 0;
+    if (!seenPhases.has(pid)) {
+      seenPhases.add(pid);
+      allPhases.push({
+        id: pid,
+        name: t.phase?.name || "No phase",
+        sortOrder: t.phase?.sortOrder ?? 999,
+      });
+    }
+  }
+  allPhases.sort((a, b) => a.sortOrder - b.sortOrder);
+
+  // Build columns with empty phases included
+  const columns = allPhases.map((phase) => ({
+    phase,
+    tasks: filtered
+      .filter((t) => (t.phase?.id || 0) === phase.id)
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
+  }));
+
+  return (
+    <div>
+      {/* Filter dropdown — shared with main product */}
+      <div
+        style={{
+          padding: "12px 16px",
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
+        <TaskFilterMenu value={filter} onChange={setFilter} />
+      </div>
+
+      {filtered.length === 0 ? (
+        <EmptyState filter={filter} myOnly={myOnly} />
+      ) : (
+        <>
+          {/* ─── MOBILE: stacked list by phase ─── */}
+          <div className="flex flex-col gap-4 md:hidden" style={{ padding: "12px 16px" }}>
+            {phaseOrder.map((group) => (
+              <div key={group.id}>
+                <div
+                  className="text-xs font-semibold mb-2"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  {group.name}
+                </div>
+                <div className="flex flex-col gap-2">
+                  {group.tasks.map((task) => (
+                    <PortalTaskCard
+                      key={task.id}
+                      task={task}
+                      onTaskUpdated={onTaskUpdated}
+                      onCardClick={onCardClick}
+                      onSessionExpired={onSessionExpired}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ─── DESKTOP: Kanban columns ─── */}
+          <div className="hidden md:block" style={{ overflowX: "auto" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: 0,
+                minWidth: columns.length * 288,
+                padding: "12px 16px",
+                alignItems: "stretch",
+              }}
+            >
+              {columns.map(({ phase, tasks: colTasks }) => (
+                <div
+                  key={phase.id}
+                  style={{
+                    // Fixed width, not just a minimum — matches the vendor kanban
+                    // column. Without maxWidth a long task title stretches the
+                    // column and its cards, so columns end up different widths.
+                    // 264 content + 24px marginRight = 288px footprint per column.
+                    width: 264,
+                    minWidth: 264,
+                    maxWidth: 264,
+                    flexShrink: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    marginRight: 24,
+                  }}
+                >
+                  {/* Column header */}
+                  <div
+                    className="flex items-center justify-between"
+                    style={{ marginBottom: 8, padding: "0 4px" }}
+                  >
+                    <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+                      {phase.name}
+                    </span>
+                    <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+                      {colTasks.length}
+                    </span>
+                  </div>
+
+                  {/* Cards */}
+                  <div className="flex flex-col gap-2" style={{ minHeight: 40 }}>
+                    {colTasks.map((task) => (
+                      <PortalTaskCard
+                        key={task.id}
+                        task={task}
+                        onTaskUpdated={onTaskUpdated}
+                        onCardClick={onCardClick}
+                        onSessionExpired={onSessionExpired}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,183 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import IconButton from "./IconButton";
+import { ChevronLeftIcon, ChevronRightIcon } from "./Icons";
+
+/**
+ * CalendarDropdown — DS primitive
+ *
+ * Custom date picker styled to match the design system.
+ * Positioned absolutely below its parent (use inside a relative container).
+ *
+ * The month chevrons are `IconButton`s (20x20, the DS icon-button size) with
+ * registry `ChevronLeftIcon` / `ChevronRightIcon` — they were bespoke 24px
+ * buttons carrying `.icon-btn` plus inline `background:none;border:none`,
+ * which beat the class's hover fill (slice 1, round 4).
+ *
+ * Props:
+ *   value            — selected date string (YYYY-MM-DD) or ""
+ *   viewDate         — Date object controlling which month is displayed;
+ *                      hosts start it at today (or the value's month) so the
+ *                      picker opens on the current month
+ *   onViewDateChange — callback to update viewDate
+ *   onChange          — called with YYYY-MM-DD string when a day is picked
+ *   onClear          — called when "Clear" is clicked
+ *   onClose          — called on outside click
+ */
+
+const DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+function toDateStr(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+export interface CalendarDropdownProps {
+  value: string;
+  viewDate: Date;
+  onViewDateChange: (date: Date) => void;
+  onChange: (dateStr: string) => void;
+  onClear: () => void;
+  onClose: () => void;
+}
+
+export default function CalendarDropdown({ value, viewDate, onViewDateChange, onChange, onClear, onClose }: CalendarDropdownProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+
+  // Close on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [onClose]);
+
+  // Build calendar grid (Monday-start)
+  const firstDay = new Date(year, month, 1);
+  const startDow = (firstDay.getDay() + 6) % 7; // 0=Mon
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrev = new Date(year, month, 0).getDate();
+
+  const cells: { day: number; outside: boolean; date: Date }[] = [];
+  for (let i = startDow - 1; i >= 0; i--) {
+    cells.push({ day: daysInPrev - i, outside: true, date: new Date(year, month - 1, daysInPrev - i) });
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ day: d, outside: false, date: new Date(year, month, d) });
+  }
+  const remaining = 7 - (cells.length % 7);
+  if (remaining < 7) {
+    for (let d = 1; d <= remaining; d++) {
+      cells.push({ day: d, outside: true, date: new Date(year, month + 1, d) });
+    }
+  }
+
+  const today = new Date();
+  const todayStr = toDateStr(today);
+
+  return (
+    <div
+      ref={ref}
+      className="absolute left-0 top-full z-20 flex flex-col"
+      style={{
+        marginTop: 4,
+        background: "var(--bg-elevated)",
+        border: "1px solid var(--border)",
+        borderRadius: 12,
+        padding: 12,
+        minWidth: 260,
+        boxShadow: "var(--shadow-floating)",
+      }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between" style={{ marginBottom: 8 }}>
+        <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+          {MONTHS[month]} {year}
+        </span>
+        <div className="flex items-center gap-1">
+          <IconButton
+            aria-label="Previous month"
+            onClick={() => onViewDateChange(new Date(year, month - 1, 1))}
+          >
+            <ChevronLeftIcon />
+          </IconButton>
+          <IconButton
+            aria-label="Next month"
+            onClick={() => onViewDateChange(new Date(year, month + 1, 1))}
+          >
+            <ChevronRightIcon />
+          </IconButton>
+        </div>
+      </div>
+
+      {/* Day-of-week headers */}
+      <div className="grid grid-cols-7 text-center" style={{ marginBottom: 4 }}>
+        {DAYS.map((d) => (
+          <span key={d} className="text-xs font-medium py-1" style={{ color: "var(--text-muted)" }}>{d}</span>
+        ))}
+      </div>
+
+      {/* Day cells */}
+      <div className="grid grid-cols-7 text-center">
+        {cells.map((cell, i) => {
+          const dateStr = toDateStr(cell.date);
+          const isSelected = dateStr === value;
+          const isToday = dateStr === todayStr;
+          return (
+            <button
+              key={i}
+              type="button"
+              onClick={() => onChange(dateStr)}
+              className="flex items-center justify-center text-sm rounded-lg transition-colors"
+              style={{
+                width: 32,
+                height: 32,
+                margin: "1px auto",
+                border: isToday && !isSelected ? "1px solid var(--border)" : "1px solid transparent",
+                background: isSelected ? "var(--action)" : "transparent",
+                color: isSelected ? "var(--action-text)" : cell.outside ? "var(--icon-tertiary)" : "var(--text)",
+                fontWeight: isSelected ? 600 : 400,
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = "var(--surface-hover)"; }}
+              onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = "transparent"; }}
+            >
+              {cell.day}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between" style={{ marginTop: 8 }}>
+        <button
+          type="button"
+          onClick={onClear}
+          className="text-xs transition-colors"
+          style={{ color: "var(--action)", background: "none", border: "none", cursor: "pointer" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--action-hover)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--action)"; }}
+        >
+          Clear
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange(todayStr)}
+          className="text-xs transition-colors"
+          style={{ color: "var(--action)", background: "none", border: "none", cursor: "pointer" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--action-hover)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--action)"; }}
+        >
+          Today
+        </button>
+      </div>
+    </div>
+  );
+}
