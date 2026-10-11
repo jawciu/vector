@@ -1,0 +1,110 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "4C9E2B71-8D3A-4F16-A5B9-D41E7C000021",
+      "title": "Modal weekly sync — semantic layer",
+      "date": "2026-06-17T14:00:00Z",
+      "end_time": "2026-06-17T14:31:12Z",
+      "duration_seconds": 1872,
+      "language": "en",
+      "summary": "Weekly implementation sync with Modal. Reviewed semantic layer progress; Theo to draft the first metric definitions, Dara to provision the read-only Snowflake service account, Priya to nominate the pilot group.",
+      "action_items": ["Theo to draft the first ten metric definitions in dbt yml by Friday", "Dara to provision read-only Snowflake service account by end of next week", "Priya to send pilot group list"],
+      "key_decisions": ["Start the semantic layer with the compute-usage billing marts"],
+      "topics": ["semantic layer", "service account", "pilot group"],
+      "discussion_flow": ["dbt project status", "warehouse access", "pilot rollout"],
+      "notes": "Row-level security parked for a later phase. Pilot group likely the platform team first.",
+      "speaker_count": 3,
+      "speaker_names": { "0": "Dara Okafor", "1": "Priya Nair", "-1": "Theo Okonkwo" },
+      "transcript": [
+        { "speaker": "Theo Okonkwo", "text": "Thanks for making time again. Last week we got the dbt repo compiling in Quarry, so this week is about metrics.", "timestamp": 0 },
+        { "speaker": "Dara Okafor", "text": "Right. Our marts are in decent shape, the compute-usage billing models especially.", "timestamp": 12.4 },
+        { "speaker": "Theo Okonkwo", "text": "Perfect starting point. I'll draft the first ten metric definitions in the dbt yml and share them by Friday for your review.", "timestamp": 24.8 },
+        { "speaker": "Dara Okafor", "text": "Great. On our side, warehouse access is still the gap — you're on my personal credentials right now, which won't fly with security.", "timestamp": 41.5 },
+        { "speaker": "Theo Okonkwo", "text": "Agreed, we need the dedicated account before we open this beyond you two.", "timestamp": 55 },
+        {
+          "speaker": "Dara Okafor",
+          "text": "I'll get the read-only service account provisioned on our Snowflake by end of next week. I need platform team sign-off but that's a formality.",
+          "timestamp": 63.2
+        },
+        { "speaker": "Priya Nair", "text": "Once that lands, who do we let in first?", "timestamp": 82.7 },
+        { "speaker": "Theo Okonkwo", "text": "Usually a small pilot group — five to eight people who live in the data anyway.", "timestamp": 90.1 },
+        { "speaker": "Priya Nair", "text": "That's the platform team. I'll send you the pilot group list with names and emails.", "timestamp": 101.9 },
+        { "speaker": "Theo Okonkwo", "text": "Great. Anything on row-level security? You mentioned it in the kickoff.", "timestamp": 114.3 },
+        { "speaker": "Dara Okafor", "text": "We should think about row-level security at some point, but honestly it's not a launch blocker. Let's park it.", "timestamp": 122 },
+        { "speaker": "Theo Okonkwo", "text": "Parked. So: metrics draft from me by Friday, service account from you by end of next week, pilot list from Priya.", "timestamp": 138.6 },
+        { "speaker": "Priya Nair", "text": "Works for us. Same time next week?", "timestamp": 152.2 },
+        { "speaker": "Theo Okonkwo", "text": "Same time next week. Thanks both.", "timestamp": 158.9 }
+      ],
+      "calendar_event_id": "evt_mdl_ws_0617",
+      "attendees": [
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "dara@modal.com", "name": "Dara Okafor", "domain": "modal.com" },
+        { "email": "priya@modal.com", "name": "Priya Nair", "domain": "modal.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "MDL",
+    "companyName": "Modal",
+    "contacts": [
+      { "name": "Dara Okafor", "email": "dara@modal.com" },
+      { "name": "Priya Nair", "email": "priya@modal.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Theo Okonkwo", "email": "theo@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Connect dbt repo to Quarry", "status": "Done", "owner": "customer", "ownerName": "Dara Okafor", "dueDate": "2026-06-12", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Configure Okta SAML SSO", "status": "Not started", "owner": "customer", "ownerName": "Dara Okafor", "dueDate": null, "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Build inference-cost pilot dashboard", "status": "Not started", "owner": "vendor", "ownerName": "Theo Okonkwo", "dueDate": "2026-07-03", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Roll out to pilot group", "status": "Not started", "owner": "vendor", "ownerName": "Theo Okonkwo", "dueDate": "2026-07-06", "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t5",
+        "title": "Run admin training for Modal data team",
+        "status": "Not started",
+        "owner": "vendor",
+        "ownerName": "Theo Okonkwo",
+        "dueDate": "2026-07-08",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "MDL" },
+    "toolCalls": [
+      {
+        "action": "create_task",
+        "titleLike": "Draft first ten metric definitions in dbt yml",
+        "owner": "vendor",
+        "assignee": "Theo Okonkwo",
+        "dueDate": "2026-06-19",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll draft the first ten metric definitions in the dbt yml and share them by Friday"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Provision read-only Snowflake service account",
+        "owner": "customer",
+        "assignee": "Dara Okafor",
+        "dueDate": "2026-06-26",
+        "kind": "commitment",
+        "dependsOn": { "freeText": "platform team sign-off", "gap": "free_text_dependency" },
+        "sourceQuoteContains": "I'll get the read-only service account provisioned on our Snowflake by end of next week"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Send pilot group list",
+        "owner": "customer",
+        "assignee": "Priya Nair",
+        "dueDate": null,
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll send you the pilot group list"
+      }
+    ],
+    "notes": "Owner-attribution test: vendor Theo owns the metrics draft, customers Dara and Priya own the service account and the pilot list; owner must follow the speaker. The service account needs platform team sign-off, which is not a task anyone can tag, so it is a free-text dependency. Parked row-level security has no owner remembering it, so it stays out.",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

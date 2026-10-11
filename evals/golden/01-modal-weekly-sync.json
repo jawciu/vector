@@ -1,0 +1,162 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "D01B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A01",
+      "title": "Modal x Quarry — weekly implementation sync",
+      "date": "2026-06-15T16:00:00Z",
+      "end_time": "2026-06-15T16:31:42Z",
+      "duration_seconds": 1902,
+      "language": "en",
+      "summary": "Weekly sync on the Modal onboarding. Reviewed warehouse connectivity blockers, agreed next steps on the usage events model, IP allowlisting, and pilot dashboard sign-off.",
+      "action_items": [
+        "Theo to open PR with incremental model config for usage events by June 18",
+        "Jonas to add Quarry static IPs to warehouse network policy by June 17",
+        "Priya to circulate pilot dashboard list for guild sign-off by June 19"
+      ],
+      "key_decisions": ["Usage events model will be incremental, partitioned by event date"],
+      "topics": ["warehouse connectivity", "dbt modeling", "pilot dashboards"],
+      "discussion_flow": ["Blocker review", "Usage events model", "Network policy", "Pilot scope"],
+      "notes": "Modal team is moving fast; main risk is the network policy change sitting in their infra queue.",
+      "training": {
+        "talk_ratio_you": 0.41,
+        "speakers": [
+          { "speaker": "Maya Lindqvist", "is_you": true, "word_count": 980, "fillers_per_minute": 1.1 },
+          { "speaker": "Theo Okonkwo", "is_you": false, "word_count": 610 },
+          { "speaker": "Priya Raman", "is_you": false, "word_count": 540 },
+          { "speaker": "Jonas Beck", "is_you": false, "word_count": 420 }
+        ]
+      },
+      "speaker_count": 4,
+      "speaker_names": { "0": "Theo Okonkwo", "1": "Priya Raman", "2": "Jonas Beck", "-1": "Maya Lindqvist" },
+      "transcript": [
+        { "speaker": "Maya Lindqvist", "text": "Morning everyone, let's run through the board. Priya, anything urgent before we start?", "timestamp": 0 },
+        { "speaker": "Priya Raman", "text": "Nothing urgent. The team is happy with the explore experience so far, we just need the usage events data in.", "timestamp": 8.2 },
+        { "speaker": "Maya Lindqvist", "text": "Great. Theo, where are we on the usage events model?", "timestamp": 19.5 },
+        {
+          "speaker": "Theo Okonkwo",
+          "text": "I looked at the volumes — about forty million rows a day — so a full refresh is off the table. It needs to be incremental, partitioned by event date.",
+          "timestamp": 26
+        },
+        { "speaker": "Jonas Beck", "text": "That matches what we do elsewhere in the project. Do you want to write that config or should we?", "timestamp": 41.3 },
+        { "speaker": "Theo Okonkwo", "text": "I'll take it. I'll draft the incremental model config for the usage events table and have it in a PR by Thursday the 18th.", "timestamp": 49.8 },
+        { "speaker": "Jonas Beck", "text": "Perfect, I'll review it same day.", "timestamp": 61 },
+        { "speaker": "Maya Lindqvist", "text": "Next blocker: the connection from our cloud is still being refused by your warehouse. Jonas, that's the network policy, right?", "timestamp": 66.4 },
+        { "speaker": "Jonas Beck", "text": "Yes, it's on me. I'll add the Quarry static IPs to our warehouse network policy — I can get that done by end of day Wednesday, June 17th.", "timestamp": 78.9 },
+        { "speaker": "Maya Lindqvist", "text": "That unblocks the scheduled refreshes, thank you. Priya, last one is pilot scope.", "timestamp": 93.1 },
+        {
+          "speaker": "Priya Raman",
+          "text": "Right. I have a shortlist of six dashboards but I want the analytics guild to agree on which four make the pilot. I'll circulate the pilot dashboard list to the analytics guild and get sign-off by Friday the 19th.",
+          "timestamp": 101.7
+        },
+        { "speaker": "Theo Okonkwo", "text": "Six to four sounds right for a pilot.", "timestamp": 122.5 },
+        { "speaker": "Priya Raman", "text": "One more thing — at some point we should think about row-level security for the sales team, but that's not a today problem.", "timestamp": 128 },
+        { "speaker": "Maya Lindqvist", "text": "Agreed, let's park row-level security until after the pilot. Anything else?", "timestamp": 141.6 },
+        { "speaker": "Jonas Beck", "text": "Nope, all clear on our side.", "timestamp": 150.2 },
+        { "speaker": "Maya Lindqvist", "text": "Great, short and sharp. Talk next Monday.", "timestamp": 154.8 }
+      ],
+      "calendar_event_id": "evt_mdl_weekly_0615",
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "priya@modal.com", "name": "Priya Raman", "domain": "modal.com" },
+        { "email": "jonas@modal.com", "name": "Jonas Beck", "domain": "modal.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "MDL",
+    "companyName": "Modal",
+    "contacts": [
+      { "name": "Priya Raman", "email": "priya@modal.com" },
+      { "name": "Jonas Beck", "email": "jonas@modal.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Maya Lindqvist", "email": "maya@vector.test" },
+      { "name": "Theo Okonkwo", "email": "theo@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Connect Snowflake warehouse to Quarry", "status": "In progress", "owner": "customer", "ownerName": "Jonas Beck", "dueDate": "2026-06-19", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Configure Okta SAML SSO", "status": "Not started", "owner": "customer", "ownerName": "Priya Raman", "dueDate": "2026-06-26", "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t3",
+        "title": "Define usage metrics in the semantic layer",
+        "status": "Not started",
+        "owner": "vendor",
+        "ownerName": "Theo Okonkwo",
+        "dueDate": "2026-06-30",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      {
+        "ref": "t4",
+        "title": "Build inference-cost pilot dashboard",
+        "status": "In progress",
+        "owner": "vendor",
+        "ownerName": "Maya Lindqvist",
+        "dueDate": "2026-06-24",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      {
+        "ref": "t5",
+        "title": "Run admin training for Modal data team",
+        "status": "Not started",
+        "owner": "vendor",
+        "ownerName": "Maya Lindqvist",
+        "dueDate": "2026-07-08",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "MDL" },
+    "toolCalls": [
+      {
+        "action": "create_task",
+        "titleLike": "Draft incremental model config for usage events table (PR)",
+        "owner": "vendor",
+        "assignee": "Theo Okonkwo",
+        "dueDate": "2026-06-18",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll draft the incremental model config for the usage events table and have it in a PR by Thursday the 18th"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Add Quarry static IPs to warehouse network policy",
+        "owner": "customer",
+        "assignee": "Jonas Beck",
+        "dueDate": "2026-06-17",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll add the Quarry static IPs to our warehouse network policy"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Circulate pilot dashboard list to analytics guild for sign-off",
+        "owner": "customer",
+        "assignee": "Priya Raman",
+        "dueDate": "2026-06-19",
+        "kind": "commitment",
+        "notesContains": ["four", "six"],
+        "sourceQuoteContains": "circulate the pilot dashboard list to the analytics guild and get sign-off by Friday the 19th"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Row-level security for the sales team",
+        "owner": "vendor",
+        "assignee": "Maya Lindqvist",
+        "dueDate": null,
+        "kind": "parked_for_later",
+        "dueDateReason": "Parked until after the pilot; nobody gave a date.",
+        "dependsOn": { "freeText": "after the pilot", "gap": "free_text_dependency" },
+        "sourceQuoteContains": "at some point we should think about row-level security for the sales team"
+      }
+    ],
+    "notes": "Clear weekly sync with three dated commitments. The pilot list task must carry the scope: the guild picks which four of the six shortlisted dashboards make the pilot. Row-level security for the sales team is parked, but Maya explicitly parks it 'until after the pilot', so it lands on the board as an undated task owned by Maya, dependent on the pilot (free-text dependency, not a task).",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

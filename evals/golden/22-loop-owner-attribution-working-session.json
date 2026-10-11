@@ -1,0 +1,111 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "7A1F5D38-2E6C-4B94-8C07-B92A4E000022",
+      "title": "Loop Returns working session — dashboard build",
+      "date": "2026-06-24T16:00:00Z",
+      "end_time": "2026-06-24T16:47:30Z",
+      "duration_seconds": 2850,
+      "language": "en",
+      "summary": "Technical working session with Loop Returns. Maya to migrate the two returns-ops dashboards; Jonah to add the metrics block to fct_returns.yml; Rosa raised exec rollup for a later sprint.",
+      "action_items": ["Maya to migrate the two returns-ops dashboards by end of week", "Jonah to add metrics block to fct_returns.yml before Monday sync"],
+      "key_decisions": ["Returns-ops dashboards are the migration priority, exec rollup waits"],
+      "topics": ["dashboard migration", "dbt metrics", "exec reporting"],
+      "discussion_flow": ["migration priorities", "fct_returns metrics", "exec rollup discussion"],
+      "notes": "Exec rollup dashboard deliberately deferred — Rosa to raise it again next sprint planning.",
+      "speaker_count": 3,
+      "speaker_names": { "0": "Jonah Fields", "1": "Rosa Delgado", "-1": "Maya Lindqvist" },
+      "transcript": [
+        { "speaker": "Maya Lindqvist", "text": "Okay, screen's shared. Today I want to lock the dashboard migration order and unblock the returns metrics.", "timestamp": 0 },
+        { "speaker": "Jonah Fields", "text": "The two returns-ops dashboards are what the team checks every morning, so those first please.", "timestamp": 15.3 },
+        { "speaker": "Maya Lindqvist", "text": "Makes sense. I'll migrate the two returns-ops dashboards into Quarry by end of the week — Friday at the latest.", "timestamp": 28.9 },
+        { "speaker": "Jonah Fields", "text": "Nice. They lean on fct_returns pretty heavily though, and that model has no metrics defined yet.", "timestamp": 44.1 },
+        { "speaker": "Maya Lindqvist", "text": "Right — I can only wire the tiles up once the metrics exist in the yml.", "timestamp": 58.6 },
+        { "speaker": "Jonah Fields", "text": "That's on me. I'll add the metrics block to fct_returns.yml before our Monday sync — return rate, refund value, and processing time.", "timestamp": 70.2 },
+        { "speaker": "Maya Lindqvist", "text": "Those three cover both dashboards, perfect.", "timestamp": 88.5 },
+        { "speaker": "Rosa Delgado", "text": "While we're here — leadership keeps asking for a single exec rollup view. Where would that fit?", "timestamp": 99 },
+        { "speaker": "Maya Lindqvist", "text": "After the ops dashboards, honestly. It needs the same metrics plus a few we haven't modeled.", "timestamp": 112.7 },
+        { "speaker": "Rosa Delgado", "text": "Fine. I'll own building the exec rollup dashboard once the ops ones land — I'll pick it up sometime next sprint, no hard date yet.", "timestamp": 126.4 },
+        { "speaker": "Maya Lindqvist", "text": "Deal, and I'll review it when you have a draft.", "timestamp": 143 },
+        { "speaker": "Jonah Fields", "text": "One more thing — do we want dbt exposures declared for these dashboards?", "timestamp": 151.8 },
+        { "speaker": "Maya Lindqvist", "text": "Nice to have. Maybe we look at exposures down the line, but let's not add scope this week.", "timestamp": 160.5 },
+        { "speaker": "Jonah Fields", "text": "Agreed, parking it.", "timestamp": 173.1 },
+        { "speaker": "Maya Lindqvist", "text": "Recap: dashboards on me by Friday, fct_returns metrics on Jonah before Monday, exec rollup with Rosa next sprint.", "timestamp": 181.6 },
+        { "speaker": "Rosa Delgado", "text": "Perfect, thanks Maya.", "timestamp": 196.2 }
+      ],
+      "calendar_event_id": "evt_loop_ws_0624",
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "jonah@loopreturns.com", "name": "Jonah Fields", "domain": "loopreturns.com" },
+        { "email": "rosa@loopreturns.com", "name": "Rosa Delgado", "domain": "loopreturns.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "LOOP",
+    "companyName": "Loop Returns",
+    "contacts": [
+      { "name": "Jonah Fields", "email": "jonah@loopreturns.com" },
+      { "name": "Rosa Delgado", "email": "rosa@loopreturns.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Maya Lindqvist", "email": "maya@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Connect dbt repo to Quarry", "status": "Done", "owner": "customer", "ownerName": "Jonah Fields", "dueDate": "2026-06-02", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Draft returns KPI one-pager", "status": "Done", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-06-10", "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t3",
+        "title": "Backfill exchange_type column in staging model",
+        "status": "Done",
+        "owner": "customer",
+        "ownerName": "Jonah Fields",
+        "dueDate": "2026-05-29",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t4", "title": "Run analyst training", "status": "Not started", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-07-08", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t5", "title": "Go-live", "status": "Not started", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-07-20", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "LOOP" },
+    "toolCalls": [
+      {
+        "action": "create_task",
+        "titleLike": "Migrate two returns-ops dashboards",
+        "owner": "vendor",
+        "assignee": "Maya Lindqvist",
+        "dueDate": "2026-06-26",
+        "kind": "commitment",
+        "dependsOn": { "newTaskTitleLike": "Add metrics block to fct_returns.yml", "gap": "depends_on_new_draft" },
+        "sourceQuoteContains": "I'll migrate the two returns-ops dashboards into Quarry by end of the week"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Add metrics block to fct_returns.yml",
+        "owner": "customer",
+        "assignee": "Jonah Fields",
+        "dueDate": "2026-06-29",
+        "kind": "commitment",
+        "notesContains": ["return rate", "refund value", "processing time"],
+        "sourceQuoteContains": "I'll add the metrics block to fct_returns.yml before our Monday sync"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Build exec rollup dashboard",
+        "owner": "customer",
+        "assignee": "Rosa Delgado",
+        "dueDate": null,
+        "kind": "commitment",
+        "notesContains": ["Maya", "review"],
+        "dependsOn": { "newTaskTitleLike": "Migrate two returns-ops dashboards", "gap": "depends_on_new_draft" },
+        "sourceQuoteContains": "I'll own building the exec rollup dashboard once the ops ones land"
+      }
+    ],
+    "notes": "Owner-attribution test: vendor Maya owns the migration, customer Jonah the yml metrics, customer Rosa the exec rollup (vague timing, no due date). The migration can only wire up tiles once Jonah's metrics exist, so it depends on that new draft; the metrics task notes the three metrics (return rate, refund value, processing time); the exec rollup notes to send the draft to Maya for review. dbt exposures are explicitly parked and must not become a task. Transcript fixed: Maya migrates the dashboards 'into Quarry' (the analytics product), not into Vector.",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

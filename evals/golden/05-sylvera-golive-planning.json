@@ -1,0 +1,147 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "D05B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A05",
+      "title": "Sylvera go-live planning — weekly sync",
+      "date": "2026-06-29T09:30:00Z",
+      "end_time": "2026-06-29T10:08:20Z",
+      "duration_seconds": 2300,
+      "language": "en",
+      "summary": "Go-live planning for Sylvera. Locked the training schedule, parity checks on the carbon ratings dashboard, launch comms, and enabling the AI analyst for the pilot group.",
+      "action_items": [
+        "Sam to send invites for two developer training sessions by June 30",
+        "Tom to finish parity checks on the carbon ratings dashboard against Looker and post results by July 2",
+        "Aisha to draft internal launch comms for review by July 3",
+        "Ines to enable the AI analyst for the pilot group on July 6"
+      ],
+      "key_decisions": ["Go-live holds to July 13 provided parity results are clean by July 2"],
+      "topics": ["go-live", "training", "parity validation", "AI analyst"],
+      "discussion_flow": ["Go-live date check", "Training plan", "Parity status", "Launch comms", "AI analyst pilot"],
+      "notes": "Everything tracks to the July 13 go-live; parity results on July 2 are the decision gate.",
+      "training": {
+        "talk_ratio_you": 0.34,
+        "speakers": [
+          { "speaker": "Ines Ferreira", "is_you": true, "word_count": 890, "fillers_per_minute": 1 },
+          { "speaker": "Sam Whitfield", "is_you": false, "word_count": 640 },
+          { "speaker": "Tom Whitmore", "is_you": false, "word_count": 720 },
+          { "speaker": "Aisha Bello", "is_you": false, "word_count": 410 }
+        ]
+      },
+      "speaker_count": 4,
+      "speaker_names": { "0": "Sam Whitfield", "1": "Tom Whitmore", "2": "Aisha Bello", "-1": "Ines Ferreira" },
+      "transcript": [
+        { "speaker": "Ines Ferreira", "text": "Two weeks to target go-live on July 13th, so today is about locking the runway. First: training.", "timestamp": 0 },
+        {
+          "speaker": "Sam Whitfield",
+          "text": "We agreed two developer sessions for the ratings team — metrics-as-code workflow, ninety minutes each. I'll schedule the two developer training sessions for the ratings team — invites out by Tuesday, June 30th.",
+          "timestamp": 11.8
+        },
+        { "speaker": "Tom Whitmore", "text": "Aim for the week of July 6th, that's when the whole team is back from offsite.", "timestamp": 34.5 },
+        { "speaker": "Sam Whitfield", "text": "Will do — sessions that week, invites tomorrow.", "timestamp": 43.9 },
+        { "speaker": "Ines Ferreira", "text": "Next, the big one: parity. Tom, where are the checks on the carbon ratings dashboard?", "timestamp": 50.2 },
+        {
+          "speaker": "Tom Whitmore",
+          "text": "About sixty percent through. Two discrepancies so far and both were timezone handling in the old Looker explore, not your numbers. I'll finish the parity checks on the carbon ratings dashboard against Looker and post results by Thursday, July 2nd.",
+          "timestamp": 59.7
+        },
+        { "speaker": "Ines Ferreira", "text": "Then July 2nd is our decision gate — clean results and go-live holds at July 13th.", "timestamp": 86.4 },
+        { "speaker": "Tom Whitmore", "text": "Agreed, that's the deal.", "timestamp": 96 },
+        {
+          "speaker": "Aisha Bello",
+          "text": "On comms — people will ask why the Looker links stop working, so we should get ahead of it. I'll draft the internal launch comms and share for review by Friday, July 3rd.",
+          "timestamp": 101.3
+        },
+        { "speaker": "Ines Ferreira", "text": "Please include the sunset date for the old dashboards in that draft.", "timestamp": 119.6 },
+        { "speaker": "Aisha Bello", "text": "Will do.", "timestamp": 126.2 },
+        { "speaker": "Sam Whitfield", "text": "Last item — the AI analyst. Do we enable it at go-live for everyone or start smaller?", "timestamp": 130.8 },
+        { "speaker": "Tom Whitmore", "text": "Smaller. Pilot group first — the six analysts who did early access.", "timestamp": 141.5 },
+        { "speaker": "Ines Ferreira", "text": "Sensible. I'll enable the AI analyst for the pilot group once training is done — flipping it on Monday, July 6th.", "timestamp": 149.9 },
+        { "speaker": "Aisha Bello", "text": "And wider rollout is a post-go-live conversation, right? Not something we're deciding today.", "timestamp": 165.4 },
+        { "speaker": "Ines Ferreira", "text": "Correct, no commitment on wider rollout today. Good — four owners, four dates. See you all next Monday.", "timestamp": 173 }
+      ],
+      "calendar_event_id": "evt_syl_golive_0629",
+      "attendees": [
+        { "email": "ines@vector.test", "name": "Ines Ferreira", "domain": "vector.test" },
+        { "email": "sam@vector.test", "name": "Sam Whitfield", "domain": "vector.test" },
+        { "email": "tom.whitmore@sylvera.com", "name": "Tom Whitmore", "domain": "sylvera.com" },
+        { "email": "aisha.bello@sylvera.com", "name": "Aisha Bello", "domain": "sylvera.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "SYL",
+    "companyName": "Sylvera",
+    "contacts": [
+      { "name": "Tom Whitmore", "email": "tom.whitmore@sylvera.com" },
+      { "name": "Aisha Bello", "email": "aisha.bello@sylvera.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Ines Ferreira", "email": "ines@vector.test" },
+      { "name": "Sam Whitfield", "email": "sam@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Configure Okta SSO for Sylvera", "status": "In progress", "owner": "vendor", "ownerName": "Sam Whitfield", "dueDate": "2026-07-02", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Migrate ratings team dashboards", "status": "In progress", "owner": "vendor", "ownerName": "Ines Ferreira", "dueDate": "2026-07-03", "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t3",
+        "title": "Define carbon ratings metrics in semantic layer",
+        "status": "Done",
+        "owner": "customer",
+        "ownerName": "Tom Whitmore",
+        "dueDate": "2026-06-19",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t4", "title": "Go-live on 13 Jul", "status": "Not started", "owner": "vendor", "ownerName": "Ines Ferreira", "dueDate": "2026-07-13", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t5", "title": "Decommission legacy dashboards", "status": "Not started", "owner": "customer", "ownerName": "Tom Whitmore", "dueDate": null, "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "SYL" },
+    "toolCalls": [
+      {
+        "action": "create_task",
+        "titleLike": "Schedule two developer training sessions for ratings team (send invites)",
+        "owner": "vendor",
+        "assignee": "Sam Whitfield",
+        "dueDate": "2026-06-30",
+        "kind": "commitment",
+        "notesContains": ["week of July 6"],
+        "sourceQuoteContains": "I'll schedule the two developer training sessions for the ratings team"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Finish parity checks on carbon ratings dashboard against Looker and post results",
+        "owner": "customer",
+        "assignee": "Tom Whitmore",
+        "dueDate": "2026-07-02",
+        "kind": "commitment",
+        "sourceQuoteContains": "finish the parity checks on the carbon ratings dashboard against Looker"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Draft internal launch comms and share for review",
+        "owner": "customer",
+        "assignee": "Aisha Bello",
+        "dueDate": "2026-07-03",
+        "kind": "commitment",
+        "notesContains": ["sunset date"],
+        "sourceQuoteContains": "I'll draft the internal launch comms and share for review by Friday, July 3rd"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Enable AI analyst for pilot group",
+        "owner": "vendor",
+        "assignee": "Ines Ferreira",
+        "dueDate": "2026-07-06",
+        "kind": "commitment",
+        "notesContains": ["six analysts", "early access"],
+        "sourceQuoteContains": "I'll enable the AI analyst for the pilot group once training is done"
+      }
+    ],
+    "notes": "Near-go-live sync with four dated commitments (2 vendor, 2 customer). The specifics agreed on the call must travel into the task notes: training sessions run the week of July 6th (invites go out 30 Jun, sessions happen later), the launch comms must include the sunset date for the old dashboards, and the AI analyst pilot is the six analysts who did early access. Wider AI rollout is explicitly not committed.",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

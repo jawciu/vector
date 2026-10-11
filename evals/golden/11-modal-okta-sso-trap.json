@@ -1,0 +1,116 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "E0000011-4A7B-4C2D-9E1F-A6B5C4D3E011",
+      "title": "Modal weekly implementation sync",
+      "date": "2026-06-24T16:00:00Z",
+      "end_time": "2026-06-24T16:34:12Z",
+      "duration_seconds": 2052,
+      "language": "en",
+      "summary": "Weekly sync on the Modal onboarding. Dashboards for the inference-cost pilot are on track. Main topic was single sign-on: Dmitri will configure the Okta SAML app on Modal's side this week, and Theo will send over the SAML metadata file and ACS URL by Friday June 26th.",
+      "action_items": ["Dmitri to configure the Okta SAML app on Modal's side this week", "Theo to send SAML metadata file and ACS URL by Friday June 26th"],
+      "key_decisions": ["SSO enforcement will be enabled for the pilot group only, not the whole org, until go-live"],
+      "topics": ["SSO", "Okta SAML", "dashboards", "pilot group"],
+      "discussion_flow": ["Pilot dashboard status", "Okta SSO configuration", "Enforcement scope", "Next steps"],
+      "notes": "Dmitri already has admin access to the Modal Okta tenant, so no extra approvals are needed on their side.",
+      "speaker_count": 3,
+      "speaker_names": { "0": "Priya Raman", "1": "Dmitri Volkov", "-1": "Theo Okonkwo" },
+      "transcript": [
+        { "speaker": "Theo Okonkwo", "text": "Alright, thanks both for joining. Quick agenda: pilot dashboards, then SSO, then anything else.", "timestamp": 0 },
+        { "speaker": "Priya Raman", "text": "Sounds good. Dashboards first — the inference-cost dashboard looks great, the team has been using it daily.", "timestamp": 8.2 },
+        { "speaker": "Theo Okonkwo", "text": "Love to hear it. Any numbers looking off?", "timestamp": 16.5 },
+        { "speaker": "Priya Raman", "text": "Nothing so far. A couple of people asked for a filter by GPU type but that's a nice-to-have, not urgent.", "timestamp": 21.9 },
+        { "speaker": "Theo Okonkwo", "text": "Noted as a nice-to-have then. Okay, SSO. This is the big one blocking wider rollout.", "timestamp": 34 },
+        { "speaker": "Dmitri Volkov", "text": "Yeah, that's me. I looked at the Okta side yesterday and it's straightforward — standard SAML 2.0 app.", "timestamp": 41.7 },
+        { "speaker": "Theo Okonkwo", "text": "Exactly, we're a standard SP-initiated flow. You'll need our metadata to set up the app.", "timestamp": 52.3 },
+        { "speaker": "Dmitri Volkov", "text": "Right. I'll get the Okta SAML app configured on our side this week — it's already on my list for this sprint.", "timestamp": 60.1 },
+        { "speaker": "Theo Okonkwo", "text": "Perfect. And on my end, I'll send the SAML metadata file and our ACS URL by end of day Friday, June 26th, so you have everything you need.", "timestamp": 70.4 },
+        { "speaker": "Dmitri Volkov", "text": "Great, that works. One question — do we enforce SSO for everyone immediately?", "timestamp": 82 },
+        { "speaker": "Priya Raman", "text": "I'd rather not force the whole org through it before go-live. Can we scope enforcement to the pilot group?", "timestamp": 88.6 },
+        { "speaker": "Theo Okonkwo", "text": "Yes, enforcement is per-group. Let's agree: pilot group only until go-live, then we flip it org-wide.", "timestamp": 97.8 },
+        { "speaker": "Priya Raman", "text": "Agreed. That de-risks it nicely.", "timestamp": 108.2 },
+        { "speaker": "Theo Okonkwo", "text": "Anything else before we wrap? No? Okay — Dmitri on the Okta app, me on the metadata by Friday. Talk next week.", "timestamp": 114.9 },
+        { "speaker": "Dmitri Volkov", "text": "Thanks Theo, talk soon.", "timestamp": 126.3 }
+      ],
+      "attendees": [
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "priya@modal.com", "name": "Priya Raman", "domain": "modal.com" },
+        { "email": "dmitri@modal.com", "name": "Dmitri Volkov", "domain": "modal.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "MDL",
+    "companyName": "Modal",
+    "contacts": [
+      { "name": "Priya Raman", "email": "priya@modal.com" },
+      { "name": "Dmitri Volkov", "email": "dmitri@modal.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Theo Okonkwo", "email": "theo@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Configure Okta SAML SSO", "status": "Not started", "owner": "customer", "ownerName": "Dmitri Volkov", "dueDate": null, "priority": "medium", "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Build inference-cost pilot dashboard", "status": "Done", "owner": "vendor", "ownerName": "Theo Okonkwo", "dueDate": "2026-06-19", "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t3",
+        "title": "Define usage metrics in the semantic layer",
+        "status": "In progress",
+        "owner": "vendor",
+        "ownerName": "Theo Okonkwo",
+        "dueDate": "2026-06-30",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t4", "title": "Roll out to pilot group", "status": "Not started", "owner": "vendor", "ownerName": "Theo Okonkwo", "dueDate": "2026-07-06", "priority": null, "notes": "", "blockedBy": "t1" },
+      {
+        "ref": "t5",
+        "title": "Run admin training for Modal data team",
+        "status": "Not started",
+        "owner": "vendor",
+        "ownerName": "Theo Okonkwo",
+        "dueDate": "2026-07-08",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "MDL" },
+    "toolCalls": [
+      {
+        "action": "match_existing",
+        "existingTaskRef": "t1",
+        "existingTaskTitleContains": "Okta SAML SSO",
+        "newPriority": "high",
+        "dependsOn": { "newTaskTitleLike": "Send SAML metadata file and ACS URL to Modal", "gap": ["existing_task_dependency", "depends_on_new_draft"] },
+        "sourceQuoteContains": "I'll get the Okta SAML app configured on our side this week"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Send SAML metadata file and ACS URL to Modal",
+        "owner": "vendor",
+        "assignee": "Theo Okonkwo",
+        "dueDate": "2026-06-26",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll send the SAML metadata file and our ACS URL by end of day Friday, June 26th"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Filter by GPU type",
+        "owner": "vendor",
+        "assignee": "Theo Okonkwo",
+        "dueDate": null,
+        "priority": "low",
+        "kind": "parked_for_later",
+        "dueDateReason": "Explicitly a nice-to-have, not urgent; no date.",
+        "sourceQuoteContains": "A couple of people asked for a filter by GPU type"
+      }
+    ],
+    "notes": "Trap: Dmitri's Okta commitment is the existing 'Configure Okta SAML SSO' task (t1) and must NOT become a duplicate. The update should raise it to high priority (SSO is 'the big one blocking wider rollout') and record that it is blocked by Theo's metadata delivery, a new draft from this meeting. Theo's metadata delivery is new vendor work with an explicit date. The GPU-type filter is a nice-to-have Theo noted, so it lands as a low-priority, undated task for Theo.",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

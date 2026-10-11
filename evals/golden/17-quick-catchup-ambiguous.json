@@ -1,0 +1,91 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "E0000017-0A3B-4C8D-9E7F-A2B1C0D9E017",
+      "title": "Quick catch-up",
+      "date": "2026-05-21T11:30:00Z",
+      "duration_seconds": 912,
+      "language": "en",
+      "action_items": ["Send the SSO troubleshooting guide today"],
+      "key_decisions": [],
+      "topics": ["SSO login issue", "training attendance"],
+      "discussion_flow": ["Login issue triage", "Training session headcount"],
+      "notes": "Ad-hoc call, no calendar invite. Two analysts hit a redirect error when signing in via SSO this morning.",
+      "speaker_count": 2,
+      "speaker_names": { "0": "Speaker 1", "-1": "You" },
+      "transcript": [
+        { "speaker": "Speaker 1", "text": "Thanks for jumping on quickly. Two of our analysts got a redirect error signing in this morning.", "timestamp": 0 },
+        { "speaker": "You", "text": "Both via SSO, or one on password login?", "timestamp": 8.9 },
+        { "speaker": "Speaker 1", "text": "Both SSO. Everyone else got in fine, which is the confusing part.", "timestamp": 14.2 },
+        { "speaker": "You", "text": "That usually means those two are missing the app assignment in your identity provider rather than anything on our side.", "timestamp": 22.6 },
+        { "speaker": "Speaker 1", "text": "Ah — they did both join the data team this month. That would fit.", "timestamp": 35.1 },
+        { "speaker": "You", "text": "Almost certainly it. I'll send you our SSO troubleshooting guide today — page two shows exactly where the assignment lives.", "timestamp": 42.7 },
+        { "speaker": "Speaker 1", "text": "Great, I'll forward it to IT. Second thing, very quick: the training session next month, can we bring a few extra people?", "timestamp": 55.3 },
+        { "speaker": "You", "text": "How many are we talking?", "timestamp": 66 },
+        { "speaker": "Speaker 1", "text": "Maybe four or five from the ops side. Nothing confirmed yet, they're still deciding.", "timestamp": 70.4 },
+        { "speaker": "You", "text": "That's fine capacity-wise. Let me know once they decide and we'll size the workshop accordingly.", "timestamp": 79.8 },
+        { "speaker": "Speaker 1", "text": "Will do. That was everything — appreciate the fast turnaround.", "timestamp": 90.2 },
+        { "speaker": "You", "text": "No problem, guide is on its way today.", "timestamp": 97.5 }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "LOOP",
+    "companyName": "Loop Returns",
+    "contacts": [
+      { "name": "Speaker 1", "email": null }
+    ],
+    "vendorUsers": [
+      { "name": "You", "email": null },
+      { "name": "Theo Okonkwo", "email": "theo@vector.test" },
+      { "name": "Maya Lindqvist", "email": "maya@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Configure Google Workspace SSO", "status": "Done", "owner": "customer", "ownerName": "Speaker 1", "dueDate": "2026-05-15", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Connect dbt repo to Quarry", "status": "In progress", "owner": "customer", "ownerName": "Speaker 1", "dueDate": "2026-06-02", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Run analyst training workshop", "status": "Not started", "owner": "vendor", "ownerName": "Theo Okonkwo", "dueDate": "2026-06-16", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Migrate returns-ops dashboards", "status": "Not started", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-06-26", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "ambiguous": true },
+    "toolCalls": [],
+    "afterAssign": {
+      "companyPrefix": "LOOP",
+      "toolCalls": [
+        {
+          "action": "create_task",
+          "titleLike": "Send the SSO troubleshooting guide",
+          "owner": "vendor",
+          "assignee": "You",
+          "dueDate": "2026-05-21",
+          "kind": "commitment",
+          "dueDateReason": "'today' = the meeting day, Thu 21 May.",
+          "sourceQuoteContains": "I'll send you our SSO troubleshooting guide today"
+        },
+        {
+          "action": "create_task",
+          "titleLike": "Forward the SSO troubleshooting guide to IT",
+          "owner": "customer",
+          "assignee": "Speaker 1",
+          "kind": "commitment",
+          "dependsOn": { "newTaskTitleLike": "Send the SSO troubleshooting guide", "gap": "depends_on_new_draft" },
+          "sourceQuoteContains": "I'll forward it to IT"
+        },
+        {
+          "action": "create_task",
+          "titleLike": "Update the customer on additional workshop participants",
+          "owner": "vendor",
+          "assignee": "You",
+          "dueDate": null,
+          "kind": "vendor_reminder",
+          "dueDateReason": "The extra participants are undecided; no date.",
+          "sourceQuoteContains": "Let me know once they decide and we'll size the workshop accordingly"
+        }
+      ]
+    },
+    "notes": "Ad-hoc call, no calendar event, no attendees: must be matchAmbiguous. After assignment (Loop Returns chosen: SSO already live in May, a training workshop the following month, and an 'ops side' that matches Loop's returns-ops team), three tasks: the vendor sends the SSO guide today (21 May), the customer forwards it to IT (depends on the guide arriving), and the vendor keeps an undated reminder about the extra workshop participants so the workshop gets sized.",
+    "review": { "verdict": "approved", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

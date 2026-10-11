@@ -1,0 +1,88 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "E0000015-8E1F-4A6B-9C5D-E0F9A8B7C015",
+      "title": "Weekly sync",
+      "date": "2026-06-30T09:00:00Z",
+      "end_time": "2026-06-30T09:27:44Z",
+      "duration_seconds": 1664,
+      "language": "en",
+      "summary": "Weekly implementation sync. Warehouse connection is healthy after last week's credential rotation. The customer will finish tagging the exposure models by Thursday, and the vendor side will share a draft of the executive dashboard before the next call.",
+      "action_items": ["Finish tagging the exposure models by Thursday", "Share a draft of the executive dashboard before the next call"],
+      "key_decisions": ["Executive dashboard will use weekly grain, not daily"],
+      "topics": ["warehouse connection", "dbt exposures", "executive dashboard"],
+      "discussion_flow": ["Connection health check", "Exposure tagging", "Executive dashboard draft", "Wrap-up"],
+      "notes": "Credential rotation last week caused a brief sync failure; resolved same day. No open incidents.",
+      "speaker_count": 3,
+      "speaker_names": { "0": "Speaker 1", "1": "Speaker 2", "-1": "You" },
+      "transcript": [
+        { "speaker": "You", "text": "Morning both. Usual run-through: connection status, then the exposure work, then the exec dashboard.", "timestamp": 0 },
+        { "speaker": "Speaker 1", "text": "Connection's been solid since the credential rotation. The overnight syncs have all gone green.", "timestamp": 9.7 },
+        { "speaker": "You", "text": "Good — that outage last Tuesday was the rotation, nothing structural. Okay, exposures. Where did the tagging land?", "timestamp": 18.4 },
+        { "speaker": "Speaker 1", "text": "About two thirds done. The finance models are tagged, the ops ones aren't yet. I'll finish tagging the exposure models by Thursday.", "timestamp": 29.8 },
+        { "speaker": "You", "text": "Thursday works. Once they're tagged the lineage view fills itself in, which the exec audience will love.", "timestamp": 43.2 },
+        { "speaker": "Speaker 2", "text": "On that — leadership asked what the exec dashboard will actually look like. Do we have anything to show them?", "timestamp": 54.6 },
+        { "speaker": "You", "text": "Not yet, but I can fix that. I'll share a draft of the executive dashboard before our next call so you have something concrete to circulate.", "timestamp": 64.1 },
+        { "speaker": "Speaker 2", "text": "That would help a lot. One design question: daily or weekly numbers? Daily felt noisy in the old tool.", "timestamp": 76.9 },
+        { "speaker": "You", "text": "For an exec audience, weekly. Daily grain invites questions about single bad days that don't mean anything.", "timestamp": 87.3 },
+        { "speaker": "Speaker 2", "text": "Agreed, let's commit to weekly grain for that one.", "timestamp": 98 },
+        { "speaker": "Speaker 1", "text": "Fine by me. Anything you need from us for the draft?", "timestamp": 105.5 },
+        { "speaker": "You", "text": "No, I have enough from discovery. Alright — tagging by Thursday, draft dashboard from me before next week. Short and sweet today.", "timestamp": 112.8 },
+        { "speaker": "Speaker 1", "text": "Perfect, thanks. Speak next week.", "timestamp": 124.2 }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "MDL",
+    "companyName": "Modal",
+    "contacts": [
+      { "name": "Speaker 1", "email": null },
+      { "name": "Speaker 2", "email": null }
+    ],
+    "vendorUsers": [
+      { "name": "You", "email": null },
+      { "name": "Theo Okonkwo", "email": "theo@vector.test" },
+      { "name": "Maya Lindqvist", "email": "maya@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Rotate warehouse credentials", "status": "Done", "owner": "customer", "ownerName": "Speaker 1", "dueDate": "2026-06-23", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Define compute-usage billing metrics", "status": "In progress", "owner": "vendor", "ownerName": "Theo Okonkwo", "dueDate": "2026-07-03", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Configure Okta SAML SSO", "status": "Not started", "owner": "customer", "ownerName": "Speaker 1", "dueDate": null, "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Roll out to pilot group", "status": "Not started", "owner": "vendor", "ownerName": "Theo Okonkwo", "dueDate": "2026-07-13", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t5", "title": "Build inference-cost pilot dashboard", "status": "Done", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-06-19", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "ambiguous": true },
+    "toolCalls": [],
+    "afterAssign": {
+      "companyPrefix": "MDL",
+      "toolCalls": [
+        {
+          "action": "create_task",
+          "titleLike": "Share draft of the executive dashboard",
+          "owner": "vendor",
+          "assignee": "You",
+          "dueDate": "2026-07-06",
+          "kind": "commitment",
+          "dueDateReason": "'before our next call'; weekly sync on Tue 30 Jun → next call Tue 7 Jul → due Mon 6 Jul.",
+          "notesContains": ["exec audience", "weekly"],
+          "sourceQuoteContains": "I'll share a draft of the executive dashboard before our next call"
+        },
+        {
+          "action": "create_task",
+          "titleLike": "Finish tagging the exposure models",
+          "owner": "customer",
+          "assignee": "Speaker 1",
+          "dueDate": "2026-07-02",
+          "kind": "commitment",
+          "dueDateReason": "'by Thursday' from Tue 30 Jun → Thu 2 Jul.",
+          "sourceQuoteContains": "I'll finish tagging the exposure models by Thursday"
+        }
+      ]
+    },
+    "notes": "No attendees, generic title, no company name: must surface as matchAmbiguous with no drafts. Once a human assigns it (Modal chosen: finance models fit Modal's compute-usage billing marts, and a credential rotation fits their new key-pair service account), the exec dashboard draft becomes a vendor task with the design notes from the call (exec audience, weekly grain), and Speaker 1's tagging commitment becomes a customer task.",
+    "review": { "verdict": "approved", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

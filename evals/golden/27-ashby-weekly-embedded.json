@@ -1,0 +1,104 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "1C7E4B98-3F2D-4A56-8E19-B04D6C000027",
+      "title": "Ashby weekly sync — embedded analytics",
+      "date": "2026-07-02T13:00:00Z",
+      "end_time": "2026-07-02T13:32:15Z",
+      "duration_seconds": 1935,
+      "language": "en",
+      "summary": "Weekly sync on Ashby's embedded analytics rollout. Repo connection confirmed done Monday; Theo to draft the embed JWT auth example, Lena to ship the staging embed page by the 10th.",
+      "action_items": ["Theo to draft the embed JWT auth example by next Wednesday", "Lena to ship the staging embed page by July 10"],
+      "key_decisions": ["Customer-facing dashboards embed via signed JWTs, one token per tenant"],
+      "topics": ["embedded analytics", "JWT auth", "staging"],
+      "discussion_flow": ["repo connection status", "embed auth design", "staging plan"],
+      "notes": "Tenant isolation via JWT claims agreed in principle; example code needed before Lena's team builds.",
+      "speaker_count": 2,
+      "speaker_names": { "0": "Lena Brouwer", "-1": "Theo Okonkwo" },
+      "transcript": [
+        { "speaker": "Theo Okonkwo", "text": "Hey Lena. First up — did the repo connection go through after we fixed the deploy key?", "timestamp": 0 },
+        { "speaker": "Lena Brouwer", "text": "Yes, we hooked the dbt repo up on Monday and it compiles on every push now. That task is done.", "timestamp": 11.7 },
+        { "speaker": "Theo Okonkwo", "text": "Great. So the interesting part this week is the embedded side — dashboards inside your ATS product.", "timestamp": 28.3 },
+        { "speaker": "Lena Brouwer", "text": "Right. Each customer should only ever see their own hiring data. How does tenant isolation work in the embed?", "timestamp": 42.9 },
+        { "speaker": "Theo Okonkwo", "text": "Signed JWTs. Your backend mints a token per tenant with their filters baked into the claims, and the embed honors it.", "timestamp": 58.4 },
+        { "speaker": "Lena Brouwer", "text": "That fits our auth model. My team will need a working example before they build against it though.", "timestamp": 76 },
+        { "speaker": "Theo Okonkwo", "text": "Fair. I'll draft the embed JWT auth example with a sample token and claims for your stack by next Wednesday.", "timestamp": 89.6 },
+        { "speaker": "Lena Brouwer", "text": "Perfect. Then we'll ship the staging embed page with one dashboard wired in by the 10th — we want it demoable for our own sprint review.", "timestamp": 106.2 },
+        { "speaker": "Theo Okonkwo", "text": "Love that deadline. Anything else blocking?", "timestamp": 125.8 },
+        { "speaker": "Lena Brouwer", "text": "Not blocking. At some point we should discuss usage-based pricing for embedded seats, but that's a commercial chat.", "timestamp": 133.5 },
+        { "speaker": "Theo Okonkwo", "text": "I'll flag it to the account team informally, no action needed from you.", "timestamp": 149.1 },
+        { "speaker": "Lena Brouwer", "text": "Great. Short one today then.", "timestamp": 158.7 },
+        { "speaker": "Theo Okonkwo", "text": "Short ones are the good ones. Speak next week.", "timestamp": 164.3 }
+      ],
+      "calendar_event_id": "evt_ash_ws_0702",
+      "attendees": [
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "lena@ashbyhq.com", "name": "Lena Brouwer", "domain": "ashbyhq.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "ASH",
+    "companyName": "Ashby",
+    "contacts": [
+      { "name": "Lena Brouwer", "email": "lena@ashbyhq.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Theo Okonkwo", "email": "theo@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Connect dbt repo to Quarry", "status": "In progress", "owner": "customer", "ownerName": "Lena Brouwer", "dueDate": "2026-06-26", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Define first 10 metrics in dbt .yml", "status": "In progress", "owner": "customer", "ownerName": "Lena Brouwer", "dueDate": "2026-07-10", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Set up embed sandbox with signed JWT auth", "status": "Done", "owner": "vendor", "ownerName": "Theo Okonkwo", "dueDate": "2026-06-24", "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t4",
+        "title": "Security review of multi-tenant embed approach",
+        "status": "In progress",
+        "owner": "customer",
+        "ownerName": "Lena Brouwer",
+        "dueDate": "2026-07-03",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t5", "title": "Embedded analytics go-live", "status": "Not started", "owner": "vendor", "ownerName": "Theo Okonkwo", "dueDate": "2026-07-31", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "ASH" },
+    "toolCalls": [
+      { "action": "update_status", "existingTaskRef": "t1", "existingTaskTitleContains": "dbt repo", "newStatus": "Done" },
+      {
+        "action": "create_task",
+        "titleLike": "Draft embed JWT auth example",
+        "owner": "vendor",
+        "assignee": "Theo Okonkwo",
+        "dueDate": "2026-07-08",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll draft the embed JWT auth example"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Ship staging embed page with one dashboard",
+        "owner": "customer",
+        "assignee": "Lena Brouwer",
+        "dueDate": "2026-07-10",
+        "kind": "commitment",
+        "sourceQuoteContains": "we'll ship the staging embed page with one dashboard wired in by the 10th"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Flag usage-based pricing for embedded seats to account team",
+        "owner": "vendor",
+        "assignee": "Theo Okonkwo",
+        "dueDate": null,
+        "kind": "commitment",
+        "dueDateReason": "Informal, no date given.",
+        "sourceQuoteContains": "I'll flag it to the account team informally"
+      }
+    ],
+    "notes": "Ordinary weekly sync, mixed actions: repo connection reported done (update_status), a vendor task and a customer task with explicit dates. Theo's 'I'll flag it to the account team' about usage-based pricing for embedded seats is a promise he owns, so it becomes an undated task for Theo (nothing for the customer).",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

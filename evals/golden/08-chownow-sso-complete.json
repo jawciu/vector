@@ -1,0 +1,81 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "D08B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A08",
+      "title": "ChowNow — SSO check-in",
+      "date": "2026-06-25T11:00:00Z",
+      "end_time": "2026-06-25T11:14:30Z",
+      "duration_seconds": 870,
+      "language": "en",
+      "summary": "Short check-in on ChowNow SSO. Marta confirmed the Okta SAML integration is configured and tested; no new work agreed.",
+      "action_items": [],
+      "key_decisions": ["SSO is confirmed working; go-live checklist item closes"],
+      "topics": ["SSO", "Okta"],
+      "discussion_flow": ["SSO test results", "Wrap-up"],
+      "notes": "Quick call — pure status confirmation ahead of the go-live review next week.",
+      "training": {
+        "talk_ratio_you": 0.39,
+        "speakers": [
+          { "speaker": "Sam Whitfield", "is_you": true, "word_count": 340, "fillers_per_minute": 0.8 },
+          { "speaker": "Lukas Vogel", "is_you": false, "word_count": 260 },
+          { "speaker": "Marta Keller", "is_you": false, "word_count": 310 }
+        ]
+      },
+      "speaker_count": 3,
+      "speaker_names": { "0": "Lukas Vogel", "1": "Marta Keller", "-1": "Sam Whitfield" },
+      "transcript": [
+        { "speaker": "Sam Whitfield", "text": "Thanks for squeezing this in — I just want to close the loop on SSO before the go-live review next week.", "timestamp": 0 },
+        { "speaker": "Marta Keller", "text": "Good news then. The Okta SAML integration is done — we configured it, tested it with five users yesterday, and everyone got in fine.", "timestamp": 10.4 },
+        { "speaker": "Sam Whitfield", "text": "Including the just-in-time provisioning for new users?", "timestamp": 24.7 },
+        { "speaker": "Marta Keller", "text": "Yes — two of the five testers had never logged in before and their accounts were created on first sign-in with the right group mappings.", "timestamp": 31.2 },
+        { "speaker": "Lukas Vogel", "text": "From my side that was the last item on the security checklist. I consider SSO closed.", "timestamp": 47.8 },
+        { "speaker": "Sam Whitfield", "text": "Excellent — I'll mark that task done on our board. Anything else you want to flag while we're on?", "timestamp": 56.3 },
+        { "speaker": "Lukas Vogel", "text": "Nothing concrete today. We might want to talk about SCIM deprovisioning someday, but it's not needed for go-live.", "timestamp": 66.9 },
+        { "speaker": "Sam Whitfield", "text": "Noted as a someday, not scheduling anything for it. Nice work Marta — see you both at the go-live review.", "timestamp": 79.5 },
+        { "speaker": "Marta Keller", "text": "Thanks, bye!", "timestamp": 90.1 }
+      ],
+      "calendar_event_id": "evt_chow_sso_0625",
+      "attendees": [
+        { "email": "sam@vector.test", "name": "Sam Whitfield", "domain": "vector.test" },
+        { "email": "lukas.vogel@chownow.com", "name": "Lukas Vogel", "domain": "chownow.com" },
+        { "email": "marta.keller@chownow.com", "name": "Marta Keller", "domain": "chownow.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "CHOW",
+    "companyName": "ChowNow",
+    "contacts": [
+      { "name": "Lukas Vogel", "email": "lukas.vogel@chownow.com" },
+      { "name": "Marta Keller", "email": "marta.keller@chownow.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Sam Whitfield", "email": "sam@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Configure Okta SAML SSO", "status": "In progress", "owner": "customer", "ownerName": "Marta Keller", "dueDate": "2026-06-26", "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t2",
+        "title": "Validate restaurant dashboards against legacy numbers (parity sign-off)",
+        "status": "In progress",
+        "owner": "customer",
+        "ownerName": "Lukas Vogel",
+        "dueDate": "2026-06-26",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t3", "title": "Run restaurant success team training", "status": "Not started", "owner": "vendor", "ownerName": "Sam Whitfield", "dueDate": "2026-07-07", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Go-live review", "status": "Not started", "owner": "vendor", "ownerName": "Sam Whitfield", "dueDate": "2026-07-02", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "CHOW" },
+    "toolCalls": [
+      { "action": "update_status", "existingTaskRef": "t1", "existingTaskTitleContains": "Okta SAML", "newStatus": "Done" }
+    ],
+    "notes": "Completion report: customer confirms Okta SAML SSO is configured and tested, so the existing SSO task moves to Done; the SCIM remark is a deliberate non-commitment.",
+    "review": { "verdict": "approved", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}
