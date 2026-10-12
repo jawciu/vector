@@ -110,7 +110,8 @@
     "toolCalls": [
       {
         "action": "create_task",
-        "titleLike": "Set up embed sandbox with signed JWT auth and share credentials",
+        "titleLike": "Set up embed sandbox",
+        "notesContains": ["signed JWT", "share credentials"],
         "owner": "vendor",
         "assignee": "Theo Okonkwo",
         "dueDate": "2026-06-24",
@@ -137,7 +138,8 @@
       },
       {
         "action": "create_task",
-        "titleLike": "Get security approval after reviewing the write-up and the sandbox",
+        "titleLike": "Get security approval",
+        "titleAlternatives": ["Security team reviews the embed write-up"],
         "owner": "customer",
         "assignee": "Elise Vandamme",
         "dueDate": null,
@@ -145,7 +147,7 @@
         "dueDateReason": "No date given; it can only start once the write-up and sandbox exist.",
         "dependsOn": [
           { "newTaskTitleLike": "Write up row-level filtering approach for multi-tenant embeds", "gap": "depends_on_new_draft" },
-          { "newTaskTitleLike": "Set up embed sandbox with signed JWT auth and share credentials", "gap": "depends_on_new_draft" }
+          { "newTaskTitleLike": "Set up embed sandbox", "gap": "depends_on_new_draft" }
         ],
         "sourceQuoteContains": "I'd like our security folks to read that before we go further"
       }

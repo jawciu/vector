@@ -59,6 +59,7 @@
         {
           "action": "create_task",
           "titleLike": "Three new staging models, stg_events becomes a thin union",
+          "titleAlternatives": ["Split stg_events into three staging models"],
           "owner": "customer",
           "assignee": "Speaker 1",
           "kind": "commitment",
@@ -73,7 +74,7 @@
           "dueDate": "2026-06-09",
           "kind": "commitment",
           "dueDateReason": "'by Tuesday' from Fri 5 Jun → Tue 9 Jun.",
-          "notesContains": ["tag", "compile-time numbers"],
+          "notesContains": ["tag me", "compile-time numbers"],
           "sourceQuoteContains": "I can get the refactor PR open by Tuesday"
         },
         {

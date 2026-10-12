@@ -79,7 +79,8 @@
       },
       {
         "action": "create_task",
-        "titleLike": "Ad-revenue attribution: sponsorship performance for the roadmap conversation",
+        "titleLike": "Ad-revenue attribution",
+        "notesContains": ["sponsorship performance"],
         "owner": "vendor",
         "assignee": "Caroline",
         "dueDate": null,

@@ -8,7 +8,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { normalizeText, titleSimilarity } from "./scoring.js";
+import { normalizeText, titleSimilarity } from "./scoring.ts";
 
 const GOLDEN_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), "golden");
 const ACTIONS = new Set(["create_task", "match_existing", "update_status", "flag_no_action_items"]);
@@ -73,6 +73,18 @@ function checkToolCalls(file, calls, { transcript, board, label }) {
       err(file, `${where}: notesContains must be a non-empty array`);
     }
 
+    if (c.titleAlternatives !== undefined) {
+      if (!Array.isArray(c.titleAlternatives) || c.titleAlternatives.length === 0 || c.titleAlternatives.some((t) => typeof t !== "string" || !t)) {
+        err(file, `${where}: titleAlternatives must be a non-empty array of strings`);
+      }
+      if (c.action !== "create_task") err(file, `${where}: titleAlternatives only applies to create_task`);
+    }
+    for (const ph of c.notesContains ?? []) {
+      // Single words are near-free to match; the review asked for specific phrases.
+      // (Code identifiers like fct_applications or snake_case are fine.)
+      if (/^[A-Za-z]+$/.test(String(ph).trim())) err(file, `${where}: notesContains "${ph}" is a single word; use a specific phrase`);
+    }
+
     if (c.action === "create_task") {
       if (!c.titleLike) err(file, `${where}: create_task without titleLike`);
       if (!board) err(file, `${where}: create_task but the case has no board`);
@@ -83,8 +95,10 @@ function checkToolCalls(file, calls, { transcript, board, label }) {
       }
       // A create_task must not duplicate an open board task.
       for (const t of board?.tasks ?? []) {
-        if (t.status !== "Done" && titleSimilarity(t.title, c.titleLike) >= 0.6) {
-          err(file, `${where}: titleLike "${c.titleLike}" looks like open board task ${t.ref} "${t.title}"`);
+        for (const title of [c.titleLike, ...(c.titleAlternatives ?? [])]) {
+          if (t.status !== "Done" && titleSimilarity(t.title, title) >= 0.6) {
+            err(file, `${where}: title "${title}" looks like open board task ${t.ref} "${t.title}"`);
+          }
         }
       }
     }

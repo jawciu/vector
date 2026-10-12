@@ -66,7 +66,8 @@
     "toolCalls": [
       {
         "action": "create_task",
-        "titleLike": "Revisit with Derek: pilot group, warehouse permissions restart or review",
+        "titleLike": "Revisit with Derek",
+        "titleAlternatives": ["Circle back with Derek", "Follow up with Derek"],
         "owner": "vendor",
         "assignee": "Maya Lindqvist",
         "dueDate": "2026-07-15",

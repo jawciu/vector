@@ -67,7 +67,7 @@
           "dueDate": "2026-07-06",
           "kind": "commitment",
           "dueDateReason": "'before our next call'; weekly sync on Tue 30 Jun → next call Tue 7 Jul → due Mon 6 Jul.",
-          "notesContains": ["exec audience", "weekly"],
+          "notesContains": ["exec audience", "weekly grain"],
           "sourceQuoteContains": "I'll share a draft of the executive dashboard before our next call"
         },
         {

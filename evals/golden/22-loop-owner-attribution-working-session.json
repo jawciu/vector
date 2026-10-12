@@ -100,7 +100,7 @@
         "assignee": "Rosa Delgado",
         "dueDate": null,
         "kind": "commitment",
-        "notesContains": ["Maya", "review"],
+        "notesContains": ["Maya will review"],
         "dependsOn": { "newTaskTitleLike": "Migrate two returns-ops dashboards", "gap": "depends_on_new_draft" },
         "sourceQuoteContains": "I'll own building the exec rollup dashboard once the ops ones land"
       }

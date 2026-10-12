@@ -12,10 +12,9 @@ Last reviewed by Caroline on 2026-10-11. The review and what came out of it are 
 
 Check the files with `node evals/validate-golden.mjs` (no database, no API calls).
 
-> **Not wired up yet.** `scoring.js` and `run-golden.js` still read only the original fields
-> (`match`, `action`, `titleLike`, `owner`, `dueDate`, `existingTaskTitleContains`, `newStatus`,
-> `sourceQuoteContains`). The runner does not seed `board` yet; it scores against whatever is in
-> the database. Everything else below is the target spec for the next scorer.
+> **Scoring:** `evals/run-golden.ts` seeds each case's `board` in a throwaway local Postgres,
+> replays the meeting and scores every field below with `evals/scoring.ts`. How to run it and
+> what each metric means: `evals/README.md`.
 
 ## The fiction
 
@@ -75,6 +74,10 @@ What the case tests, in plain English.
 ### `titleLike`
 Roughly what the title should say. Matched by word overlap, not exact text.
 
+### `titleAlternatives`
+Optional list of other acceptable wordings. The scorer pairs on whichever of `titleLike` and these
+is closest. Keep titles to the core of the task; scope and specifics belong in `notesContains`.
+
 ### `owner`
 `vendor` (someone at Quarry) or `customer`. Follows whoever made the promise, not whoever
 asked for it.
@@ -96,8 +99,10 @@ One line explaining an inferred or deliberately empty date, e.g.
 ### `notesContains`
 Short phrases that must appear in the task's description or notes: the specifics from the call
 that someone doing the task would need (scope, metric names, audience, who to send it to).
-Matched loosely: case and punctuation do not matter, and numbers may be written as digits or
-words ("four" = "4").
+Matched loosely: case and punctuation do not matter, numbers may be written as digits or
+words ("four" = "4"), plurals and simple tenses match ("dashboards" = "dashboard"), and the
+phrase's words must appear in order and close together. Use a specific multi-word phrase, never a
+single common word: one word matches almost anything (the validator rejects it).
 
 ### `dependsOn`
 What the task waits on. One object, or a list of them. Each object has exactly one of:

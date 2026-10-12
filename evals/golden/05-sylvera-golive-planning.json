@@ -103,7 +103,7 @@
     "toolCalls": [
       {
         "action": "create_task",
-        "titleLike": "Schedule two developer training sessions for ratings team (send invites)",
+        "titleLike": "Schedule two developer training sessions for ratings team",
         "owner": "vendor",
         "assignee": "Sam Whitfield",
         "dueDate": "2026-06-30",
@@ -113,7 +113,8 @@
       },
       {
         "action": "create_task",
-        "titleLike": "Finish parity checks on carbon ratings dashboard against Looker and post results",
+        "titleLike": "Finish parity checks on carbon ratings dashboard",
+        "notesContains": ["against Looker", "post results"],
         "owner": "customer",
         "assignee": "Tom Whitmore",
         "dueDate": "2026-07-02",

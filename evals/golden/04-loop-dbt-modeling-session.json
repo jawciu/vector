@@ -98,7 +98,8 @@
     "toolCalls": [
       {
         "action": "create_task",
-        "titleLike": "Add metrics block (return_rate, refund_total) to fct_returns.yml and open PR",
+        "titleLike": "Add metrics block to fct_returns.yml and open PR",
+        "notesContains": ["return_rate", "refund_total"],
         "owner": "customer",
         "assignee": "Casey Morgan",
         "dueDate": "2026-06-01",
