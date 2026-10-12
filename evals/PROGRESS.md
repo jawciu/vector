@@ -19,7 +19,9 @@ A running record of how Vector's meeting AI is evaluated and improved: what was 
 | 2026-10-11 | Answer key rewritten from the review: new story (Quarry Analytics), new expected fields, capability gaps marked, judgement rules written down. |
 | 2026-10-12 | **Baseline eval run** on a throwaway local database: 30 meetings, $1.26. Results below. |
 | 2026-10-12 | Judgement rules added to the AI's instructions (phrased generally, no test-set names); after run, $1.46. |
-| _next_ | Features for the capability gaps (see `GAPS-PLAN.md`), each measured by the eval. |
+| 2026-10-12 | Rules v2 (quote rule, concreteness test for parked items); original vs v2 each run 3 times (~$8.40 total). Results below. |
+| 2026-10-12 | Feature 1 (richer updates to existing tasks) built and under review. |
+| _next_ | Remaining capability-gap features (see `GAPS-PLAN.md`), each measured by the eval. |
 
 ---
 
@@ -125,7 +127,34 @@ Newly missed: two commitments in a security working session, a PR review in an a
 
 **Reading it:** the rules did what they were aimed at where the behaviour is distinctive (team reminders 0 → 2 of 2, dates 90% → 96%, notes 76% → 83%, fewer invented drafts so precision rose 83% → 87%). Parked items barely moved (0 → 1 of 5): the AI still treats most "not today" items as musing, so this rule needs stronger wording or examples. Total recall is flat because a few clear commitments were missed this time. Two quotes were not found verbatim in their transcripts, the first grounding misses: the new "notes in your own words" rule may be bleeding into the source quote, which must stay verbatim.
 
-**Caveat on noise:** each row is one run. The model is not fully deterministic, so a swing of one or two tasks per case can be chance. Before treating the commitment drop or the precision gain as real, repeat each configuration a few times and compare averages.
+**Caveat on noise:** each row above is one run. The model is not fully deterministic, so a swing of one or two tasks per case can be chance. The repeat runs below settle it.
+
+### Repeat runs: averages over 3 runs each (2026-10-12)
+
+The first "after" run raised two clear problems: quotes stitched across two speakers or taken from the meeting's written notes, and parked items still mostly dropped. **Rules v2** fixed the quote rule (one continuous passage from one speaker's turn) and reframed the parked-items rule around concreteness ("a nameable deliverable someone wants later is a task; a general wish is not"). Cue phrases in the instructions were checked against every test transcript; none overlap. Then the original instructions and v2 were each run three times.
+
+| Metric | Original instructions (3 runs) | Rules v2 (3 runs) |
+|---|---|---|
+| Parked "for later" items | 0 of 5 every run (0%) | 2, 2, 3 of 5 (avg 47%) |
+| Reminders for our own team | 1, 0, 0 of 2 (avg 17%) | 2, 2, 1 of 2 (avg 83%) |
+| Due date right | avg 92% (90–94%) | avg 95% (93–98%) |
+| Notes captured | avg 75% (71–76%) | avg 78% (75–83%) |
+| Quotes found verbatim | avg 98.8% (98–100%) | avg 99.6% (99–100%) |
+| Clear commitments found | avg 89% (88–90%) | avg 87% (86–88%) |
+| Total recall | avg 83.5% (81–86%) | avg 84.4% (83–86%) |
+| Precision | avg 81.5% (80–83%) | avg 81.7% (79–84%) |
+| Owner side right | avg 91% (90–92%) | avg 86% (83–89%) |
+| Gap expectations met | 2 of 18 every run | 1–2 of 18 |
+| Cost per run | ~$1.28 | ~$1.50 |
+
+**Reading it:**
+- **Clear wins, well outside the run-to-run wobble:** parked items (0% → 47%) and team reminders (17% → 83%). These are the two behaviours the review said were missing.
+- **Smaller real gains:** due dates (+3 points) and notes (+3 points); the ranges barely overlap.
+- **No change within noise:** total recall, precision and clear commitments. The rules did not make the AI over-eager, which was the main risk.
+- **One regression to look at: owner side fell about 5 points.** The new parked items and reminders are exactly the cases where "who should carry this forward" is a judgement call, so this is likely where the misses are. Worth a per-case look before shipping the rules.
+- **Grounding:** the original instructions also produce the occasional non-verbatim quote (2 of 84 in one run), so the single-run dip after v1 was mostly noise; v2 is the best of the three.
+- The single v1 run (above) sits within these ranges, which is why one run was never enough to judge.
+
 
 **Caveat on dates:** some date conventions ("early next week" means Tuesday, "before an event" means the working day before) come from the same review as the answer key. They are the team's house rules, so following them is correct, but part of the date gain measures convention-following.
 

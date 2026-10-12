@@ -134,7 +134,7 @@ Produce a single JSON object with these arrays:
 
 actionItems[]: every concrete commitment surfaced anywhere in the transcript or in meeting.actionItems. For each one capture:
   - claim: a short imperative summary of what was committed to ("Send security questionnaire").
-  - sourceQuote: the EXACT verbatim passage from the transcript or action_items list that justifies the claim.
+  - sourceQuote: ONE continuous passage copied word for word from a single speaker's turn in the transcript. Never join separate turns or speakers, never paraphrase, and never quote the meeting's summary, notes or key decisions. Only if the commitment appears nowhere in the transcript, use the exact wording of the matching meeting.actionItems entry instead.
   - speaker: who said it (use the name from the transcript verbatim, e.g. "Ian Ahuja", "Marco", "unknown" if not attributable).
   - mentionedOwner: the name of the person who said they'd do it, VERBATIM from the transcript ("Marco", "Ian", "the customer's IT team", or "" if not mentioned). DO NOT resolve to an id.
   - mentionedDueDate: VERBATIM date phrasing ("by Friday", "next week", "end of Q3") or "" if no deadline mentioned. DO NOT convert to ISO.
@@ -150,7 +150,7 @@ externalBlockers[]: external blockers mentioned that aren't tasks ("customer's I
 meetingTone: a single short label — one of "kickoff", "status update", "casual catchup", "escalation", "planning", "review", "other".
 
 Rules:
-1. Be FAITHFUL. Every actionItem must point to a sourceQuote that's literally present in the transcript or action_items. If you can't quote it, don't surface it.
+1. Be FAITHFUL. Every actionItem must point to a sourceQuote that is literally present, character for character, in one transcript turn (or, failing that, one meeting.actionItems entry). If you can't quote it that way, don't surface it.
 2. Capture EVERYTHING. Err on the side of including marginal items — Pass 2 decides whether they make it through.
 3. Keep mentioned-* fields as VERBATIM TEXT. Do NOT resolve names to ids, do NOT convert dates to ISO. That's Pass 2's job.
 4. If meeting.actionItems already lists an item that you find in the transcript too, surface it once with the most informative sourceQuote.
@@ -158,8 +158,9 @@ Rules:
 
 What counts as an action item (judgement rules; these refine rule 2, they do not loosen rule 1):
 A. Promises to do something "right after this call", "straight after we hang up", "later today" are action items like any other. People get distracted after calls. Mark them firm, with the timing phrase as mentionedDueDate.
-B. Parked items ("not for today", "let's park that", "later", "a phase-two thing") ARE action items when someone owns remembering them: a person says they'll write it down, keep track of it, or take it away, or it is a real future need that one side clearly has to act on. Capture them as "tentative", mentionedOwner = whoever should remember it, mentionedDueDate = "" unless a time was given.
-   NOT action items: thinking out loud that nobody takes on ("it'd be nice someday if..."), hypotheticals, opinions, background on how things work today, and ideas that were raised and then explicitly dropped. If you cannot point to a person or side who now has to remember it, leave it out.
+B. Parked items ARE action items. The test is: is it a SPECIFIC piece of work (you could write it as a task title) that one side said they will want, need or do later ("later on we'll need...", "one day we'll have to...", "not today, but...", "let's park that", "phase two")? If yes, capture it as "tentative" with mentionedDueDate = "" unless a time was given. mentionedOwner = the person who should carry it forward: whoever said they'd note or track it; otherwise whoever raised the need; if the vendor side acknowledged it ("I'll keep that on my list", "we'll come back to it"), that vendor person.
+   Example (different domain): "Later on we'll need the delivery report split by region, not this quarter though." "I'll keep that on my list." → tentative item "Delivery report split by region", owner = the person keeping it on their list.
+   NOT action items: vague musing with no concrete deliverable ("it'd be great to be more data-driven someday"), hypotheticals, opinions, descriptions of how things work today, and ideas that were raised and then explicitly rejected ("actually, let's not").
 C. When the customer says they are overwhelmed, stretched, or asks for space or time before taking on more, do NOT surface new work for the customer from that exchange. If the vendor side agrees to check back in (or it is clearly the vendor's job to pick it up again later), surface that as one vendor-owned action item ("Check back in with <contact> about <topic>"), with any timing that was discussed as mentionedDueDate.
 D. Updates to work that already exists count too: if someone restates, re-times, or hands over a piece of work that looks like it is already on openTasks, surface it as an action item with the new owner or timing as said, so the next pass can compare it against the board.
 
@@ -340,8 +341,8 @@ Rules, non-negotiable:
 
 JUDGEMENT RULES (how an experienced onboarding manager listens; apply them when deciding and filling drafts):
 
-A. Parked items with an owner become undated tasks. When an item was parked for later but someone owns remembering it (they said they'd keep track of it, took it on, or it is a real future need one side has to act on), create a task with NO dueDate (unless a time was actually given), owned by whoever should remember it: the vendor user via ownerId, or the customer contact via assigneeContactId. Priority "low", confidence "low" or "medium".
-   Do NOT create a task for: thinking out loud nobody took on, hypotheticals, opinions, descriptions of how things work today, ideas raised and then dropped, or general goodwill ("we should catch up sometime"). When in doubt about whether anyone owns it, leave it out. Precision matters as much as recall.
+A. Parked items become undated tasks. When extraction surfaced a parked item (a specific piece of work one side said they'll want, need or do later), create a task with NO dueDate (unless a time was actually given), owned by the person extraction named: the vendor user via ownerId, or the customer contact via assigneeContactId. Priority "low", confidence "low" or "medium". Title it as the deliverable itself, and say in notes that it was parked and why ("Parked: not in scope until after launch").
+   Do NOT create a task for: vague musing with no concrete deliverable, hypotheticals, opinions, descriptions of how things work today, ideas explicitly rejected, or general goodwill ("we should catch up sometime"). The line is concreteness: a nameable deliverable someone wants later is a task; a general wish is not.
 
 B. Dates. Turn vague and anchored timing into a concrete date, counting from the meeting date and its weekday (given below):
    - "by <weekday>" / "on <weekday>" = the next occurrence of that weekday after the meeting.
