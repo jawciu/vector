@@ -17,8 +17,8 @@ A running record of how Vector's meeting AI is evaluated and improved: what was 
 | 2026-10-11 | Golden set had gone stale against the live demo board (10 of 30 cases pointed at tasks that were missing or already done). Decided each case should carry its own board. |
 | 2026-10-11 | **Caroline reviewed all 30 cases** in a purpose-built review page. Outcome below. |
 | 2026-10-11 | Answer key rewritten from the review: new story (Quarry Analytics), new expected fields, capability gaps marked, judgement rules written down. |
-| _next_ | Baseline eval run with the current prompt. |
-| _next_ | Prompt updated with the judgement rules; after run. |
+| 2026-10-12 | **Baseline eval run** on a throwaway local database: 30 meetings, $1.26. Results below. |
+| 2026-10-12 | Judgement rules added to the AI's instructions (phrased generally, no test-set names); after run, $1.46. |
 | _next_ | Features for the capability gaps (see `GAPS-PLAN.md`), each measured by the eval. |
 
 ---
@@ -82,12 +82,54 @@ These are written into the answer key but marked, and scored as a separate metri
 
 ## Eval runs
 
-Each run replays all 30 meetings through the real pipeline and scores the drafts against the answer key. Results are stored in the `EvalRun` table and shown on `/admin/ai`.
+Each run replays all 30 meetings through the real pipeline and scores the drafts against the answer key. Results are written as JSON run files in `evals/runs/` (see `evals/README.md`); the in-app `EvalRun` table and `/admin/ai` tab are deferred.
 
-| Run | Date | Prompt / code | Match accuracy | Task recall | Task precision | Owner accuracy | Date accuracy | Notes captured | Groundedness violations | Gap expectations met | Cost |
+| Run | Date | Prompt / code | Match accuracy | Task recall | Task precision | Owner side | Due date | Notes captured | Quotes grounded | Gap expectations met | Cost |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Baseline | _pending_ | current prompt | | | | | | | | | |
-| After judgement rules | _pending_ | prompt + rules | | | | | | | | | |
+| Baseline | 2026-10-12 | prompt as shipped (decision pass 8,000 tokens) | 30 of 30 (100%) | 67 of 81 (83%) | 67 of 81 (83%) | 45 of 50 (90%) | 47 of 52 (90%) | 16 of 21 (76%) | 80 of 80 (100%) | 2 of 18 (11%) | $1.26 |
+| After judgement rules | 2026-10-12 | prompt + Caroline's 7 rules, weekday in today's date | 30 of 30 (100%) | 67 of 81 (83%) | 67 of 77 (87%) | 46 of 51 (90%) | 50 of 52 (96%) | 20 of 24 (83%) | 73 of 75 (97%) | 1 of 18 (6%) | $1.46 |
+
+### Baseline in detail (`runs/2026-10-12-baseline.json`)
+
+Recall by kind of item, which maps straight onto Caroline's rules:
+
+| Kind | Baseline |
+|---|---|
+| Clear commitments | 45 of 51 (88%) |
+| Parked "for later" items | 0 of 5 (0%) |
+| Reminders for our own team | 0 of 2 (0%) |
+
+Also: ambiguous meetings held for a human 4 of 4, duplicate delivery absorbed 1 of 1, action type right 66 of 67, assignee right 41 of 45, status changes right 10 of 10, cited task ids all open on the board 28 of 28, new tasks duplicating the board 0 of 59.
+
+Gap expectations by code: free-text dependency 2 of 3 (written into notes, as today's prompt asks), dependency on a new draft 0 of 11, notes on an existing task 0 of 4, dependency on an existing task 0 of 2.
+
+**Reading it:** the AI is already reliable at the mechanics (matching, quoting, not duplicating, status changes). What it misses is exactly what the review added: it never keeps a parked item and never reminds our own team, and it proposes extra drafts (14 of 81 proposals had no match in the key). The rules in step 4 target the first two; precision is the number to watch so the rules don't make it over-eager.
+
+### After the judgement rules (`runs/2026-10-12-after-rules.json`)
+
+| Kind | Baseline | After rules |
+|---|---|---|
+| Clear commitments | 45 of 51 | 43 of 51 |
+| Parked "for later" items | 0 of 5 | 1 of 5 |
+| Reminders for our own team | 0 of 2 | 2 of 2 |
+
+| Metric | Baseline | After rules |
+|---|---|---|
+| Precision (proposals that were right) | 67 of 81 (83%) | 67 of 77 (87%) |
+| Due date right | 47 of 52 (90%) | 50 of 52 (96%) |
+| Notes captured | 16 of 21 (76%) | 20 of 24 (83%) |
+| Quotes found in the transcript | 80 of 80 | 73 of 75 |
+
+Newly found: the overwhelmed-customer reminder, the "update the customer on workshop participants" reminder, a parked ad-revenue item, a forwarded guide, a PR review, and the no-action meeting correctly left empty (it had invented a task before).
+Newly missed: two commitments in a security working session, a PR review in an ambiguous meeting, a staging embed page, and two existing-task updates.
+
+**Reading it:** the rules did what they were aimed at where the behaviour is distinctive (team reminders 0 → 2 of 2, dates 90% → 96%, notes 76% → 83%, fewer invented drafts so precision rose 83% → 87%). Parked items barely moved (0 → 1 of 5): the AI still treats most "not today" items as musing, so this rule needs stronger wording or examples. Total recall is flat because a few clear commitments were missed this time. Two quotes were not found verbatim in their transcripts, the first grounding misses: the new "notes in your own words" rule may be bleeding into the source quote, which must stay verbatim.
+
+**Caveat on noise:** each row is one run. The model is not fully deterministic, so a swing of one or two tasks per case can be chance. Before treating the commitment drop or the precision gain as real, repeat each configuration a few times and compare averages.
+
+**Caveat on dates:** some date conventions ("early next week" means Tuesday, "before an event" means the working day before) come from the same review as the answer key. They are the team's house rules, so following them is correct, but part of the date gain measures convention-following.
+
+
 
 **What to watch:** recall should rise the most (parked items, "right after the call" promises, vendor reminders), notes captured should rise, and precision should not fall (the rules must not make the AI invent tasks from thinking out loud).
 
