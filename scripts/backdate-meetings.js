@@ -354,7 +354,24 @@ async function main() {
         taskPatch.status = merged.newStatus;
         effect = `status → ${merged.newStatus}`;
       } else if (draft.action === "match_existing") {
-        if (merged.action === "reprioritise" && merged.newPriority) {
+        // Current shape (lib/ai/task-update.ts): every change in `changes`.
+        const changes = merged.changes && typeof merged.changes === "object" ? merged.changes : null;
+        if (changes) {
+          if (changes.ownerId !== undefined) taskPatch.ownerId = changes.ownerId;
+          if (changes.assigneeContactId !== undefined) taskPatch.assigneeContactId = changes.assigneeContactId;
+          if (changes.priority) taskPatch.priority = changes.priority;
+          if (changes.dueDate) taskPatch.due = changes.dueDate;
+          if (changes.dueDate === null) taskPatch.due = "";
+          if (changes.appendNotes) {
+            // Same stamp as the approve route: meeting day + source, else the resolved day.
+            const src = merged.noteSource;
+            const stamp = src && src.date && src.label ? `${src.date}, ${src.label}` : resolved.toISOString().slice(0, 10);
+            const line = `[${stamp}] ${String(changes.appendNotes).trim()}`;
+            const before = (target.notes ?? "").replace(/\s+$/, "");
+            taskPatch.notes = before ? `${before}\n${line}` : line;
+          }
+          effect = `update ${JSON.stringify(taskPatch)}`;
+        } else if (merged.action === "reprioritise" && merged.newPriority) {
           taskPatch.priority = merged.newPriority;
           effect = `priority → ${merged.newPriority}`;
         } else if (merged.action === "update_due_date" && merged.newDueDate) {

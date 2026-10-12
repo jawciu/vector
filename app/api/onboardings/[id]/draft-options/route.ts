@@ -49,6 +49,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         title: t.title,
         status: t.status,
         phaseId: t.phaseId,
+        // The "before" side of an update draft's diff.
+        due: t.due,
+        priority: t.priority,
+        ownerId: t.ownerId,
+        assigneeContactId: t.assigneeContactId,
       })),
   });
 }

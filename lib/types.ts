@@ -120,6 +120,8 @@ export interface CreateTaskPayload {
 
 export interface TaskTargetPayload {
   taskId?: number | null;
+  /** match_existing: every change in one draft (lib/ai/task-update.ts). */
+  changes?: Record<string, unknown>;
   status?: string;
   priority?: string;
   ownerId?: number | null;

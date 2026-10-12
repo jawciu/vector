@@ -349,9 +349,19 @@ function proposalAssignee(p: Proposal, actual: PhaseActual): string | null {
   if (p.action === "create_task") {
     return p.ownerSide === "customer" ? p.assigneeContactName ?? null : p.ownerName ?? null;
   }
-  if (p.newOwnerName) return p.newOwnerName; // future multi-field update
+  if (p.newOwnerName) return p.newOwnerName; // `changes.ownerId` / `changes.assigneeContactId`
   if (p.updateKind === "reassign") return null; // today's tool cannot name the new owner
   return actual.boardTasks.find((t) => t.ref === p.taskRef)?.ownerName ?? null;
+}
+
+/**
+ * Does an existing-task draft set the expected due date? `null` expected means
+ * "remove the date", met only by a draft that actually clears it
+ * (`changes.dueDate: null`), not by one that just leaves the date alone.
+ */
+function dueDateUpdateMatches(p: Proposal, expected: string | null): boolean {
+  if (expected === null) return !!p.clearsDueDate;
+  return !p.clearsDueDate && emptyToNull(p.newDueDate) === expected;
 }
 
 /** Does an existing-task draft touch ownership at all? */
@@ -537,8 +547,11 @@ export function scorePhase(
       }
       if (callGaps.includes("multi_field_existing_update")) {
         what.push("several changes in one existing-task update");
-        met = met && (e.newDueDate === undefined || p!.newDueDate === e.newDueDate)
-          && (e.newPriority === undefined || p!.newPriority === e.newPriority);
+        // Every expected field in THIS one draft (the `changes` object maps to
+        // newDueDate / newPriority / newOwnerName in harness/map-actual.ts).
+        met = met && (e.newDueDate === undefined || dueDateUpdateMatches(p!, e.newDueDate))
+          && (e.newPriority === undefined || p!.newPriority === e.newPriority)
+          && (e.assignee === undefined || sameName(proposalAssignee(p!, actual), e.assignee));
       }
       if (what.length === 0) what.push(`call-level gap ${callGaps.join("+")}`);
       result.gaps.push({ codes: callGaps, what: what.join("; "), met });
@@ -594,8 +607,8 @@ export function scorePhase(
       result.checks.dueDate = check(e.dueDate, got, pass);
       tally(totals.dueDate, pass);
     } else if (e.newDueDate !== undefined && !callGaps.includes("multi_field_existing_update")) {
-      const got = emptyToNull(p.newDueDate);
-      const pass = got === e.newDueDate;
+      const got = p.clearsDueDate ? null : emptyToNull(p.newDueDate);
+      const pass = dueDateUpdateMatches(p, e.newDueDate);
       result.checks.dueDate = check(e.newDueDate, got, pass);
       tally(totals.dueDate, pass);
     }

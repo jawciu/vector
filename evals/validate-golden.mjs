@@ -67,7 +67,8 @@ function checkToolCalls(file, calls, { transcript, board, label }) {
       }
     }
     if (c.dueDate !== undefined && c.dueDate !== null && !ISO.test(c.dueDate)) err(file, `${where}: bad dueDate ${c.dueDate}`);
-    if (c.newDueDate !== undefined && !ISO.test(c.newDueDate)) err(file, `${where}: bad newDueDate ${c.newDueDate}`);
+    // null = the update should remove the task's due date.
+    if (c.newDueDate !== undefined && c.newDueDate !== null && !ISO.test(c.newDueDate)) err(file, `${where}: bad newDueDate ${c.newDueDate}`);
     if (c.kind !== undefined && !KINDS.has(c.kind)) err(file, `${where}: unknown kind "${c.kind}"`);
     if (c.notesContains !== undefined && (!Array.isArray(c.notesContains) || c.notesContains.length === 0)) {
       err(file, `${where}: notesContains must be a non-empty array`);

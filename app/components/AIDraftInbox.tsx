@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useId } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
 import { ToastStack, useToasts } from "@/app/ui/Toast";
@@ -22,7 +22,15 @@ import TaskIdChip from "@/app/ui/TaskIdChip";
 import MeetingDrawer from "./MeetingDrawer";
 import { ActionIcon } from "./DraftActionIcon";
 import { TASK_STATUSES, STATUS_COLORS } from "@/lib/constants";
+import {
+  normaliseTaskUpdate,
+  readNoteSource,
+  staleContactMessage,
+  staleOwnerMessage,
+} from "@/lib/ai/task-update";
+import type { NoteSource, TaskUpdateChanges } from "@/lib/ai/task-update";
 import Button from "@/app/ui/Button";
+import Textarea from "@/app/ui/Textarea";
 import IconButton from "@/app/ui/IconButton";
 import type { ToastAction } from "@/app/ui/Toast";
 import type {
@@ -655,25 +663,73 @@ export function DraftCard({
   // the editor each variant pre-fills from `payload`. Approve passes the
   // overrides object through to /approve so the backend merges them.
   const [editing, setEditing] = useState(false);
-  const [overrides, setOverrides] = useState<ReassignOverrides>({});
+  const [overrides, setOverrides] = useState<StatusOverrides>({});
   const editable = isEditableAction(action, payload);
 
+  // Existing-task updates (match_existing) carry every change in `changes`
+  // (lib/ai/task-update.ts normalises legacy single-action rows), shown as a
+  // per-field before → after list and edited field by field.
+  const isUpdate = action === "match_existing";
+  const update = isUpdate ? normaliseTaskUpdate(payload) : null;
+  const before = taskBefore(matchedTask);
+  const [updateEdits, setUpdateEdits] = useState<TaskUpdateEdits | null>(null);
+
   function openEdit() {
-    setOverrides(initialOverridesFor(action, payload));
+    if (isUpdate && update) setUpdateEdits(initialUpdateEdits(proposedChanges, before));
+    else setOverrides(initialOverridesFor(action, payload));
     setEditing(true);
   }
 
   function cancelEdit() {
     setEditing(false);
     setOverrides({});
+    setUpdateEdits(null);
   }
 
-  function patchOverrides(patch: ReassignOverrides) {
+  // A proposed owner / assignee who is no longer around: the reviewer must
+  // pick someone or leave it unassigned before approving (never dropped
+  // silently). `resolved` holds that choice when the editor isn't open.
+  const [resolved, setResolved] = useState<PeopleChoice>({});
+  const proposedChanges: TaskUpdateChanges = update ? { ...update.changes, ...resolved } : {};
+  // In the editor, a field left at the task's current person is "no change",
+  // so only a changed value can be stale.
+  const currentPeople = editing && updateEdits
+    ? {
+        ownerId: updateEdits.ownerId !== before.ownerId ? updateEdits.ownerId : null,
+        assigneeContactId: updateEdits.assigneeContactId !== before.assigneeContactId ? updateEdits.assigneeContactId : null,
+      }
+    : { ownerId: proposedChanges.ownerId ?? null, assigneeContactId: proposedChanges.assigneeContactId ?? null };
+  const stale = isUpdate && isPending
+    ? stalePeople(currentPeople, vendorUsers, contacts, {
+        ownerId: update?.changes.ownerId,
+        ownerName: payload?.ownerName,
+        assigneeContactId: update?.changes.assigneeContactId,
+        assigneeContactName: payload?.assigneeContactName,
+      })
+    : NO_STALE;
+
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  function resolvePerson(choice: PeopleChoice) {
+    setResolved((prev) => ({ ...prev, ...choice }));
+    if (editing) setUpdateEdits((prev) => (prev ? { ...prev, ...choice } : prev));
+    focusAfterResolve(cardRef.current);
+  }
+
+  function editedOverrides(): DraftOverrides {
+    if (isUpdate && editing && updateEdits) return { changes: diffUpdateEdits(updateEdits, before) };
+    if (isUpdate && Object.keys(resolved).length > 0) return { changes: proposedChanges };
+    if (!editing) return {};
+    return overrides;
+  }
+
+  function patchOverrides(patch: StatusOverrides) {
     setOverrides((prev) => ({ ...prev, ...patch }));
   }
 
   return (
     <div
+      ref={cardRef}
       className="draft-card"
       style={{
         padding: 24,
@@ -722,15 +778,37 @@ export function DraftCard({
           )}
         </div>
         <div style={{ flex: "1 1 240px", minWidth: 0 }}>
-          {editing ? (
+          {isUpdate && update ? (
+            editing && updateEdits ? (
+              <TaskUpdateEditForm
+                edits={updateEdits}
+                before={before}
+                known={!!matchedTask}
+                onChange={(patch) => setUpdateEdits((prev) => (prev ? { ...prev, ...patch } : prev))}
+                vendorUsers={vendorUsers}
+                contacts={contacts}
+                disabled={busy}
+              />
+            ) : (
+              <TaskUpdateDiff
+                task={matchedTask}
+                fallbackTitle={taskTitle}
+                changes={proposedChanges}
+                names={{ owner: asName(payload?.ownerName), assignee: asName(payload?.assigneeContactName) }}
+                noteSource={readNoteSource(payload?.noteSource)}
+                flagOnlyReassign={update.action === "reassign" && Object.keys(proposedChanges).length === 0}
+                before={before}
+                vendorUsers={vendorUsers}
+                contacts={contacts}
+                onPickOwner={isPending && !busy ? openEdit : undefined}
+              />
+            )
+          ) : editing ? (
             <DraftEditPanel
               action={action}
-              payload={payload}
               overrides={overrides}
               onChange={patchOverrides}
               disabled={busy}
-              vendorUsers={vendorUsers}
-              contacts={contacts}
             />
           ) : (
             <DraftCardTaskPreview task={matchedTask} fallbackTitle={taskTitle} />
@@ -738,7 +816,15 @@ export function DraftCard({
         </div>
       </div>
 
-      {error && (
+      <StalePeopleWarnings
+        stale={stale}
+        vendorUsers={vendorUsers}
+        contacts={contacts}
+        onResolve={resolvePerson}
+        disabled={busy}
+      />
+
+      {visibleError(error, stale) && (
         <div
           style={{
             fontSize: 12,
@@ -774,8 +860,9 @@ export function DraftCard({
               </Button>
             )}
             <Button
+              data-approve
               onClick={() => {
-                onApprove(editing ? overrides : {});
+                onApprove(editedOverrides());
                 if (editing) setEditing(false);
               }}
               disabled={busy || selected}
@@ -795,59 +882,37 @@ export function DraftCard({
 }
 
 /** Whether the given draft has a known edit-before-approve form.
- *  Defer reassign (no payload override field) and comment_only (filtered
- *  out as retired). */
+ *  comment_only is retired (filtered out of the list). */
 function isEditableAction(action: string, payload: DraftPayload | null) {
   if (action === "update_status") return true;
-  if (action === "match_existing") {
-    const sub = payload?.action;
-    return sub === "update_due_date" || sub === "reprioritise" || sub === "reassign";
-  }
+  if (action === "match_existing") return payload?.action !== "comment_only";
   return false;
 }
 
-/** Pre-fill the overrides object from the draft's payload so the editor
- *  opens with the AI's suggestion as the starting point. */
-/** Edit-before-approve overrides for DraftCard (keys vary by sub-action). */
-type ReassignOverrides = {
+/** Edit-before-approve overrides for an update_status DraftCard. */
+type StatusOverrides = {
   newStatus?: string;
-  newDueDate?: string;
-  newPriority?: string;
-  newOwnerId?: number | null;
-  newAssigneeContactId?: number | null;
 };
 
-function initialOverridesFor(action: string, payload: DraftPayload | null): ReassignOverrides {
+/** Pre-fill the overrides object from the draft's payload so the editor
+ *  opens with the AI's suggestion as the starting point. */
+function initialOverridesFor(action: string, payload: DraftPayload | null): StatusOverrides {
   if (action === "update_status") {
     return { newStatus: payload?.newStatus ?? "Not started" };
-  }
-  if (action === "match_existing") {
-    const sub = payload?.action;
-    if (sub === "update_due_date") return { newDueDate: payload?.newDueDate ?? "" };
-    if (sub === "reprioritise") return { newPriority: payload?.newPriority ?? "medium" };
-    // Vector doesn't supply a target owner for reassigns — Caroline picks one.
-    // Start with NO keys so an un-touched field is never sent: the backend
-    // only patches owner/assignee for keys actually present in overrides, so
-    // editing just the owner won't clobber an existing assignee (and vice
-    // versa). Explicitly choosing "None" sets the key to null on purpose.
-    if (sub === "reassign") return {};
   }
   return {};
 }
 
-/** Inline editor for a DraftCard. Replaces the right-column preview while
- *  the user is editing. Sub-action-aware. */
+/** Inline status editor for an update_status DraftCard. Replaces the
+ *  right-column preview while the user is editing. */
 interface DraftEditPanelProps {
   action: string;
-  payload: DraftPayload | null;
-  overrides: ReassignOverrides;
-  onChange: (patch: ReassignOverrides) => void;
+  overrides: StatusOverrides;
+  onChange: (patch: StatusOverrides) => void;
   disabled: boolean;
-  vendorUsers?: VendorUserOption[];
-  contacts?: ContactOption[];
 }
 
-function DraftEditPanel({ action, payload, overrides, onChange, disabled, vendorUsers = [], contacts = [] }: DraftEditPanelProps) {
+function DraftEditPanel({ action, overrides, onChange, disabled }: DraftEditPanelProps) {
   return (
     <div
       className="draft-card-preview"
@@ -866,28 +931,165 @@ function DraftEditPanel({ action, payload, overrides, onChange, disabled, vendor
           disabled={disabled}
         />
       )}
-      {action === "match_existing" && payload?.action === "update_due_date" && (
-        <DueDateOverrideEditor
-          value={overrides.newDueDate}
-          onChange={(newDueDate) => onChange({ newDueDate })}
+    </div>
+  );
+}
+
+// ── People who are no longer around (create + update drafts) ────────────────
+
+/** An explicit choice the reviewer made for a gone owner / assignee. */
+type PeopleChoice = { ownerId?: number | null; assigneeContactId?: number | null };
+
+type StalePeople = {
+  owner: { message: string } | null;
+  assignee: { message: string } | null;
+};
+
+const NO_STALE: StalePeople = { owner: null, assignee: null };
+
+/**
+ * Which of a draft's people are gone: an owner not among the vendor users,
+ * an assignee not among this onboarding's contacts. Only judged when the list
+ * was loaded (an empty list means "unknown", and the approve route still
+ * checks). Names come from the snapshot taken when the draft was created.
+ */
+function stalePeople(
+  current: { ownerId: number | null; assigneeContactId: number | null },
+  vendorUsers: VendorUserOption[],
+  contacts: ContactOption[],
+  proposed: {
+    ownerId?: unknown;
+    ownerName?: unknown;
+    assigneeContactId?: unknown;
+    assigneeContactName?: unknown;
+  }
+): StalePeople {
+  const nameFor = (id: number, proposedId: unknown, name: unknown) =>
+    Number(proposedId) === id && typeof name === "string" ? name : null;
+  const ownerGone = current.ownerId != null && vendorUsers.length > 0
+    && !vendorUsers.some((u) => u.id === current.ownerId);
+  const assigneeGone = current.assigneeContactId != null && contacts.length > 0
+    && !contacts.some((c) => c.id === current.assigneeContactId);
+  return {
+    owner: ownerGone
+      ? { message: staleOwnerMessage(nameFor(current.ownerId!, proposed.ownerId, proposed.ownerName)) }
+      : null,
+    assignee: assigneeGone
+      ? { message: staleContactMessage(nameFor(current.assigneeContactId!, proposed.assigneeContactId, proposed.assigneeContactName)) }
+      : null,
+  };
+}
+
+/**
+ * After a gone person is resolved the warning unmounts, which would drop
+ * keyboard focus to <body>. Move it to the next warning's picker if one is
+ * left, else to the card's approve button. Runs after React commits.
+ */
+/**
+ * "Remove due date" and "Keep <date>" replace each other, so the button that
+ * was pressed unmounts. Hand focus to whichever toggle is now showing.
+ */
+function focusDueToggle(from: HTMLElement) {
+  const field = from.closest<HTMLElement>("[data-due-field]");
+  requestAnimationFrame(() => {
+    field?.querySelector<HTMLElement>("[data-due-toggle]:not([disabled])")?.focus();
+  });
+}
+
+function focusAfterResolve(card: HTMLElement | null) {
+  requestAnimationFrame(() => {
+    const next =
+      card?.querySelector<HTMLElement>("[data-stale-warning] button:not([disabled])") ??
+      card?.querySelector<HTMLElement>("[data-approve]:not([disabled])");
+    next?.focus();
+  });
+}
+
+/** The card's error, unless it only repeats a stale-person warning already on screen. */
+function visibleError(error: string | null | undefined, stale: StalePeople): string | null {
+  if (!error) return null;
+  return error === stale.owner?.message || error === stale.assignee?.message ? null : error;
+}
+
+/** What the reviewer chose for a gone person, so they see what will be applied. */
+function ResolvedPeople({
+  resolved,
+  vendorUsers,
+  contacts,
+  onChange,
+  disabled,
+}: {
+  resolved: PeopleChoice;
+  vendorUsers: VendorUserOption[];
+  contacts: ContactOption[];
+  onChange: (key: keyof PeopleChoice) => void;
+  disabled: boolean;
+}) {
+  const rows: { key: keyof PeopleChoice; label: string; value: string }[] = [];
+  if (resolved.ownerId !== undefined) {
+    rows.push({
+      key: "ownerId",
+      label: "Owner",
+      value: resolved.ownerId === null ? "unassigned" : personName(vendorUsers, resolved.ownerId),
+    });
+  }
+  if (resolved.assigneeContactId !== undefined) {
+    rows.push({
+      key: "assigneeContactId",
+      label: "Assignee",
+      value: resolved.assigneeContactId === null ? "unassigned" : personName(contacts, resolved.assigneeContactId),
+    });
+  }
+  if (rows.length === 0) return null;
+  return (
+    <ul aria-live="polite" className="flex flex-col gap-1 text-sm">
+      {rows.map((r) => (
+        <li key={r.key} className="flex flex-wrap items-center gap-2">
+          <span className="text-text-muted">{r.label}:</span>
+          <span className="text-text">{r.value}</span>
+          <Button variant="tertiary" size="xs" onClick={() => onChange(r.key)} disabled={disabled}>
+            Change
+          </Button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** The warning (plus the way out) for each gone person, shown before approving. */
+function StalePeopleWarnings({
+  stale,
+  vendorUsers,
+  contacts,
+  onResolve,
+  disabled,
+}: {
+  stale: StalePeople;
+  vendorUsers: VendorUserOption[];
+  contacts: ContactOption[];
+  onResolve: (choice: PeopleChoice) => void;
+  disabled: boolean;
+}) {
+  if (!stale.owner && !stale.assignee) return null;
+  return (
+    <div className="flex flex-col gap-3">
+      {stale.owner && (
+        <StalePersonWarning
+          message={stale.owner.message}
+          icon={<OwnerIcon />}
+          pickLabel="Pick a new owner"
+          options={vendorUsers.map((u) => ({ id: u.id, label: u.name || u.email }))}
+          onPick={(ownerId) => onResolve({ ownerId })}
           disabled={disabled}
         />
       )}
-      {action === "match_existing" && payload?.action === "reprioritise" && (
-        <PriorityOverrideEditor
-          value={overrides.newPriority}
-          onChange={(newPriority) => onChange({ newPriority })}
-          disabled={disabled}
-        />
-      )}
-      {action === "match_existing" && payload?.action === "reassign" && (
-        <ReassignOverrideEditor
-          ownerId={overrides.newOwnerId}
-          assigneeContactId={overrides.newAssigneeContactId}
-          onChangeOwner={(newOwnerId) => onChange({ newOwnerId })}
-          onChangeAssignee={(newAssigneeContactId) => onChange({ newAssigneeContactId })}
-          vendorUsers={vendorUsers}
-          contacts={contacts}
+      {stale.assignee && (
+        <StalePersonWarning
+          message={stale.assignee.message}
+          icon={<AssigneeIcon />}
+          pickLabel="Pick a new assignee"
+          options={contacts.map((c) => ({ id: c.id, label: c.name || c.email }))}
+          onPick={(assigneeContactId) => onResolve({ assigneeContactId })}
           disabled={disabled}
         />
       )}
@@ -895,54 +1097,381 @@ function DraftEditPanel({ action, payload, overrides, onChange, disabled, vendor
   );
 }
 
-/** Reassign editor: pick a new owner (vendor) and/or assignee (contact).
- *  Vector flags the reassignment but never the target, so both start unset
- *  and are populated entirely by Caroline's selection. Reuses SelectPill. */
-function ReassignOverrideEditor({
-  ownerId,
-  assigneeContactId,
-  onChangeOwner,
-  onChangeAssignee,
+function StalePersonWarning({
+  message,
+  icon,
+  pickLabel,
+  options,
+  onPick,
+  disabled,
+}: {
+  message: string;
+  icon: ReactNode;
+  pickLabel: string;
+  options: SelectPillOption[];
+  onPick: (id: number | null) => void;
+  disabled: boolean;
+}) {
+  return (
+    <div role="alert" data-stale-warning className="flex flex-col gap-2 rounded-lg border border-alert px-3 py-2 text-sm">
+      <span className="text-alert">{message}.</span>
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="min-w-48 flex-1">
+          <SelectPill
+            icon={icon}
+            label={pickLabel}
+            valueLabel={null}
+            options={options}
+            selected={undefined}
+            onSelect={(id) => onPick(id)}
+            disabled={disabled}
+            tone="warning"
+          />
+        </div>
+        <Button variant="tertiary" size="xs" onClick={() => onPick(null)} disabled={disabled}>
+          Leave unassigned
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ── Existing-task update (match_existing) ────────────────────────────────────
+
+/** The task's current values, as far as the board knows them. */
+type TaskBefore = {
+  ownerId: number | null;
+  assigneeContactId: number | null;
+  due: string | null;
+  priority: Priority | null;
+};
+
+function taskBefore(task: OpenTaskOption | undefined): TaskBefore {
+  const priority = task?.priority;
+  return {
+    ownerId: task?.ownerId ?? null,
+    assigneeContactId: task?.assigneeContactId ?? null,
+    due: task?.due ? String(task.due).slice(0, 10) : null,
+    priority: priority === "low" || priority === "medium" || priority === "high" ? priority : null,
+  };
+}
+
+/** Editor state: every field holds its value AFTER approval. A field equal
+ *  to the task's current value is "no change" and is not sent. */
+type TaskUpdateEdits = {
+  ownerId: number | null;
+  assigneeContactId: number | null;
+  dueDate: string;
+  priority: Priority | null;
+  appendNotes: string;
+};
+
+function initialUpdateEdits(changes: TaskUpdateChanges, before: TaskBefore): TaskUpdateEdits {
+  return {
+    ownerId: changes.ownerId !== undefined ? changes.ownerId : before.ownerId,
+    assigneeContactId: changes.assigneeContactId !== undefined ? changes.assigneeContactId : before.assigneeContactId,
+    // "" = no due date (a proposed removal starts empty).
+    dueDate: changes.dueDate === null ? "" : changes.dueDate ?? before.due ?? "",
+    priority: changes.priority ?? before.priority,
+    appendNotes: changes.appendNotes ?? "",
+  };
+}
+
+/** The `changes` override for the approve route: only fields that differ
+ *  from the task as it stands. An emptied due date on a task that has one is
+ *  `dueDate: null` (remove it). */
+function diffUpdateEdits(edits: TaskUpdateEdits, before: TaskBefore): TaskUpdateChanges {
+  const changes: TaskUpdateChanges = {};
+  if (edits.ownerId !== before.ownerId) changes.ownerId = edits.ownerId;
+  if (edits.assigneeContactId !== before.assigneeContactId) changes.assigneeContactId = edits.assigneeContactId;
+  const due = edits.dueDate.slice(0, 10);
+  if (due !== (before.due ?? "")) changes.dueDate = due === "" ? null : due;
+  if (edits.priority && edits.priority !== before.priority) changes.priority = edits.priority;
+  if (edits.appendNotes.trim()) changes.appendNotes = edits.appendNotes.trim();
+  return changes;
+}
+
+const PRIORITY_LABEL: Record<string, string> = { low: "Low", medium: "Medium", high: "High" };
+
+function formatDay(iso: string | null | undefined) {
+  if (!iso) return null;
+  const d = new Date(`${iso.slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+}
+
+function personName(
+  list: { id: number; name?: string | null; email?: string | null }[],
+  id: number | null | undefined,
+  fallback?: string | null
+) {
+  if (id == null) return "None";
+  const hit = list.find((x) => x.id === id);
+  return hit?.name || hit?.email || fallback || "Unknown";
+}
+
+/** A name snapshot from a draft payload (JSON, so unknown until checked). */
+function asName(x: unknown): string | null {
+  return typeof x === "string" && x.trim() ? x : null;
+}
+
+/** One field of the update diff: the label on its own line, then
+ *  "before → after" below it. Nothing truncates: in the card's narrow
+ *  column a long value wraps instead, so every value is readable in full
+ *  (no hover-only tooltip, which keyboard users never get). */
+function UpdateDiffRow({
+  icon,
+  label,
+  before,
+  after,
+}: {
+  icon: ReactNode;
+  label: string;
+  before: string;
+  after: string;
+}) {
+  return (
+    <li className="flex min-w-0 flex-col gap-0.5 text-sm">
+      <span className="inline-flex items-center gap-1.5 text-xs text-text-muted">
+        {icon}
+        {label}
+      </span>
+      <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
+        <span className="break-words text-text-muted">{before}</span>
+        <span aria-hidden className="text-text-muted">→</span>
+        <span className="sr-only">changes to</span>
+        <span className="break-words text-text">{after}</span>
+      </span>
+    </li>
+  );
+}
+
+/** "Before" value for the diff: "—" when the task isn't in the loaded list,
+ *  so an unknown value never reads as "None". */
+function beforeLabel(known: boolean, value: string | null) {
+  if (!known) return "—";
+  return value ?? "None";
+}
+
+/** Right-column view of an existing-task update: the task, then one
+ *  before → after row per proposed change, then the note it would append. */
+function TaskUpdateDiff({
+  task,
+  fallbackTitle,
+  changes,
+  flagOnlyReassign,
+  before,
+  vendorUsers,
+  contacts,
+  onPickOwner,
+  names,
+  noteSource,
+}: {
+  task: OpenTaskOption | undefined;
+  fallbackTitle: string;
+  changes: TaskUpdateChanges;
+  /** Names snapshotted when the draft was created, for people no longer listed. */
+  names: { owner: string | null; assignee: string | null };
+  /** Where the appended note will be stamped from (meeting day + source). */
+  noteSource: NoteSource | null;
+  flagOnlyReassign: boolean;
+  before: TaskBefore;
+  vendorUsers: VendorUserOption[];
+  contacts: ContactOption[];
+  /** Opens the editor; only offered on a flag-only reassign (pending drafts). */
+  onPickOwner?: () => void;
+}) {
+  const known = !!task;
+  return (
+    <div className="draft-card-preview flex flex-col gap-3 rounded-lg px-4 py-3">
+      <div className="text-sm leading-snug">
+        {task && <TaskIdChip task={task} />}
+        {task?.title ?? fallbackTitle}
+      </div>
+      <ul aria-label="Proposed changes" className="flex flex-col gap-3">
+        {changes.ownerId !== undefined && (
+          <UpdateDiffRow
+            icon={<OwnerIcon />}
+            label="Owner"
+            before={beforeLabel(known, personName(vendorUsers, before.ownerId))}
+            after={personName(vendorUsers, changes.ownerId, names.owner)}
+          />
+        )}
+        {changes.assigneeContactId !== undefined && (
+          <UpdateDiffRow
+            icon={<AssigneeIcon />}
+            label="Assignee"
+            before={beforeLabel(known, personName(contacts, before.assigneeContactId))}
+            after={personName(contacts, changes.assigneeContactId, names.assignee)}
+          />
+        )}
+        {changes.dueDate !== undefined && (
+          <UpdateDiffRow
+            icon={<CalendarIcon />}
+            label="Due date"
+            before={beforeLabel(known, formatDay(before.due))}
+            after={changes.dueDate === null ? "none" : formatDay(changes.dueDate) ?? changes.dueDate}
+          />
+        )}
+        {changes.priority !== undefined && (
+          <UpdateDiffRow
+            icon={<PriorityIcon priority={changes.priority} />}
+            label="Priority"
+            before={beforeLabel(known, before.priority ? PRIORITY_LABEL[before.priority] : null)}
+            after={PRIORITY_LABEL[changes.priority]}
+          />
+        )}
+        {flagOnlyReassign && (
+          <li className="flex flex-wrap items-center gap-1.5 text-sm text-text-muted">
+            <OwnerIcon />
+            Reassignment discussed.
+            {onPickOwner && (
+              <Button variant="tertiary" size="xs" onClick={onPickOwner}>
+                Pick the new owner
+              </Button>
+            )}
+          </li>
+        )}
+      </ul>
+      {changes.appendNotes && (
+        <div className="flex flex-col gap-1 text-sm">
+          <span className="inline-flex flex-wrap items-center gap-1.5 text-text-muted">
+            <NotesIcon />
+            Adds note
+            {noteSource && (
+              <span className="text-xs">
+                (dated {formatDay(noteSource.date)}, {noteSource.label})
+              </span>
+            )}
+          </span>
+          <p className="whitespace-pre-wrap leading-normal text-text-secondary">{changes.appendNotes}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** "Now: …" hint under an edit-form field: the task's current value, or "—"
+ *  when the task isn't in the loaded list. */
+function NowHint({ known, value }: { known: boolean; value: string | null }) {
+  return <span className="text-xs text-text-muted">Now: {beforeLabel(known, value)}</span>;
+}
+
+/** Edit form for an existing-task update: the same field pills as the
+ *  create-task editor, each showing what the task has today, plus the note
+ *  to append. Only fields that end up different from today are sent. */
+function TaskUpdateEditForm({
+  edits,
+  before,
+  known,
+  onChange,
   vendorUsers,
   contacts,
   disabled,
 }: {
-  ownerId?: number | null;
-  assigneeContactId?: number | null;
-  onChangeOwner: (id: number | null) => void;
-  onChangeAssignee: (id: number | null) => void;
+  edits: TaskUpdateEdits;
+  before: TaskBefore;
+  /** Whether the task (and so its current values) is in the loaded list. */
+  known: boolean;
+  onChange: (patch: Partial<TaskUpdateEdits>) => void;
   vendorUsers: VendorUserOption[];
   contacts: ContactOption[];
   disabled: boolean;
 }) {
-  const ownerName = vendorUsers.find((u) => u.id === ownerId)?.name || null;
-  const assigneeName = contacts.find((c) => c.id === assigneeContactId)?.name || null;
+  const ownerName = edits.ownerId != null ? personName(vendorUsers, edits.ownerId) : null;
+  const assigneeName = edits.assigneeContactId != null ? personName(contacts, edits.assigneeContactId) : null;
+  const notesId = useId();
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <SelectPill
-        icon={<OwnerIcon />}
-        label="Owner"
-        valueLabel={ownerName}
-        options={[
-          { id: null, label: "None" },
-          ...vendorUsers.map((u) => ({ id: u.id, label: u.name || u.email })),
-        ]}
-        selected={ownerId}
-        onSelect={onChangeOwner}
-        disabled={disabled}
-      />
-      <SelectPill
-        icon={<AssigneeIcon />}
-        label="Assignee"
-        valueLabel={assigneeName}
-        options={[
-          { id: null, label: "None" },
-          ...contacts.map((c) => ({ id: c.id, label: c.name || c.email })),
-        ]}
-        selected={assigneeContactId}
-        onSelect={onChangeAssignee}
-        disabled={disabled}
-      />
+    <div className="draft-card-preview flex flex-col gap-4 rounded-lg px-4 py-3">
+      <div className="flex flex-col gap-1">
+        <SelectPill
+          icon={<OwnerIcon />}
+          label="Owner"
+          valueLabel={ownerName}
+          options={[
+            { id: null, label: "None" },
+            ...vendorUsers.map((u) => ({ id: u.id, label: u.name || u.email })),
+          ]}
+          selected={edits.ownerId}
+          onSelect={(ownerId) => onChange({ ownerId })}
+          disabled={disabled}
+        />
+        <NowHint known={known} value={personName(vendorUsers, before.ownerId)} />
+      </div>
+      <div className="flex flex-col gap-1">
+        <SelectPill
+          icon={<AssigneeIcon />}
+          label="Assignee"
+          valueLabel={assigneeName}
+          options={[
+            { id: null, label: "None" },
+            ...contacts.map((c) => ({ id: c.id, label: c.name || c.email })),
+          ]}
+          selected={edits.assigneeContactId}
+          onSelect={(assigneeContactId) => onChange({ assigneeContactId })}
+          disabled={disabled}
+        />
+        <NowHint known={known} value={personName(contacts, before.assigneeContactId)} />
+      </div>
+      <div className="flex flex-wrap gap-4">
+        <div className="flex min-w-36 flex-1 flex-col gap-1" data-due-field>
+          <DueDatePill value={edits.dueDate} onChange={(dueDate) => onChange({ dueDate })} disabled={disabled} />
+          <NowHint known={known} value={formatDay(before.due)} />
+          {!edits.dueDate && before.due && (
+            <span className="flex flex-wrap items-center gap-2 text-xs text-alert" aria-live="polite">
+              Will remove the due date
+              <Button
+                variant="tertiary"
+                size="xs"
+                onClick={(e) => {
+                  focusDueToggle(e.currentTarget);
+                  onChange({ dueDate: before.due ?? "" });
+                }}
+                disabled={disabled}
+                data-due-toggle
+              >
+                Keep {formatDay(before.due)}
+              </Button>
+            </span>
+          )}
+          {edits.dueDate && (
+            <Button
+              variant="tertiary"
+              size="xs"
+              className="self-start"
+              onClick={(e) => {
+                focusDueToggle(e.currentTarget);
+                onChange({ dueDate: "" });
+              }}
+              disabled={disabled}
+              data-due-toggle
+            >
+              Remove due date
+            </Button>
+          )}
+        </div>
+        <div className="flex min-w-36 flex-1 flex-col gap-1">
+          <PriorityPill
+            value={edits.priority ?? undefined}
+            onChange={(priority) => onChange({ priority })}
+            disabled={disabled}
+          />
+          <NowHint known={known} value={before.priority ? PRIORITY_LABEL[before.priority] : null} />
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <label htmlFor={notesId} className="inline-flex items-center gap-2 text-sm text-text-secondary">
+          <NotesIcon />
+          Add to notes
+        </label>
+        <Textarea
+          id={notesId}
+          value={edits.appendNotes}
+          onChange={(e) => onChange({ appendNotes: e.target.value })}
+          disabled={disabled}
+          placeholder="Added to the task's notes as a new dated line (optional)"
+        />
+      </div>
     </div>
   );
 }
@@ -1011,106 +1540,17 @@ function StatusOverrideEditor({ value, onChange, disabled }: ValueEditorProps<st
   );
 }
 
-function DueDateOverrideEditor({ value, onChange, disabled }: ValueEditorProps<string>) {
-  // Normalise the payload value (which may be a full ISO timestamp) down
-  // to a YYYY-MM-DD string so the native date input renders it.
-  const dateOnly = typeof value === "string" ? value.slice(0, 10) : "";
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>New due date</span>
-      <input
-        type="date"
-        value={dateOnly}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={disabled}
-        aria-label="New due date"
-        style={{
-          width: "100%",
-          padding: "6px 10px",
-          fontSize: 14,
-          background: "var(--bg)",
-          color: "var(--text)",
-          border: "1px solid var(--button-secondary-border)",
-          borderRadius: 8,
-          outline: "none",
-          minHeight: 30,
-          fontFamily: "inherit",
-        }}
-      />
-    </div>
-  );
-}
-
-function PriorityOverrideEditor({ value, onChange, disabled }: ValueEditorProps<string>) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    function handle(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener("mousedown", handle);
-    return () => document.removeEventListener("mousedown", handle);
-  }, [open]);
-
-  const labelMap: Record<string, string> = { low: "Low", medium: "Medium", high: "High" };
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>New priority</span>
-      <div ref={ref} className="relative" style={{ width: "100%" }}>
-        {/* eslint-disable-next-line no-restricted-syntax -- dropdown trigger, becomes Select in slice 3 */}
-        <button
-          type="button"
-          onClick={() => !disabled && setOpen((o) => !o)}
-          disabled={disabled}
-          className="field-pill flex items-center gap-2 rounded-lg"
-          data-active={open ? "true" : undefined}
-          style={{
-            width: "100%",
-            border: "1px solid var(--button-secondary-border)",
-            padding: "6px 10px",
-            minHeight: 30,
-            background: "var(--bg)",
-            color: "var(--text)",
-            fontSize: 14,
-            textAlign: "left",
-            cursor: disabled ? "not-allowed" : "pointer",
-          }}
-        >
-          <PriorityIcon priority={value as TaskPriority | undefined} />
-          <span style={{ flex: 1, textAlign: "left" }}>{labelMap[value as string] || "Pick priority"}</span>
-        </button>
-        {open && (
-          <MenuList style={{ width: "100%" }}>
-            {["low", "medium", "high"].map((p) => (
-              <MenuOption
-                key={p}
-                active={p === value}
-                onClick={() => {
-                  onChange(p);
-                  setOpen(false);
-                }}
-              >
-                {labelMap[p]}
-              </MenuOption>
-            ))}
-          </MenuList>
-        )}
-      </div>
-    </div>
-  );
-}
-
 const TASK_STATUS_OPTIONS = TASK_STATUSES;
 
 /** Verb-only label for an action draft — kept short so the left column
  *  stays compact. Full payload details live on the right (task preview). */
 function describeActionVerb(action: string, payload: DraftPayload | null) {
   if (action === "match_existing") {
-    const sub = payload?.action;
+    const sub = normaliseTaskUpdate(payload).action;
     if (sub === "reassign") return "Reassign";
     if (sub === "reprioritise") return "Re-prioritise";
     if (sub === "update_due_date") return "Update due date";
+    if (sub === "add_notes") return "Add notes";
     return "Update task";
   }
   if (action === "update_status") return `Mark as ${payload?.newStatus ?? "—"}`;
@@ -1608,8 +2048,54 @@ export function CreateTaskCard({
 
   const dirty = !payloadsEqual(edits, savedPayload);
 
+  // A proposed owner / assignee who is no longer around must be replaced or
+  // explicitly left unassigned before approving (the route 409s otherwise).
+  const [resolved, setResolved] = useState<PeopleChoice>({});
+  const people = { ...(cardMode === "edit" ? edits : savedPayload), ...resolved };
+  const stale = isPending
+    ? stalePeople(
+        { ownerId: people.ownerId, assigneeContactId: people.assigneeContactId },
+        vendorUsers,
+        contacts,
+        {
+          ownerId: draft.payload?.ownerId,
+          ownerName: draft.payload?.ownerName,
+          assigneeContactId: draft.payload?.assigneeContactId,
+          assigneeContactName: draft.payload?.assigneeContactName,
+        }
+      )
+    : NO_STALE;
+
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  function resolvePerson(choice: PeopleChoice) {
+    setResolved((prev) => ({ ...prev, ...choice }));
+    if (cardMode === "edit") setEdits((prev) => ({ ...prev, ...choice }));
+    focusAfterResolve(cardRef.current);
+  }
+
+  /** Undo a warning choice, so the warning (and its picker) comes back. */
+  function unresolvePerson(key: keyof PeopleChoice) {
+    setResolved((prev) => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+    // The warning comes back; put focus on its picker.
+    focusAfterResolve(cardRef.current);
+  }
+
   function patchEdits(patch: Partial<CreateTaskEdits>) {
     setEdits((prev) => ({ ...prev, ...patch }));
+    // A pick in the form itself supersedes an earlier warning choice.
+    if ("ownerId" in patch || "assigneeContactId" in patch) {
+      setResolved((prev) => {
+        const next = { ...prev };
+        if ("ownerId" in patch) delete next.ownerId;
+        if ("assigneeContactId" in patch) delete next.assigneeContactId;
+        return next;
+      });
+    }
   }
 
   async function handleSaveDraft() {
@@ -1655,11 +2141,12 @@ export function CreateTaskCard({
   function handleCreate() {
     // Pass current in-memory edits as overrides; backend will merge with
     // the persisted payload server-side.
-    onApprove(cardMode === "edit" ? edits : savedPayload);
+    onApprove({ ...(cardMode === "edit" ? edits : savedPayload), ...resolved });
   }
 
   return (
     <div
+      ref={cardRef}
       className="draft-card"
       style={{
         display: "flex",
@@ -1701,7 +2188,25 @@ export function CreateTaskCard({
         />
       )}
 
-      {(error || saveError) && (
+      <StalePeopleWarnings
+        stale={stale}
+        vendorUsers={vendorUsers}
+        contacts={contacts}
+        onResolve={resolvePerson}
+        disabled={busy || saving}
+      />
+
+      {isPending && cardMode === "compact" && (
+        <ResolvedPeople
+          resolved={resolved}
+          vendorUsers={vendorUsers}
+          contacts={contacts}
+          onChange={unresolvePerson}
+          disabled={busy || saving}
+        />
+      )}
+
+      {(visibleError(error, stale) || saveError) && (
         <div
           role="alert"
           style={{
@@ -1712,7 +2217,7 @@ export function CreateTaskCard({
             borderRadius: 6,
           }}
         >
-          {error || saveError}
+          {visibleError(error, stale) || saveError}
         </div>
       )}
 
@@ -1756,6 +2261,7 @@ export function CreateTaskCard({
               </Button>
             )}
             <Button
+              data-approve
               onClick={handleCreate}
               disabled={busy || saving || selected}
               aria-disabled={busy || saving || selected}
@@ -2170,6 +2676,7 @@ function SelectPill({
   selected,
   onSelect,
   disabled,
+  tone,
 }: {
   icon: ReactNode;
   label: string;
@@ -2178,6 +2685,8 @@ function SelectPill({
   selected: number | null | undefined;
   onSelect: (id: number | null) => void;
   disabled: boolean;
+  /** "warning": the field needs a decision (e.g. its person is gone). */
+  tone?: "warning";
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -2202,7 +2711,7 @@ function SelectPill({
         data-active={open ? "true" : undefined}
         style={{
           width: "100%",
-          border: "1px solid var(--button-secondary-border)",
+          border: `1px solid ${tone === "warning" ? "var(--alert)" : "var(--button-secondary-border)"}`,
           padding: "6px 10px",
           minHeight: 30,
           background: "var(--bg)",
