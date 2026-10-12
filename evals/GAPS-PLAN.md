@@ -13,6 +13,7 @@ Caroline's review of the golden set (2026-10-11, see `PROGRESS.md`) asked the me
 | 1 | Richer updates to existing tasks | `existing_task_notes`, `multi_field_existing_update` | S-M | none |
 | 2 | Free-text dependencies | `free_text_dependency`, `existing_task_dependency` | M | yes |
 | 3 | Dependencies between drafts from the same meeting | `depends_on_new_draft` | M | none (uses 2) |
+| 4 | Resolve the recorder ("You") to a real person | owner checks in 15, 17 | S | maybe one column |
 
 ---
 
@@ -48,6 +49,18 @@ Caroline's review of the golden set (2026-10-11, see `PROGRESS.md`) asked the me
 - Each create draft from the AI gets a short `draftRef` ("d1", "d2"); `dependsOn` can name `{ draftRef }`.
 - On approval of the dependent task: if the blocker draft is already approved, link to its created task; if it's still pending, store the link and resolve it when the blocker is approved; if the blocker is rejected, fall back to a text dependency with the blocker's title (needs feature 2).
 - Inbox shows "depends on draft d1" on the card, and approving both in one bulk action keeps the order right.
+
+## 4. Resolve the recorder ("You") to a real person
+
+**Found by the eval (2026-10-12), not by the review.** Miniti labels whoever recorded the meeting as speaker -1, "You", instead of by name. Nothing in Vector maps "You" to a vendor user, so commitments made by the recorder ("I'll send the guide") arrive with no owner. In the golden set this fails the owner check in cases 15 and 17 on every run of every prompt version; in real use it affects any meeting where the recorder speaks.
+
+**Build:**
+- Record which vendor user a Miniti connection belongs to (today the integration is workspace-level; the connecting user is the recorder), and pass that user to the pipeline as `recorder: { id, name }`.
+- In the extraction and decision context, state that speaker "You" is that person, so ownership resolves like any named speaker.
+- Fallback when unknown: keep the draft unowned but flag it on the card ("Said by the person who recorded the meeting: pick an owner"), using the same warning pattern as people who have left.
+- Eval: the harness passes the recorder for the case's vendor user; cases 15 and 17 then measure it.
+
+**Size:** S. **Schema:** possibly one nullable column on the integration settings; dry-run first.
 
 ## Scoring support (do alongside step 1 of the order)
 
