@@ -3306,7 +3306,7 @@ export async function getVendorUserById(id: IdLike) {
   if (Number.isNaN(vId)) return null;
   return prisma.vendorUser.findUnique({
     where: { id: vId },
-    select: { id: true, name: true, email: true },
+    select: { id: true, name: true, email: true, role: true },
   });
 }
 
