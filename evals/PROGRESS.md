@@ -21,7 +21,8 @@ A running record of how Vector's meeting AI is evaluated and improved: what was 
 | 2026-10-12 | Judgement rules added to the AI's instructions (phrased generally, no test-set names); after run, $1.46. |
 | 2026-10-12 | Rules v2 (quote rule, concreteness test for parked items); original vs v2 each run 3 times (~$8.40 total). Results below. |
 | 2026-10-12 | Feature 1 (richer updates to existing tasks) built and under review. |
-| _next_ | Remaining capability-gap features (see `GAPS-PLAN.md`), each measured by the eval. |
+| 2026-10-13 | Feature 2 (free-text dependencies, new `TaskDependency` table) built, reviewed in two evaluator rounds, eval run 3 times (~$4.50). Results below. |
+| _next_ | Features 3 (dependencies between new tasks) and 4 (recorder identity), each measured by the eval. |
 
 ---
 
@@ -163,6 +164,30 @@ The first "after" run raised two clear problems: quotes stitched across two spea
 **What to watch:** recall should rise the most (parked items, "right after the call" promises, vendor reminders), notes captured should rise, and precision should not fall (the rules must not make the AI invent tasks from thinking out loud).
 
 ---
+
+### Feature 2: free-text dependencies (3 runs, 2026-10-13)
+
+Feature 2 gives tasks a proper list of blockers: other tasks or plain text ("platform team sign-off"), several per task, text ones ticked off when they clear. The AI fills them in through `dependsOn` instead of writing "Blocked by" lines in notes. Compared with feature 1 (3 runs each):
+
+| Metric | Feature 1 | Feature 2 |
+|---|---|---|
+| Total recall | avg 91% (90–93%) | avg 89% (85–90%) |
+| Precision | avg 79% (79–80%) | **avg 82% (78–85%)** |
+| Due date right | avg 93% | **avg 98%** |
+| Notes captured | avg 76% (73–83%) | avg 68% |
+| Owner side right | avg 82% | avg 81% |
+| Quotes found verbatim | 99.6% | 99.2% |
+| Gap expectations met | 4–5 of 18 | 3–5 of 18 |
+| ...blockers that aren't tasks | 3 of 3 (via notes) | 1–3 of 3 (as real blockers) |
+| ...blockers added to existing tasks | 0 of 2 | 0 of 2 |
+| Cost per run | ~$1.57 | ~$1.51 |
+
+**Reading it:**
+- **The capability works:** when the AI proposes a task with a blocker, the blocker is now a real, structured dependency (for example "security sign-off on the infosec review"), not a line of text in the notes. The non-task blocker misses are runs where the task itself was not proposed.
+- **Blockers on existing tasks stay at 0 of 2** because both expectations point at a *new* task from the same meeting, which is feature 3.
+- **Precision and dates improved; recall dipped about 2 points** (ranges overlap, so possibly noise).
+- **Notes captured fell about 8 points and needs a look.** The notes instruction only lost its "Blocked by" line, yet some details (for example the comparison tool in a parity-check task) are now missed on every run. Likely the notes simply got shorter once blockers moved out. Investigated later on a general basis, not by tuning against these meetings.
+- Scoring: blocker labels are now matched on their meaningful words in any order ("Pilot completion" matches "after the pilot"); older runs rescore identically.
 
 ## Material for the case study
 
