@@ -241,11 +241,13 @@ export default function AIDraftInbox({
       }
       const result = await res.json().catch(() => ({}));
       setSiblingStatus((prev) => ({ ...prev, [draft.id]: { status: "rejected", taskCode: null } }));
-      // Drafts that waited on this one keep it as a text blocker: say so.
+      // Drafts that waited on this one keep it as a text blocker: say so. A
+      // count, not their titles: a toast is two lines at most, and each
+      // waiting card already reads "rejected, kept as a text blocker".
       const dependents: { title: string }[] = Array.isArray(result.dependents) ? result.dependents : [];
       if (dependents.length > 0) {
-        const names = dependents.map((d) => `“${d.title}”`).join(", ");
-        flashToast(`${names} depended on this; it will be kept as a text blocker`);
+        const one = dependents.length === 1;
+        flashToast(`${one ? "1 draft" : `${dependents.length} drafts`} depended on this; ${one ? "it keeps" : "they keep"} it as a text blocker`);
       }
       setDrafts((prev) => prev.filter((d) => d.id !== draft.id));
       setSelectedIds((prev) => {
