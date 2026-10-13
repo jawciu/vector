@@ -70,10 +70,10 @@ describe("planDraftRefs (storage-time validation)", () => {
 
   it("an existing-task update may wait on a new draft", () => {
     const plan = planDraftRefs([
-      create({ draftRef: "d1", title: "Close the security review" }),
+      create({ draftRef: "d1", title: "Close the vendor review" }),
       update({ taskId: 7, changes: { appendNotes: "x", dependsOn: [{ draftRef: "d1" }] } }),
     ]);
-    expect(plan.dependsOn[1]).toEqual([{ draftRef: "d1", title: "Close the security review" }]);
+    expect(plan.dependsOn[1]).toEqual([{ draftRef: "d1", title: "Close the vendor review" }]);
   });
 
   it("an entry with a valid taskId is a task blocker even if it also names a ref", () => {
