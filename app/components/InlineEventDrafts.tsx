@@ -382,6 +382,9 @@ export default function InlineEventDrafts({ eventId, onboardingId, onAllHandled,
             onToggleSelect={() => {}}
             onApprove={(overrides) => handleApprove(draft, overrides)}
             onReject={() => handleReject(draft)}
+            openTasks={options.openTasks}
+            vendorUsers={options.vendorUsers}
+            contacts={options.contacts}
           />
         );
       })}

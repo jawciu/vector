@@ -351,13 +351,16 @@ export function statements() {
                    OR (payload #>> '{meeting,id}') = ANY(${FX}))`,
     },
     {
-      // dueDate / newDueDate are the only dates a draft holds as data. The
-      // prose in a follow-up body ("overdue by 5 days") cannot be shifted.
-      // See the open risks in REALISM_PLAN.md. The payload is rebuilt key by
-      // key because Postgres allows one assignment per column, and both keys
-      // can appear on the same draft.
+      // dueDate / newDueDate / changes.dueDate / noteSource.date are the only
+      // dates a draft holds as data (changes.dueDate and noteSource.date, the
+      // meeting day an appended note is stamped with, are the existing-task
+      // update shape, lib/ai/task-update.ts; the top-level keys are
+      // create_task and legacy updates). The prose in a follow-up body ("overdue by 5 days") cannot
+      // be shifted. See the open risks in REALISM_PLAN.md. The payload is
+      // rebuilt key by key because Postgres allows one assignment per column,
+      // and several of these keys can appear on the same draft.
       table: "PendingAIChange",
-      what: "createdAt, resolvedAt, payload.dueDate, payload.newDueDate",
+      what: "createdAt, resolvedAt, payload.dueDate, payload.newDueDate, payload.changes.dueDate, payload.noteSource.date",
       sql: `UPDATE "PendingAIChange" SET
               "createdAt"  = "createdAt" + ${iv},
               "resolvedAt" = ${keep('"resolvedAt"')},
@@ -366,6 +369,16 @@ export function statements() {
                          WHEN e.k IN ('dueDate','newDueDate')
                           AND (e.v #>> '{}') ~ '^\\d{4}-\\d{2}-\\d{2}$'
                          THEN to_jsonb(to_char((e.v #>> '{}')::date + {{delta}}::int, 'YYYY-MM-DD'))
+                         WHEN e.k = 'changes'
+                          AND jsonb_typeof(e.v) = 'object'
+                          AND (e.v #>> '{dueDate}') ~ '^\\d{4}-\\d{2}-\\d{2}$'
+                         THEN jsonb_set(e.v, '{dueDate}',
+                                to_jsonb(to_char((e.v #>> '{dueDate}')::date + {{delta}}::int, 'YYYY-MM-DD')))
+                         WHEN e.k = 'noteSource'
+                          AND jsonb_typeof(e.v) = 'object'
+                          AND (e.v #>> '{date}') ~ '^\\d{4}-\\d{2}-\\d{2}$'
+                         THEN jsonb_set(e.v, '{date}',
+                                to_jsonb(to_char((e.v #>> '{date}')::date + {{delta}}::int, 'YYYY-MM-DD')))
                          ELSE e.v END)
                 FROM jsonb_each(payload) AS e(k, v)
               ), payload)

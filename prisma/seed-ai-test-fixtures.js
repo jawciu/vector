@@ -5,6 +5,7 @@
  * tagged so it can be removed again:
  *   - PendingAIChange rows carry sourceUrl === FIXTURE_TAG
  *   - Tasks it (or an approve test) creates have titles starting with MARKER
+ *     (including the target task of the multi-field update fixture)
  *
  * Usage:
  *   npx tsx prisma/seed-ai-test-fixtures.js          # clean old fixtures, then seed fresh
@@ -36,6 +37,20 @@ export const TITLES = {
   bulkB: `${MARKER} Bulk reject candidate B`,
   bulkC: `${MARKER} Bulk reject candidate C`,
   control: `${MARKER} Control draft (never touched)`,
+  updateTarget: `${MARKER} Update target task`,
+};
+
+/** The multi-field existing-task update fixture (e2e/ai-drafts.spec.ts). */
+export const UPDATE_FIXTURE = {
+  originalNotes: "Original note written on the board.",
+  originalDue: "2026-06-10",
+  changes: {
+    dueDate: "2026-07-01",
+    priority: "high",
+    appendNotes: "Scope agreed on the call: billing reports only.",
+  },
+  // The meeting day + source the appended note is stamped with.
+  noteSource: { date: "2026-06-18", label: "call with fixture" },
 };
 
 async function resolveTarget() {
@@ -100,6 +115,58 @@ function createTaskDraft({ onboardingId, phaseId, title, confidence = "medium" }
   };
 }
 
+/**
+ * A fixture task (MARKER title, so clean() deletes it) for the existing-task
+ * update draft to target. Never points an update draft at a real task.
+ * Same atomic counter bump as lib/db.ts createTask.
+ */
+async function createTargetTask({ onboardingId, phaseId }) {
+  return prisma.$transaction(async (tx) => {
+    const rows = await tx.$queryRaw`
+      WITH ob AS (SELECT "companyId" FROM "Onboarding" WHERE id = ${onboardingId}),
+      mx AS (
+        SELECT COALESCE(MAX(t."number"), 0) AS max_n
+          FROM "Task" t JOIN "Onboarding" o ON o.id = t."onboardingId"
+         WHERE o."companyId" = (SELECT "companyId" FROM ob)
+      ),
+      upd AS (
+        UPDATE "Company" SET "taskCounter" = GREATEST("taskCounter", (SELECT max_n FROM mx)) + 1
+         WHERE id = (SELECT "companyId" FROM ob)
+         RETURNING "taskCounter", id
+      )
+      SELECT "taskCounter" AS "number", id AS "companyId" FROM upd;
+    `;
+    return tx.task.create({
+      data: {
+        onboardingId,
+        phaseId,
+        title: TITLES.updateTarget,
+        description: "Auto-generated Playwright fixture. Safe to delete.",
+        status: "Not started",
+        due: UPDATE_FIXTURE.originalDue,
+        priority: "low",
+        notes: UPDATE_FIXTURE.originalNotes,
+        number: Number(rows[0].number),
+        companyId: Number(rows[0].companyId),
+      },
+    });
+  });
+}
+
+/** A current-shape match_existing draft: several changes in one update. */
+function updateTaskDraft({ onboardingId, taskId }) {
+  return {
+    source: "miniti",
+    onboardingId,
+    action: "match_existing",
+    confidence: "high",
+    status: "pending",
+    sourceUrl: FIXTURE_TAG,
+    sourceQuote: `${MARKER} "${TITLES.updateTarget}" — multi-field update fixture for automated tests.`,
+    payload: { taskId, action: "update", changes: UPDATE_FIXTURE.changes, noteSource: UPDATE_FIXTURE.noteSource },
+  };
+}
+
 async function main() {
   const mode = process.argv.includes("--clean") ? "clean" : "seed";
   const { onboardingId, phaseId } = await resolveTarget();
@@ -120,10 +187,13 @@ async function main() {
     createTaskDraft({ onboardingId, phaseId, title: TITLES.control }),
   ];
 
+  const target = await createTargetTask({ onboardingId, phaseId });
+  drafts.push(updateTaskDraft({ onboardingId, taskId: target.id }));
+
   const created = [];
   for (const d of drafts) {
     const row = await prisma.pendingAIChange.create({ data: d });
-    created.push({ id: row.id, title: d.payload.title });
+    created.push({ id: row.id, title: d.payload.title ?? `update of task ${target.id}` });
   }
 
   console.log(JSON.stringify({ mode, onboardingId, phaseId, cleaned, created }, null, 2));

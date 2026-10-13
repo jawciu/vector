@@ -213,6 +213,8 @@ export type DraftPayload = {
   assigneeContactId?: number | null;
   phaseId?: number | null;
   blockedByTaskId?: number | null;
+  /** match_existing: every change in one draft (lib/ai/task-update.ts). */
+  changes?: Record<string, unknown>;
   [key: string]: unknown;
 };
 
@@ -252,4 +254,7 @@ export type OpenTaskOption = {
   due?: string | null;
   status?: string | null;
   priority?: string | null;
+  /** Current owner / assignee, the "before" side of an update draft's diff. */
+  ownerId?: number | null;
+  assigneeContactId?: number | null;
 };

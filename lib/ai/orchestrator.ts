@@ -298,14 +298,14 @@ You will receive a JSON context with:
     - reportedCompletions[]: { claim, sourceQuote, speaker }
     - externalBlockers[]: string[]
     - meetingTone: short label
-- openTasks: existing OPEN tasks for this onboarding, each with id, taskId (human-readable e.g. "AC-12"), title, status, phaseId, due, assigneeContactId, description, notes, blockedByTaskId. When referring to a task in sourceQuote or notes, you may use its taskId (e.g. "blocked on AC-7") for readability.
+- openTasks: existing OPEN tasks for this onboarding, each with id, taskId (human-readable e.g. "AC-12"), title, status, phaseId, due, ownerId (a vendorUsers id), priority, assigneeContactId (a customerContacts id), description, notes, blockedByTaskId. When referring to a task in sourceQuote or notes, you may use its taskId (e.g. "blocked on AC-7") for readability.
 - customerContacts: [{ id, name, email }] — for assigneeContactId
 - vendorUsers: [{ id, name, email }] — Caroline's team; for ownerId
 - phases: [{ id, name, isComplete }]
 - today: today's ISO date
 
 For each extraction.actionItems entry, decide:
-- If it maps to an existing open task by topic, call match_to_existing_task_draft (don't duplicate).
+- If it maps to an existing open task by topic, call match_to_existing_task_draft (don't duplicate). Every change to that task goes in the one draft's \`changes\` object.
 - Otherwise call create_task_draft. This includes commitments where the actor is vendor-side (Caroline's team) — internal vendor work IS roadmap work and belongs as a draft on this onboarding too. Don't filter by who owns it.
 - If it's a "vague" item with no clear owner AND no clear commitment, skip it. Tentative items with a credible owner still get a create_task_draft (mark confidence "low"). Parked items that someone owns remembering are tentative items with an owner: draft them undated (see JUDGEMENT RULES).
 
@@ -322,11 +322,11 @@ Rules, non-negotiable:
 
 2. NEVER guess. If you can't resolve a mention with reasonable confidence, leave the field null/omitted. The vendor reviews every draft.
 
-3. Match before you create. If extraction.claim plausibly maps to an existing open task (compare title + description + notes), use match_to_existing_task_draft. Don't duplicate work.
+3. Match before you create. If extraction.claim plausibly maps to an existing open task (compare title + description + notes), use match_to_existing_task_draft. Don't duplicate work. Several action items about the same existing task become ONE match_to_existing_task_draft with all their changes (see JUDGEMENT RULES G and H).
 
 4. phaseId is REQUIRED on create_task_draft and MUST be from the phases array. Pick the phase that semantically fits (Discovery / Setup / Migration / Go-Live etc.). If unclear, pick the first non-complete phase.
 
-5. Every tool call MUST include sourceQuote. Use the same sourceQuote that Pass 1 surfaced — don't invent a new one.
+5. Every tool call MUST include sourceQuote. Use the same sourceQuote that Pass 1 surfaced — don't invent a new one. When several action items merge into one draft (e.g. one update carrying several changes to the same task), use the quote of the most important change; never join quotes together.
 
 6. Never invent task ids, contact ids, vendor user ids, or phase ids. Use only ids that appear in the context.
 
@@ -362,7 +362,9 @@ E. Dependencies. When the item can only happen after something else:
 
 F. Overwhelmed customer. When the customer says they are overwhelmed, stretched thin, or asks for space before taking on more, put NOTHING new on their plate from that exchange: no customer-owned tasks, no assigneeContactId for them on new work. Instead create one reminder for our own owner (ownerId = the vendor user who owns the relationship or took it on) to circle back, titled like "Check back in with <contact> about <topic>", with dueDate set to the check-in time if one was discussed (rule B), otherwise empty. Put the reason in notes ("Customer asked for space until ...").
 
-G. Cross-check existing tasks. When the call touches an existing open task (it maps via match_to_existing_task_draft, or someone talks about that work), compare its owner, due date and priority against what was agreed on the call. If they differ, propose the change with match_to_existing_task_draft: "update_due_date" with newDueDate, "reassign", or "reprioritise" with newPriority. The tool takes one action per draft, so emit ONE draft per existing task and pick the change that matters most (a moved date usually matters most). Do not propose a change when the board already agrees with the call.
+G. Cross-check existing tasks. When the call touches an existing open task (it maps via match_to_existing_task_draft, or someone talks about that work), compare its owner, assignee, due date and priority against what was agreed on the call. Propose ONE match_to_existing_task_draft per existing task, carrying every change in its \`changes\` object: ownerId / assigneeContactId when the work changed hands, dueDate when the timing moved (rule B applies; null when the call says the date no longer applies), priority when it was re-ranked. Do not split one task's changes across several drafts. Only include a field when the call disagrees with the board; do not restate what the board already says.
+
+H. Add what was agreed to existing tasks. When the call adds information to an existing task (scope, names of the specific things involved, audience, constraints, who to send it to, a non-task blocker), put it in changes.appendNotes, following rule D (and rule E's "Blocked by: ..." line). It is appended to the task's notes as a new dated line, never replacing what is there, so write only what is new, not a restatement of the existing notes. Add any "Due date: ..." reasoning line (rule B) there too. A call that adds information but changes nothing else is still worth one update with appendNotes only.
 
 ${GLOBAL_RULES}
 
@@ -425,21 +427,40 @@ const TOOLS: Tool[] = [
   },
   {
     name: "match_to_existing_task_draft",
-    description: "Propose updating an existing open task instead of creating a duplicate. Use when an action item maps to a task already in the openTasks list.",
+    description: "Propose updating an existing open task instead of creating a duplicate. Use when an action item maps to a task already in the openTasks list. One draft per task: put EVERY change agreed on the call for that task in `changes` (new owner or assignee, new due date, new priority, notes to append). Only include fields that differ from the board.",
     input_schema: {
       type: "object",
       properties: {
         taskId: { type: "integer", description: "Must be an id from openTasks" },
-        action: {
-          type: "string",
-          enum: ["reassign", "reprioritise", "update_due_date"],
+        changes: {
+          type: "object",
+          description: "The changes to apply to the task, all at once. At least one field.",
+          properties: {
+            ownerId: {
+              type: "integer",
+              description: "New vendor owner. MUST be an id from vendorUsers. Only when the work moved to a different vendor team-mate.",
+            },
+            assigneeContactId: {
+              type: "integer",
+              description: "New customer-side assignee. MUST be an id from customerContacts. Only when the work moved to a different customer contact.",
+            },
+            priority: { type: "string", enum: ["low", "medium", "high"], description: "New priority." },
+            dueDate: {
+              type: ["string", "null"],
+              description: "New due date, ISO YYYY-MM-DD (see JUDGEMENT RULES, dates). null removes the task's due date: only when the call says there is no date for it any more.",
+            },
+            appendNotes: {
+              type: "string",
+              description: "Concise, in your own words: what the call added to this task (scope, names, audience, constraints, recipient), then any \"Blocked by: ...\" line, then any \"Due date: ...\" line explaining an inferred date. Appended to the task's notes as a new dated line; never repeat what the notes already say.",
+            },
+          },
+          minProperties: 1,
+          additionalProperties: false,
         },
-        newPriority: { type: "string", enum: ["low", "medium", "high"], description: "For reprioritise" },
-        newDueDate: { type: "string", description: "ISO date for update_due_date" },
         sourceQuote: { type: "string" },
         confidence: { type: "string", enum: ["low", "medium", "high"] },
       },
-      required: ["taskId", "action", "sourceQuote", "confidence"],
+      required: ["taskId", "changes", "sourceQuote", "confidence"],
     },
   },
   {

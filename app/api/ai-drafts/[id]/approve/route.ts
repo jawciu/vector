@@ -4,6 +4,18 @@
  * Translates the draft's `action` into the matching createTask / updateTask /
  * createComment call, records the appliedTaskId, marks the draft applied.
  *
+ * match_existing drafts carry `changes` ({ ownerId?, assigneeContactId?,
+ * priority?, dueDate?, appendNotes? }) and are applied as ONE updateTask
+ * call; `appendNotes` is appended to the task's notes on a new line stamped
+ * `[meeting day, source]` (or today's London date for drafts with no
+ * meeting), never overwriting them; `dueDate: null` removes the due date.
+ * Legacy single-action drafts (`action` + `newPriority` / `newDueDate`) are
+ * normalised by lib/ai/task-update.ts.
+ *
+ * Owners / assignees that no longer exist (create_task and match_existing
+ * alike) are a 409 with a plain message the card shows inline. The card asks
+ * the reviewer first; an explicit null override means "leave unassigned".
+ *
  * Optional body: { overrides: {...} } — when Caroline edited fields before
  * approving (UI's "Edit then approve" / `draft_followup` Send-to-portal path),
  * those overrides are merged into the payload before execution. `taskId` is
@@ -18,6 +30,8 @@ import {
   markAIChangeApplied,
   markAIChangeRejected,
   getTaskOnboardingId,
+  getTaskNotes,
+  getContactsForOnboarding,
   getVendorUserById,
   getPhasesForOnboarding,
   createTask,
@@ -26,6 +40,16 @@ import {
   getOrCreateVendorUser,
 } from "@/lib/db";
 import type { Actor } from "@/lib/types";
+import type { UpdateTaskInput } from "@/lib/db";
+import {
+  appendDatedNote,
+  applyTaskUpdateOverrides,
+  invalidChangeFields,
+  noteStamp,
+  readNoteSource,
+  staleContactMessage,
+  staleOwnerMessage,
+} from "@/lib/ai/task-update";
 
 /**
  * Every payload field this route reads, across all four actions. The column is
@@ -44,7 +68,14 @@ interface ApprovePayload {
   assigneeContactId?: number | null;
   blockedByTaskId?: number | null;
   notes?: string;
-  // match_existing
+  // match_existing (current shape: `changes`; the rest is the legacy
+  // one-change-per-draft shape, normalised by lib/ai/task-update.ts)
+  changes?: Record<string, unknown>;
+  appendNotes?: string;
+  noteSource?: unknown;
+  // Names of the proposed people, snapshotted when the draft was created
+  ownerName?: string;
+  assigneeContactName?: string;
   action?: string;
   newPriority?: string;
   newDueDate?: string;
@@ -57,6 +88,33 @@ interface ApprovePayload {
   fromName?: string;
   subject?: string;
   body?: string;
+}
+
+/**
+ * The 409 message when a draft's owner is no longer a vendor user, or its
+ * customer assignee is no longer a contact on this onboarding; null when both
+ * are fine (or unset). `proposed` holds the ids the draft was created with
+ * and `names` the names snapshotted with them, so the message can say who.
+ */
+async function stalePersonError(
+  onboardingId: number,
+  ownerId: number | null,
+  assigneeContactId: number | null,
+  proposed: { ownerId?: unknown; assigneeContactId?: unknown } | null | undefined,
+  names: ApprovePayload | null = proposed as ApprovePayload | null
+): Promise<string | null> {
+  const nameFor = (id: number, proposedId: unknown, name: string | undefined) =>
+    Number(proposedId) === id ? name ?? null : null;
+  if (ownerId != null && !(await getVendorUserById(ownerId))) {
+    return staleOwnerMessage(nameFor(ownerId, proposed?.ownerId, names?.ownerName));
+  }
+  if (assigneeContactId != null) {
+    const contacts = await getContactsForOnboarding(onboardingId);
+    if (!contacts.some((c) => c.id === assigneeContactId)) {
+      return staleContactMessage(nameFor(assigneeContactId, proposed?.assigneeContactId, names?.assigneeContactName));
+    }
+  }
+  return null;
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -124,25 +182,19 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     if (draft.action === "create_task") {
       const merged = { ...(draft.payload as ApprovePayload), ...overrides };
       // Vector now emits structured ownerId / assigneeContactId / blockedByTaskId
-      // / notes alongside the basic fields. createTask already accepts all of
-      // these, so it's a clean pass-through (validation against the context
-      // happened server-side at draft-creation time in processMinitiEvent).
-
-      // A draft bakes `ownerId` into its payload at creation time, so the
-      // VendorUser can be deleted between drafting and approval. VendorUser 4
-      // was, when Maya was merged into 8: that merge patched the JSON owner on
-      // draft_followup rows only, leaving create_task drafts pointing at a dead
-      // id. `Task.ownerId` is a real FK, so a dangling id makes the insert throw
-      // P2003 and the whole approve 500s with a raw Prisma message. Resolve it
-      // against the live table and drop it if it is gone, mirroring the
-      // ON DELETE SET NULL rule the same column already carries on
-      // PendingAIChange: an orphaned owner becomes no owner, and the task still
-      // gets created. `assigneeContactId` and `blockedByTaskId` are the same
-      // shape and are currently clean, but would fail the same way.
-      let ownerId = merged.ownerId ?? null;
-      if (ownerId != null && !(await getVendorUserById(ownerId))) {
-        ownerId = null;
-      }
+      // / notes alongside the basic fields; createTask accepts all of them.
+      //
+      // A draft bakes its owner and assignee in at creation, so either can be
+      // gone by approval (VendorUser 4 was, when Maya was merged into 8, and
+      // Task.ownerId is a real FK, so a dangling id 500'd with a raw Prisma
+      // message). We no longer drop it silently: the card warns first and the
+      // reviewer picks someone or explicitly leaves it unassigned (an override
+      // of null). A stale id that still arrives is a 409 the card shows inline.
+      const stored = draft.payload as ApprovePayload | null;
+      const ownerId = merged.ownerId ?? null;
+      const assigneeContactId = merged.assigneeContactId ?? null;
+      const stale = await stalePersonError(draft.onboardingId, ownerId, assigneeContactId, stored);
+      if (stale) return NextResponse.json({ error: stale }, { status: 409 });
 
       const taskData = {
         onboardingId: draft.onboardingId,
@@ -179,27 +231,53 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       const check = await assertTaskBelongs(targetId);
       if (!check.ok) return NextResponse.json({ error: check.error }, { status: check.status });
 
-      if (merged.action === "reprioritise" && merged.newPriority) {
-        await updateTask(targetId, { priority: merged.newPriority }, { actor });
-      } else if (merged.action === "update_due_date" && merged.newDueDate) {
-        await updateTask(targetId, { due: merged.newDueDate }, { actor });
-      } else if (merged.action === "reassign") {
-        // Vector flags that a reassignment was discussed but doesn't know the
-        // team's user/contact ids, so the new owner/assignee only arrive when
-        // Caroline edits the draft before approving (overrides). When present,
-        // apply the ownership change; otherwise fall back to the audit-comment
-        // behaviour so an un-edited approve still records the flag.
-        const patch: { ownerId?: number | null; assigneeContactId?: number | null } = {};
-        if (merged.newOwnerId !== undefined) {
-          patch.ownerId = merged.newOwnerId === null ? null : Number(merged.newOwnerId);
-        }
-        if (merged.newAssigneeContactId !== undefined) {
-          patch.assigneeContactId =
-            merged.newAssigneeContactId === null ? null : Number(merged.newAssigneeContactId);
-        }
-        if (Object.keys(patch).length > 0) {
-          await updateTask(targetId, patch, { actor });
-        }
+      // Every change in one update (GAPS-PLAN feature 1). Legacy drafts and
+      // legacy editor overrides are folded into `changes` by the normaliser.
+      const badFields = invalidChangeFields(overrides.changes);
+      if (badFields.length > 0) {
+        return NextResponse.json(
+          { error: `Invalid change: ${badFields.join(", ")}` },
+          { status: 400 }
+        );
+      }
+      const storedPayload = draft.payload as ApprovePayload | null;
+      const { changes } = applyTaskUpdateOverrides(storedPayload, overrides);
+      // The old tool flagged a reassignment without knowing who to; approving
+      // one still records the flag as an audit comment, as before.
+      const legacyReassign = storedPayload?.changes === undefined && storedPayload?.action === "reassign";
+
+      // Same rule as create_task: a person who is gone is never dropped
+      // silently. The card asks first; a stale id that still arrives is a 409.
+      const stale = await stalePersonError(
+        draft.onboardingId,
+        changes.ownerId ?? null,
+        changes.assigneeContactId ?? null,
+        storedPayload?.changes as ApprovePayload | undefined,
+        storedPayload
+      );
+      if (stale) return NextResponse.json({ error: stale }, { status: 409 });
+
+      const patch: UpdateTaskInput = {};
+      if (changes.ownerId !== undefined) patch.ownerId = changes.ownerId;
+      if (changes.assigneeContactId !== undefined) patch.assigneeContactId = changes.assigneeContactId;
+      if (changes.priority !== undefined) patch.priority = changes.priority;
+      // null = remove the due date (Task.due is "" when there is none).
+      if (changes.dueDate !== undefined) patch.due = changes.dueDate ?? "";
+      if (changes.appendNotes !== undefined) {
+        // Append, never overwrite: what a person wrote stays. Stamped with the
+        // meeting's day + source when the draft has one, else today in London.
+        const current = await getTaskNotes(targetId);
+        const stamp = noteStamp(readNoteSource(storedPayload?.noteSource), new Date());
+        patch.notes = appendDatedNote(current, changes.appendNotes, stamp);
+      }
+
+      if (Object.keys(patch).length === 0 && !legacyReassign) {
+        return NextResponse.json({ error: "This update has no changes to apply" }, { status: 400 });
+      }
+      if (Object.keys(patch).length > 0) {
+        await updateTask(targetId, patch, { actor });
+      }
+      if (legacyReassign) {
         await createComment(
           targetId,
           vu.name,

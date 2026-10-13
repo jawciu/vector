@@ -37,7 +37,8 @@ export type ExpectedToolCall = {
   existingTaskRef?: string;
   existingTaskTitleContains?: string;
   newStatus?: string;
-  newDueDate?: string;
+  /** null = the update should remove the due date. */
+  newDueDate?: string | null;
   newPriority?: "low" | "medium" | "high";
   // shared
   notesContains?: string[];
@@ -112,12 +113,14 @@ export type Proposal = {
   blockedByRef?: string | null;
   /** match_existing / update_status: board ref of the targeted task. */
   taskRef?: string | null;
-  /** match_existing sub-action: reassign | reprioritise | update_due_date. */
+  /** match_existing sub-action: reassign | reprioritise | update_due_date (legacy), or add_notes | update (derived from `changes`). */
   updateKind?: string | null;
   newStatus?: string | null;
   newDueDate?: string | null;
+  /** match_existing `changes.dueDate: null`: the update removes the due date. */
+  clearsDueDate?: boolean;
   newPriority?: string | null;
-  /** Future multi-field update (GAPS-PLAN feature 1): the new owner, by name. */
+  /** match_existing `changes.ownerId` / `changes.assigneeContactId`: the new owner, by name. */
   newOwnerName?: string | null;
   sourceQuote?: string | null;
   confidence?: string | null;
@@ -125,7 +128,7 @@ export type Proposal = {
   dependsOn?: unknown;
   /** Future draft-to-draft reference (GAPS-PLAN feature 3), passed through untouched. */
   draftRef?: string | null;
-  /** Future appended notes on existing tasks (GAPS-PLAN feature 1). */
+  /** match_existing `changes.appendNotes`: notes appended to the existing task. */
   appendNotes?: string | null;
 };
 
