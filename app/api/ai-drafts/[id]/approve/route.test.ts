@@ -571,7 +571,7 @@ describe("POST /api/ai-drafts/[id]/approve — dependencies (GAPS-PLAN feature 2
   });
 
   it("match_existing whose only change is a sibling-draft link still applies (not 'no changes')", async () => {
-    partialMock(getPendingAIChange).mockResolvedValue(updateDraft({ dependsOn: [{ draftId: 230, title: "Close the security review" }] }));
+    partialMock(getPendingAIChange).mockResolvedValue(updateDraft({ dependsOn: [{ draftId: 230, title: "Close the vendor review" }] }));
     vi.mocked(applyDraftApproval).mockImplementationOnce(async ({ draftId, resolvedBy, work }) => {
       const { appliedTaskId, value } = await work({ tx: null as never, linkDeps: [{ taskId: 900 }], afterCommit: [] });
       await markAIChangeApplied(draftId, { resolvedBy, appliedTaskId });
