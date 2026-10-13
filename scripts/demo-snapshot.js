@@ -641,6 +641,11 @@ export function planRestoreState(snapshot, companies, { only = null, vendorByEma
                 appliedTaskId: sd.appliedTaskNumber == null
                   ? null
                   : liveTaskByNumber.get(sd.appliedTaskNumber)?.id ?? null,
+                // What an approval recorded about its links to sibling drafts
+                // (GAPS-PLAN feature 3) goes too when the draft is pending again.
+                ...(sd.status === "pending" && ld.payload && typeof ld.payload === "object" && "draftLinks" in ld.payload && {
+                  payload: Object.fromEntries(Object.entries(ld.payload).filter(([k]) => k !== "draftLinks")),
+                }),
               },
             }));
         }
