@@ -354,3 +354,32 @@ describe("draft payload dates", () => {
     expect(params).toEqual([7, "N", [1], "A"]);
   });
 });
+
+describe("task dependencies (GAPS-PLAN feature 2)", () => {
+  const stmt = statements().find((s) => s.table === "TaskDependency");
+
+  it("shifts createdAt and clamps resolvedAt, scoped to the demo companies' tasks, pre-anchor only", () => {
+    expect(stmt.what).toBe("createdAt, resolvedAt");
+    expect(stmt.sql).toMatch(/"resolvedAt" = CASE WHEN d\."resolvedAt" IS NULL THEN NULL ELSE LEAST/);
+    expect(stmt.sql).toMatch(/t\."companyId" = ANY\(\{\{companyIds\}\}::int\[\]\)/);
+    expect(stmt.sql).toMatch(/d\."createdAt" <= /);
+  });
+
+  it("the snapshot's text blockers keep their resolved state, shifted and clamped; tasks without dependencies are untouched", () => {
+    const snap = {
+      capturedAt: "2026-09-01T00:00:00.000Z",
+      companies: [{ prefix: "RAY", onboardings: [{
+        key: "RAY|2026-09-01T00:00:00.000Z", createdAt: "2026-09-01T00:00:00.000Z", updatedAt: null, targetGoLive: null,
+        phases: [],
+        tasks: [
+          { number: 1, due: "", dependencies: [{ label: "sign-off", resolvedAt: "2026-09-05T10:00:00.000Z" }, { blockedByNumber: 2 }] },
+          { number: 2, due: "" },
+        ],
+      }] }],
+    };
+    const out = shiftSnapshot(snap, 3, "2026-09-04", "2026-09-07T00:00:00.000Z");
+    const [t1, t2] = out.companies[0].onboardings[0].tasks;
+    expect(t1.dependencies).toEqual([{ label: "sign-off", resolvedAt: "2026-09-07T00:00:00.000Z" }, { blockedByNumber: 2 }]);
+    expect(t2).not.toHaveProperty("dependencies");
+  });
+});

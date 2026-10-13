@@ -162,7 +162,13 @@ export function shiftSnapshot(snapshot, days, today, now = null) {
             lastSeenPortalAt: s(ct.lastSeenPortalAt),
             bouncedAt: s(ct.bouncedAt),
           })),
-          tasks: o.tasks.map((t) => ({ ...t, due: shiftDueString(t.due, days) })),
+          tasks: o.tasks.map((t) => ({
+            ...t,
+            due: shiftDueString(t.due, days),
+            ...(Array.isArray(t.dependencies) && {
+              dependencies: t.dependencies.map((d) => (d.resolvedAt ? { ...d, resolvedAt: clamp(d.resolvedAt) } : d)),
+            }),
+          })),
           comments: maybe(o.comments, (cm) => shiftRow(cm, (r) => ({ ...r, createdAt: s(r.createdAt) }))),
           files: maybe(o.files, (f) => shiftRow(f, (r) => ({ ...r, createdAt: s(r.createdAt) }))),
           magicLinks: maybe(o.magicLinks, (m) => ({
@@ -270,6 +276,18 @@ export function statements() {
                          THEN to_char(due::date + {{delta}}::int, 'YYYY-MM-DD')
                          ELSE due END
             WHERE "companyId" = ANY(${CO}) AND "createdAt" <= ${A}`,
+    },
+    {
+      // GAPS-PLAN feature 2. A text blocker's resolvedAt records something
+      // that happened, so it is clamped like the other "happened" columns.
+      table: "TaskDependency",
+      what: "createdAt, resolvedAt",
+      sql: `UPDATE "TaskDependency" d SET
+              "createdAt"  = d."createdAt" + ${iv},
+              "resolvedAt" = ${keep('d."resolvedAt"')}
+            FROM "Task" t
+            WHERE t.id = d."taskId" AND t."companyId" = ANY(${CO})
+              AND d."createdAt" <= ${A}`,
     },
     {
       table: "Comment",
@@ -568,6 +586,7 @@ async function countAffected(prisma, { anchor, obIds, companyIds, fixtureIds }) 
     `SELECT 'Onboarding' t, count(*)::int n FROM "Onboarding" WHERE id = ANY($2::int[]) AND "createdAt" <= $1
      UNION ALL SELECT 'Phase', count(*)::int FROM "Phase" WHERE "onboardingId" = ANY($2::int[]) AND "targetDate" IS NOT NULL
      UNION ALL SELECT 'Task', count(*)::int FROM "Task" WHERE "companyId" = ANY($3::int[]) AND "createdAt" <= $1
+     UNION ALL SELECT 'TaskDependency', count(*)::int FROM "TaskDependency" d JOIN "Task" t ON t.id = d."taskId" WHERE t."companyId" = ANY($3::int[]) AND d."createdAt" <= $1
      UNION ALL SELECT 'Comment', count(*)::int FROM "Comment" c JOIN "Task" t ON t.id = c."taskId" WHERE t."companyId" = ANY($3::int[]) AND c."createdAt" <= $1
      UNION ALL SELECT 'ActivityLog', count(*)::int FROM "ActivityLog" WHERE "onboardingId" = ANY($2::int[]) AND "createdAt" <= $1
      UNION ALL SELECT 'Notification', count(*)::int FROM "Notification" n JOIN "ActivityLog" a ON a.id = n."activityLogId" WHERE a."onboardingId" = ANY($2::int[]) AND n."createdAt" <= $1
