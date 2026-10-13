@@ -44,6 +44,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../lib/generated/prisma/client";
+import { draftDependsOn } from "../lib/task-dependencies.ts";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
@@ -269,6 +270,19 @@ async function main() {
         );
         if (WRITE) {
           await prisma.$transaction(async (tx) => {
+            // Dependencies (GAPS-PLAN feature 2): the draft's dependsOn, or an
+            // older draft's single blockedByTaskId. Task blockers must still be
+            // open tasks on this onboarding, as the approve route requires.
+            const wanted = draftDependsOn(merged);
+            const wantedIds = wanted.filter((d) => "taskId" in d).map((d) => d.taskId);
+            const openIds = new Set(
+              wantedIds.length === 0 ? [] : (await tx.task.findMany({
+                where: { id: { in: wantedIds }, onboardingId, status: { not: "Done" } },
+                select: { id: true },
+              })).map((t) => t.id)
+            );
+            const deps = wanted.filter((d) => !("taskId" in d) || openIds.has(d.taskId));
+            const firstTaskDep = deps.find((d) => "taskId" in d);
             const { number, companyId } = await bumpCounter(tx, onboardingId);
             const sortOrder = await nextSortOrder(tx, phaseId);
             const task = await tx.task.create({
@@ -285,7 +299,8 @@ async function main() {
                 notes: merged.notes || "",
                 sortOrder,
                 priority: merged.priority ?? null,
-                blockedByTaskId: merged.blockedByTaskId ?? null,
+                // Legacy column = first task blocker, as lib/db keeps it.
+                blockedByTaskId: firstTaskDep ? firstTaskDep.taskId : null,
                 assigneeContactId: merged.assigneeContactId ?? null,
                 companyId,
                 number,
@@ -296,6 +311,13 @@ async function main() {
                 onboarding: { select: { company: { select: { prefix: true } } } },
               },
             });
+            for (const d of deps) {
+              await tx.taskDependency.create({
+                data: "taskId" in d
+                  ? { taskId: task.id, blockedByTaskId: d.taskId, createdAt: resolved }
+                  : { taskId: task.id, label: d.text, createdAt: resolved },
+              });
+            }
             await tx.pendingAIChange.update({
               where: { id: draft.id },
               data: { status: "applied", createdAt: created, resolvedAt: resolved, resolvedBy, appliedTaskId: task.id },

@@ -749,9 +749,14 @@ async function writeCompany(entry, vendorIdByKey) {
         const idByKey = new Map(o.tasks.map((t) => [t.key, idByNumber.get(t.number)]));
         const codeByKey = new Map(o.tasks.map((t) => [t.key, `${cast.prefix}-${t.number}`]));
 
-        // Dependency chains (blockedByTaskId).
+        // Dependency chains: a TaskDependency row (what the app reads) plus
+        // the legacy blockedByTaskId column (kept equal to the first task
+        // blocker until it is retired; GAPS-PLAN feature 2).
         for (const t of o.tasks) {
           if (!t.blockedBy) continue;
+          await tx.taskDependency.create({
+            data: { taskId: idByKey.get(t.key), blockedByTaskId: idByKey.get(t.blockedBy) },
+          });
           await tx.task.update({
             where: { id: idByKey.get(t.key) },
             data: { blockedByTaskId: idByKey.get(t.blockedBy) },
