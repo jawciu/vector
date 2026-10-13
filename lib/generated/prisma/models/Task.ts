@@ -373,6 +373,8 @@ export type TaskWhereInput = {
   ownerUser?: Prisma.XOR<Prisma.VendorUserNullableScalarRelationFilter, Prisma.VendorUserWhereInput> | null
   blockedByTask?: Prisma.XOR<Prisma.TaskNullableScalarRelationFilter, Prisma.TaskWhereInput> | null
   blockedTasks?: Prisma.TaskListRelationFilter
+  dependencies?: Prisma.TaskDependencyListRelationFilter
+  dependentOf?: Prisma.TaskDependencyListRelationFilter
   assigneeContact?: Prisma.XOR<Prisma.ContactNullableScalarRelationFilter, Prisma.ContactWhereInput> | null
   comments?: Prisma.CommentListRelationFilter
   files?: Prisma.FileListRelationFilter
@@ -405,6 +407,8 @@ export type TaskOrderByWithRelationInput = {
   ownerUser?: Prisma.VendorUserOrderByWithRelationInput
   blockedByTask?: Prisma.TaskOrderByWithRelationInput
   blockedTasks?: Prisma.TaskOrderByRelationAggregateInput
+  dependencies?: Prisma.TaskDependencyOrderByRelationAggregateInput
+  dependentOf?: Prisma.TaskDependencyOrderByRelationAggregateInput
   assigneeContact?: Prisma.ContactOrderByWithRelationInput
   comments?: Prisma.CommentOrderByRelationAggregateInput
   files?: Prisma.FileOrderByRelationAggregateInput
@@ -441,6 +445,8 @@ export type TaskWhereUniqueInput = Prisma.AtLeast<{
   ownerUser?: Prisma.XOR<Prisma.VendorUserNullableScalarRelationFilter, Prisma.VendorUserWhereInput> | null
   blockedByTask?: Prisma.XOR<Prisma.TaskNullableScalarRelationFilter, Prisma.TaskWhereInput> | null
   blockedTasks?: Prisma.TaskListRelationFilter
+  dependencies?: Prisma.TaskDependencyListRelationFilter
+  dependentOf?: Prisma.TaskDependencyListRelationFilter
   assigneeContact?: Prisma.XOR<Prisma.ContactNullableScalarRelationFilter, Prisma.ContactWhereInput> | null
   comments?: Prisma.CommentListRelationFilter
   files?: Prisma.FileListRelationFilter
@@ -520,6 +526,8 @@ export type TaskCreateInput = {
   ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedTasksInput
   blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
   blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyCreateNestedManyWithoutBlockedByTaskInput
   assigneeContact?: Prisma.ContactCreateNestedOneWithoutAssignedTasksInput
   comments?: Prisma.CommentCreateNestedManyWithoutTaskInput
   files?: Prisma.FileCreateNestedManyWithoutTaskInput
@@ -548,6 +556,8 @@ export type TaskUncheckedCreateInput = {
   companyId: number
   createdAt?: Date | string
   blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutBlockedByTaskInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutTaskInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutTaskInput
 }
@@ -571,6 +581,8 @@ export type TaskUpdateInput = {
   ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedTasksNestedInput
   blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
   blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUpdateManyWithoutBlockedByTaskNestedInput
   assigneeContact?: Prisma.ContactUpdateOneWithoutAssignedTasksNestedInput
   comments?: Prisma.CommentUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUpdateManyWithoutTaskNestedInput
@@ -599,6 +611,8 @@ export type TaskUncheckedUpdateInput = {
   companyId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUncheckedUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUncheckedUpdateManyWithoutBlockedByTaskNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutTaskNestedInput
 }
@@ -1068,6 +1082,36 @@ export type TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput = {
   deleteMany?: Prisma.TaskScalarWhereInput | Prisma.TaskScalarWhereInput[]
 }
 
+export type TaskCreateNestedOneWithoutDependenciesInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutDependenciesInput, Prisma.TaskUncheckedCreateWithoutDependenciesInput>
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutDependenciesInput
+  connect?: Prisma.TaskWhereUniqueInput
+}
+
+export type TaskCreateNestedOneWithoutDependentOfInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutDependentOfInput, Prisma.TaskUncheckedCreateWithoutDependentOfInput>
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutDependentOfInput
+  connect?: Prisma.TaskWhereUniqueInput
+}
+
+export type TaskUpdateOneRequiredWithoutDependenciesNestedInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutDependenciesInput, Prisma.TaskUncheckedCreateWithoutDependenciesInput>
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutDependenciesInput
+  upsert?: Prisma.TaskUpsertWithoutDependenciesInput
+  connect?: Prisma.TaskWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TaskUpdateToOneWithWhereWithoutDependenciesInput, Prisma.TaskUpdateWithoutDependenciesInput>, Prisma.TaskUncheckedUpdateWithoutDependenciesInput>
+}
+
+export type TaskUpdateOneWithoutDependentOfNestedInput = {
+  create?: Prisma.XOR<Prisma.TaskCreateWithoutDependentOfInput, Prisma.TaskUncheckedCreateWithoutDependentOfInput>
+  connectOrCreate?: Prisma.TaskCreateOrConnectWithoutDependentOfInput
+  upsert?: Prisma.TaskUpsertWithoutDependentOfInput
+  disconnect?: Prisma.TaskWhereInput | boolean
+  delete?: Prisma.TaskWhereInput | boolean
+  connect?: Prisma.TaskWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TaskUpdateToOneWithWhereWithoutDependentOfInput, Prisma.TaskUpdateWithoutDependentOfInput>, Prisma.TaskUncheckedUpdateWithoutDependentOfInput>
+}
+
 export type TaskCreateNestedOneWithoutCommentsInput = {
   create?: Prisma.XOR<Prisma.TaskCreateWithoutCommentsInput, Prisma.TaskUncheckedCreateWithoutCommentsInput>
   connectOrCreate?: Prisma.TaskCreateOrConnectWithoutCommentsInput
@@ -1115,6 +1159,8 @@ export type TaskCreateWithoutCompanyInput = {
   ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedTasksInput
   blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
   blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyCreateNestedManyWithoutBlockedByTaskInput
   assigneeContact?: Prisma.ContactCreateNestedOneWithoutAssignedTasksInput
   comments?: Prisma.CommentCreateNestedManyWithoutTaskInput
   files?: Prisma.FileCreateNestedManyWithoutTaskInput
@@ -1141,6 +1187,8 @@ export type TaskUncheckedCreateWithoutCompanyInput = {
   number: number
   createdAt?: Date | string
   blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutBlockedByTaskInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutTaskInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutTaskInput
 }
@@ -1215,6 +1263,8 @@ export type TaskCreateWithoutOwnerUserInput = {
   phase: Prisma.PhaseCreateNestedOneWithoutTasksInput
   blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
   blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyCreateNestedManyWithoutBlockedByTaskInput
   assigneeContact?: Prisma.ContactCreateNestedOneWithoutAssignedTasksInput
   comments?: Prisma.CommentCreateNestedManyWithoutTaskInput
   files?: Prisma.FileCreateNestedManyWithoutTaskInput
@@ -1242,6 +1292,8 @@ export type TaskUncheckedCreateWithoutOwnerUserInput = {
   companyId: number
   createdAt?: Date | string
   blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutBlockedByTaskInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutTaskInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutTaskInput
 }
@@ -1290,6 +1342,8 @@ export type TaskCreateWithoutOnboardingInput = {
   ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedTasksInput
   blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
   blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyCreateNestedManyWithoutBlockedByTaskInput
   assigneeContact?: Prisma.ContactCreateNestedOneWithoutAssignedTasksInput
   comments?: Prisma.CommentCreateNestedManyWithoutTaskInput
   files?: Prisma.FileCreateNestedManyWithoutTaskInput
@@ -1317,6 +1371,8 @@ export type TaskUncheckedCreateWithoutOnboardingInput = {
   companyId: number
   createdAt?: Date | string
   blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutBlockedByTaskInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutTaskInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutTaskInput
 }
@@ -1366,6 +1422,8 @@ export type TaskCreateWithoutAssigneeContactInput = {
   ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedTasksInput
   blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
   blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyCreateNestedManyWithoutBlockedByTaskInput
   comments?: Prisma.CommentCreateNestedManyWithoutTaskInput
   files?: Prisma.FileCreateNestedManyWithoutTaskInput
   company: Prisma.CompanyCreateNestedOneWithoutTasksInput
@@ -1392,6 +1450,8 @@ export type TaskUncheckedCreateWithoutAssigneeContactInput = {
   companyId: number
   createdAt?: Date | string
   blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutBlockedByTaskInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutTaskInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutTaskInput
 }
@@ -1440,6 +1500,8 @@ export type TaskCreateWithoutPhaseInput = {
   ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedTasksInput
   blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
   blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyCreateNestedManyWithoutBlockedByTaskInput
   assigneeContact?: Prisma.ContactCreateNestedOneWithoutAssignedTasksInput
   comments?: Prisma.CommentCreateNestedManyWithoutTaskInput
   files?: Prisma.FileCreateNestedManyWithoutTaskInput
@@ -1467,6 +1529,8 @@ export type TaskUncheckedCreateWithoutPhaseInput = {
   companyId: number
   createdAt?: Date | string
   blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutBlockedByTaskInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutTaskInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutTaskInput
 }
@@ -1515,6 +1579,8 @@ export type TaskCreateWithoutBlockedTasksInput = {
   phase: Prisma.PhaseCreateNestedOneWithoutTasksInput
   ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedTasksInput
   blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
+  dependencies?: Prisma.TaskDependencyCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyCreateNestedManyWithoutBlockedByTaskInput
   assigneeContact?: Prisma.ContactCreateNestedOneWithoutAssignedTasksInput
   comments?: Prisma.CommentCreateNestedManyWithoutTaskInput
   files?: Prisma.FileCreateNestedManyWithoutTaskInput
@@ -1542,6 +1608,8 @@ export type TaskUncheckedCreateWithoutBlockedTasksInput = {
   number: number
   companyId: number
   createdAt?: Date | string
+  dependencies?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutBlockedByTaskInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutTaskInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutTaskInput
 }
@@ -1569,6 +1637,8 @@ export type TaskCreateWithoutBlockedByTaskInput = {
   phase: Prisma.PhaseCreateNestedOneWithoutTasksInput
   ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedTasksInput
   blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyCreateNestedManyWithoutBlockedByTaskInput
   assigneeContact?: Prisma.ContactCreateNestedOneWithoutAssignedTasksInput
   comments?: Prisma.CommentCreateNestedManyWithoutTaskInput
   files?: Prisma.FileCreateNestedManyWithoutTaskInput
@@ -1596,6 +1666,8 @@ export type TaskUncheckedCreateWithoutBlockedByTaskInput = {
   companyId: number
   createdAt?: Date | string
   blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutBlockedByTaskInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutTaskInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutTaskInput
 }
@@ -1639,6 +1711,8 @@ export type TaskUpdateWithoutBlockedTasksInput = {
   phase?: Prisma.PhaseUpdateOneRequiredWithoutTasksNestedInput
   ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedTasksNestedInput
   blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
+  dependencies?: Prisma.TaskDependencyUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUpdateManyWithoutBlockedByTaskNestedInput
   assigneeContact?: Prisma.ContactUpdateOneWithoutAssignedTasksNestedInput
   comments?: Prisma.CommentUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUpdateManyWithoutTaskNestedInput
@@ -1666,6 +1740,8 @@ export type TaskUncheckedUpdateWithoutBlockedTasksInput = {
   number?: Prisma.IntFieldUpdateOperationsInput | number
   companyId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dependencies?: Prisma.TaskDependencyUncheckedUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUncheckedUpdateManyWithoutBlockedByTaskNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutTaskNestedInput
 }
@@ -1684,6 +1760,250 @@ export type TaskUpdateWithWhereUniqueWithoutBlockedByTaskInput = {
 export type TaskUpdateManyWithWhereWithoutBlockedByTaskInput = {
   where: Prisma.TaskScalarWhereInput
   data: Prisma.XOR<Prisma.TaskUpdateManyMutationInput, Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskInput>
+}
+
+export type TaskCreateWithoutDependenciesInput = {
+  title: string
+  description?: string
+  status: string
+  due: string
+  owner?: string
+  members?: Prisma.TaskCreatemembersInput | string[]
+  notes?: string
+  sortOrder?: number
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
+  number: number
+  createdAt?: Date | string
+  onboarding: Prisma.OnboardingCreateNestedOneWithoutTasksInput
+  phase: Prisma.PhaseCreateNestedOneWithoutTasksInput
+  ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedTasksInput
+  blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
+  blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
+  dependentOf?: Prisma.TaskDependencyCreateNestedManyWithoutBlockedByTaskInput
+  assigneeContact?: Prisma.ContactCreateNestedOneWithoutAssignedTasksInput
+  comments?: Prisma.CommentCreateNestedManyWithoutTaskInput
+  files?: Prisma.FileCreateNestedManyWithoutTaskInput
+  company: Prisma.CompanyCreateNestedOneWithoutTasksInput
+}
+
+export type TaskUncheckedCreateWithoutDependenciesInput = {
+  id?: number
+  onboardingId: number
+  phaseId: number
+  title: string
+  description?: string
+  status: string
+  due: string
+  owner?: string
+  ownerId?: number | null
+  members?: Prisma.TaskCreatemembersInput | string[]
+  notes?: string
+  sortOrder?: number
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
+  blockedByTaskId?: number | null
+  assigneeContactId?: number | null
+  number: number
+  companyId: number
+  createdAt?: Date | string
+  blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
+  dependentOf?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutBlockedByTaskInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutTaskInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutTaskInput
+}
+
+export type TaskCreateOrConnectWithoutDependenciesInput = {
+  where: Prisma.TaskWhereUniqueInput
+  create: Prisma.XOR<Prisma.TaskCreateWithoutDependenciesInput, Prisma.TaskUncheckedCreateWithoutDependenciesInput>
+}
+
+export type TaskCreateWithoutDependentOfInput = {
+  title: string
+  description?: string
+  status: string
+  due: string
+  owner?: string
+  members?: Prisma.TaskCreatemembersInput | string[]
+  notes?: string
+  sortOrder?: number
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
+  number: number
+  createdAt?: Date | string
+  onboarding: Prisma.OnboardingCreateNestedOneWithoutTasksInput
+  phase: Prisma.PhaseCreateNestedOneWithoutTasksInput
+  ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedTasksInput
+  blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
+  blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyCreateNestedManyWithoutTaskInput
+  assigneeContact?: Prisma.ContactCreateNestedOneWithoutAssignedTasksInput
+  comments?: Prisma.CommentCreateNestedManyWithoutTaskInput
+  files?: Prisma.FileCreateNestedManyWithoutTaskInput
+  company: Prisma.CompanyCreateNestedOneWithoutTasksInput
+}
+
+export type TaskUncheckedCreateWithoutDependentOfInput = {
+  id?: number
+  onboardingId: number
+  phaseId: number
+  title: string
+  description?: string
+  status: string
+  due: string
+  owner?: string
+  ownerId?: number | null
+  members?: Prisma.TaskCreatemembersInput | string[]
+  notes?: string
+  sortOrder?: number
+  priority?: string | null
+  commentCount?: number
+  previousStatus?: string | null
+  blockedByTaskId?: number | null
+  assigneeContactId?: number | null
+  number: number
+  companyId: number
+  createdAt?: Date | string
+  blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutTaskInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutTaskInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutTaskInput
+}
+
+export type TaskCreateOrConnectWithoutDependentOfInput = {
+  where: Prisma.TaskWhereUniqueInput
+  create: Prisma.XOR<Prisma.TaskCreateWithoutDependentOfInput, Prisma.TaskUncheckedCreateWithoutDependentOfInput>
+}
+
+export type TaskUpsertWithoutDependenciesInput = {
+  update: Prisma.XOR<Prisma.TaskUpdateWithoutDependenciesInput, Prisma.TaskUncheckedUpdateWithoutDependenciesInput>
+  create: Prisma.XOR<Prisma.TaskCreateWithoutDependenciesInput, Prisma.TaskUncheckedCreateWithoutDependenciesInput>
+  where?: Prisma.TaskWhereInput
+}
+
+export type TaskUpdateToOneWithWhereWithoutDependenciesInput = {
+  where?: Prisma.TaskWhereInput
+  data: Prisma.XOR<Prisma.TaskUpdateWithoutDependenciesInput, Prisma.TaskUncheckedUpdateWithoutDependenciesInput>
+}
+
+export type TaskUpdateWithoutDependenciesInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  due?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  members?: Prisma.TaskUpdatemembersInput | string[]
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  number?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutTasksNestedInput
+  phase?: Prisma.PhaseUpdateOneRequiredWithoutTasksNestedInput
+  ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedTasksNestedInput
+  blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
+  blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUpdateManyWithoutBlockedByTaskNestedInput
+  assigneeContact?: Prisma.ContactUpdateOneWithoutAssignedTasksNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutTaskNestedInput
+  files?: Prisma.FileUpdateManyWithoutTaskNestedInput
+  company?: Prisma.CompanyUpdateOneRequiredWithoutTasksNestedInput
+}
+
+export type TaskUncheckedUpdateWithoutDependenciesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
+  phaseId?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  due?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  members?: Prisma.TaskUpdatemembersInput | string[]
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  assigneeContactId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  number?: Prisma.IntFieldUpdateOperationsInput | number
+  companyId?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutTaskNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutTaskNestedInput
+}
+
+export type TaskUpsertWithoutDependentOfInput = {
+  update: Prisma.XOR<Prisma.TaskUpdateWithoutDependentOfInput, Prisma.TaskUncheckedUpdateWithoutDependentOfInput>
+  create: Prisma.XOR<Prisma.TaskCreateWithoutDependentOfInput, Prisma.TaskUncheckedCreateWithoutDependentOfInput>
+  where?: Prisma.TaskWhereInput
+}
+
+export type TaskUpdateToOneWithWhereWithoutDependentOfInput = {
+  where?: Prisma.TaskWhereInput
+  data: Prisma.XOR<Prisma.TaskUpdateWithoutDependentOfInput, Prisma.TaskUncheckedUpdateWithoutDependentOfInput>
+}
+
+export type TaskUpdateWithoutDependentOfInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  due?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  members?: Prisma.TaskUpdatemembersInput | string[]
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  number?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboarding?: Prisma.OnboardingUpdateOneRequiredWithoutTasksNestedInput
+  phase?: Prisma.PhaseUpdateOneRequiredWithoutTasksNestedInput
+  ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedTasksNestedInput
+  blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
+  blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUpdateManyWithoutTaskNestedInput
+  assigneeContact?: Prisma.ContactUpdateOneWithoutAssignedTasksNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutTaskNestedInput
+  files?: Prisma.FileUpdateManyWithoutTaskNestedInput
+  company?: Prisma.CompanyUpdateOneRequiredWithoutTasksNestedInput
+}
+
+export type TaskUncheckedUpdateWithoutDependentOfInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingId?: Prisma.IntFieldUpdateOperationsInput | number
+  phaseId?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  due?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  members?: Prisma.TaskUpdatemembersInput | string[]
+  notes?: Prisma.StringFieldUpdateOperationsInput | string
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  priority?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  previousStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockedByTaskId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  assigneeContactId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  number?: Prisma.IntFieldUpdateOperationsInput | number
+  companyId?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUncheckedUpdateManyWithoutTaskNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutTaskNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutTaskNestedInput
 }
 
 export type TaskCreateWithoutCommentsInput = {
@@ -1705,6 +2025,8 @@ export type TaskCreateWithoutCommentsInput = {
   ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedTasksInput
   blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
   blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyCreateNestedManyWithoutBlockedByTaskInput
   assigneeContact?: Prisma.ContactCreateNestedOneWithoutAssignedTasksInput
   files?: Prisma.FileCreateNestedManyWithoutTaskInput
   company: Prisma.CompanyCreateNestedOneWithoutTasksInput
@@ -1732,6 +2054,8 @@ export type TaskUncheckedCreateWithoutCommentsInput = {
   companyId: number
   createdAt?: Date | string
   blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutBlockedByTaskInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutTaskInput
 }
 
@@ -1770,6 +2094,8 @@ export type TaskUpdateWithoutCommentsInput = {
   ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedTasksNestedInput
   blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
   blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUpdateManyWithoutBlockedByTaskNestedInput
   assigneeContact?: Prisma.ContactUpdateOneWithoutAssignedTasksNestedInput
   files?: Prisma.FileUpdateManyWithoutTaskNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutTasksNestedInput
@@ -1797,6 +2123,8 @@ export type TaskUncheckedUpdateWithoutCommentsInput = {
   companyId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUncheckedUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUncheckedUpdateManyWithoutBlockedByTaskNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutTaskNestedInput
 }
 
@@ -1819,6 +2147,8 @@ export type TaskCreateWithoutFilesInput = {
   ownerUser?: Prisma.VendorUserCreateNestedOneWithoutOwnedTasksInput
   blockedByTask?: Prisma.TaskCreateNestedOneWithoutBlockedTasksInput
   blockedTasks?: Prisma.TaskCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyCreateNestedManyWithoutBlockedByTaskInput
   assigneeContact?: Prisma.ContactCreateNestedOneWithoutAssignedTasksInput
   comments?: Prisma.CommentCreateNestedManyWithoutTaskInput
   company: Prisma.CompanyCreateNestedOneWithoutTasksInput
@@ -1846,6 +2176,8 @@ export type TaskUncheckedCreateWithoutFilesInput = {
   companyId: number
   createdAt?: Date | string
   blockedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutBlockedByTaskInput
+  dependencies?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutTaskInput
+  dependentOf?: Prisma.TaskDependencyUncheckedCreateNestedManyWithoutBlockedByTaskInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutTaskInput
 }
 
@@ -1884,6 +2216,8 @@ export type TaskUpdateWithoutFilesInput = {
   ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedTasksNestedInput
   blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
   blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUpdateManyWithoutBlockedByTaskNestedInput
   assigneeContact?: Prisma.ContactUpdateOneWithoutAssignedTasksNestedInput
   comments?: Prisma.CommentUpdateManyWithoutTaskNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutTasksNestedInput
@@ -1911,6 +2245,8 @@ export type TaskUncheckedUpdateWithoutFilesInput = {
   companyId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUncheckedUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUncheckedUpdateManyWithoutBlockedByTaskNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutTaskNestedInput
 }
 
@@ -1955,6 +2291,8 @@ export type TaskUpdateWithoutCompanyInput = {
   ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedTasksNestedInput
   blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
   blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUpdateManyWithoutBlockedByTaskNestedInput
   assigneeContact?: Prisma.ContactUpdateOneWithoutAssignedTasksNestedInput
   comments?: Prisma.CommentUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUpdateManyWithoutTaskNestedInput
@@ -1981,6 +2319,8 @@ export type TaskUncheckedUpdateWithoutCompanyInput = {
   number?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUncheckedUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUncheckedUpdateManyWithoutBlockedByTaskNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutTaskNestedInput
 }
@@ -2047,6 +2387,8 @@ export type TaskUpdateWithoutOwnerUserInput = {
   phase?: Prisma.PhaseUpdateOneRequiredWithoutTasksNestedInput
   blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
   blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUpdateManyWithoutBlockedByTaskNestedInput
   assigneeContact?: Prisma.ContactUpdateOneWithoutAssignedTasksNestedInput
   comments?: Prisma.CommentUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUpdateManyWithoutTaskNestedInput
@@ -2074,6 +2416,8 @@ export type TaskUncheckedUpdateWithoutOwnerUserInput = {
   companyId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUncheckedUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUncheckedUpdateManyWithoutBlockedByTaskNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutTaskNestedInput
 }
@@ -2140,6 +2484,8 @@ export type TaskUpdateWithoutOnboardingInput = {
   ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedTasksNestedInput
   blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
   blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUpdateManyWithoutBlockedByTaskNestedInput
   assigneeContact?: Prisma.ContactUpdateOneWithoutAssignedTasksNestedInput
   comments?: Prisma.CommentUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUpdateManyWithoutTaskNestedInput
@@ -2167,6 +2513,8 @@ export type TaskUncheckedUpdateWithoutOnboardingInput = {
   companyId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUncheckedUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUncheckedUpdateManyWithoutBlockedByTaskNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutTaskNestedInput
 }
@@ -2234,6 +2582,8 @@ export type TaskUpdateWithoutAssigneeContactInput = {
   ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedTasksNestedInput
   blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
   blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUpdateManyWithoutBlockedByTaskNestedInput
   comments?: Prisma.CommentUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUpdateManyWithoutTaskNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutTasksNestedInput
@@ -2260,6 +2610,8 @@ export type TaskUncheckedUpdateWithoutAssigneeContactInput = {
   companyId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUncheckedUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUncheckedUpdateManyWithoutBlockedByTaskNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutTaskNestedInput
 }
@@ -2326,6 +2678,8 @@ export type TaskUpdateWithoutPhaseInput = {
   ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedTasksNestedInput
   blockedByTask?: Prisma.TaskUpdateOneWithoutBlockedTasksNestedInput
   blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUpdateManyWithoutBlockedByTaskNestedInput
   assigneeContact?: Prisma.ContactUpdateOneWithoutAssignedTasksNestedInput
   comments?: Prisma.CommentUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUpdateManyWithoutTaskNestedInput
@@ -2353,6 +2707,8 @@ export type TaskUncheckedUpdateWithoutPhaseInput = {
   companyId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUncheckedUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUncheckedUpdateManyWithoutBlockedByTaskNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutTaskNestedInput
 }
@@ -2419,6 +2775,8 @@ export type TaskUpdateWithoutBlockedByTaskInput = {
   phase?: Prisma.PhaseUpdateOneRequiredWithoutTasksNestedInput
   ownerUser?: Prisma.VendorUserUpdateOneWithoutOwnedTasksNestedInput
   blockedTasks?: Prisma.TaskUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUpdateManyWithoutBlockedByTaskNestedInput
   assigneeContact?: Prisma.ContactUpdateOneWithoutAssignedTasksNestedInput
   comments?: Prisma.CommentUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUpdateManyWithoutTaskNestedInput
@@ -2446,6 +2804,8 @@ export type TaskUncheckedUpdateWithoutBlockedByTaskInput = {
   companyId?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blockedTasks?: Prisma.TaskUncheckedUpdateManyWithoutBlockedByTaskNestedInput
+  dependencies?: Prisma.TaskDependencyUncheckedUpdateManyWithoutTaskNestedInput
+  dependentOf?: Prisma.TaskDependencyUncheckedUpdateManyWithoutBlockedByTaskNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutTaskNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutTaskNestedInput
 }
@@ -2479,12 +2839,16 @@ export type TaskUncheckedUpdateManyWithoutBlockedByTaskInput = {
 
 export type TaskCountOutputType = {
   blockedTasks: number
+  dependencies: number
+  dependentOf: number
   comments: number
   files: number
 }
 
 export type TaskCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   blockedTasks?: boolean | TaskCountOutputTypeCountBlockedTasksArgs
+  dependencies?: boolean | TaskCountOutputTypeCountDependenciesArgs
+  dependentOf?: boolean | TaskCountOutputTypeCountDependentOfArgs
   comments?: boolean | TaskCountOutputTypeCountCommentsArgs
   files?: boolean | TaskCountOutputTypeCountFilesArgs
 }
@@ -2504,6 +2868,20 @@ export type TaskCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
  */
 export type TaskCountOutputTypeCountBlockedTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.TaskWhereInput
+}
+
+/**
+ * TaskCountOutputType without action
+ */
+export type TaskCountOutputTypeCountDependenciesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TaskDependencyWhereInput
+}
+
+/**
+ * TaskCountOutputType without action
+ */
+export type TaskCountOutputTypeCountDependentOfArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TaskDependencyWhereInput
 }
 
 /**
@@ -2547,6 +2925,8 @@ export type TaskSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   ownerUser?: boolean | Prisma.Task$ownerUserArgs<ExtArgs>
   blockedByTask?: boolean | Prisma.Task$blockedByTaskArgs<ExtArgs>
   blockedTasks?: boolean | Prisma.Task$blockedTasksArgs<ExtArgs>
+  dependencies?: boolean | Prisma.Task$dependenciesArgs<ExtArgs>
+  dependentOf?: boolean | Prisma.Task$dependentOfArgs<ExtArgs>
   assigneeContact?: boolean | Prisma.Task$assigneeContactArgs<ExtArgs>
   comments?: boolean | Prisma.Task$commentsArgs<ExtArgs>
   files?: boolean | Prisma.Task$filesArgs<ExtArgs>
@@ -2642,6 +3022,8 @@ export type TaskInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   ownerUser?: boolean | Prisma.Task$ownerUserArgs<ExtArgs>
   blockedByTask?: boolean | Prisma.Task$blockedByTaskArgs<ExtArgs>
   blockedTasks?: boolean | Prisma.Task$blockedTasksArgs<ExtArgs>
+  dependencies?: boolean | Prisma.Task$dependenciesArgs<ExtArgs>
+  dependentOf?: boolean | Prisma.Task$dependentOfArgs<ExtArgs>
   assigneeContact?: boolean | Prisma.Task$assigneeContactArgs<ExtArgs>
   comments?: boolean | Prisma.Task$commentsArgs<ExtArgs>
   files?: boolean | Prisma.Task$filesArgs<ExtArgs>
@@ -2673,6 +3055,8 @@ export type $TaskPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     ownerUser: Prisma.$VendorUserPayload<ExtArgs> | null
     blockedByTask: Prisma.$TaskPayload<ExtArgs> | null
     blockedTasks: Prisma.$TaskPayload<ExtArgs>[]
+    dependencies: Prisma.$TaskDependencyPayload<ExtArgs>[]
+    dependentOf: Prisma.$TaskDependencyPayload<ExtArgs>[]
     assigneeContact: Prisma.$ContactPayload<ExtArgs> | null
     comments: Prisma.$CommentPayload<ExtArgs>[]
     files: Prisma.$FilePayload<ExtArgs>[]
@@ -3098,6 +3482,8 @@ export interface Prisma__TaskClient<T, Null = never, ExtArgs extends runtime.Typ
   ownerUser<T extends Prisma.Task$ownerUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Task$ownerUserArgs<ExtArgs>>): Prisma.Prisma__VendorUserClient<runtime.Types.Result.GetResult<Prisma.$VendorUserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   blockedByTask<T extends Prisma.Task$blockedByTaskArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Task$blockedByTaskArgs<ExtArgs>>): Prisma.Prisma__TaskClient<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   blockedTasks<T extends Prisma.Task$blockedTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Task$blockedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  dependencies<T extends Prisma.Task$dependenciesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Task$dependenciesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskDependencyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  dependentOf<T extends Prisma.Task$dependentOfArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Task$dependentOfArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskDependencyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assigneeContact<T extends Prisma.Task$assigneeContactArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Task$assigneeContactArgs<ExtArgs>>): Prisma.Prisma__ContactClient<runtime.Types.Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   comments<T extends Prisma.Task$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Task$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   files<T extends Prisma.Task$filesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Task$filesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3606,6 +3992,54 @@ export type Task$blockedTasksArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.TaskScalarFieldEnum | Prisma.TaskScalarFieldEnum[]
+}
+
+/**
+ * Task.dependencies
+ */
+export type Task$dependenciesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TaskDependency
+   */
+  select?: Prisma.TaskDependencySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TaskDependency
+   */
+  omit?: Prisma.TaskDependencyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TaskDependencyInclude<ExtArgs> | null
+  where?: Prisma.TaskDependencyWhereInput
+  orderBy?: Prisma.TaskDependencyOrderByWithRelationInput | Prisma.TaskDependencyOrderByWithRelationInput[]
+  cursor?: Prisma.TaskDependencyWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TaskDependencyScalarFieldEnum | Prisma.TaskDependencyScalarFieldEnum[]
+}
+
+/**
+ * Task.dependentOf
+ */
+export type Task$dependentOfArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TaskDependency
+   */
+  select?: Prisma.TaskDependencySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TaskDependency
+   */
+  omit?: Prisma.TaskDependencyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TaskDependencyInclude<ExtArgs> | null
+  where?: Prisma.TaskDependencyWhereInput
+  orderBy?: Prisma.TaskDependencyOrderByWithRelationInput | Prisma.TaskDependencyOrderByWithRelationInput[]
+  cursor?: Prisma.TaskDependencyWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TaskDependencyScalarFieldEnum | Prisma.TaskDependencyScalarFieldEnum[]
 }
 
 /**

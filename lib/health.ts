@@ -9,9 +9,22 @@
  *   On track — none of the above
  *
  * Velocity is only evaluated when a targetGoLive date exists.
+ *
+ * Text blockers (TaskDependency rows with a label, GAPS-PLAN feature 2) do NOT
+ * affect health unless TEXT_BLOCKERS_COUNT_AS_BLOCKED is switched on: Caroline
+ * has not decided yet whether "waiting on platform team sign-off" should turn
+ * an onboarding red like a Blocked task does.
  */
 
 import type { HealthResult, HealthStatus } from "./types";
+
+/**
+ * OPEN DECISION (Caroline): should an unresolved text blocker count like a
+ * task with status "Blocked"? false = no (today's behaviour, health is
+ * unchanged by text blockers). true = a task that is not Done and has at least
+ * one unresolved text blocker counts towards the blocked share.
+ */
+export const TEXT_BLOCKERS_COUNT_AS_BLOCKED = false;
 
 const BLOCKED_THRESHOLD = 0.3;
 const OVERDUE_SINGLE_DAYS = 7;
@@ -26,6 +39,18 @@ function daysBetween(a: Date, b: Date): number {
 export interface HealthTask {
   status: string;
   due?: string | null;
+  /** The task's dependencies (board shape or DB rows). Only read when TEXT_BLOCKERS_COUNT_AS_BLOCKED. */
+  dependencies?: { label?: string | null; resolvedAt?: unknown }[] | null;
+}
+
+function openTextBlockers(t: HealthTask): number {
+  return (t.dependencies ?? []).filter((d) => d.label && !d.resolvedAt).length;
+}
+
+/** Whether a task counts as blocked for health. `textBlockersCount` exists for tests. */
+export function countsAsBlocked(t: HealthTask, textBlockersCount = TEXT_BLOCKERS_COUNT_AS_BLOCKED): boolean {
+  if (t.status === "Blocked") return true;
+  return textBlockersCount && t.status !== "Done" && openTextBlockers(t) > 0;
 }
 
 export interface HealthDates {
@@ -35,7 +60,8 @@ export interface HealthDates {
 
 export function computeHealth(
   tasks: HealthTask[],
-  { targetGoLive = null, createdAt = null }: HealthDates = {}
+  { targetGoLive = null, createdAt = null }: HealthDates = {},
+  textBlockersCount: boolean = TEXT_BLOCKERS_COUNT_AS_BLOCKED
 ): HealthResult {
   const total = tasks.length;
   if (total === 0) return { status: "On track", reasons: [] };
@@ -44,7 +70,7 @@ export function computeHealth(
   const reasons: string[] = [];
   let status: HealthStatus = "On track";
 
-  const blockedCount = tasks.filter((t) => t.status === "Blocked").length;
+  const blockedCount = tasks.filter((t) => countsAsBlocked(t, textBlockersCount)).length;
   const doneCount = tasks.filter((t) => t.status === "Done").length;
 
   // --- Blocked check ---

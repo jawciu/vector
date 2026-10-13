@@ -7,7 +7,10 @@
  * feature 1):
  *
  *   { taskId, action, changes: { ownerId?, assigneeContactId?, priority?,
- *     dueDate?, appendNotes? }, sourceQuote, confidence }
+ *     dueDate?, appendNotes?, dependsOn? }, sourceQuote, confidence }
+ *
+ * `dependsOn` (GAPS-PLAN feature 2) is what the task should additionally wait
+ * on: `[{ taskId } | { text }]`, normalised by lib/task-dependencies.ts.
  *
  * Legacy shape (older rows, and the model if it ever falls back to it): one
  * sub-action per draft, `action` = "reassign" | "reprioritise" |
@@ -24,6 +27,8 @@
  * the inbox card.
  */
 
+import { normaliseDependsOn, type DependsOnItem } from "@/lib/task-dependencies";
+
 export const TASK_UPDATE_PRIORITIES = ["low", "medium", "high"] as const;
 export type TaskUpdatePriority = (typeof TASK_UPDATE_PRIORITIES)[number];
 
@@ -37,6 +42,8 @@ export type TaskUpdateChanges = {
   dueDate?: string | null;
   /** Text to append to the task's notes (never overwrites). */
   appendNotes?: string;
+  /** Dependencies to ADD to the task (existing ones stay). */
+  dependsOn?: DependsOnItem[];
 };
 
 export type TaskUpdateSubAction =
@@ -44,6 +51,7 @@ export type TaskUpdateSubAction =
   | "reprioritise"
   | "update_due_date"
   | "add_notes"
+  | "add_dependency"
   | "update";
 
 /** Sub-actions the old one-change-per-draft tool emitted. */
@@ -55,7 +63,9 @@ export type NormalisedTaskUpdate = {
   changes: TaskUpdateChanges;
 };
 
-const CHANGE_KEYS = ["ownerId", "assigneeContactId", "priority", "dueDate", "appendNotes"] as const;
+const CHANGE_KEYS = ["ownerId", "assigneeContactId", "priority", "dueDate", "appendNotes", "dependsOn"] as const;
+/** Accepted on input and folded into dependsOn (the model's or an older editor's single blocker). */
+const LEGACY_CHANGE_KEYS = ["blockedByTaskId"] as const;
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -97,6 +107,10 @@ export function sanitiseChanges(raw: unknown): TaskUpdateChanges {
   if (r.dueDate === null) out.dueDate = null;
   else if (typeof r.dueDate === "string" && isIsoDate(r.dueDate.slice(0, 10))) out.dueDate = r.dueDate.slice(0, 10);
   if (typeof r.appendNotes === "string" && r.appendNotes.trim() !== "") out.appendNotes = r.appendNotes.trim();
+  if (r.dependsOn !== undefined || r.blockedByTaskId !== undefined) {
+    const deps = normaliseDependsOn(r.dependsOn, r.blockedByTaskId);
+    if (deps.length > 0) out.dependsOn = deps;
+  }
   return out;
 }
 
@@ -106,10 +120,13 @@ export function invalidChangeFields(raw: unknown): string[] {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return ["changes"];
   const kept = sanitiseChanges(raw);
   return Object.keys(raw as Record<string, unknown>).filter((k) => {
-    if (!(CHANGE_KEYS as readonly string[]).includes(k)) return true;
     const v = (raw as Record<string, unknown>)[k];
+    if ((LEGACY_CHANGE_KEYS as readonly string[]).includes(k)) return v !== null && kept.dependsOn === undefined;
+    if (!(CHANGE_KEYS as readonly string[]).includes(k)) return true;
     // A blank note is "no note", not an error.
     if (k === "appendNotes" && typeof v === "string") return false;
+    // An empty list is "no dependencies to add", not an error.
+    if (k === "dependsOn" && Array.isArray(v) && v.length === 0) return false;
     return !(k in kept);
   });
 }
@@ -135,6 +152,7 @@ export function subActionFor(changes: TaskUpdateChanges, fallback: string | null
     kinds.add(k === "ownerId" || k === "assigneeContactId" ? "reassign"
       : k === "priority" ? "reprioritise"
       : k === "dueDate" ? "update_due_date"
+      : k === "dependsOn" ? "add_dependency"
       : "add_notes");
   }
   if (kinds.size === 0) return fallback;
@@ -203,7 +221,7 @@ export function toStoredTaskUpdatePayload<T extends Record<string, unknown>>(inp
  */
 export function prepareStoredTaskUpdate(
   input: Record<string, unknown>,
-  valid: { vendorUserIds: Set<number>; contactIds: Set<number> }
+  valid: { vendorUserIds: Set<number>; contactIds: Set<number>; openTaskIds?: Set<number> }
 ): { payload: Record<string, unknown> | null; dropped: string[] } {
   const stored = toStoredTaskUpdatePayload(input);
   const changes = { ...(stored.changes as TaskUpdateChanges) };
@@ -215,6 +233,18 @@ export function prepareStoredTaskUpdate(
   if (changes.assigneeContactId != null && !valid.contactIds.has(changes.assigneeContactId)) {
     dropped.push(`assigneeContactId=${changes.assigneeContactId}`);
     delete changes.assigneeContactId;
+  }
+  if (changes.dependsOn) {
+    // A blocker must be another open task the model was shown.
+    const target = typeof input.taskId === "number" ? input.taskId : Number(input.taskId);
+    const kept = changes.dependsOn.filter((d) => {
+      if (!("taskId" in d)) return true;
+      const ok = d.taskId !== target && (!valid.openTaskIds || valid.openTaskIds.has(d.taskId));
+      if (!ok) dropped.push(`dependsOn.taskId=${d.taskId}`);
+      return ok;
+    });
+    if (kept.length > 0) changes.dependsOn = kept;
+    else delete changes.dependsOn;
   }
   const legacyFlagOnly = input.changes === undefined && input.action === "reassign";
   if (!hasChanges(changes) && !legacyFlagOnly) return { payload: null, dropped };

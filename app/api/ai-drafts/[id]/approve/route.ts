@@ -12,6 +12,13 @@
  * Legacy single-action drafts (`action` + `newPriority` / `newDueDate`) are
  * normalised by lib/ai/task-update.ts.
  *
+ * Dependencies (GAPS-PLAN feature 2): create_task's `dependsOn` and
+ * match_existing's `changes.dependsOn` are `[{ taskId } | { text }]` (a legacy
+ * `blockedByTaskId` is folded in). Each becomes a TaskDependency row. A blocker
+ * task on another onboarding is a 400 (nothing is written); one that is Done
+ * or deleted since the draft was made is skipped and listed in the response's
+ * `skippedDependencies`.
+ *
  * Owners / assignees that no longer exist (create_task and match_existing
  * alike) are a 409 with a plain message the card shows inline. The card asks
  * the reviewer first; an explicit null override means "leave unassigned".
@@ -38,7 +45,10 @@ import {
   updateTask,
   createComment,
   getOrCreateVendorUser,
+  addTaskDependencies,
+  classifyBlockerTasks,
 } from "@/lib/db";
+import { normaliseDependsOn, type DependsOnItem } from "@/lib/task-dependencies";
 import type { Actor } from "@/lib/types";
 import type { UpdateTaskInput } from "@/lib/db";
 import {
@@ -67,6 +77,7 @@ interface ApprovePayload {
   ownerId?: number | null;
   assigneeContactId?: number | null;
   blockedByTaskId?: number | null;
+  dependsOn?: unknown;
   notes?: string;
   // match_existing (current shape: `changes`; the rest is the legacy
   // one-change-per-draft shape, normalised by lib/ai/task-update.ts)
@@ -115,6 +126,32 @@ async function stalePersonError(
     }
   }
   return null;
+}
+
+/**
+ * Check a draft's task blockers against the onboarding before anything is
+ * written. Returns the dependencies to create, the blocker ids skipped (Done
+ * or deleted), or an error for blockers on another onboarding.
+ */
+async function vetDependencies(
+  onboardingId: number,
+  items: DependsOnItem[],
+  ownTaskId: number | null = null
+): Promise<{ ok: true; items: DependsOnItem[]; skipped: number[] } | { ok: false; error: string }> {
+  const taskIds = items.filter((i): i is { taskId: number } => "taskId" in i).map((i) => i.taskId);
+  if (ownTaskId != null && taskIds.includes(ownTaskId)) {
+    return { ok: false, error: "A task cannot depend on itself" };
+  }
+  const c = await classifyBlockerTasks(onboardingId, taskIds);
+  if (c.foreign.length > 0) {
+    return { ok: false, error: "A blocker task belongs to a different onboarding" };
+  }
+  const skip = new Set([...c.closed, ...c.missing]);
+  return {
+    ok: true,
+    items: items.filter((i) => !("taskId" in i) || !skip.has(i.taskId)),
+    skipped: [...skip],
+  };
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -170,6 +207,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     }
 
     let appliedTaskId: ApprovePayload["taskId"] = null;
+    // Blocker tasks dropped at approval because they were done or deleted.
+    let skippedDependencies: number[] = [];
     // Only create_task fills this in. It tells the inbox what was made and
     // where it landed, so the toast can name the task and link to its column
     // instead of leaving the row to just vanish.
@@ -196,6 +235,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       const stale = await stalePersonError(draft.onboardingId, ownerId, assigneeContactId, stored);
       if (stale) return NextResponse.json({ error: stale }, { status: 409 });
 
+      // The editor sends the full edited list as overrides.dependsOn; without
+      // it, the stored list plus any legacy single blocker.
+      const requestedDeps = overrides.dependsOn !== undefined
+        ? normaliseDependsOn(overrides.dependsOn, overrides.blockedByTaskId)
+        : normaliseDependsOn(merged.dependsOn, merged.blockedByTaskId);
+      const vetted = await vetDependencies(draft.onboardingId, requestedDeps);
+      if (!vetted.ok) return NextResponse.json({ error: vetted.error }, { status: 400 });
+      skippedDependencies = vetted.skipped;
+
       const taskData = {
         onboardingId: draft.onboardingId,
         // createTask throws "Invalid phase ID" if the draft has none.
@@ -207,7 +255,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         priority: merged.priority ?? null,
         ownerId,
         assigneeContactId: merged.assigneeContactId ?? null,
-        blockedByTaskId: merged.blockedByTaskId ?? null,
+        dependsOn: vetted.items,
         notes: merged.notes ?? "",
       };
       const task = await createTask(taskData, { actor });
@@ -257,6 +305,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       );
       if (stale) return NextResponse.json({ error: stale }, { status: 409 });
 
+      // Vet dependencies before writing anything, so a bad blocker leaves the task untouched.
+      let depsToAdd: DependsOnItem[] = [];
+      if (changes.dependsOn) {
+        const vetted = await vetDependencies(draft.onboardingId, changes.dependsOn, targetId);
+        if (!vetted.ok) return NextResponse.json({ error: vetted.error }, { status: 400 });
+        depsToAdd = vetted.items;
+        skippedDependencies = vetted.skipped;
+      }
+
       const patch: UpdateTaskInput = {};
       if (changes.ownerId !== undefined) patch.ownerId = changes.ownerId;
       if (changes.assigneeContactId !== undefined) patch.assigneeContactId = changes.assigneeContactId;
@@ -271,11 +328,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         patch.notes = appendDatedNote(current, changes.appendNotes, stamp);
       }
 
-      if (Object.keys(patch).length === 0 && !legacyReassign) {
-        return NextResponse.json({ error: "This update has no changes to apply" }, { status: 400 });
+      if (Object.keys(patch).length === 0 && depsToAdd.length === 0 && !legacyReassign) {
+        const allSkipped = changes.dependsOn && skippedDependencies.length > 0;
+        return NextResponse.json(
+          { error: allSkipped ? "The blocker tasks in this update are done or gone; nothing to apply" : "This update has no changes to apply" },
+          { status: 400 }
+        );
       }
       if (Object.keys(patch).length > 0) {
         await updateTask(targetId, patch, { actor });
+      }
+      if (depsToAdd.length > 0) {
+        await addTaskDependencies(targetId, depsToAdd);
       }
       if (legacyReassign) {
         await createComment(
@@ -324,7 +388,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     await markAIChangeApplied(draftId, { resolvedBy: vu.id, appliedTaskId });
 
-    return NextResponse.json({ ok: true, appliedTaskId, created });
+    return NextResponse.json({
+      ok: true,
+      appliedTaskId,
+      created,
+      ...(skippedDependencies.length > 0 && { skippedDependencies }),
+    });
   } catch (err) {
     console.error("[POST /api/ai-drafts/[id]/approve]", err);
     return NextResponse.json(

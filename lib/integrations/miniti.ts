@@ -33,6 +33,13 @@ import {
 import { runMinitiExtraction, runMinitiOrchestrator, toolCallToAction } from "@/lib/ai/orchestrator";
 import type { MinitiExtraction, OrchestratorAction } from "@/lib/ai/orchestrator";
 import { noteSourceFor, prepareStoredTaskUpdate } from "@/lib/ai/task-update";
+import {
+  filterDependsOn,
+  isDependencyOpen,
+  normaliseDependsOn,
+  type DependsOnItem,
+  type TaskDependencyView,
+} from "@/lib/task-dependencies";
 import type { Prisma } from "@/lib/generated/prisma/client";
 
 // ---------------------------------------------------------------------------
@@ -105,6 +112,8 @@ type ContextTask = {
   description?: string | null;
   notes?: string | null;
   blockedByTaskId?: number | null;
+  /** Board shape from getTasksForOnboarding (TaskDependencyView[]). */
+  dependencies?: TaskDependencyView[] | null;
 };
 type ContextContact = { id: number; name: string; email?: string | null };
 type ContextPhase = { id: number; name: string; isComplete: boolean; sortOrder: number };
@@ -474,10 +483,18 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
         console.warn(`[miniti] dropping invalid assigneeContactId=${payload.assigneeContactId} on create_task draft (event ${eventId})`);
         delete payload.assigneeContactId;
       }
-      if (payload.blockedByTaskId != null && !validOpenTaskIds.has(payload.blockedByTaskId)) {
-        console.warn(`[miniti] dropping invalid blockedByTaskId=${payload.blockedByTaskId} on create_task draft (event ${eventId})`);
-        delete payload.blockedByTaskId;
+      // dependsOn (and a legacy blockedByTaskId) → one clean list; task
+      // blockers must be open tasks the model was shown. Text blockers stay.
+      const { kept, dropped } = filterDependsOn(
+        normaliseDependsOn(payload.dependsOn, payload.blockedByTaskId),
+        validOpenTaskIds
+      );
+      for (const id of dropped) {
+        console.warn(`[miniti] dropping invalid dependsOn taskId=${id} on create_task draft (event ${eventId})`);
       }
+      delete payload.blockedByTaskId;
+      if (kept.length > 0) payload.dependsOn = kept;
+      else delete payload.dependsOn;
       // phaseId is required by the tool schema; if Claude returned an invalid
       // one, fall back to the first non-complete phase rather than dropping.
       if (payload.phaseId == null || !validPhaseIds.has(payload.phaseId)) {
@@ -502,6 +519,7 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
       const prepared = prepareStoredTaskUpdate(call.input, {
         vendorUserIds: validVendorUserIds,
         contactIds: validContactIds,
+        openTaskIds: validOpenTaskIds,
       });
       for (const d of prepared.dropped) {
         console.warn(`[miniti] dropping invalid ${d} on match_existing draft (event ${eventId})`);
@@ -567,6 +585,20 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
  *                             when a customer-side person is the actor.
  *   - phases                  Required for picking phaseId on new tasks.
  */
+/**
+ * A board task's open dependencies as `[{ taskId } | { text }]`. Tasks that
+ * predate TaskDependency (or callers that only pass the old column) fall back
+ * to blockedByTaskId.
+ */
+function contextDependsOn(t: ContextTask): DependsOnItem[] {
+  if (Array.isArray(t.dependencies)) {
+    return t.dependencies.filter(isDependencyOpen).map((d) =>
+      d.blockedByTask ? { taskId: d.blockedByTask.id } : { text: d.label ?? "" }
+    );
+  }
+  return t.blockedByTaskId != null ? [{ taskId: t.blockedByTaskId }] : [];
+}
+
 export function buildOrchestratorContext({
   meeting,
   tasks,
@@ -602,7 +634,9 @@ export function buildOrchestratorContext({
       // (description) and pick a coherent blockedByTaskId for a new draft.
       description: t.description || null,
       notes: t.notes || null,
-      blockedByTaskId: t.blockedByTaskId ?? null,
+      // What the task already waits on (open blockers only), in the same
+      // shape the tools take, so the model can avoid repeating one.
+      dependsOn: contextDependsOn(t),
     }));
 
   const phasesLite = phases
