@@ -19,6 +19,15 @@
  * or deleted since the draft was made is skipped and listed in the response's
  * `skippedDependencies`.
  *
+ * Sibling-draft links (GAPS-PLAN feature 3): either list may also name another
+ * create draft from the same meeting (`{ draftId }`). Those resolve inside
+ * lib/db.ts applyDraftApproval, in the same transaction as the task write and
+ * the draft's status: a sibling already applied → task blocker on its task;
+ * still pending → a text placeholder with its title, completed into a task
+ * blocker when the sibling is approved (that approval does it, once); rejected
+ * → text blocker. What became of each link is returned as `draftLinks`, and
+ * links on OTHER drafts that this approval completed as `resolvedLinks`.
+ *
  * Owners / assignees that no longer exist (create_task and match_existing
  * alike) are a 409 with a plain message the card shows inline. The card asks
  * the reviewer first; an explicit null override means "leave unassigned".
@@ -46,9 +55,19 @@ import {
   createComment,
   getOrCreateVendorUser,
   classifyBlockerTasks,
+  applyDraftApproval,
   DependencyError,
+  DraftConflictError,
 } from "@/lib/db";
-import { draftDependsOn, normaliseDependsOn, type DependsOnItem } from "@/lib/task-dependencies";
+import {
+  draftDependsOn,
+  isDraftLink,
+  normaliseDraftDependsOn,
+  type DependsOnItem,
+  type DraftDependsOnItem,
+  type DraftLinkItem,
+} from "@/lib/task-dependencies";
+import type { AppliedDraftLink } from "@/lib/draft-links";
 import type { Actor } from "@/lib/types";
 import type { UpdateTaskInput } from "@/lib/db";
 import {
@@ -126,6 +145,17 @@ async function stalePersonError(
     }
   }
   return null;
+}
+
+/** Split a draft's list into board/text dependencies and sibling-draft links. */
+function splitDraftDeps(items: DraftDependsOnItem[]): { plain: DependsOnItem[]; links: DraftLinkItem[] } {
+  const plain: DependsOnItem[] = [];
+  const links: DraftLinkItem[] = [];
+  for (const i of items) {
+    if (isDraftLink(i)) links.push(i);
+    else plain.push(i);
+  }
+  return { plain, links };
 }
 
 /**
@@ -207,6 +237,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     }
 
     let appliedTaskId: ApprovePayload["taskId"] = null;
+    // Set when the draft went through applyDraftApproval (create / update),
+    // which marks it applied in its own transaction.
+    let appliedInTransaction = false;
+    let draftLinks: AppliedDraftLink[] = [];
+    let resolvedLinks: Awaited<ReturnType<typeof applyDraftApproval>>["resolved"] = [];
     // Blocker tasks dropped at approval because they were done or deleted.
     let skippedDependencies: number[] = [];
     // Only create_task fills this in. It tells the inbox what was made and
@@ -238,9 +273,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       // The editor sends the full edited list as overrides.dependsOn; without
       // it, the stored list, or a legacy draft's single blocker.
       const requestedDeps = overrides.dependsOn !== undefined
-        ? normaliseDependsOn(overrides.dependsOn)
+        ? normaliseDraftDependsOn(overrides.dependsOn)
         : draftDependsOn(merged);
-      const vetted = await vetDependencies(draft.onboardingId, requestedDeps);
+      const { plain, links } = splitDraftDeps(requestedDeps);
+      const vetted = await vetDependencies(draft.onboardingId, plain);
       if (!vetted.ok) return NextResponse.json({ error: vetted.error }, { status: 400 });
       skippedDependencies = vetted.skipped;
 
@@ -258,8 +294,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         dependsOn: vetted.items,
         notes: merged.notes ?? "",
       };
-      const task = await createTask(taskData, { actor });
+      const approval = await applyDraftApproval({
+        draftId,
+        resolvedBy: vu.id,
+        links,
+        work: async ({ tx, linkDeps, afterCommit }) => {
+          const t = await createTask({ ...taskData, dependsOn: [...vetted.items, ...linkDeps] }, { actor, tx, afterCommit });
+          return { appliedTaskId: t.id, value: t };
+        },
+      });
+      const task = approval.value;
       appliedTaskId = task.id;
+      appliedInTransaction = true;
+      draftLinks = approval.draftLinks;
+      resolvedLinks = approval.resolved;
 
       const phases = await getPhasesForOnboarding(draft.onboardingId);
       const phase = phases.find((ph) => ph.id === task.phaseId) ?? null;
@@ -307,8 +355,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
       // Vet dependencies before writing anything, so a bad blocker leaves the task untouched.
       let depsToAdd: DependsOnItem[] = [];
-      if (changes.dependsOn) {
-        const vetted = await vetDependencies(draft.onboardingId, changes.dependsOn, targetId);
+      const { plain: plainDeps, links } = splitDraftDeps(changes.dependsOn ?? []);
+      if (plainDeps.length > 0) {
+        const vetted = await vetDependencies(draft.onboardingId, plainDeps, targetId);
         if (!vetted.ok) return NextResponse.json({ error: vetted.error }, { status: 400 });
         depsToAdd = vetted.items;
         skippedDependencies = vetted.skipped;
@@ -328,19 +377,31 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         patch.notes = appendDatedNote(current, changes.appendNotes, stamp);
       }
 
-      if (Object.keys(patch).length === 0 && depsToAdd.length === 0 && !legacyReassign) {
+      if (Object.keys(patch).length === 0 && depsToAdd.length === 0 && links.length === 0 && !legacyReassign) {
         const allSkipped = changes.dependsOn && skippedDependencies.length > 0;
         return NextResponse.json(
           { error: allSkipped ? "The blocker tasks in this update are done or gone; nothing to apply" : "This update has no changes to apply" },
           { status: 400 }
         );
       }
-      if (Object.keys(patch).length > 0 || depsToAdd.length > 0) {
-        // One transaction: the field changes and the new blockers land
-        // together or not at all (a loop or a bad blocker leaves the task as
-        // it was and the draft pending).
-        await updateTask(targetId, patch, { actor, addDependencies: depsToAdd });
-      }
+      // One transaction: the field changes, the new blockers (sibling-draft
+      // links included) and the draft's status land together or not at all
+      // (a loop or a bad blocker leaves the task as it was and the draft
+      // pending).
+      const approval = await applyDraftApproval({
+        draftId,
+        resolvedBy: vu.id,
+        links,
+        work: async ({ tx, linkDeps, afterCommit }) => {
+          const deps = [...depsToAdd, ...linkDeps];
+          if (Object.keys(patch).length > 0 || deps.length > 0) {
+            await updateTask(targetId, patch, { actor, addDependencies: deps, tx, afterCommit });
+          }
+          return { appliedTaskId: targetId, value: null };
+        },
+      });
+      appliedInTransaction = true;
+      draftLinks = approval.draftLinks;
       if (legacyReassign) {
         await createComment(
           targetId,
@@ -386,15 +447,21 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       );
     }
 
-    await markAIChangeApplied(draftId, { resolvedBy: vu.id, appliedTaskId });
+    if (!appliedInTransaction) await markAIChangeApplied(draftId, { resolvedBy: vu.id, appliedTaskId });
 
     return NextResponse.json({
       ok: true,
       appliedTaskId,
       created,
       ...(skippedDependencies.length > 0 && { skippedDependencies }),
+      ...(draftLinks.length > 0 && { draftLinks }),
+      ...(resolvedLinks.length > 0 && { resolvedLinks }),
     });
   } catch (err) {
+    // Approved or rejected meanwhile (another tab, a double click): say so.
+    if (err instanceof DraftConflictError) {
+      return NextResponse.json({ error: err.message }, { status: err.status });
+    }
     // A blocker the database layer refuses (a loop, another onboarding):
     // the reviewer's problem to fix on the card, not a server fault.
     if (err instanceof DependencyError) {

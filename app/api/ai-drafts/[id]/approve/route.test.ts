@@ -35,6 +35,19 @@ vi.mock("@/lib/db", () => ({
   DependencyError: class DependencyError extends Error {
     status = 400;
   },
+  DraftConflictError: class DraftConflictError extends Error {
+    status = 409;
+  },
+  // The real one runs `work` in a transaction, resolves sibling-draft links
+  // and marks the draft applied (covered by lib/draft-approval.test.ts). Here:
+  // run `work` with no links and record the applied mark through the
+  // markAIChangeApplied mock, so these tests keep asserting on it.
+  applyDraftApproval: vi.fn(async ({ draftId, resolvedBy, work }) => {
+    const { appliedTaskId, value } = await work({ tx: null, linkDeps: [], afterCommit: [] });
+    const { markAIChangeApplied } = await import("@/lib/db");
+    await markAIChangeApplied(draftId, { resolvedBy, appliedTaskId });
+    return { value, draftLinks: [], resolved: [] };
+  }),
   classifyBlockerTasks: vi.fn(async (_ob: number, ids: number[]) => ({ open: ids, closed: [], missing: [], foreign: [] })),
 }));
 
