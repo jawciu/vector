@@ -3543,8 +3543,9 @@ export async function rejectDraftWithLinks(
       select: DRAFT_ROW_SELECT,
       orderBy: { id: "asc" },
     });
+    const titles = await siblingTitles(tx, siblings);
     for (const sib of siblings) {
-      const title = siblingTitle(sib);
+      const title = titles.get(sib.id)!;
       if (sib.status === "pending") {
         if (payloadDraftLinks(sib.payload).some((l) => l.draftId === draftId)) dependents.push({ draftId: sib.id, title, status: sib.status });
         continue;
@@ -3568,9 +3569,23 @@ export async function rejectDraftWithLinks(
   }, { maxWait: 10_000, timeout: 30_000 });
 }
 
-function siblingTitle(row: { action: string; payload: Prisma.JsonValue }): string {
-  const t = (row.payload as { title?: unknown } | null)?.title;
-  return typeof t === "string" && t.trim() ? t.trim() : row.action === "create_task" ? "A new task" : "An update to a task";
+/**
+ * How a sibling draft is named to the reviewer: a create draft by its title,
+ * an existing-task update as "Update to <that task's title>".
+ */
+async function siblingTitles(client: DbClient, rows: { id: number; action: string; payload: Prisma.JsonValue }[]): Promise<Map<number, string>> {
+  const taskIds = rows
+    .filter((r) => r.action !== "create_task")
+    .map((r) => Number((r.payload as { taskId?: unknown } | null)?.taskId))
+    .filter((n) => Number.isInteger(n) && n > 0);
+  const tasks = taskIds.length ? await client.task.findMany({ where: { id: { in: taskIds } }, select: { id: true, title: true } }) : [];
+  const taskTitle = new Map(tasks.map((t) => [t.id, t.title]));
+  return new Map(rows.map((r) => {
+    const p = (r.payload ?? {}) as { title?: unknown; taskId?: unknown };
+    if (r.action === "create_task") return [r.id, typeof p.title === "string" && p.title.trim() ? p.title.trim() : "A new task"];
+    const t = taskTitle.get(Number(p.taskId));
+    return [r.id, t ? `Update to ${t}` : "An update to a task"];
+  }));
 }
 
 /**
@@ -3592,6 +3607,7 @@ async function hydrateDraftLinks(rows: { id: number; sourceEventId: number | nul
   const taskIds = siblings.map((s) => s.appliedTaskId).filter((x): x is number => x != null);
   const codes = taskIds.length ? await taskCodes(prisma, taskIds) : new Map<number, string>();
   const byId = new Map(siblings.map((s) => [s.id, s]));
+  const titles = await siblingTitles(prisma, siblings);
   const info = (id: number): LinkedDraftInfo | null => {
     const s = byId.get(id);
     if (!s) return null;
@@ -3609,7 +3625,7 @@ async function hydrateDraftLinks(rows: { id: number; sourceEventId: number | nul
     const linkedDrafts = linksOf(r).map(info).filter((x): x is LinkedDraftInfo => x != null);
     const dependentDrafts = siblings
       .filter((s) => s.id !== r.id && s.status !== "rejected" && s.sourceEventId === r.sourceEventId && linksOf(s).includes(r.id))
-      .map((s) => ({ draftId: s.id, title: siblingTitle(s), status: s.status }));
+      .map((s) => ({ draftId: s.id, title: titles.get(s.id)!, status: s.status }));
     if (linkedDrafts.length || dependentDrafts.length) out.set(r.id, { linkedDrafts, dependentDrafts });
   }
   return out;

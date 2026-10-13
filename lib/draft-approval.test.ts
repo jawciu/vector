@@ -249,7 +249,7 @@ describe("rejected blocker", () => {
   it("rejected after the dependent was approved: the placeholder stays as text and the link says so", async () => {
     await approve(1002);
     const r = await rejectDraftWithLinks(1001, { resolvedBy: 8 });
-    expect(r.dependents).toEqual([{ draftId: 1002, title: "Migrate the dashboards", status: "applied" }, { draftId: 1003, title: "An update to a task", status: "pending" }]);
+    expect(r.dependents).toEqual([{ draftId: 1002, title: "Migrate the dashboards", status: "applied" }, { draftId: 1003, title: "Update to Dashboards parity", status: "pending" }]);
     expect(readDraftLinks(draftRow(1002).payload)[0]).toMatchObject({ state: "kept_as_text", reason: "rejected" });
     expect(boardLinks()).toEqual(["Migrate the dashboards → text:Add the metrics block", "Migrate the dashboards → text:platform sign-off"]);
   });
