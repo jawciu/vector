@@ -2,7 +2,8 @@
  * What a task waits on, as the board card shows it (GAPS-PLAN feature 2):
  * board tasks as their id chip (with the title when it is the only blocker)
  * and text blockers as a plain label chip, task blockers first. Resolved text blockers are left
- * off the card; they no longer hold anything up.
+ * off the card; they no longer hold anything up. Long labels wrap rather
+ * than truncate (readable over tidy).
  *
  * Falls back to the legacy single `blockedByTask` when a task arrives
  * without `dependencies` (an older API shape).
@@ -34,15 +35,14 @@ export default function TaskDependencyChips({ task }: { task: Pick<ClientTask, "
       <ul className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0 text-sm text-text-secondary">
         {deps.map((d) =>
           d.blockedByTask ? (
-            <li key={d.id} className={single ? "truncate min-w-0" : undefined} title={d.blockedByTask.title}>
+            <li key={d.id} className={single ? "min-w-0 break-words" : undefined} title={d.blockedByTask.title}>
               <TaskIdChip task={d.blockedByTask} />
               {(single || !d.blockedByTask.taskId) && d.blockedByTask.title}
             </li>
           ) : (
             <li
               key={d.id}
-              className="max-w-full truncate rounded-md border border-border px-1 text-xs leading-5 text-text-secondary"
-              title={d.label ?? undefined}
+              className="max-w-full min-w-0 break-words rounded-md border border-border px-1 text-xs leading-5 text-text-secondary"
             >
               {d.label}
             </li>

@@ -45,13 +45,17 @@ export default function TaskDependenciesField({ task, allTasks, open, onToggle, 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const popRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  // After a removal, which row's controls should get focus once the list re-renders.
+  const [focusAfterRemove, setFocusAfterRemove] = useState<number | null>(null);
   const rowRef = useRef<HTMLDivElement>(null);
 
   const deps = task.dependencies ?? [];
   const linked = new Set(deps.map((d) => d.blockedByTask?.id).filter((x): x is number => x != null));
   const q = query.trim().toLowerCase();
   const candidates = allTasks
-    .filter((t) => t.id !== task.id && !linked.has(t.id))
+    // A Done task no longer holds anything up, so it is not offered as a blocker.
+    .filter((t) => t.id !== task.id && !linked.has(t.id) && t.status !== "Done")
     .filter((t) => !q || t.title.toLowerCase().includes(q) || (t.taskId ?? "").toLowerCase().includes(q))
     .slice(0, 8);
   const typed = cleanDependencyLabel(query);
@@ -81,6 +85,9 @@ export default function TaskDependenciesField({ task, allTasks, open, onToggle, 
   }, [open, onClose]);
 
   async function send(url: string, method: string, body?: unknown) {
+    // Controls stay enabled while saving (disabling a focused control drops
+    // focus to the page), so a second action during a save is ignored here.
+    if (busy) return false;
     setBusy(true);
     setError(null);
     try {
@@ -110,6 +117,22 @@ export default function TaskDependenciesField({ task, allTasks, open, onToggle, 
     if (!typed || busy) return;
     if (await send(base, "POST", { text: typed })) { setQuery(""); focusInput(); }
   }
+
+  async function remove(depId: number, index: number) {
+    if (await send(`${base}/${depId}`, "DELETE")) setFocusAfterRemove(index);
+  }
+
+  // Hand focus on after a removal: the row that took the removed one's place,
+  // else the one before it, else the field row itself.
+  useEffect(() => {
+    if (focusAfterRemove == null) return;
+    const rows = listRef.current?.querySelectorAll("li") ?? [];
+    const row = rows[Math.min(focusAfterRemove, rows.length - 1)];
+    const target = row?.querySelector<HTMLElement>("[role=checkbox], button")
+      ?? rowRef.current?.querySelector<HTMLButtonElement>(".field-main");
+    target?.focus();
+    setFocusAfterRemove(null);
+  }, [focusAfterRemove, deps.length]);
 
   function onInputKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
@@ -153,16 +176,16 @@ export default function TaskDependenciesField({ task, allTasks, open, onToggle, 
             </div>
             <div role="listbox" aria-label="Blockers to add" className="max-h-40 overflow-y-auto flex flex-col gap-1">
               {typed && (
-                <MenuOption onClick={addText} disabled={busy}>
-                  <span className="truncate">Add &ldquo;{typed}&rdquo; as a blocker</span>
+                <MenuOption onClick={addText}>
+                  <span className="min-w-0 break-words">Add &ldquo;{typed}&rdquo; as a blocker</span>
                 </MenuOption>
               )}
               {candidates.length === 0 ? (
                 <div className="px-2 py-1.5 text-sm text-text-muted">{q ? "No matching tasks" : "No other tasks"}</div>
               ) : (
                 candidates.map((t) => (
-                  <MenuOption key={t.id} onClick={() => addTask(t.id)} disabled={busy}>
-                    <span className="truncate">
+                  <MenuOption key={t.id} onClick={() => addTask(t.id)}>
+                    <span className="min-w-0 break-words">
                       <TaskIdChip task={t} />
                       {t.title}
                     </span>
@@ -176,23 +199,23 @@ export default function TaskDependenciesField({ task, allTasks, open, onToggle, 
       </div>
 
       {deps.length > 0 && (
-        <ul className="flex w-full min-w-0 flex-col gap-1 pl-8" aria-label="Dependencies">
-          {deps.map((d) => {
+        <ul ref={listRef} className="flex w-full min-w-0 flex-col gap-1 pl-8" aria-label="Dependencies">
+          {deps.map((d, index) => {
             const name = d.blockedByTask ? `${d.blockedByTask.taskId ?? ""} ${d.blockedByTask.title}`.trim() : d.label ?? "";
             const resolved = d.blockedByTask ? d.blockedByTask.status === "Done" : !!d.resolvedAt;
             return (
-              <li key={d.id} className="group flex items-center gap-2 min-h-6 text-sm">
+              <li key={d.id} className="group flex items-start gap-2 min-h-6 text-sm leading-6">
                 {d.blockedByTask ? (
-                  <DependenciesIcon className="shrink-0 text-text-muted" />
+                  <DependenciesIcon className="shrink-0 mt-1 text-text-muted" />
                 ) : (
                   <Checkbox
                     checked={resolved}
                     onChange={(checked) => send(`${base}/${d.id}`, "PATCH", { resolved: checked })}
                     aria-label={`${resolved ? "Reopen" : "Mark resolved"}: ${name}`}
-                    disabled={busy}
+                    className="mt-1 shrink-0"
                   />
                 )}
-                <span className={`flex-1 min-w-0 truncate ${resolved ? "line-through text-text-muted" : "text-text"}`} title={name}>
+                <span className={`flex-1 min-w-0 break-words ${resolved ? "line-through text-text-muted" : "text-text"}`}>
                   {d.blockedByTask ? (
                     <>
                       <TaskIdChip task={d.blockedByTask} />
@@ -204,9 +227,8 @@ export default function TaskDependenciesField({ task, allTasks, open, onToggle, 
                 </span>
                 <IconButton
                   aria-label={`Remove dependency: ${name}`}
-                  onClick={() => send(`${base}/${d.id}`, "DELETE")}
-                  disabled={busy}
-                  className="shrink-0 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+                  onClick={() => remove(d.id, index)}
+                  className="shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
                 >
                   <CloseIcon />
                 </IconButton>

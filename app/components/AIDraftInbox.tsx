@@ -1505,6 +1505,7 @@ function TaskUpdateEditForm({
             tasks={openTasks}
             disabled={disabled}
             onRemove={(i) => onChange({ dependsOn: edits.dependsOn.filter((_, j) => j !== i) })}
+            onEmptied={() => document.getElementById(notesId)?.focus()}
           />
         </div>
       )}
@@ -2574,6 +2575,7 @@ function CreateTaskEditForm({
 }) {
   const ownerName = vendorUsers.find((u) => u.id === edits.ownerId)?.name || null;
   const assigneeName = contacts.find((c) => c.id === edits.assigneeContactId)?.name || null;
+  const depsPillRef = useRef<HTMLDivElement>(null);
   const linkedTaskIds = new Set(edits.dependsOn.flatMap((d) => ("taskId" in d ? [d.taskId] : [])));
   const phaseName = phases.find((p) => p.id === edits.phaseId)?.name || null;
 
@@ -2642,7 +2644,7 @@ function CreateTaskEditForm({
         disabled={disabled}
       />
 
-      <div className="flex flex-col gap-2">
+      <div ref={depsPillRef} className="flex flex-col gap-2">
         <SelectPill
           icon={<DependenciesIcon />}
           label="Dependencies"
@@ -2661,6 +2663,7 @@ function CreateTaskEditForm({
           tasks={openTasks}
           disabled={disabled}
           onRemove={(i) => onChange({ dependsOn: edits.dependsOn.filter((_, j) => j !== i) })}
+          onEmptied={() => depsPillRef.current?.querySelector<HTMLButtonElement>("button")?.focus()}
         />
       </div>
 
