@@ -153,7 +153,7 @@ fields on the same call are still scored normally.
 | Code | Meaning |
 |---|---|
 | `free_text_dependency` | The task waits on something that is not a task ("security sign-off"). |
-| `depends_on_new_draft` | The task waits on another draft from the same meeting. Today a draft can only point at a task that already exists. |
+| `depends_on_new_draft` | The task waits on another draft from the same meeting. Since GAPS-PLAN feature 3 a draft can name it (`{ draftRef }`, stored as `{ draftId }`); met only when it points at the proposal paired with that expected task. |
 | `existing_task_notes` | Adding notes to an existing task. |
 | `existing_task_dependency` | Adding a dependency to an existing task. |
 | `multi_field_existing_update` | One existing-task change needs more than one of reassign / reprioritise / due date. (No case needs it today.) |
