@@ -981,7 +981,18 @@ export interface UpdateTaskInput {
   onboardingId?: never;
 }
 
-export async function updateTask(id: IdLike, data: UpdateTaskInput, { actor }: { actor?: Actor | null } = {}) {
+/**
+ * `addDependencies` adds blockers in the SAME transaction as the field update,
+ * so an AI update draft that changes fields (e.g. appends a note) and adds
+ * blockers applies all or nothing: a rejected blocker (another onboarding, a
+ * loop) leaves the task untouched and the draft pending, and a retry cannot
+ * append the note twice.
+ */
+export async function updateTask(
+  id: IdLike,
+  data: UpdateTaskInput,
+  { actor, addDependencies = [] }: { actor?: Actor | null; addDependencies?: DependsOnItem[] } = {}
+) {
   // Defensive: moving a task to a different onboarding would break the
   // Task.companyId == Onboarding.companyId invariant. The whitelist below
   // already excludes it, but make the rule explicit so accidental future
@@ -1006,7 +1017,13 @@ export async function updateTask(id: IdLike, data: UpdateTaskInput, { actor }: {
     await replaceLegacyBlocker(taskId, existing.onboardingId, data.blockedByTaskId);
   }
 
-  const updated = await prisma.task.update({
+  const deps = normaliseDependsOn(addDependencies);
+  const updated = await prisma.$transaction(async (tx) => {
+   if (deps.length > 0) {
+    await insertDependencies(tx, taskId, existing.onboardingId, deps);
+    await syncLegacyBlockedBy(tx, taskId);
+   }
+   return tx.task.update({
     where: { id: taskId },
     data: {
       ...(data.title !== undefined && { title: data.title }),
@@ -1034,6 +1051,7 @@ export async function updateTask(id: IdLike, data: UpdateTaskInput, { actor }: {
       assigneeContact: { select: { id: true, name: true } },
       onboarding: { select: { company: { select: { prefix: true } } } },
     },
+   });
   });
 
   const updatedMapped = mapTask(updated);
@@ -1072,7 +1090,7 @@ export async function updateTask(id: IdLike, data: UpdateTaskInput, { actor }: {
 
   // Health may have flipped if any input to computeHealth changed.
   const healthInputs = ["status", "due", "blockedByTaskId"] as const;
-  if (healthInputs.some((k) => data[k] !== undefined)) {
+  if (healthInputs.some((k) => data[k] !== undefined) || deps.length > 0) {
     await maybeEmitHealthFlip({
       onboardingId: existing.onboardingId,
       taskBefore: { id: existing.id, status: existing.status, due: existing.due ?? "" },
@@ -1132,6 +1150,17 @@ async function insertDependencies(client: DbClient, taskId: number, onboardingId
       throw new DependencyError("Blocker task not found on this onboarding");
     }
   }
+  for (const blockerId of new Set(taskIds)) {
+    const loop = await findDependencyLoop(client, taskId, blockerId);
+    if (loop) {
+      const codes = await taskCodes(client, [taskId, ...loop]);
+      const [self, ...path] = [taskId, ...loop].map((id) => codes.get(id) ?? `#${id}`);
+      const chain = [...path, self];
+      throw new DependencyError(
+        `${path[0]} can't block ${self}: ${chain[0]} already waits on ${chain.slice(1).join(", which waits on ")}, so this would make a loop`
+      );
+    }
+  }
   const existing = await client.taskDependency.findMany({
     where: { taskId },
     select: { blockedByTaskId: true, label: true },
@@ -1150,6 +1179,46 @@ async function insertDependencies(client: DbClient, taskId: number, onboardingId
       await client.taskDependency.create({ data: { taskId, label } });
     }
   }
+}
+
+/**
+ * Would "taskId waits on blockerId" close a loop? Follows what blockerId
+ * already waits on (task blockers only, any status) and returns the chain
+ * [blockerId, ..., a task that waits on taskId] if it reaches taskId, else
+ * null. Visits each task once, so loops already in the data (old rows) cannot
+ * hang it.
+ */
+async function findDependencyLoop(client: DbClient, taskId: number, blockerId: number): Promise<number[] | null> {
+  const parent = new Map<number, number | null>([[blockerId, null]]);
+  let frontier = [blockerId];
+  while (frontier.length > 0) {
+    const edges = await client.taskDependency.findMany({
+      where: { taskId: { in: frontier }, blockedByTaskId: { not: null } },
+      select: { taskId: true, blockedByTaskId: true },
+    });
+    const next: number[] = [];
+    for (const e of edges) {
+      const to = e.blockedByTaskId as number;
+      if (to === taskId) {
+        const chain = [e.taskId];
+        let p = parent.get(e.taskId) ?? null;
+        while (p != null) { chain.unshift(p); p = parent.get(p) ?? null; }
+        return chain;
+      }
+      if (!parent.has(to)) { parent.set(to, e.taskId); next.push(to); }
+    }
+    frontier = next;
+  }
+  return null;
+}
+
+/** "RAY-7" codes for task ids. */
+async function taskCodes(client: DbClient, ids: number[]): Promise<Map<number, string>> {
+  const rows = await client.task.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, number: true, onboarding: { select: { company: { select: { prefix: true } } } } },
+  });
+  return new Map(rows.map((r) => [r.id, `${r.onboarding.company.prefix}-${r.number}`]));
 }
 
 /** Legacy `blockedByTaskId` write: swap the first task blocker for `next` (null = drop it). */

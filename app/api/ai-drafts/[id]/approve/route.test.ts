@@ -32,7 +32,9 @@ vi.mock("@/lib/db", () => ({
   updateTask: vi.fn(),
   createComment: vi.fn(),
   getOrCreateVendorUser: vi.fn(async () => ({ id: 1, name: "Caroline Jaworsky" })),
-  addTaskDependencies: vi.fn(async () => ({})),
+  DependencyError: class DependencyError extends Error {
+    status = 400;
+  },
   classifyBlockerTasks: vi.fn(async (_ob: number, ids: number[]) => ({ open: ids, closed: [], missing: [], foreign: [] })),
 }));
 
@@ -48,8 +50,8 @@ import {
   getContactsForOnboarding,
   updateTask,
   createComment,
-  addTaskDependencies,
   classifyBlockerTasks,
+  DependencyError,
 } from "@/lib/db";
 import { POST } from "./route";
 
@@ -477,8 +479,9 @@ describe("POST /api/ai-drafts/[id]/approve — dependencies (GAPS-PLAN feature 2
     partialMock(getPendingAIChange).mockResolvedValue(updateDraft({ dependsOn: [{ taskId: 7 }, { text: "security review closes" }] }));
     const res = await POST(req(), { params });
     expect(res.status).toBe(200);
-    expect(updateTask).not.toHaveBeenCalled();
-    expect(addTaskDependencies).toHaveBeenCalledWith(501, [{ taskId: 7 }, { text: "security review closes" }]);
+    expect(updateTask).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(updateTask).mock.calls[0][1]).toEqual({});
+    expect(vi.mocked(updateTask).mock.calls[0][2]).toMatchObject({ addDependencies: [{ taskId: 7 }, { text: "security review closes" }] });
     expect(markAIChangeApplied).toHaveBeenCalledWith(232, { resolvedBy: 1, appliedTaskId: 501 });
   });
 
@@ -486,8 +489,10 @@ describe("POST /api/ai-drafts/[id]/approve — dependencies (GAPS-PLAN feature 2
     partialMock(getPendingAIChange).mockResolvedValue(updateDraft({ appendNotes: "Scope agreed.", dependsOn: [{ text: "budget approval" }] }));
     const res = await POST(req(), { params });
     expect(res.status).toBe(200);
+    // Notes and blockers go through ONE updateTask call (one transaction).
     expect(updateTask).toHaveBeenCalledTimes(1);
-    expect(addTaskDependencies).toHaveBeenCalledWith(501, [{ text: "budget approval" }]);
+    expect(vi.mocked(updateTask).mock.calls[0][1]).toHaveProperty("notes");
+    expect(vi.mocked(updateTask).mock.calls[0][2]).toMatchObject({ addDependencies: [{ text: "budget approval" }] });
   });
 
   it("match_existing refuses a foreign blocker before writing anything", async () => {
@@ -496,14 +501,22 @@ describe("POST /api/ai-drafts/[id]/approve — dependencies (GAPS-PLAN feature 2
     const res = await POST(req(), { params });
     expect(res.status).toBe(400);
     expect(updateTask).not.toHaveBeenCalled();
-    expect(addTaskDependencies).not.toHaveBeenCalled();
   });
 
   it("match_existing refuses the task depending on itself", async () => {
     partialMock(getPendingAIChange).mockResolvedValue(updateDraft({ dependsOn: [{ taskId: 501 }] }));
     const res = await POST(req(), { params });
     expect(res.status).toBe(400);
-    expect(addTaskDependencies).not.toHaveBeenCalled();
+    expect(updateTask).not.toHaveBeenCalled();
+  });
+
+  it("a loop refused by the database layer is a 400 with its message, and the draft stays pending", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(updateDraft({ appendNotes: "x", dependsOn: [{ taskId: 7 }] }));
+    vi.mocked(updateTask).mockRejectedValueOnce(new DependencyError("RAY-7 can't block RAY-8: RAY-7 waits on RAY-8, so this would make a loop"));
+    const res = await POST(req(), { params });
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/would make a loop/);
+    expect(markAIChangeApplied).not.toHaveBeenCalled();
   });
 
   it("match_existing whose only blockers are done is a 400 that says why", async () => {

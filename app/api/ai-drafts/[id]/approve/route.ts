@@ -45,8 +45,8 @@ import {
   updateTask,
   createComment,
   getOrCreateVendorUser,
-  addTaskDependencies,
   classifyBlockerTasks,
+  DependencyError,
 } from "@/lib/db";
 import { draftDependsOn, normaliseDependsOn, type DependsOnItem } from "@/lib/task-dependencies";
 import type { Actor } from "@/lib/types";
@@ -335,11 +335,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
           { status: 400 }
         );
       }
-      if (Object.keys(patch).length > 0) {
-        await updateTask(targetId, patch, { actor });
-      }
-      if (depsToAdd.length > 0) {
-        await addTaskDependencies(targetId, depsToAdd);
+      if (Object.keys(patch).length > 0 || depsToAdd.length > 0) {
+        // One transaction: the field changes and the new blockers land
+        // together or not at all (a loop or a bad blocker leaves the task as
+        // it was and the draft pending).
+        await updateTask(targetId, patch, { actor, addDependencies: depsToAdd });
       }
       if (legacyReassign) {
         await createComment(
@@ -395,6 +395,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       ...(skippedDependencies.length > 0 && { skippedDependencies }),
     });
   } catch (err) {
+    // A blocker the database layer refuses (a loop, another onboarding):
+    // the reviewer's problem to fix on the card, not a server fault.
+    if (err instanceof DependencyError) {
+      return NextResponse.json({ error: err.message }, { status: err.status });
+    }
     console.error("[POST /api/ai-drafts/[id]/approve]", err);
     return NextResponse.json(
       { error: (err as Error).message || "Failed to approve draft" },
