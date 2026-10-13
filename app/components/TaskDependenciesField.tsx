@@ -47,7 +47,7 @@ export default function TaskDependenciesField({ task, allTasks, open, onToggle, 
   const popRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   // After a removal, which row's controls should get focus once the list re-renders.
-  const [focusAfterRemove, setFocusAfterRemove] = useState<number | null>(null);
+  const focusAfterRemove = useRef<number | null>(null);
   const rowRef = useRef<HTMLDivElement>(null);
 
   const deps = task.dependencies ?? [];
@@ -119,20 +119,22 @@ export default function TaskDependenciesField({ task, allTasks, open, onToggle, 
   }
 
   async function remove(depId: number, index: number) {
-    if (await send(`${base}/${depId}`, "DELETE")) setFocusAfterRemove(index);
+    focusAfterRemove.current = index;
+    if (!(await send(`${base}/${depId}`, "DELETE"))) focusAfterRemove.current = null;
   }
 
   // Hand focus on after a removal: the row that took the removed one's place,
   // else the one before it, else the field row itself.
   useEffect(() => {
-    if (focusAfterRemove == null) return;
+    const i = focusAfterRemove.current;
+    if (i == null) return;
+    focusAfterRemove.current = null;
     const rows = listRef.current?.querySelectorAll("li") ?? [];
-    const row = rows[Math.min(focusAfterRemove, rows.length - 1)];
+    const row = rows[Math.min(i, rows.length - 1)];
     const target = row?.querySelector<HTMLElement>("[role=checkbox], button")
       ?? rowRef.current?.querySelector<HTMLButtonElement>(".field-main");
     target?.focus();
-    setFocusAfterRemove(null);
-  }, [focusAfterRemove, deps.length]);
+  }, [deps.length]);
 
   function onInputKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {

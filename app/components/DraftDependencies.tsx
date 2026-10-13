@@ -8,7 +8,7 @@
  * sensible instead of dropping it on the page.
  */
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { DependsOnItem } from "@/lib/task-dependencies";
 import IconButton from "../ui/IconButton";
 import TaskIdChip from "../ui/TaskIdChip";
@@ -34,14 +34,16 @@ export default function DraftDependencies({
   disabled?: boolean;
 }) {
   const listRef = useRef<HTMLUListElement>(null);
-  const [focusIndex, setFocusIndex] = useState<number | null>(null);
+  // Index of the item just removed; acted on once the shorter list renders.
+  const focusIndex = useRef<number | null>(null);
   useEffect(() => {
-    if (focusIndex == null) return;
+    const i = focusIndex.current;
+    if (i == null) return;
+    focusIndex.current = null;
     const buttons = listRef.current?.querySelectorAll<HTMLButtonElement>("button") ?? [];
-    if (buttons.length > 0) buttons[Math.min(focusIndex, buttons.length - 1)].focus();
+    if (buttons.length > 0) buttons[Math.min(i, buttons.length - 1)].focus();
     else onEmptied?.();
-    setFocusIndex(null);
-  }, [focusIndex, items.length, onEmptied]);
+  }, [items.length, onEmptied]);
 
   if (items.length === 0) return null;
   return (
@@ -73,7 +75,7 @@ export default function DraftDependencies({
               )}
             </span>
             {onRemove && (
-              <IconButton aria-label={`Remove blocker: ${name}`} onClick={() => { onRemove(i); setFocusIndex(i); }} disabled={disabled} className="shrink-0">
+              <IconButton aria-label={`Remove blocker: ${name}`} onClick={() => { focusIndex.current = i; onRemove(i); }} disabled={disabled} className="shrink-0">
                 <CloseIcon />
               </IconButton>
             )}
