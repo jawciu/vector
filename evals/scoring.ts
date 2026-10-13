@@ -369,7 +369,8 @@ function addressesOwnership(p: Proposal): boolean {
   return p.updateKind === "reassign" || !!p.newOwnerName;
 }
 
-/** A structured dependency on the draft (future GAPS-PLAN shape), as plain entries. */
+/** A draft's structured dependencies (GAPS-PLAN feature 2: { taskRef } | { text };
+ *  feature 3 adds { draftRef } / { title }), as harness/map-actual.ts maps them. */
 type DepEntry = { taskRef?: string; text?: string; draftRef?: string; title?: string };
 function structuredDeps(p: Proposal): DepEntry[] {
   return asList(p.dependsOn as DepEntry | DepEntry[] | null | undefined).filter((d) => d && typeof d === "object");
@@ -387,7 +388,8 @@ function dependencyMet(
   }
   if (d.freeText) {
     if (deps.some((x) => x.text && phraseFound(d.freeText!, x.text))) return true;
-    // Today's prompt says to put external blockers in the notes.
+    // Before feature 2 the prompt put external blockers in the notes ("Blocked
+    // by: ..."); still counted so older run files rescore identically.
     return phraseFound(d.freeText, proposalText(p));
   }
   if (d.newTaskTitleLike) {
@@ -651,6 +653,7 @@ export function scorePhase(
     for (const [field, id, ref] of [
       ["taskId", c.taskId, c.taskRef],
       ["blockedByTaskId", c.blockedByTaskId, c.blockedByRef],
+      ...(c.dependsOnTaskIds ?? []).map((d) => ["dependsOn.taskId", d.id, d.ref] as const),
     ] as const) {
       if (id == null) continue;
       const ok = !!ref && openRefs.has(ref);

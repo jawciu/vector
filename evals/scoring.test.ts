@@ -513,3 +513,93 @@ describe("existing-task updates with a `changes` object (GAPS-PLAN feature 1)", 
     expect(p).toMatchObject({ taskRef: "t1", updateKind: "update_due_date", newDueDate: "2026-06-26", newOwnerName: null, appendNotes: null });
   });
 });
+
+describe("structured dependencies (GAPS-PLAN feature 2)", () => {
+  const golden = {
+    payload: { event: "meeting.saved", meeting: { id: "m1", title: "Sync", date: "2026-06-18" } },
+    board: {
+      companyPrefix: "ACM",
+      companyName: "Acme",
+      contacts: [],
+      vendorUsers: [],
+      tasks: [
+        { ref: "t1", title: "Configure Okta SAML SSO", status: "Not started", owner: "vendor", ownerName: "Dmitri Volkov", dueDate: null, priority: null, notes: "", blockedBy: null },
+        { ref: "t2", title: "Connect Snowflake warehouse to Quarry", status: "In progress", owner: "customer", ownerName: "Jonas Beck", dueDate: null, priority: null, notes: "", blockedBy: null },
+        { ref: "t3", title: "Kickoff call", status: "Done", owner: "vendor", ownerName: "Maya Lindqvist", dueDate: null, priority: null, notes: "", blockedBy: null },
+      ],
+    },
+    expected: { match: { companyPrefix: "ACM" }, toolCalls: [] },
+  } as unknown as GoldenCase;
+  const maps: RawMaps = {
+    companyPrefixByOnboardingId: { "1": "ACM" },
+    onboardingIdByPrefix: { ACM: 1 },
+    vendorNameById: {},
+    contactNameById: {},
+    refByTaskId: { "101": "t1", "102": "t2", "103": "t3" },
+  };
+  const row = (id: number, action: string, payload: Record<string, unknown>) => ({ id, action, payload, sourceQuote: null, confidence: "high" });
+  const mapped = (drafts: ReturnType<typeof row>[], orchestratorOutput: unknown = null) =>
+    mapPhase(golden, maps, { drafts, orchestratorOutput, orchestratorExtraction: null } as Parameters<typeof mapPhase>[2]);
+
+  it("maps stored dependsOn task ids to board refs and keeps text", () => {
+    const [p] = mapped([row(1, "create_task", { title: "Row-level security", dependsOn: [{ taskId: 102 }, { text: "platform team sign-off" }] })]).proposals;
+    expect(p.dependsOn).toEqual([{ taskRef: "t2" }, { text: "platform team sign-off" }]);
+    expect(p.blockedByRef).toBe("t2");
+  });
+
+  it("an older draft with only blockedByTaskId maps as before (no dependsOn field)", () => {
+    const [p] = mapped([row(1, "create_task", { title: "x", blockedByTaskId: 101 })]).proposals;
+    expect(p.blockedByRef).toBe("t1");
+    expect(p.dependsOn).toBeUndefined();
+  });
+
+  it("free_text_dependency is met by a text dependency matching the expected phrase", () => {
+    const expected: ExpectedToolCall[] = [
+      { action: "create_task", titleLike: "Row-level security for the sales team", dependsOn: { freeText: "platform team sign-off", gap: "free_text_dependency" } },
+    ];
+    const reordered = mapped([row(1, "create_task", { title: "Row-level security for the sales team", dependsOn: [{ text: "sign-off from the Platform team" }] })]);
+    const miss = mapped([row(1, "create_task", { title: "Row-level security for the sales team", dependsOn: [{ text: "security review" }] })]);
+    // "platform team sign-off" vs "sign-off from the Platform team": the phrase matcher needs the words in order.
+    expect(scorePhase(expected, reordered, sources).totals.gapsByCode.free_text_dependency).toEqual(count(0, 1));
+    const exact = mapped([row(1, "create_task", { title: "Row-level security for the sales team", dependsOn: [{ text: "Platform team sign-off on the schema" }] })]);
+    expect(scorePhase(expected, exact, sources).totals.gapsByCode.free_text_dependency).toEqual(count(1, 1));
+    expect(scorePhase(expected, miss, sources).totals.gapsByCode.free_text_dependency).toEqual(count(0, 1));
+  });
+
+  it("a 'Blocked by:' line in notes (older runs) still meets free_text_dependency", () => {
+    const expected: ExpectedToolCall[] = [
+      { action: "create_task", titleLike: "Row-level security for the sales team", dependsOn: { freeText: "platform team sign-off", gap: "free_text_dependency" } },
+    ];
+    const old = mapped([row(1, "create_task", { title: "Row-level security for the sales team", notes: "Blocked by: platform team sign-off." })]);
+    expect(scorePhase(expected, old, sources).totals.gapsByCode.free_text_dependency).toEqual(count(1, 1));
+  });
+
+  it("existing_task_dependency is met when the update's dependsOn names the expected board task", () => {
+    const expected: ExpectedToolCall[] = [
+      { action: "match_existing", existingTaskRef: "t1", dependsOn: { existingTaskRef: "t2", gap: "existing_task_dependency" } },
+    ];
+    const hit = mapped([row(1, "match_existing", { taskId: 101, action: "add_dependency", changes: { dependsOn: [{ taskId: 102 }] } })]);
+    const wrong = mapped([row(1, "match_existing", { taskId: 101, action: "add_dependency", changes: { dependsOn: [{ text: "Connect Snowflake warehouse" }] } })]);
+    expect(scorePhase(expected, hit, sources).totals.gapsByCode.existing_task_dependency).toEqual(count(1, 1));
+    expect(scorePhase(expected, wrong, sources).totals.gapsByCode.existing_task_dependency).toEqual(count(0, 1));
+  });
+
+  it("a non-gap existing-task dependency on a create is met through dependsOn too", () => {
+    const expected: ExpectedToolCall[] = [{ action: "create_task", titleLike: "Build the SSO dashboard", dependsOn: { existingTaskRef: "t1" } }];
+    const s = scorePhase(expected, mapped([row(1, "create_task", { title: "Build the SSO dashboard", dependsOn: [{ text: "x" }, { taskId: 101 }] })]), sources);
+    expect(s.totals.dependencies).toEqual(count(1, 1));
+  });
+
+  it("task ids cited in dependsOn count towards 'cited ids = open tasks'", () => {
+    const actual = mapped([], [
+      { tool: "create_task_draft", input: { title: "a", dependsOn: [{ taskId: 102 }, { taskId: 103 }, { text: "x" }] } },
+      { tool: "match_to_existing_task_draft", input: { taskId: 101, changes: { dependsOn: [{ taskId: 999 }] } } },
+    ]);
+    const s = scorePhase([], actual, sources);
+    expect(s.totals.citedIdsValid).toEqual(count(2, 4));
+    expect(s.groundedness.citedIdViolations).toEqual([
+      "create_task_draft.dependsOn.taskId=103",
+      "match_to_existing_task_draft.dependsOn.taskId=999",
+    ]);
+  });
+});

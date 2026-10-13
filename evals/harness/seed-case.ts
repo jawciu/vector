@@ -16,7 +16,8 @@
  *     (two onboardings for one company would make every match ambiguous);
  *   - the Quarry vendor team (Maya, Theo, Ines, Sam, Caroline) plus any extra
  *     vendor user a board names (the anonymous recorder "You");
- *   - the case's `board` (contacts, tasks, blockedBy) on its company's
+ *   - the case's `board` (contacts, tasks, blockedBy → TaskDependency rows
+ *     plus the legacy column) on its company's
  *     onboarding. Every other onboarding is empty.
  *
  * Writes go through a raw `pg` client, never through lib/db, so seeding does
@@ -185,11 +186,20 @@ export async function seedCase(client: pg.Client, board: Board | undefined): Pro
         maps.taskIdByRef.set(t.ref, row.id);
         maps.refByTaskId.set(row.id, t.ref);
       }
+      // Board blockers, the way the app stores them (GAPS-PLAN feature 2): one
+      // TaskDependency row per blocker, and the legacy Task.blockedByTaskId
+      // column set to the first one, as lib/db keeps it.
       for (const t of board!.tasks) {
-        if (!t.blockedBy) continue;
-        const blocker = maps.taskIdByRef.get(t.blockedBy);
-        if (blocker == null) throw new Error(`board task ${t.ref}: blockedBy ${t.blockedBy} not on board`);
-        await client.query(`UPDATE "Task" SET "blockedByTaskId" = $1 WHERE id = $2`, [blocker, maps.taskIdByRef.get(t.ref)]);
+        const refs = (Array.isArray(t.blockedBy) ? t.blockedBy : t.blockedBy ? [t.blockedBy] : []) as string[];
+        const taskId = maps.taskIdByRef.get(t.ref);
+        for (const r of refs) {
+          const blocker = maps.taskIdByRef.get(r);
+          if (blocker == null) throw new Error(`board task ${t.ref}: blockedBy ${r} not on board`);
+          await client.query(`INSERT INTO "TaskDependency" ("taskId", "blockedByTaskId") VALUES ($1, $2)`, [taskId, blocker]);
+        }
+        if (refs.length > 0) {
+          await client.query(`UPDATE "Task" SET "blockedByTaskId" = $1 WHERE id = $2`, [maps.taskIdByRef.get(refs[0]), taskId]);
+        }
       }
     }
     if (board && !maps.onboardingIdByPrefix.has(board.companyPrefix)) {

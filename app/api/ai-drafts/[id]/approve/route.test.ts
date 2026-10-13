@@ -425,7 +425,8 @@ describe("POST /api/ai-drafts/[id]/approve — dependencies (GAPS-PLAN feature 2
   function createDraft(payload: Record<string, unknown>) {
     return { id: 232, action: "create_task", status: "pending", onboardingId: 63, payload: { title: "Rebuild the report", phaseId: 338, ...payload } };
   }
-  function updateDraft(changes: Record<string, unknown>) {
+  type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
+  function updateDraft(changes: { [k: string]: Json }) {
     return { id: 232, action: "match_existing", status: "pending", onboardingId: 63, payload: { taskId: 501, action: "add_dependency", changes } };
   }
 

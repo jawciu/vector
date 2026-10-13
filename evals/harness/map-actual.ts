@@ -70,6 +70,10 @@ const num = (x: unknown): number | null =>
   typeof x === "number" ? x : typeof x === "string" && x.trim() !== "" && !Number.isNaN(Number(x)) ? Number(x) : null;
 const str = (x: unknown): string | null => (typeof x === "string" && x !== "" ? x : null);
 
+type DepEntry = { taskRef?: string; text?: string; draftRef?: string; title?: string };
+const firstTaskRef = (deps: DepEntry[] | undefined): string | null =>
+  deps?.find((x) => x.taskRef && !x.taskRef.startsWith("unknown:"))?.taskRef ?? null;
+
 export function emptyPhase(golden: GoldenCase): PhaseActual {
   const tasks = golden.board?.tasks ?? [];
   return {
@@ -95,6 +99,29 @@ export function mapPhase(golden: GoldenCase, maps: RawMaps, raw: RawPhase): Phas
     return n == null ? null : maps.contactNameById[String(n)] ?? null;
   };
 
+  // dependsOn as stored ([{ taskId } | { text }], GAPS-PLAN feature 2) → the
+  // scorer's entries ({ taskRef } | { text }). Other keys (feature 3's
+  // draftRef / title) pass through. A legacy blockedByTaskId comes first.
+  const mapDeps = (rawDeps: unknown, legacyBlockedBy: unknown): DepEntry[] | undefined => {
+    const list = Array.isArray(rawDeps) ? rawDeps : rawDeps && typeof rawDeps === "object" ? [rawDeps] : [];
+    const out: DepEntry[] = [];
+    const legacy = ref(legacyBlockedBy);
+    if (legacy) out.push({ taskRef: legacy });
+    for (const e of list) {
+      if (!e || typeof e !== "object") continue;
+      const { taskId, ...rest } = e as Record<string, unknown>;
+      if (taskId !== undefined) {
+        const r = ref(taskId);
+        if (r && !out.some((x) => x.taskRef === r)) out.push({ ...rest, taskRef: r });
+        else if (!r) out.push({ ...rest, taskRef: `unknown:${String(taskId)}` });
+      } else {
+        out.push(rest as DepEntry);
+      }
+    }
+    // Old runs had no structured dependencies: keep the field absent so their mapped view is unchanged.
+    return out.length > 0 ? out : rawDeps === undefined ? undefined : out;
+  };
+
   const proposals: Proposal[] = raw.drafts.map((d) => {
     const p = d.payload ?? {};
     const changes = (p.changes && typeof p.changes === "object" ? p.changes : {}) as Record<string, unknown>;
@@ -103,7 +130,7 @@ export function mapPhase(golden: GoldenCase, maps: RawMaps, raw: RawPhase): Phas
       draftId: d.id,
       sourceQuote: d.sourceQuote ?? str(p.sourceQuote),
       confidence: d.confidence,
-      dependsOn: p.dependsOn ?? changes.dependsOn,
+      dependsOn: mapDeps(p.dependsOn ?? changes.dependsOn, d.action === "create_task" ? undefined : changes.blockedByTaskId),
       draftRef: str(p.draftRef),
     };
     if (d.action === "create_task") {
@@ -119,7 +146,8 @@ export function mapPhase(golden: GoldenCase, maps: RawMaps, raw: RawPhase): Phas
         ownerSide: contactId != null ? "customer" : ownerId != null ? "vendor" : null,
         dueDate: str(p.dueDate),
         priority: str(p.priority),
-        blockedByRef: ref(p.blockedByTaskId),
+        // First task blocker: the legacy field on older drafts, else the first dependsOn task.
+        blockedByRef: ref(p.blockedByTaskId) ?? firstTaskRef(mapDeps(p.dependsOn, undefined)),
       };
     }
     // match_existing: current drafts carry every change in `changes`
@@ -146,14 +174,24 @@ export function mapPhase(golden: GoldenCase, maps: RawMaps, raw: RawPhase): Phas
     proposals.push({ action: "flag_no_action_items", draftId: null, sourceQuote: null, title: null, notes: str(f.input?.reason) });
   }
 
-  const rawCalls: RawCall[] = output.map((c) => ({
-    tool: c.tool,
-    taskId: num(c.input?.taskId),
-    taskRef: ref(c.input?.taskId),
-    blockedByTaskId: num(c.input?.blockedByTaskId),
-    blockedByRef: ref(c.input?.blockedByTaskId),
-    sourceQuote: str(c.input?.sourceQuote),
-  }));
+  const rawCalls: RawCall[] = output.map((c) => {
+    const call: RawCall = {
+      tool: c.tool,
+      taskId: num(c.input?.taskId),
+      taskRef: ref(c.input?.taskId),
+      blockedByTaskId: num(c.input?.blockedByTaskId),
+      blockedByRef: ref(c.input?.blockedByTaskId),
+      sourceQuote: str(c.input?.sourceQuote),
+    };
+    // Task ids the AI cited in dependsOn (create, or an update's changes).
+    const inputChanges = c.input?.changes && typeof c.input.changes === "object" ? (c.input.changes as Record<string, unknown>) : {};
+    const rawDeps = c.input?.dependsOn ?? inputChanges.dependsOn;
+    const depIds = (Array.isArray(rawDeps) ? rawDeps : rawDeps && typeof rawDeps === "object" ? [rawDeps] : [])
+      .map((e) => num((e as Record<string, unknown> | null)?.taskId))
+      .filter((n): n is number => n != null);
+    if (depIds.length > 0) call.dependsOnTaskIds = depIds.map((id) => ({ id, ref: ref(id) }));
+    return call;
+  });
 
   return { ...emptyPhase(golden), proposals, rawCalls };
 }
