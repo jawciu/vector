@@ -18,10 +18,10 @@ Run the script, **never paste its steps or `source` it** (a pasted `set -e` woul
 terminal on the first non-zero exit):
 
 ```bash
-bash scripts/migrations/apply-task-dependency.sh dry-run
+DIRECT_DATABASE_URL='<target>' bash scripts/migrations/apply-task-dependency.sh dry-run
 ```
 
-It prints the target (host:port/database from `DIRECT_DATABASE_URL`, shell first, then `.env`),
+The target must be given explicitly as `DIRECT_DATABASE_URL` on the command line; the script refuses to fall back to `.env`. It prints the target (host:port/database) first,
 runs the migration SQL inside `BEGIN ... ROLLBACK`, and checks that the backfill has one row per
 task with a `blockedByTaskId`, every pair matching the old column. Exit 0 = passed. It refuses if
 the table already exists. Read the output before going further; on live, run it only with
@@ -30,14 +30,14 @@ Caroline's go-ahead, even though it rolls back.
 ## 2. Apply (live: only with Caroline's explicit go-ahead)
 
 ```bash
-bash scripts/migrations/apply-task-dependency.sh apply
+DIRECT_DATABASE_URL='<target>' bash scripts/migrations/apply-task-dependency.sh apply
 ```
 
 Steps, each gated on the previous one's exit code:
 
 1. the same dry run (stops if it fails);
 2. `prisma migrate status` (exits 1 while the migration is pending: expected, ignored);
-3. a prompt: type `APPLY` to write;
+3. a prompt naming the target host: type `APPLY` to write;
 4. `prisma db execute --file .../migration.sql` (URL from `prisma.config.ts`, i.e.
    `DIRECT_DATABASE_URL`; Prisma 7.4 has no `--url` flag here and fails with
    `unknown or unexpected option: --url`, exit 1);
