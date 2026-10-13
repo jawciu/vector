@@ -136,8 +136,9 @@ Who should own the task after the update. If it is the same person the board alr
 it is a check ("the owner is right"), not a reassignment.
 
 ### `notesContains`, `dependsOn`
-Same meaning as on `create_task`, but on an existing task the AI cannot add either today
-(see gaps).
+Same meaning as on `create_task`. On an existing task the AI adds them through the update's
+`changes` (`appendNotes` since GAPS-PLAN feature 1, `dependsOn` since feature 2); they keep their
+gap codes so the gap metric shows the features closing them.
 
 ## `gap`: expectations the AI cannot meet yet
 
