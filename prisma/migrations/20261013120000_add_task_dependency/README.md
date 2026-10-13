@@ -12,44 +12,45 @@ task blocker until a later migration retires it (add-then-tighten).
 `prisma migrate dev` cannot be used (the Supabase shadow database cannot replay the `auth`
 schema, P3006), so the SQL is applied by hand.
 
-## 1. Dry run on a copy (no live writes)
+## 1. Dry run (writes nothing)
 
-On a local copy of the live data (`/Users/caro/Code/onboarding-ts-eval/localdb`, database
-cloned from `vector_snapshot`):
+Run the script, **never paste its steps or `source` it** (a pasted `set -e` would close the
+terminal on the first non-zero exit):
 
 ```bash
-node /Users/caro/Code/onboarding-ts-eval/feat2/dry-run.cjs <local db> prisma/migrations/20261013120000_add_task_dependency/migration.sql
+bash scripts/migrations/apply-task-dependency.sh dry-run
 ```
 
-It runs the SQL inside `BEGIN ... ROLLBACK`, checks that the backfilled row count equals the
-number of tasks with a `blockedByTaskId` (and that every pair matches), probes each constraint,
-and confirms the table is gone after the rollback. Transcript of the rehearsal:
-`/Users/caro/Code/onboarding-ts-eval/feat2/migration-dry-run.txt` (419 tasks, 115 with a
-blocker, 115 rows backfilled, 0 missing, 0 self-blocked, 0 dangling).
-
-The same rolled-back check can be run against live with Caroline's go-ahead (read-only in
-effect: it ends in ROLLBACK). Read its output before going further.
+It prints the target (host:port/database from `DIRECT_DATABASE_URL`, shell first, then `.env`),
+runs the migration SQL inside `BEGIN ... ROLLBACK`, and checks that the backfill has one row per
+task with a `blockedByTaskId`, every pair matching the old column. Exit 0 = passed. It refuses if
+the table already exists. Read the output before going further; on live, run it only with
+Caroline's go-ahead, even though it rolls back.
 
 ## 2. Apply (live: only with Caroline's explicit go-ahead)
 
-Prisma 7.4's `db execute` has **no `--url` flag** (it prints its help, does nothing and exits,
-and a following `migrate resolve` would then mark an unapplied migration as applied; this
-happened in the rehearsal and was caught). The URL comes from `prisma.config.ts`, which reads
-`DIRECT_DATABASE_URL`. So:
-
 ```bash
-set -euo pipefail
-# DIRECT_DATABASE_URL must be the session pooler (port 5432) of the target database.
-npx prisma migrate status                      # expect: 20261013120000_add_task_dependency not yet applied
-npx prisma db execute --file prisma/migrations/20261013120000_add_task_dependency/migration.sql
-# Verify BEFORE resolving: the table exists and the backfill matches.
-#   select (select count(*) from "TaskDependency") as rows,
-#          (select count(*) from "Task" where "blockedByTaskId" is not null and "blockedByTaskId" <> id) as expected;
-npx prisma migrate resolve --applied 20261013120000_add_task_dependency
-npx prisma migrate status                      # expect: Database schema is up to date
+bash scripts/migrations/apply-task-dependency.sh apply
 ```
 
-Do not pipe these commands through `tail`/`head` (that hides a failing exit code).
+Steps, each gated on the previous one's exit code:
+
+1. the same dry run (stops if it fails);
+2. `prisma migrate status` (exits 1 while the migration is pending: expected, ignored);
+3. a prompt: type `APPLY` to write;
+4. `prisma db execute --file .../migration.sql` (URL from `prisma.config.ts`, i.e.
+   `DIRECT_DATABASE_URL`; Prisma 7.4 has no `--url` flag here and fails with
+   `unknown or unexpected option: --url`, exit 1);
+5. `node scripts/migrations/task-dependency-check.mjs verify`: exits 1 if the table is missing
+   or any old-column blocker has no row, and then `migrate resolve` is NOT run;
+6. `prisma migrate resolve --applied 20261013120000_add_task_dependency`;
+7. `prisma migrate status`, which must now say the schema is up to date.
+
+`DIRECT_DATABASE_URL` must be the session pooler (port 5432) of the target database.
+
+Proof on a fresh clone of the live snapshot (dry run, declined prompt, full apply, refusal on a
+second run, verify refusing an unapplied database):
+`/Users/caro/Code/onboarding-ts-eval/feat2/runbook-proof.txt`.
 
 ## 3. After applying
 
