@@ -3377,7 +3377,7 @@ async function loadSiblingDrafts(client: DbClient, ids: number[]): Promise<Map<n
 }
 
 /** A dependent's pending link completed (or settled) by a sibling's approval. */
-export type ResolvedDraftLink = { draftId: number; taskId: number | null; state: AppliedDraftLink["state"]; blockedByTaskId: number | null };
+export type ResolvedDraftLink = { draftId: number; taskId: number | null; state: AppliedDraftLink["state"]; blockedByTaskId: number | null; reason?: string };
 
 /**
  * Approve a draft, resolving its sibling-draft links, in ONE transaction:
@@ -3504,7 +3504,7 @@ async function completeLinksTo(tx: Prisma.TransactionClient, draft: DraftRow, ne
         l.state = "linked";
         l.blockedByTaskId = newTaskId;
       }
-      out.push({ draftId: d.id, taskId, state: l.state, blockedByTaskId: l.blockedByTaskId ?? null });
+      out.push({ draftId: d.id, taskId, state: l.state, blockedByTaskId: l.blockedByTaskId ?? null, ...(l.reason && { reason: l.reason }) });
     }
     if (changed) {
       await tx.pendingAIChange.update({
