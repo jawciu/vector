@@ -10,6 +10,7 @@
  */
 
 import type { TaskDependencyView } from "@/lib/task-dependencies";
+import type { LinkedDraftInfo } from "@/lib/draft-links";
 
 /** A file attached to a task (subset of the Prisma File row). */
 export type TaskFile = {
@@ -244,6 +245,10 @@ export type AIDraft = {
   appliedTaskId?: number | null;
   taskTitle?: string | null;
   meetingTitle?: string | null;
+  /** Sibling drafts this one waits on (GAPS-PLAN feature 3); absent when none. */
+  linkedDrafts?: LinkedDraftInfo[];
+  /** Sibling drafts (pending or applied) that wait on this one; absent when none. */
+  dependentDrafts?: { draftId: number; title: string; status: string }[];
 };
 
 /** Overrides body for POST /api/ai-drafts/[id]/approve. Shape varies by action. */
