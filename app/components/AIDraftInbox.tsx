@@ -29,6 +29,8 @@ import {
   staleOwnerMessage,
 } from "@/lib/ai/task-update";
 import type { NoteSource, TaskUpdateChanges } from "@/lib/ai/task-update";
+import { draftDependsOn, type DependsOnItem } from "@/lib/task-dependencies";
+import DraftDependencies from "./DraftDependencies";
 import Button from "@/app/ui/Button";
 import Textarea from "@/app/ui/Textarea";
 import IconButton from "@/app/ui/IconButton";
@@ -788,6 +790,7 @@ export function DraftCard({
                 vendorUsers={vendorUsers}
                 contacts={contacts}
                 disabled={busy}
+                openTasks={openTasks}
               />
             ) : (
               <TaskUpdateDiff
@@ -801,6 +804,7 @@ export function DraftCard({
                 vendorUsers={vendorUsers}
                 contacts={contacts}
                 onPickOwner={isPending && !busy ? openEdit : undefined}
+                openTasks={openTasks}
               />
             )
           ) : editing ? (
@@ -1164,6 +1168,8 @@ type TaskUpdateEdits = {
   dueDate: string;
   priority: Priority | null;
   appendNotes: string;
+  /** Blockers the update adds (lib/task-dependencies.ts). */
+  dependsOn: DependsOnItem[];
 };
 
 function initialUpdateEdits(changes: TaskUpdateChanges, before: TaskBefore): TaskUpdateEdits {
@@ -1174,6 +1180,7 @@ function initialUpdateEdits(changes: TaskUpdateChanges, before: TaskBefore): Tas
     dueDate: changes.dueDate === null ? "" : changes.dueDate ?? before.due ?? "",
     priority: changes.priority ?? before.priority,
     appendNotes: changes.appendNotes ?? "",
+    dependsOn: changes.dependsOn ?? [],
   };
 }
 
@@ -1188,6 +1195,7 @@ function diffUpdateEdits(edits: TaskUpdateEdits, before: TaskBefore): TaskUpdate
   if (due !== (before.due ?? "")) changes.dueDate = due === "" ? null : due;
   if (edits.priority && edits.priority !== before.priority) changes.priority = edits.priority;
   if (edits.appendNotes.trim()) changes.appendNotes = edits.appendNotes.trim();
+  if (edits.dependsOn.length > 0) changes.dependsOn = edits.dependsOn;
   return changes;
 }
 
@@ -1266,7 +1274,10 @@ function TaskUpdateDiff({
   onPickOwner,
   names,
   noteSource,
+  openTasks,
 }: {
+  /** To name blocker tasks in changes.dependsOn. */
+  openTasks: OpenTaskOption[];
   task: OpenTaskOption | undefined;
   fallbackTitle: string;
   changes: TaskUpdateChanges;
@@ -1347,6 +1358,15 @@ function TaskUpdateDiff({
           <p className="whitespace-pre-wrap leading-normal text-text-secondary">{changes.appendNotes}</p>
         </div>
       )}
+      {changes.dependsOn && changes.dependsOn.length > 0 && (
+        <div className="flex flex-col gap-1 text-sm">
+          <span className="inline-flex items-center gap-1.5 text-text-muted">
+            <DependenciesIcon />
+            Adds blockers
+          </span>
+          <DraftDependencies items={changes.dependsOn} tasks={openTasks} />
+        </div>
+      )}
     </div>
   );
 }
@@ -1368,7 +1388,9 @@ function TaskUpdateEditForm({
   vendorUsers,
   contacts,
   disabled,
+  openTasks,
 }: {
+  openTasks: OpenTaskOption[];
   edits: TaskUpdateEdits;
   before: TaskBefore;
   /** Whether the task (and so its current values) is in the loaded list. */
@@ -1472,6 +1494,20 @@ function TaskUpdateEditForm({
           placeholder="Added to the task's notes as a new dated line (optional)"
         />
       </div>
+      {edits.dependsOn.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <span className="inline-flex items-center gap-2 text-sm text-text-secondary">
+            <DependenciesIcon />
+            Add blockers
+          </span>
+          <DraftDependencies
+            items={edits.dependsOn}
+            tasks={openTasks}
+            disabled={disabled}
+            onRemove={(i) => onChange({ dependsOn: edits.dependsOn.filter((_, j) => j !== i) })}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -1988,7 +2024,8 @@ type CreateTaskEdits = {
   dueDate: string;
   phaseId: number | null;
   priority: Priority;
-  blockedByTaskId: number | null;
+  /** What the new task waits on: board tasks and text blockers. */
+  dependsOn: DependsOnItem[];
   notes: string;
 };
 
@@ -2167,6 +2204,7 @@ export function CreateTaskCard({
           onToggleSelect={onToggleSelect}
           busy={busy}
           vendorUsers={vendorUsers}
+          openTasks={openTasks}
         />
       ) : (
         <CreateTaskHeader draft={draft} taskTitle={taskTitle} generatedDate={generatedDate} isPending={isPending} />
@@ -2292,7 +2330,7 @@ function normaliseCreateTaskPayload(payload: DraftPayload | null): CreateTaskEdi
     dueDate: typeof p.dueDate === "string" ? p.dueDate : "",
     phaseId: Number.isInteger(p.phaseId) ? (p.phaseId as number) : null,
     priority: ["low", "medium", "high"].includes(p.priority as string) ? (p.priority as Priority) : "medium",
-    blockedByTaskId: Number.isInteger(p.blockedByTaskId) ? (p.blockedByTaskId as number) : null,
+    dependsOn: draftDependsOn(p),
     notes: typeof p.notes === "string" ? p.notes : "",
   };
 }
@@ -2306,7 +2344,7 @@ function payloadsEqual(a: CreateTaskEdits, b: CreateTaskEdits) {
     a.dueDate === b.dueDate &&
     a.phaseId === b.phaseId &&
     a.priority === b.priority &&
-    a.blockedByTaskId === b.blockedByTaskId &&
+    JSON.stringify(a.dependsOn) === JSON.stringify(b.dependsOn) &&
     a.notes === b.notes
   );
 }
@@ -2327,6 +2365,7 @@ function CreateTaskCompact({
   onToggleSelect,
   busy,
   vendorUsers = [],
+  openTasks = [],
 }: {
   draft: AIDraft;
   taskTitle: string;
@@ -2336,6 +2375,7 @@ function CreateTaskCompact({
   onToggleSelect?: () => void;
   busy: boolean;
   vendorUsers?: VendorUserOption[];
+  openTasks?: OpenTaskOption[];
 }) {
   return (
     <div style={{ display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }}>
@@ -2370,7 +2410,7 @@ function CreateTaskCompact({
         </div>
       </div>
       <div style={{ flex: "1 1 240px", minWidth: 0 }}>
-        <CreateTaskPreview payload={payload} vendorUsers={vendorUsers} />
+        <CreateTaskPreview payload={payload} vendorUsers={vendorUsers} openTasks={openTasks} />
       </div>
     </div>
   );
@@ -2421,9 +2461,11 @@ function CreateTaskHeader({
 function CreateTaskPreview({
   payload,
   vendorUsers = [],
+  openTasks = [],
 }: {
   payload: CreateTaskEdits;
   vendorUsers?: VendorUserOption[];
+  openTasks?: OpenTaskOption[];
 }) {
   const due = payload.dueDate ? new Date(payload.dueDate) : null;
   const dueLabel = due
@@ -2489,6 +2531,14 @@ function CreateTaskPreview({
 
       {/* Row 5: priority */}
       <PriorityIcon priority={payload.priority} size={18} />
+
+      {/* Row 6: what it would wait on (board tasks and text blockers) */}
+      {payload.dependsOn.length > 0 && (
+        <div className="flex w-full min-w-0 items-start justify-end gap-1.5">
+          <DependenciesIcon className="shrink-0 mt-1" />
+          <DraftDependencies items={payload.dependsOn} tasks={openTasks} align="end" />
+        </div>
+      )}
     </div>
   );
 }
@@ -2524,7 +2574,7 @@ function CreateTaskEditForm({
 }) {
   const ownerName = vendorUsers.find((u) => u.id === edits.ownerId)?.name || null;
   const assigneeName = contacts.find((c) => c.id === edits.assigneeContactId)?.name || null;
-  const blockedByTask = openTasks.find((t) => t.id === edits.blockedByTaskId) || null;
+  const linkedTaskIds = new Set(edits.dependsOn.flatMap((d) => ("taskId" in d ? [d.taskId] : [])));
   const phaseName = phases.find((p) => p.id === edits.phaseId)?.name || null;
 
   return (
@@ -2592,18 +2642,27 @@ function CreateTaskEditForm({
         disabled={disabled}
       />
 
-      <SelectPill
-        icon={<DependenciesIcon />}
-        label="Dependencies"
-        valueLabel={blockedByTask?.title || null}
-        options={[
-          { id: null, label: "None" },
-          ...openTasks.map((t) => ({ id: t.id, label: t.title })),
-        ]}
-        selected={edits.blockedByTaskId}
-        onSelect={(blockedByTaskId) => onChange({ blockedByTaskId })}
-        disabled={disabled}
-      />
+      <div className="flex flex-col gap-2">
+        <SelectPill
+          icon={<DependenciesIcon />}
+          label="Dependencies"
+          valueLabel={edits.dependsOn.length > 0 ? `${edits.dependsOn.length} blocker${edits.dependsOn.length > 1 ? "s" : ""}` : null}
+          options={openTasks
+            .filter((t) => !linkedTaskIds.has(t.id))
+            .map((t) => ({ id: t.id, label: t.title }))}
+          selected={null}
+          onSelect={(taskId) => {
+            if (taskId != null) onChange({ dependsOn: [...edits.dependsOn, { taskId }] });
+          }}
+          disabled={disabled}
+        />
+        <DraftDependencies
+          items={edits.dependsOn}
+          tasks={openTasks}
+          disabled={disabled}
+          onRemove={(i) => onChange({ dependsOn: edits.dependsOn.filter((_, j) => j !== i) })}
+        />
+      </div>
 
       {phases.length > 0 && (
         <SelectPill

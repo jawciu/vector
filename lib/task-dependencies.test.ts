@@ -6,6 +6,7 @@ import {
   splitDependsOn,
   isDependencyOpen,
   MAX_DEPENDENCIES,
+  draftDependsOn,
 } from "./task-dependencies";
 
 describe("normaliseDependsOn", () => {
@@ -90,5 +91,16 @@ describe("isDependencyOpen", () => {
   it("a text blocker is open until ticked off", () => {
     expect(isDependencyOpen({ label: "sign-off", resolvedAt: null })).toBe(true);
     expect(isDependencyOpen({ label: "sign-off", resolvedAt: "2026-10-01T00:00:00Z" })).toBe(false);
+  });
+});
+
+describe("draftDependsOn", () => {
+  it("a stored list wins, even empty, over a legacy blockedByTaskId", () => {
+    expect(draftDependsOn({ dependsOn: [], blockedByTaskId: 7 })).toEqual([]);
+    expect(draftDependsOn({ dependsOn: [{ text: "a" }], blockedByTaskId: 7 })).toEqual([{ text: "a" }]);
+  });
+  it("a legacy draft falls back to its single blocker", () => {
+    expect(draftDependsOn({ blockedByTaskId: 7 })).toEqual([{ taskId: 7 }]);
+    expect(draftDependsOn(null)).toEqual([]);
   });
 });

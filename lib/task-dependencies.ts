@@ -128,3 +128,15 @@ export function isDependencyOpen(dep: { blockedByTask?: { status: string } | nul
   if (dep.label) return !dep.resolvedAt;
   return false;
 }
+
+/**
+ * A stored create_task draft's dependencies. A `dependsOn` list (written by
+ * the AI since feature 2, or by the inbox editor) is the whole truth, even
+ * when empty; only a draft without one falls back to its legacy single
+ * `blockedByTaskId`. So removing a blocker in the editor stays removed.
+ */
+export function draftDependsOn(payload: unknown): DependsOnItem[] {
+  const p = (payload && typeof payload === "object" ? payload : {}) as Record<string, unknown>;
+  if (Array.isArray(p.dependsOn)) return normaliseDependsOn(p.dependsOn);
+  return normaliseDependsOn(p.dependsOn, p.blockedByTaskId);
+}

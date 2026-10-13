@@ -48,7 +48,7 @@ import {
   addTaskDependencies,
   classifyBlockerTasks,
 } from "@/lib/db";
-import { normaliseDependsOn, type DependsOnItem } from "@/lib/task-dependencies";
+import { draftDependsOn, normaliseDependsOn, type DependsOnItem } from "@/lib/task-dependencies";
 import type { Actor } from "@/lib/types";
 import type { UpdateTaskInput } from "@/lib/db";
 import {
@@ -236,10 +236,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       if (stale) return NextResponse.json({ error: stale }, { status: 409 });
 
       // The editor sends the full edited list as overrides.dependsOn; without
-      // it, the stored list plus any legacy single blocker.
+      // it, the stored list, or a legacy draft's single blocker.
       const requestedDeps = overrides.dependsOn !== undefined
-        ? normaliseDependsOn(overrides.dependsOn, overrides.blockedByTaskId)
-        : normaliseDependsOn(merged.dependsOn, merged.blockedByTaskId);
+        ? normaliseDependsOn(overrides.dependsOn)
+        : draftDependsOn(merged);
       const vetted = await vetDependencies(draft.onboardingId, requestedDeps);
       if (!vetted.ok) return NextResponse.json({ error: vetted.error }, { status: 400 });
       skippedDependencies = vetted.skipped;

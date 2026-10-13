@@ -5,8 +5,9 @@ import type { HTMLAttributes, Ref } from "react";
 import type { TaskPriority } from "../ui/Icons";
 import type { ClientTask } from "./types";
 import Image from "next/image";
-import { CalendarIcon, PriorityIcon, DependenciesIcon } from "../ui/Icons";
+import { CalendarIcon, PriorityIcon } from "../ui/Icons";
 import TaskIdChip from "../ui/TaskIdChip";
+import TaskDependencyChips from "./TaskDependencyChips";
 import TaskTick from "../ui/TaskTick";
 import { AVATAR_IMAGES, avatarColor, avatarInitials } from "@/lib/avatar";
 import { STATUS_COLORS } from "@/lib/constants";
@@ -177,16 +178,8 @@ export default function TaskCardView({
         </span>
       </div>
 
-      {/* Row 4: Blocked by */}
-      {task.blockedByTask && (
-        <div className="flex items-center gap-1.5">
-          <DependenciesIcon style={{ flexShrink: 0 }} />
-          <span className="text-sm truncate" style={{ color: "var(--text-secondary)" }}>
-            <TaskIdChip task={task.blockedByTask} />
-            {task.blockedByTask.title}
-          </span>
-        </div>
-      )}
+      {/* Row 4: Blocked by (board tasks and text blockers) */}
+      <TaskDependencyChips task={task} />
 
       {/* Row 5: Notes + comments + priority + owner */}
       <div className="flex items-center justify-between">
