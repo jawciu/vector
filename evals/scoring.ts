@@ -376,6 +376,26 @@ function structuredDeps(p: Proposal): DepEntry[] {
   return asList(p.dependsOn as DepEntry | DepEntry[] | null | undefined).filter((d) => d && typeof d === "object");
 }
 
+// Words that only say WHEN a blocker clears ("after the pilot", "until the
+// review closes"); a structured blocker names the thing itself ("Pilot
+// completion"), so these are ignored when comparing blocker labels.
+const BLOCKER_CONNECTORS = new Set(["after", "before", "until", "once", "when", "pending", "wait", "waiting", "on", "for"].map(stem));
+
+/**
+ * A structured blocker label matches the answer key's when at least half of the
+ * key's meaningful words (stemmed, stopwords and timing connectors dropped)
+ * appear in it, and at least one does. Labels are short, written freely by the
+ * AI, and rarely reuse the key's exact phrasing, so exact phrase matching
+ * (used for notes) is too strict here.
+ */
+export function blockerLabelMatches(expected: string, actual: string): boolean {
+  const key = words(expected, { dropStopwords: true }).filter((w) => !BLOCKER_CONNECTORS.has(w));
+  if (key.length === 0) return phraseFound(expected, actual);
+  const got = new Set(words(actual, { dropStopwords: true }));
+  const hits = key.filter((w) => got.has(w)).length;
+  return hits >= 1 && hits / key.length >= 0.5;
+}
+
 function dependencyMet(
   d: DependsOn,
   p: Proposal,
@@ -387,7 +407,7 @@ function dependencyMet(
     return deps.some((x) => x.taskRef === d.existingTaskRef);
   }
   if (d.freeText) {
-    if (deps.some((x) => x.text && phraseFound(d.freeText!, x.text))) return true;
+    if (deps.some((x) => x.text && blockerLabelMatches(d.freeText!, x.text))) return true;
     // Before feature 2 the prompt put external blockers in the notes ("Blocked
     // by: ..."); still counted so older run files rescore identically.
     return phraseFound(d.freeText, proposalText(p));

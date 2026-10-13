@@ -559,8 +559,8 @@ describe("structured dependencies (GAPS-PLAN feature 2)", () => {
     ];
     const reordered = mapped([row(1, "create_task", { title: "Row-level security for the sales team", dependsOn: [{ text: "sign-off from the Platform team" }] })]);
     const miss = mapped([row(1, "create_task", { title: "Row-level security for the sales team", dependsOn: [{ text: "security review" }] })]);
-    // "platform team sign-off" vs "sign-off from the Platform team": the phrase matcher needs the words in order.
-    expect(scorePhase(expected, reordered, sources).totals.gapsByCode.free_text_dependency).toEqual(count(0, 1));
+    // Blocker labels match on their meaningful words, in any order: the AI names blockers freely.
+    expect(scorePhase(expected, reordered, sources).totals.gapsByCode.free_text_dependency).toEqual(count(1, 1));
     const exact = mapped([row(1, "create_task", { title: "Row-level security for the sales team", dependsOn: [{ text: "Platform team sign-off on the schema" }] })]);
     expect(scorePhase(expected, exact, sources).totals.gapsByCode.free_text_dependency).toEqual(count(1, 1));
     expect(scorePhase(expected, miss, sources).totals.gapsByCode.free_text_dependency).toEqual(count(0, 1));
@@ -601,5 +601,21 @@ describe("structured dependencies (GAPS-PLAN feature 2)", () => {
       "create_task_draft.dependsOn.taskId=103",
       "match_to_existing_task_draft.dependsOn.taskId=999",
     ]);
+  });
+});
+
+describe("blockerLabelMatches", () => {
+  it("matches a blocker named by the thing rather than the timing", async () => {
+    const { blockerLabelMatches } = await import("./scoring");
+    expect(blockerLabelMatches("after the pilot", "Pilot completion")).toBe(true);
+    expect(blockerLabelMatches("after the pilot", "pilot sign-off and completion")).toBe(true);
+    expect(blockerLabelMatches("security sign-off", "Security sign-off on the infosec review")).toBe(true);
+    expect(blockerLabelMatches("platform team sign-off", "Sign-off from the platform team")).toBe(true);
+  });
+  it("does not match an unrelated blocker", async () => {
+    const { blockerLabelMatches } = await import("./scoring");
+    expect(blockerLabelMatches("after the pilot", "Legal review of the contract")).toBe(false);
+    expect(blockerLabelMatches("security sign-off", "Pilot completion")).toBe(false);
+    expect(blockerLabelMatches("platform team sign-off", "Finance approval")).toBe(false);
   });
 });
