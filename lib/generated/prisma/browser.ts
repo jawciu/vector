@@ -58,6 +58,14 @@ export type Phase = Prisma.PhaseModel
  */
 export type Task = Prisma.TaskModel
 /**
+ * Model TaskDependency
+ * What a task waits on: another task on the board, or something that is not
+ * a task at all (a sign-off, another team, an external event) as a text label.
+ * A task can have several. Exactly one of blockedByTaskId / label is set
+ * (CHECK constraint, see migration 20261013120000_add_task_dependency).
+ */
+export type TaskDependency = Prisma.TaskDependencyModel
+/**
  * Model Comment
  * 
  */

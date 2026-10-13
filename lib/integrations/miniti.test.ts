@@ -333,4 +333,26 @@ describe("buildOrchestratorContext", () => {
     expect(ctx.openTasks[0]).toMatchObject({ ownerId: 3, priority: "high" });
     expect(buildOrchestratorContext(base).openTasks[0]).toMatchObject({ ownerId: null, priority: null });
   });
+
+  it("lists each open task's OPEN dependencies as dependsOn, in the tools' shape", () => {
+    const ctx = buildOrchestratorContext({
+      ...base,
+      tasks: [
+        {
+          id: 1, taskId: "AC-1", title: "Open task", status: "In progress", phaseId: 5,
+          dependencies: [
+            { id: 10, blockedByTask: { id: 4, taskId: "AC-4", title: "Export", status: "In progress" } },
+            { id: 11, blockedByTask: { id: 2, taskId: "AC-2", title: "Done one", status: "Done" } },
+            { id: 12, label: "budget approval", resolvedAt: null },
+            { id: 13, label: "old sign-off", resolvedAt: "2026-07-01T00:00:00Z" },
+          ],
+        },
+        // A row without loaded dependencies falls back to the legacy column.
+        { id: 5, taskId: "AC-5", title: "Legacy", status: "Not started", phaseId: 5, blockedByTaskId: 1 },
+      ],
+    });
+    expect(ctx.openTasks[0].dependsOn).toEqual([{ taskId: 4 }, { text: "budget approval" }]);
+    expect(ctx.openTasks[1].dependsOn).toEqual([{ taskId: 1 }]);
+    expect(ctx.openTasks[0]).not.toHaveProperty("blockedByTaskId");
+  });
 });

@@ -109,7 +109,7 @@ export type Proposal = {
   assigneeContactName?: string | null;
   dueDate?: string | null;
   priority?: string | null;
-  /** create_task: board ref of blockedByTaskId. */
+  /** create_task: board ref of the first task blocker (legacy blockedByTaskId, else the first dependsOn task). */
   blockedByRef?: string | null;
   /** match_existing / update_status: board ref of the targeted task. */
   taskRef?: string | null;
@@ -124,7 +124,7 @@ export type Proposal = {
   newOwnerName?: string | null;
   sourceQuote?: string | null;
   confidence?: string | null;
-  /** Future structured dependencies (GAPS-PLAN feature 2/3), passed through untouched. */
+  /** Structured dependencies (GAPS-PLAN feature 2): [{ taskRef } | { text }], board refs mapped from task ids; feature 3 keys pass through. Absent on old runs. */
   dependsOn?: unknown;
   /** Future draft-to-draft reference (GAPS-PLAN feature 3), passed through untouched. */
   draftRef?: string | null;
@@ -139,6 +139,8 @@ export type RawCall = {
   taskRef?: string | null;
   blockedByTaskId?: number | null;
   blockedByRef?: string | null;
+  /** Task ids cited in dependsOn (create, or an update's changes), with their board refs. Absent when none. */
+  dependsOnTaskIds?: { id: number; ref: string | null }[];
   sourceQuote?: string | null;
 };
 

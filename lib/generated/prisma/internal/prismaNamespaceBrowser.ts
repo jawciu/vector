@@ -59,6 +59,7 @@ export const ModelName = {
   Contact: 'Contact',
   Phase: 'Phase',
   Task: 'Task',
+  TaskDependency: 'TaskDependency',
   Comment: 'Comment',
   MagicLink: 'MagicLink',
   File: 'File',
@@ -205,6 +206,18 @@ export const TaskScalarFieldEnum = {
 } as const
 
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
+
+
+export const TaskDependencyScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  blockedByTaskId: 'blockedByTaskId',
+  label: 'label',
+  resolvedAt: 'resolvedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type TaskDependencyScalarFieldEnum = (typeof TaskDependencyScalarFieldEnum)[keyof typeof TaskDependencyScalarFieldEnum]
 
 
 export const CommentScalarFieldEnum = {

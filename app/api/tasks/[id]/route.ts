@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { updateTask, deleteTask } from "@/lib/db";
+import { updateTask, deleteTask, DependencyError } from "@/lib/db";
 import { createClient } from "@/lib/supabase/server";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -19,6 +19,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     }
     return NextResponse.json(task);
   } catch (error) {
+    if (error instanceof DependencyError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error("[PATCH /api/tasks/:id]", error);
     return NextResponse.json(
       { error: (error as Error).message || "Failed to update task" },

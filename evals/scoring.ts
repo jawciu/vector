@@ -369,10 +369,31 @@ function addressesOwnership(p: Proposal): boolean {
   return p.updateKind === "reassign" || !!p.newOwnerName;
 }
 
-/** A structured dependency on the draft (future GAPS-PLAN shape), as plain entries. */
+/** A draft's structured dependencies (GAPS-PLAN feature 2: { taskRef } | { text };
+ *  feature 3 adds { draftRef } / { title }), as harness/map-actual.ts maps them. */
 type DepEntry = { taskRef?: string; text?: string; draftRef?: string; title?: string };
 function structuredDeps(p: Proposal): DepEntry[] {
   return asList(p.dependsOn as DepEntry | DepEntry[] | null | undefined).filter((d) => d && typeof d === "object");
+}
+
+// Words that only say WHEN a blocker clears ("after the pilot", "until the
+// review closes"); a structured blocker names the thing itself ("Pilot
+// completion"), so these are ignored when comparing blocker labels.
+const BLOCKER_CONNECTORS = new Set(["after", "before", "until", "once", "when", "pending", "wait", "waiting", "on", "for"].map(stem));
+
+/**
+ * A structured blocker label matches the answer key's when at least half of the
+ * key's meaningful words (stemmed, stopwords and timing connectors dropped)
+ * appear in it, and at least one does. Labels are short, written freely by the
+ * AI, and rarely reuse the key's exact phrasing, so exact phrase matching
+ * (used for notes) is too strict here.
+ */
+export function blockerLabelMatches(expected: string, actual: string): boolean {
+  const key = words(expected, { dropStopwords: true }).filter((w) => !BLOCKER_CONNECTORS.has(w));
+  if (key.length === 0) return phraseFound(expected, actual);
+  const got = new Set(words(actual, { dropStopwords: true }));
+  const hits = key.filter((w) => got.has(w)).length;
+  return hits >= 1 && hits / key.length >= 0.5;
 }
 
 function dependencyMet(
@@ -386,8 +407,9 @@ function dependencyMet(
     return deps.some((x) => x.taskRef === d.existingTaskRef);
   }
   if (d.freeText) {
-    if (deps.some((x) => x.text && phraseFound(d.freeText!, x.text))) return true;
-    // Today's prompt says to put external blockers in the notes.
+    if (deps.some((x) => x.text && blockerLabelMatches(d.freeText!, x.text))) return true;
+    // Before feature 2 the prompt put external blockers in the notes ("Blocked
+    // by: ..."); still counted so older run files rescore identically.
     return phraseFound(d.freeText, proposalText(p));
   }
   if (d.newTaskTitleLike) {
@@ -651,6 +673,7 @@ export function scorePhase(
     for (const [field, id, ref] of [
       ["taskId", c.taskId, c.taskRef],
       ["blockedByTaskId", c.blockedByTaskId, c.blockedByRef],
+      ...(c.dependsOnTaskIds ?? []).map((d) => ["dependsOn.taskId", d.id, d.ref] as const),
     ] as const) {
       if (id == null) continue;
       const ok = !!ref && openRefs.has(ref);

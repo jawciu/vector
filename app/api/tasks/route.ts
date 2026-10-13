@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createTask } from "@/lib/db";
+import { createTask, DependencyError } from "@/lib/db";
 import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
@@ -24,6 +24,9 @@ export async function POST(request: Request) {
     const task = await createTask(body, { actor: { type: "vendor", authUser: user } });
     return NextResponse.json(task, { status: 201 });
   } catch (error) {
+    if (error instanceof DependencyError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error("[POST /api/tasks]", error);
     return NextResponse.json(
       { error: (error as Error).message || "Failed to create task" },

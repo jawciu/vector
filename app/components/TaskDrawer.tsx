@@ -9,6 +9,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/app/ui/Button";
 import FieldPill from "@/app/ui/FieldPill";
+import TaskDependenciesField from "./TaskDependenciesField";
 import FieldRow from "@/app/ui/FieldRow";
 import CalendarDropdown from "@/app/ui/CalendarDropdown";
 import Drawer from "@/app/ui/Drawer";
@@ -510,6 +511,9 @@ const TaskDrawer = forwardRef<HTMLDivElement, TaskDrawerProps>(function TaskDraw
   const membersRef = useRef<HTMLDivElement>(null);
   const membersSearchRef = useRef<HTMLInputElement>(null);
   const depsRef = useRef<HTMLDivElement>(null);
+  // Set while a dependency edit round-trips, so the task sync below keeps the
+  // dependencies popover open for adding several in a row.
+  const keepDepsOpenRef = useRef<number | null>(null);
   const notesRef = useRef<HTMLTextAreaElement>(null);
 
   // Sync local state when task changes
@@ -519,7 +523,10 @@ const TaskDrawer = forwardRef<HTMLDivElement, TaskDrawerProps>(function TaskDraw
       setTitleValue(task.title || "");
       setDescValue(task.description || "");
       setNotesValue(task.notes || "");
+      const keepDeps = keepDepsOpenRef.current === task.id;
+      keepDepsOpenRef.current = null;
       closeAllDropdowns();
+      if (keepDeps) setDepsOpen(true);
       setEditingTitle(false);
       setEditingDesc(false);
     }
@@ -1143,52 +1150,20 @@ const TaskDrawer = forwardRef<HTMLDivElement, TaskDrawerProps>(function TaskDraw
             )}
           </div>
 
-          {/* Dependencies */}
-          <div ref={depsRef} className="relative">
-            <FieldRow
-              icon={<DependenciesIcon style={{ flexShrink: 0 }} />}
-              active={depsOpen}
-              onClick={() => toggleDropdown(depsOpen, setDepsOpen)}
-              onClear={localTask.blockedByTaskId ? () => { patchTask({ blockedByTaskId: null }); setDepsOpen(false); } : undefined}
-            >
-              <span className="text-sm" style={{ color: "var(--text-muted)" }}>Dependencies</span>
-              {localTask.blockedByTaskId && (() => {
-                const dep = allTasks.find((t) => t.id === localTask.blockedByTaskId);
-                return (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm" style={{ color: "var(--text)" }}>
-                      {dep && <TaskIdChip task={dep} />}
-                      {dep?.title || "Task"}
-                    </span>
-                  </div>
-                );
-              })()}
-            </FieldRow>
-            {depsOpen && (
-              <MenuList style={{ width: "max-content", minWidth: "100%", maxWidth: 360, maxHeight: 160, overflowY: "auto" }}>
-                {allTasks.filter((t) => t.id !== localTask.id).length === 0 ? (
-                  <div className="px-2 py-1.5 text-sm" style={{ color: "var(--text-muted)" }}>No other tasks</div>
-                ) : (
-                  allTasks
-                    .filter((t) => t.id !== localTask.id)
-                    .map((t) => (
-                      <MenuOption
-                        key={t.id}
-                        active={localTask.blockedByTaskId === t.id}
-                        onClick={() => {
-                          patchTask({ blockedByTaskId: localTask.blockedByTaskId === t.id ? null : t.id });
-                          setDepsOpen(false);
-                        }}
-                      >
-                        <span>
-                          <TaskIdChip task={t} />
-                          {t.title}
-                        </span>
-                      </MenuOption>
-                    ))
-                )}
-              </MenuList>
-            )}
+          {/* Dependencies: board tasks and text blockers (TaskDependenciesField) */}
+          <div ref={depsRef} className="w-full min-w-0">
+            <TaskDependenciesField
+              task={localTask}
+              allTasks={allTasks}
+              open={depsOpen}
+              onToggle={() => toggleDropdown(depsOpen, setDepsOpen)}
+              onClose={() => setDepsOpen(false)}
+              onTaskUpdated={(updated) => {
+                keepDepsOpenRef.current = depsOpen ? updated.id : null;
+                setLocalTask(updated);
+                if (onTaskUpdated) onTaskUpdated(updated);
+              }}
+            />
           </div>
         </div>
 

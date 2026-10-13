@@ -21,8 +21,8 @@
  * golden-set review (evals/golden/README.md, "Judgement rules"): parked
  * items with an owner become undated tasks, vague or anchored dates are
  * inferred from the meeting date (reasoning goes in notes), "right after
- * this call" promises are tasks, notes carry the agreed specifics, non-task
- * blockers are written as "Blocked by: ..." in notes, an overwhelmed
+ * this call" promises are tasks, notes carry the agreed specifics, blockers
+ * (board tasks or plain text for non-task blockers) go in dependsOn, an overwhelmed
  * customer gets nothing new (our owner gets a circle-back reminder), and
  * existing tasks are cross-checked against what was agreed. Pass 1 decides
  * which of these surface as action items; Pass 2 decides the drafts. The
@@ -84,6 +84,7 @@ export type OrchestratorToolInput = {
   phaseId?: number | null;
   priority?: string;
   blockedByTaskId?: number | null;
+  dependsOn?: Prisma.JsonValue;
   notes?: string;
   sourceQuote?: string;
   confidence?: string;
@@ -298,7 +299,7 @@ You will receive a JSON context with:
     - reportedCompletions[]: { claim, sourceQuote, speaker }
     - externalBlockers[]: string[]
     - meetingTone: short label
-- openTasks: existing OPEN tasks for this onboarding, each with id, taskId (human-readable e.g. "AC-12"), title, status, phaseId, due, ownerId (a vendorUsers id), priority, assigneeContactId (a customerContacts id), description, notes, blockedByTaskId. When referring to a task in sourceQuote or notes, you may use its taskId (e.g. "blocked on AC-7") for readability.
+- openTasks: existing OPEN tasks for this onboarding, each with id, taskId (human-readable e.g. "AC-12"), title, status, phaseId, due, ownerId (a vendorUsers id), priority, assigneeContactId (a customerContacts id), description, notes, dependsOn (what it already waits on: [{ taskId } | { text }], taskId being another openTasks id). When referring to a task in sourceQuote or notes, you may use its taskId (e.g. "blocked on AC-7") for readability.
 - customerContacts: [{ id, name, email }] — for assigneeContactId
 - vendorUsers: [{ id, name, email }] — Caroline's team; for ownerId
 - phases: [{ id, name, isComplete }]
@@ -318,7 +319,7 @@ Rules, non-negotiable:
 1. RESOLVE the verbatim mentions to ids:
    - mentionedOwner: match against vendorUsers (by name) → ownerId. If the speaker is a customer-side person, match against customerContacts → assigneeContactId. If neither matches confidently, leave the relevant id null.
    - mentionedDueDate: convert to ISO YYYY-MM-DD relative to the meeting date (today, unless meeting.date says otherwise; e.g. "by Friday" → next Friday's date). Vague and anchored phrases count as dates too; see JUDGEMENT RULES (dates). Only leave dueDate empty when no timing was said at all, or the phrase has no reasonable reading.
-   - mentionedDependency: match against openTasks (use task title + description + notes for the match) → blockedByTaskId. If the dependency is external (mentioned in extraction.externalBlockers or describes a non-task blocker) or is another new item from this same meeting, leave blockedByTaskId null and put the blocker in notes as "Blocked by: ...".
+   - mentionedDependency: match against openTasks (use task title + description + notes for the match) → dependsOn [{ taskId: <openTasks id> }]. If the dependency is not a task on the board (mentioned in extraction.externalBlockers or describes a non-task blocker) or is another new item from this same meeting → dependsOn [{ text: "<the blocker in a few words>" }]. See JUDGEMENT RULES E.
 
 2. NEVER guess. If you can't resolve a mention with reasonable confidence, leave the field null/omitted. The vendor reviews every draft.
 
@@ -337,7 +338,7 @@ Rules, non-negotiable:
 
 8. Firm items always produce a draft. Tentative items with any credible owner (vendor or customer) produce a draft (confidence: low). Only skip pure "vague" items with no owner and no commitment.
 
-9. Notes: write the create_task_draft notes in your own words, concisely, from notesSnippet and the transcript. They hold the crucial specifics agreed on the call (see JUDGEMENT RULES), then any "Blocked by: ..." line, then any "Due date: ..." reasoning. Do not paste a raw transcript window. Add any external blockers from extraction.externalBlockers if relevant.
+9. Notes: write the create_task_draft notes in your own words, concisely, from notesSnippet and the transcript. They hold the crucial specifics agreed on the call (see JUDGEMENT RULES), then any "Due date: ..." reasoning. Do not paste a raw transcript window. Blockers do not go in notes; they go in dependsOn (rule E), including relevant ones from extraction.externalBlockers.
 
 JUDGEMENT RULES (how an experienced onboarding manager listens; apply them when deciding and filling drafts):
 
@@ -356,19 +357,35 @@ C. "Right after this call" promises are tasks like any other. Draft them with th
 
 D. Notes carry the specifics. Copy into notes the crucial details agreed on the call: scope (what is in and what is out), names of the specific things involved, the audience, constraints, and who to send it to. Short, in your own words, a few comma-separated phrases or one or two sentences, never a raw transcript dump. Prefer the exact names people used for the things involved, so a reader can search for them. If nothing specific was agreed, keep notes short.
 
-E. Dependencies. When the item can only happen after something else:
-   - the blocker is an existing open task → blockedByTaskId (and nothing more is needed).
-   - the blocker is not a task on the board (a sign-off, an approval, another team, an external event) or is another new task you are proposing from this same meeting → leave blockedByTaskId empty and add a notes line "Blocked by: <blocker>".
+E. Dependencies. When the item can only happen after something else, list every blocker in dependsOn (a task can wait on several things):
+   - the blocker is an existing open task → { "taskId": <its openTasks id> }.
+   - the blocker is not a task on the board (a sign-off, an approval, another team, an external event) → { "text": "<the blocker, short, in the words used on the call>" }, e.g. { "text": "legal sign-off on the contract" }.
+   - the blocker is another new task you are proposing from this same meeting → { "text": "<that new task's title>" }.
+   This applies to new tasks (create_task_draft.dependsOn) and to existing ones: when the call says an existing open task now waits on something its dependsOn does not already list, put it in match_to_existing_task_draft changes.dependsOn. Do not repeat a blocker the task already has. Do not write "Blocked by" lines in notes.
 
 F. Overwhelmed customer. When the customer says they are overwhelmed, stretched thin, or asks for space before taking on more, put NOTHING new on their plate from that exchange: no customer-owned tasks, no assigneeContactId for them on new work. Instead create one reminder for our own owner (ownerId = the vendor user who owns the relationship or took it on) to circle back, titled like "Check back in with <contact> about <topic>", with dueDate set to the check-in time if one was discussed (rule B), otherwise empty. Put the reason in notes ("Customer asked for space until ...").
 
 G. Cross-check existing tasks. When the call touches an existing open task (it maps via match_to_existing_task_draft, or someone talks about that work), compare its owner, assignee, due date and priority against what was agreed on the call. Propose ONE match_to_existing_task_draft per existing task, carrying every change in its \`changes\` object: ownerId / assigneeContactId when the work changed hands, dueDate when the timing moved (rule B applies; null when the call says the date no longer applies), priority when it was re-ranked. Do not split one task's changes across several drafts. Only include a field when the call disagrees with the board; do not restate what the board already says.
 
-H. Add what was agreed to existing tasks. When the call adds information to an existing task (scope, names of the specific things involved, audience, constraints, who to send it to, a non-task blocker), put it in changes.appendNotes, following rule D (and rule E's "Blocked by: ..." line). It is appended to the task's notes as a new dated line, never replacing what is there, so write only what is new, not a restatement of the existing notes. Add any "Due date: ..." reasoning line (rule B) there too. A call that adds information but changes nothing else is still worth one update with appendNotes only.
+H. Add what was agreed to existing tasks. When the call adds information to an existing task (scope, names of the specific things involved, audience, constraints, who to send it to), put it in changes.appendNotes, following rule D. A new blocker goes in changes.dependsOn (rule E), not in notes. It is appended to the task's notes as a new dated line, never replacing what is there, so write only what is new, not a restatement of the existing notes. Add any "Due date: ..." reasoning line (rule B) there too. A call that adds information but changes nothing else is still worth one update with appendNotes only.
 
 ${GLOBAL_RULES}
 
 Today is {{TODAY}}. This is normally the meeting date; if meeting.date differs, count dates from meeting.date.`;
+
+/** `dependsOn` on both draft tools: board tasks or plain-text blockers. */
+const DEPENDS_ON_SCHEMA = {
+  type: "array",
+  description: "What this task waits on (see JUDGEMENT RULES E). Each item is EITHER { taskId } for an open task on the board OR { text } for anything else: a blocker that is not a task (a sign-off, another team, an external event), or another new task proposed from this same meeting (use its title). Omit when nothing blocks it.",
+  items: {
+    type: "object",
+    properties: {
+      taskId: { type: "integer", description: "An id from openTasks." },
+      text: { type: "string", description: "The blocker in a few words." },
+    },
+    additionalProperties: false,
+  },
+};
 
 const TOOLS: Tool[] = [
   {
@@ -405,13 +422,10 @@ const TOOLS: Tool[] = [
           type: "string",
           enum: ["low", "medium", "high"],
         },
-        blockedByTaskId: {
-          type: "integer",
-          description: "The single most blocking open task this depends on. MUST be an id from openTasks. Omit if no internal dependency (note external blockers in `notes` instead).",
-        },
+        dependsOn: DEPENDS_ON_SCHEMA,
         notes: {
           type: "string",
-          description: "Concise, in your own words: the crucial specifics agreed on the call (scope, names, audience, constraints, recipient), then any \"Blocked by: ...\" line for blockers that are not open tasks, then any \"Due date: ...\" line explaining an inferred date. Not a raw transcript dump.",
+          description: "Concise, in your own words: the crucial specifics agreed on the call (scope, names, audience, constraints, recipient), then any \"Due date: ...\" line explaining an inferred date. Blockers go in dependsOn, not here. Not a raw transcript dump.",
         },
         sourceQuote: {
           type: "string",
@@ -427,7 +441,7 @@ const TOOLS: Tool[] = [
   },
   {
     name: "match_to_existing_task_draft",
-    description: "Propose updating an existing open task instead of creating a duplicate. Use when an action item maps to a task already in the openTasks list. One draft per task: put EVERY change agreed on the call for that task in `changes` (new owner or assignee, new due date, new priority, notes to append). Only include fields that differ from the board.",
+    description: "Propose updating an existing open task instead of creating a duplicate. Use when an action item maps to a task already in the openTasks list. One draft per task: put EVERY change agreed on the call for that task in `changes` (new owner or assignee, new due date, new priority, notes to append, new blockers). Only include fields that differ from the board.",
     input_schema: {
       type: "object",
       properties: {
@@ -451,7 +465,11 @@ const TOOLS: Tool[] = [
             },
             appendNotes: {
               type: "string",
-              description: "Concise, in your own words: what the call added to this task (scope, names, audience, constraints, recipient), then any \"Blocked by: ...\" line, then any \"Due date: ...\" line explaining an inferred date. Appended to the task's notes as a new dated line; never repeat what the notes already say.",
+              description: "Concise, in your own words: what the call added to this task (scope, names, audience, constraints, recipient), then any \"Due date: ...\" line explaining an inferred date. Appended to the task's notes as a new dated line; never repeat what the notes already say. Blockers go in dependsOn.",
+            },
+            dependsOn: {
+              ...DEPENDS_ON_SCHEMA,
+              description: "Blockers to ADD to this task (see JUDGEMENT RULES E). Only ones its dependsOn does not already list.",
             },
           },
           minProperties: 1,
