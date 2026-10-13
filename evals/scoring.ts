@@ -370,8 +370,9 @@ function addressesOwnership(p: Proposal): boolean {
 }
 
 /** A draft's structured dependencies (GAPS-PLAN feature 2: { taskRef } | { text };
- *  feature 3 adds { draftRef } / { title }), as harness/map-actual.ts maps them. */
-type DepEntry = { taskRef?: string; text?: string; draftRef?: string; title?: string };
+ *  feature 3 adds sibling-draft links { draftId, draftRef, title }), as
+ *  harness/map-actual.ts maps them. */
+type DepEntry = { taskRef?: string; text?: string; draftId?: number; draftRef?: string; title?: string };
 function structuredDeps(p: Proposal): DepEntry[] {
   return asList(p.dependsOn as DepEntry | DepEntry[] | null | undefined).filter((d) => d && typeof d === "object");
 }
@@ -420,7 +421,16 @@ function dependencyMet(
     const target = ei >= 0 ? ctx.pairByExpected.get(ei) : undefined;
     const targetProposal = target !== undefined ? ctx.proposals[target] : undefined;
     return deps.some((x) => {
-      if (x.draftRef && targetProposal && targetProposal.draftRef === x.draftRef) return true;
+      // A link that points at a draft (feature 3) is met only when it points
+      // at the very proposal paired with the expected new task: by row id
+      // when stored, else by the model's draftRef. Its title snapshot does
+      // not count, so a link to the wrong sibling never passes on a similar
+      // title.
+      if (typeof x.draftId === "number" || x.draftRef) {
+        if (!targetProposal) return false;
+        if (typeof x.draftId === "number" && targetProposal.draftId != null) return targetProposal.draftId === x.draftId;
+        return !!x.draftRef && targetProposal.draftRef === x.draftRef;
+      }
       return !!x.title && contentSimilarity(x.title, d.newTaskTitleLike) >= PAIR_THRESHOLD;
     });
   }

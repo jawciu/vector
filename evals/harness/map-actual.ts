@@ -70,7 +70,7 @@ const num = (x: unknown): number | null =>
   typeof x === "number" ? x : typeof x === "string" && x.trim() !== "" && !Number.isNaN(Number(x)) ? Number(x) : null;
 const str = (x: unknown): string | null => (typeof x === "string" && x !== "" ? x : null);
 
-type DepEntry = { taskRef?: string; text?: string; draftRef?: string; title?: string };
+type DepEntry = { taskRef?: string; text?: string; draftId?: number; draftRef?: string; title?: string };
 const firstTaskRef = (deps: DepEntry[] | undefined): string | null =>
   deps?.find((x) => x.taskRef && !x.taskRef.startsWith("unknown:"))?.taskRef ?? null;
 
@@ -101,7 +101,8 @@ export function mapPhase(golden: GoldenCase, maps: RawMaps, raw: RawPhase): Phas
 
   // dependsOn as stored ([{ taskId } | { text }], GAPS-PLAN feature 2) → the
   // scorer's entries ({ taskRef } | { text }). Other keys (feature 3's
-  // draftRef / title) pass through. A legacy blockedByTaskId comes first.
+  // sibling-draft links: draftId / draftRef / title) pass through unchanged.
+  // A legacy blockedByTaskId comes first.
   const mapDeps = (rawDeps: unknown, legacyBlockedBy: unknown): DepEntry[] | undefined => {
     const list = Array.isArray(rawDeps) ? rawDeps : rawDeps && typeof rawDeps === "object" ? [rawDeps] : [];
     const out: DepEntry[] = [];
