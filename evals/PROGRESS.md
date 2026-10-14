@@ -22,7 +22,8 @@ A running record of how Vector's meeting AI is evaluated and improved: what was 
 | 2026-10-12 | Rules v2 (quote rule, concreteness test for parked items); original vs v2 each run 3 times (~$8.40 total). Results below. |
 | 2026-10-12/13 | Feature 1 (richer updates to existing tasks) built, reviewed in three evaluator rounds, eval run 3 times (~$4.70). Results below. |
 | 2026-10-13 | Feature 2 (free-text dependencies, new `TaskDependency` table) built, reviewed in two evaluator rounds, eval run 3 times (~$4.50). Results below. |
-| _next_ | Features 3 (dependencies between new tasks) and 4 (recorder identity), each measured by the eval. |
+| 2026-10-14 | Feature 3 (dependencies between new drafts from the same meeting) built; restore-orphan fix; eval run 3 times (~$4.59). Results below. |
+| _next_ | Feature 4 (recorder identity), measured by the eval. |
 
 ---
 
@@ -215,6 +216,28 @@ Feature 2 gives tasks a proper list of blockers: other tasks or plain text ("pla
 - **Precision and dates improved; recall dipped about 2 points** (ranges overlap, so possibly noise).
 - **Notes captured fell about 8 points and needs a look.** The notes instruction only lost its "Blocked by" line, yet some details (for example the comparison tool in a parity-check task) are now missed on every run. Likely the notes simply got shorter once blockers moved out. Investigated later on a general basis, not by tuning against these meetings.
 - Scoring: blocker labels are now matched on their meaningful words in any order ("Pilot completion" matches "after the pilot"); older runs rescore identically.
+
+### Feature 3: dependencies between new drafts (3 runs, 2026-10-14)
+
+Feature 3 lets a new task from a meeting wait on another new task from the same meeting. The AI names the blocker as `{ draftRef }`; approving the blocker later turns that into a real task dependency (and if the blocker is dismissed, the waiter keeps it as a text blocker). Compared with feature 2 (3 runs each):
+
+| Metric | Feature 2 | Feature 3 |
+|---|---|---|
+| Total recall | avg 89% (85–90%) | avg 78% (77–79%) |
+| Precision | avg 82% (78–85%) | avg 82% (82%) |
+| Owner side right | avg 81% | avg 81% |
+| Due date right | avg 98% | avg 97% |
+| Notes captured | avg 68% | avg 65% |
+| Quotes found verbatim | 99.2% | 100% |
+| Gap expectations met | 3–5 of 18 | 4–5 of 18 |
+| ...same-meeting draft blockers | 0 of 11 | **1–2 of 11** |
+| ...blockers added to existing tasks | 0 of 2 | 0–1 of 2 |
+| Cost per run | ~$1.51 | ~$1.53 |
+
+**Reading it:**
+- **The product path works** (unit tests cover approval order, rejection-as-text, and a snapshot-restore that used to leave a sibling pointing at a deleted task). The eval shows the model starting to emit `draftRef`, but only on 1–2 of the 11 cases that need it. Same pattern as feature 2: plumbing landed, the model still rarely uses the new field.
+- **Recall dropped about 11 points**, spread across several meetings rather than one fluke (cases 02, 03, 06, 13, 26, 29 among them). Precision held because it also proposed fewer drafts. Not tuned against the golden set; worth a later look as a general "did the extra tool surface crowd out ordinary creates?" question.
+- One run had six errors (laptop sleep); it was discarded and repeated. The three runs above are all 30 of 30.
 
 ## Material for the case study
 
