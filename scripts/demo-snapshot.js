@@ -648,6 +648,34 @@ export function planRestoreState(snapshot, companies, { only = null, vendorByEma
                 }),
               },
             }));
+          // GAPS-PLAN feature 3: a sibling that stays applied and whose link to
+          // this draft was completed (or is pending) points at this draft's old
+          // task, which the task rule deletes (its task blocker cascades away),
+          // and the dependency reset above puts the baseline text placeholder
+          // back under a new id. Point the link at that placeholder and mark it
+          // pending again, so approving this draft again completes it.
+          if (sd.status === "pending" && ld.status === "applied" && ld.sourceEventId != null) {
+            for (const [sibKey, sib] of K.drafts) {
+              if (sib.id === ld.id || sib.sourceEventId !== ld.sourceEventId || sib.status !== "applied") continue;
+              if (snapDrafts.get(sibKey)?.status !== "applied" || sib.appliedTaskId == null) continue;
+              const links = Array.isArray(sib.payload?.draftLinks) ? sib.payload.draftLinks : [];
+              if (!links.some((l) => l?.draftId === ld.id && (l.state === "linked" || l.state === "pending"))) continue;
+              add("PendingAIChange", "reset", `draft ${sib.action} link to a draft put back to pending → pending`, async (tx) => {
+                const next = [];
+                for (const l of links) {
+                  if (l?.draftId !== ld.id || (l.state !== "linked" && l.state !== "pending")) { next.push(l); continue; }
+                  const row = await tx.taskDependency.findFirst({
+                    where: { taskId: sib.appliedTaskId, blockedByTaskId: null, label: { equals: String(l.title ?? ""), mode: "insensitive" } },
+                    orderBy: { id: "asc" },
+                    select: { id: true },
+                  });
+                  const { blockedByTaskId: _gone, ...rest } = l;
+                  next.push({ ...rest, state: "pending", dependencyId: row?.id ?? null });
+                }
+                await tx.pendingAIChange.update({ where: { id: sib.id }, data: { payload: { ...sib.payload, draftLinks: next } } });
+              });
+            }
+          }
         }
       } else {
         inert.add("drafts");

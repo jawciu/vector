@@ -283,3 +283,77 @@ describe("placeholders a person changed meanwhile", () => {
     expect(a.resolved[0]).toMatchObject({ draftId: 1003, state: "kept_as_text", reason: "would make a loop" });
   });
 });
+
+describe("a blocker draft put back to pending after its link was made (nightly demo restore)", () => {
+  beforeEach(async () => { await seedMeeting(); });
+
+  /** What demo-snapshot --restore-state does to A: pending again, its task deleted (rows cascade). */
+  function restoreAToPending({ placeholder }: { placeholder: boolean }) {
+    const a = draftRow(1001);
+    const oldTask = a.appliedTaskId as number;
+    a.status = "pending";
+    a.appliedTaskId = null;
+    store.task = store.task.filter((t) => t.id !== oldTask);
+    store.taskDependency = store.taskDependency.filter((d) => d.blockedByTaskId !== oldTask && d.taskId !== oldTask);
+    // The dependency restore re-inserts B's baseline text placeholder under a NEW id.
+    if (placeholder) {
+      store.taskDependency.push({ id: ++store.seq, taskId: draftRow(1002).appliedTaskId as number, blockedByTaskId: null, label: "Add the metrics block", resolvedAt: null });
+    }
+    return oldTask;
+  }
+
+  it("re-approving the blocker upgrades the restored placeholder, even though B's link still says linked", async () => {
+    await approve(1002); // placeholder
+    await approve(1001); // linked to A's first task
+    const oldTask = restoreAToPending({ placeholder: true });
+    expect(readDraftLinks(draftRow(1002).payload)[0]).toMatchObject({ state: "linked", blockedByTaskId: oldTask });
+    const again = await approve(1001);
+    const newTask = draftRow(1001).appliedTaskId;
+    expect(again.resolved).toEqual([expect.objectContaining({ draftId: 1002, state: "linked", blockedByTaskId: newTask })]);
+    expect(boardLinks().filter((l) => l.startsWith("Migrate"))).toEqual([
+      "Migrate the dashboards → task:Add the metrics block",
+      "Migrate the dashboards → text:platform sign-off",
+    ]);
+    expect(readDraftLinks(draftRow(1002).payload)[0]).toMatchObject({ state: "linked", blockedByTaskId: newTask });
+    // Exactly once: a later sibling approval changes nothing on B's task.
+    const before = JSON.stringify(store.taskDependency.filter((d) => d.taskId === draftRow(1002).appliedTaskId));
+    await approve(1003);
+    expect(JSON.stringify(store.taskDependency.filter((d) => d.taskId === draftRow(1002).appliedTaskId))).toBe(before);
+  });
+
+  it("with no placeholder restored, the link is re-created on the new task", async () => {
+    await approve(1002);
+    await approve(1001);
+    restoreAToPending({ placeholder: false });
+    await approve(1001);
+    expect(boardLinks().filter((l) => l.startsWith("Migrate"))).toEqual([
+      "Migrate the dashboards → task:Add the metrics block",
+      "Migrate the dashboards → text:platform sign-off",
+    ]);
+  });
+
+  it("a restore that also resets the link to pending (the snapshot repair) ends the same", async () => {
+    await approve(1002);
+    await approve(1001);
+    restoreAToPending({ placeholder: true });
+    const b = draftRow(1002);
+    const placeholder = store.taskDependency.find((d) => d.taskId === b.appliedTaskId && d.label === "Add the metrics block")!;
+    (b.payload as Record<string, unknown>).draftLinks = [{ draftId: 1001, title: "Add the metrics block", state: "pending", dependencyId: placeholder.id }];
+    await approve(1001);
+    expect(boardLinks().filter((l) => l.startsWith("Migrate"))).toEqual([
+      "Migrate the dashboards → task:Add the metrics block",
+      "Migrate the dashboards → text:platform sign-off",
+    ]);
+  });
+
+  it("a linked entry whose blocker task still exists is left alone", async () => {
+    await approve(1001);
+    await approve(1002); // linked straight away
+    const bTask = draftRow(1002).appliedTaskId;
+    // Someone removes the task blocker by hand; nothing re-adds it.
+    store.taskDependency = store.taskDependency.filter((d) => !(d.taskId === bTask && d.blockedByTaskId != null));
+    const r = await approve(1003);
+    expect(r.resolved).toEqual([]);
+    expect(boardLinks().filter((l) => l.startsWith("Migrate"))).toEqual(["Migrate the dashboards → text:platform sign-off"]);
+  });
+});
