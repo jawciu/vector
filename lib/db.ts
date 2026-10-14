@@ -3475,18 +3475,50 @@ async function completeLinksTo(tx: Prisma.TransactionClient, draft: DraftRow, ne
     const links = readDraftLinks(d.payload);
     let changed = false;
     for (const l of links) {
-      if (l.draftId !== draft.id || l.state !== "pending") continue;
-      changed = true;
+      if (l.draftId !== draft.id) continue;
       const taskId = d.appliedTaskId;
-      const row = l.dependencyId != null && taskId != null
-        ? await tx.taskDependency.findFirst({ where: { id: l.dependencyId, taskId }, select: { id: true, blockedByTaskId: true, resolvedAt: true } })
-        : null;
-      if (!row || taskId == null) {
+      // A "linked" entry normally needs nothing. The exception: this draft was
+      // put back to pending and its old task deleted (the nightly demo
+      // restore does exactly that), which cascaded the task blocker away. Now
+      // that it is approved again, link to the new task, once: afterwards the
+      // entry points at newTaskId and is skipped.
+      const relink = l.state === "linked";
+      if (relink) {
+        if (taskId == null || l.blockedByTaskId === newTaskId) continue;
+        const oldBlocker = l.blockedByTaskId != null
+          ? await tx.task.findUnique({ where: { id: l.blockedByTaskId }, select: { id: true } })
+          : null;
+        if (oldBlocker) continue;
+      } else if (l.state !== "pending") {
+        continue;
+      }
+      changed = true;
+      // The row standing for the link: the recorded one if it is still a text
+      // placeholder; else (restored under a new id) the open text row with the
+      // sibling's title.
+      let row: { id: number; blockedByTaskId: number | null; resolvedAt: Date | null } | null = null;
+      if (taskId != null) {
+        const byId = l.dependencyId != null
+          ? await tx.taskDependency.findFirst({ where: { id: l.dependencyId, taskId }, select: { id: true, blockedByTaskId: true, resolvedAt: true } })
+          : null;
+        row = byId && (byId.blockedByTaskId == null || byId.blockedByTaskId === newTaskId)
+          ? byId
+          : await tx.taskDependency.findFirst({
+              where: { taskId, blockedByTaskId: null, label: { equals: cleanDependencyLabel(l.title) ?? l.title, mode: "insensitive" } },
+              orderBy: { id: "asc" },
+              select: { id: true, blockedByTaskId: true, resolvedAt: true },
+            });
+      }
+      if (taskId == null) {
         l.state = "removed";
-      } else if (row.blockedByTaskId != null) {
+      } else if (!row && !relink) {
+        // The placeholder was deleted by hand: leave it deleted.
+        l.state = "removed";
+      } else if (row && row.blockedByTaskId != null) {
         l.state = "linked";
         l.blockedByTaskId = row.blockedByTaskId;
-      } else if (row.resolvedAt) {
+        l.dependencyId = row.id;
+      } else if (row && row.resolvedAt) {
         l.state = "kept_as_text";
         l.reason = "ticked off by hand";
       } else if (taskId === newTaskId || (await findDependencyLoop(tx, taskId, newTaskId))) {
@@ -3495,10 +3527,15 @@ async function completeLinksTo(tx: Prisma.TransactionClient, draft: DraftRow, ne
       } else {
         const dup = await tx.taskDependency.findFirst({ where: { taskId, blockedByTaskId: newTaskId }, select: { id: true } });
         if (dup) {
-          await tx.taskDependency.delete({ where: { id: row.id } });
+          if (row) await tx.taskDependency.delete({ where: { id: row.id } });
           l.dependencyId = dup.id;
-        } else {
+        } else if (row) {
           await tx.taskDependency.update({ where: { id: row.id }, data: { blockedByTaskId: newTaskId, label: null, resolvedAt: null } });
+          l.dependencyId = row.id;
+        } else {
+          // Re-link with no placeholder left: the task blocker went with the old task.
+          const created = await tx.taskDependency.create({ data: { taskId, blockedByTaskId: newTaskId }, select: { id: true } });
+          l.dependencyId = created.id;
         }
         await syncLegacyBlockedBy(tx, taskId);
         l.state = "linked";
