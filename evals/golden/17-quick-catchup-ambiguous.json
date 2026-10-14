@@ -37,7 +37,6 @@
       { "name": "Speaker 1", "email": null }
     ],
     "vendorUsers": [
-      { "name": "You", "email": null },
       { "name": "Theo Okonkwo", "email": "theo@vector.test" },
       { "name": "Maya Lindqvist", "email": "maya@vector.test" }
     ],
@@ -58,7 +57,7 @@
           "action": "create_task",
           "titleLike": "Send the SSO troubleshooting guide",
           "owner": "vendor",
-          "assignee": "You",
+          "assignee": "Maya Lindqvist",
           "dueDate": "2026-05-21",
           "kind": "commitment",
           "dueDateReason": "'today' = the meeting day, Thu 21 May.",
@@ -77,7 +76,7 @@
           "action": "create_task",
           "titleLike": "Update the customer on additional workshop participants",
           "owner": "vendor",
-          "assignee": "You",
+          "assignee": "Maya Lindqvist",
           "dueDate": null,
           "kind": "vendor_reminder",
           "dueDateReason": "The extra participants are undecided; no date.",

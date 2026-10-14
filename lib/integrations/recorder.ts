@@ -13,6 +13,13 @@ export const RECORDER_CONFIG_KEY = "recorderVendorUserId";
 /** Miniti's label for the local microphone (speaker id -1). */
 export const RECORDER_SPEAKER_LABEL = "You";
 
+/** Inbox copy when a draft was said by the recorder and nobody is set in settings. */
+export const RECORDER_UNKNOWN_OWNER_MESSAGE =
+  "Said by the person who recorded the meeting: pick an owner";
+
+/** Settings section the inbox warning links to. */
+export const RECORDER_SETTINGS_HREF = "/settings#meeting-recorder";
+
 /** The recorder id stored in an integration config, or null if unset / malformed. */
 export function readRecorderId(config: unknown): number | null {
   if (!config || typeof config !== "object" || Array.isArray(config)) return null;

@@ -40,8 +40,8 @@
       { "name": "Speaker 1", "email": null }
     ],
     "vendorUsers": [
-      { "name": "You", "email": null },
-      { "name": "Theo Okonkwo", "email": "theo@vector.test" }
+      { "name": "Theo Okonkwo", "email": "theo@vector.test" },
+      { "name": "Maya Lindqvist", "email": "maya@vector.test" }
     ],
     "tasks": [
       { "ref": "t1", "title": "Connect dbt repo to Quarry", "status": "In progress", "owner": "customer", "ownerName": "Speaker 1", "dueDate": "2026-06-12", "priority": null, "notes": "", "blockedBy": null },
@@ -81,7 +81,7 @@
           "action": "create_task",
           "titleLike": "Review the refactor PR",
           "owner": "vendor",
-          "assignee": "You",
+          "assignee": "Maya Lindqvist",
           "kind": "commitment",
           "dependsOn": { "newTaskTitleLike": "Refactor PR open", "gap": "depends_on_new_draft" },
           "sourceQuoteContains": "I'll review the PR within a day of it landing"

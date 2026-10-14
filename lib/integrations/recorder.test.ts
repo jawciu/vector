@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { canOwnWork, readRecorderId, settleRecorderOwner, transcriptLine } from "./recorder";
+import {
+  canOwnWork,
+  readRecorderId,
+  RECORDER_SETTINGS_HREF,
+  RECORDER_UNKNOWN_OWNER_MESSAGE,
+  settleRecorderOwner,
+  transcriptLine,
+} from "./recorder";
 
 describe("readRecorderId", () => {
   it("reads a positive integer id, as a number or a numeric string", () => {
@@ -36,6 +43,13 @@ describe("settleRecorderOwner", () => {
   it("leaves unflagged drafts alone, and removes a flag that is not true", () => {
     expect(settleRecorderOwner({ ownerId: 7 }, null)).toEqual({ ownerId: 7 });
     expect(settleRecorderOwner({ ownerId: 7, ownerFromRecorder: false }, 4)).toEqual({ ownerId: 7 });
+  });
+});
+
+describe("inbox fallback copy", () => {
+  it("asks the reviewer to pick an owner and points at settings", () => {
+    expect(RECORDER_UNKNOWN_OWNER_MESSAGE).toMatch(/person who recorded the meeting/);
+    expect(RECORDER_SETTINGS_HREF).toBe("/settings#meeting-recorder");
   });
 });
 
