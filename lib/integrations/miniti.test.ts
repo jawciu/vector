@@ -10,12 +10,14 @@ vi.mock("@/lib/db", () => ({
   getOnboardings: vi.fn(),
   getOnboardingsByCompanyId: vi.fn(),
   getExternalEvent: vi.fn(),
-  markExternalEventProcessed: vi.fn(),
-  setExternalEventOrchestratorIO: vi.fn(),
+  markExternalEventProcessed: vi.fn(async () => undefined),
+  setExternalEventOrchestratorIO: vi.fn(async () => undefined),
   createMeetingDrafts: vi.fn(async () => []),
   getTasksForOnboarding: vi.fn(),
   getPhasesForOnboarding: vi.fn(),
   listVendorUsers: vi.fn(),
+  getOnboarding: vi.fn(async () => ({ id: 10, companyName: "Acme" })),
+  getMinitiRecorder: vi.fn(async () => null),
 }));
 
 vi.mock("@/lib/ai/orchestrator", () => ({
@@ -29,11 +31,21 @@ import {
   getContactsForOnboarding,
   getOnboardings,
   getOnboardingsByCompanyId,
+  getExternalEvent,
+  getTasksForOnboarding,
+  getPhasesForOnboarding,
+  listVendorUsers,
+  getMinitiRecorder,
+  createMeetingDrafts,
+  setExternalEventOrchestratorIO,
 } from "@/lib/db";
+import { runMinitiExtraction, runMinitiOrchestrator, toolCallToAction } from "@/lib/ai/orchestrator";
 import {
   validateMinitiPayload,
   matchMeetingToOnboarding,
   buildOrchestratorContext,
+  processMinitiEvent,
+  runMeetingExtractionOnly,
 } from "./miniti";
 import type { MinitiMeeting } from "./miniti";
 
@@ -313,6 +325,26 @@ describe("buildOrchestratorContext", () => {
     expect(ctx.meeting.transcript).toBe("Hello.\nBye.");
   });
 
+  it("labels each turn with its speaker, so the model can tell whose promise it was", () => {
+    const ctx = buildOrchestratorContext({
+      ...base,
+      meeting: meeting({
+        transcript: [
+          { speaker: "You", text: "I'll send the export today." },
+          { speaker: "Speaker 1", text: "Great." },
+          { speaker: "  ", text: "No label." },
+        ],
+      }),
+    });
+    expect(ctx.meeting.transcript).toBe("You: I'll send the export today.\nSpeaker 1: Great.\nNo label.");
+  });
+
+  it("carries the recorder (who \"You\" is) as { id, name }, or null when nobody is set", () => {
+    expect(buildOrchestratorContext(base).recorder).toBe(null);
+    const ctx = buildOrchestratorContext({ ...base, recorder: { id: 3, name: "Robin Vale" } });
+    expect(ctx.recorder).toEqual({ id: 3, name: "Robin Vale" });
+  });
+
   it("tolerates a meeting with no transcript or action items", () => {
     const ctx = buildOrchestratorContext({ ...base, meeting: meeting() });
     expect(ctx.meeting.transcript).toBe("");
@@ -354,5 +386,98 @@ describe("buildOrchestratorContext", () => {
     expect(ctx.openTasks[0].dependsOn).toEqual([{ taskId: 4 }, { text: "budget approval" }]);
     expect(ctx.openTasks[1].dependsOn).toEqual([{ taskId: 1 }]);
     expect(ctx.openTasks[0]).not.toHaveProperty("blockedByTaskId");
+  });
+});
+
+describe("processMinitiEvent: the recorder (\"You\")", () => {
+  const event = {
+    id: 77,
+    processedAt: null,
+    orchestratorExtraction: { actionItems: [] },
+    payload: {
+      meeting: meeting({ transcript: [{ speaker: "You", text: "I'll send the export today." }] }),
+    },
+  };
+  const vendors = [
+    { id: 3, name: "Robin Vale", email: "robin@vendor.test", role: "admin" },
+    { id: 4, name: "Jules Park", email: "jules@vendor.test", role: "member" },
+    { id: 5, name: "Read Only", email: "ro@vendor.test", role: "viewer" },
+  ];
+  const recorderCall = (input: Record<string, unknown>) => ({
+    calls: [
+      {
+        tool: "create_task_draft",
+        id: "t1",
+        input: { draftRef: "d1", title: "Send the export", phaseId: 6, sourceQuote: "I'll send the export today.", ...input },
+      },
+    ],
+    durationMs: 1,
+  });
+  const storedPayload = () => vi.mocked(createMeetingDrafts).mock.calls[0][0][0].payload as Record<string, unknown>;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getExternalEvent).mockResolvedValue(event as unknown as Awaited<ReturnType<typeof getExternalEvent>>);
+    vi.mocked(getTasksForOnboarding).mockResolvedValue([]);
+    vi.mocked(getContactsForOnboarding).mockResolvedValue([]);
+    vi.mocked(getPhasesForOnboarding).mockResolvedValue([
+      { id: 6, name: "Setup", isComplete: false, sortOrder: 1 },
+    ] as unknown as Awaited<ReturnType<typeof getPhasesForOnboarding>>);
+    vi.mocked(listVendorUsers).mockResolvedValue(vendors as unknown as Awaited<ReturnType<typeof listVendorUsers>>);
+    vi.mocked(toolCallToAction).mockImplementation((tool) => (tool === "create_task_draft" ? "create_task" : "no_action"));
+    vi.mocked(setExternalEventOrchestratorIO).mockResolvedValue(undefined as never);
+    vi.mocked(createMeetingDrafts).mockImplementation(async (rows) => rows.map((_, i) => ({ id: i + 1 })) as never);
+  });
+
+  it("puts the configured recorder in Pass 2's context", async () => {
+    vi.mocked(getMinitiRecorder).mockResolvedValue({ id: 4, name: "Jules Park", email: "jules@vendor.test" });
+    vi.mocked(runMinitiOrchestrator).mockResolvedValue(recorderCall({ ownerId: 4 }) as never);
+    await processMinitiEvent(77, 10);
+    const { context } = vi.mocked(runMinitiOrchestrator).mock.calls[0][0];
+    expect(context.recorder).toEqual({ id: 4, name: "Jules Park" });
+    expect(context.meeting.transcript).toBe("You: I'll send the export today.");
+    expect(storedPayload()).toMatchObject({ ownerId: 4, ownerName: "Jules Park" });
+    expect(storedPayload()).not.toHaveProperty("ownerFromRecorder");
+  });
+
+  it("gives a flagged recorder commitment to the configured recorder", async () => {
+    vi.mocked(getMinitiRecorder).mockResolvedValue({ id: 4, name: "Jules Park", email: "jules@vendor.test" });
+    vi.mocked(runMinitiOrchestrator).mockResolvedValue(recorderCall({ ownerFromRecorder: true }) as never);
+    await processMinitiEvent(77, 10);
+    expect(storedPayload()).toMatchObject({ ownerId: 4, ownerName: "Jules Park" });
+    expect(storedPayload()).not.toHaveProperty("ownerFromRecorder");
+  });
+
+  it("with no recorder set, leaves the owner empty and keeps the flag for the inbox", async () => {
+    vi.mocked(getMinitiRecorder).mockResolvedValue(null);
+    vi.mocked(runMinitiOrchestrator).mockResolvedValue(recorderCall({ ownerFromRecorder: true, ownerId: 3 }) as never);
+    await processMinitiEvent(77, 10);
+    expect(vi.mocked(runMinitiOrchestrator).mock.calls[0][0].context.recorder).toBe(null);
+    expect(storedPayload()).toMatchObject({ ownerFromRecorder: true });
+    expect(storedPayload()).not.toHaveProperty("ownerId");
+    expect(storedPayload()).not.toHaveProperty("ownerName");
+  });
+
+  it("treats a recorder who cannot own work (not on the owner list) as not set", async () => {
+    vi.mocked(getMinitiRecorder).mockResolvedValue({ id: 99, name: "Gone", email: "gone@vendor.test" });
+    vi.mocked(runMinitiOrchestrator).mockResolvedValue(recorderCall({ ownerFromRecorder: true }) as never);
+    await processMinitiEvent(77, 10);
+    expect(vi.mocked(runMinitiOrchestrator).mock.calls[0][0].context.recorder).toBe(null);
+    expect(storedPayload()).toMatchObject({ ownerFromRecorder: true });
+  });
+
+  it("drops a flag that is not exactly true", async () => {
+    vi.mocked(getMinitiRecorder).mockResolvedValue(null);
+    vi.mocked(runMinitiOrchestrator).mockResolvedValue(recorderCall({ ownerFromRecorder: "yes", ownerId: 3 }) as never);
+    await processMinitiEvent(77, 10);
+    expect(storedPayload()).toMatchObject({ ownerId: 3 });
+    expect(storedPayload()).not.toHaveProperty("ownerFromRecorder");
+  });
+
+  it("Pass 1 on an unmatched meeting sees the recorder too", async () => {
+    vi.mocked(getMinitiRecorder).mockResolvedValue({ id: 4, name: "Jules Park", email: "jules@vendor.test" });
+    vi.mocked(runMinitiExtraction).mockResolvedValue({ extraction: { actionItems: [] } } as never);
+    await runMeetingExtractionOnly(78, event.payload.meeting);
+    expect(vi.mocked(runMinitiExtraction).mock.calls[0][0].context.recorder).toEqual({ id: 4, name: "Jules Park" });
   });
 });

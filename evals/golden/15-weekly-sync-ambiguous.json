@@ -41,7 +41,6 @@
       { "name": "Speaker 2", "email": null }
     ],
     "vendorUsers": [
-      { "name": "You", "email": null },
       { "name": "Theo Okonkwo", "email": "theo@vector.test" },
       { "name": "Maya Lindqvist", "email": "maya@vector.test" }
     ],
@@ -63,7 +62,7 @@
           "action": "create_task",
           "titleLike": "Share draft of the executive dashboard",
           "owner": "vendor",
-          "assignee": "You",
+          "assignee": "Maya Lindqvist",
           "dueDate": "2026-07-06",
           "kind": "commitment",
           "dueDateReason": "'before our next call'; weekly sync on Tue 30 Jun → next call Tue 7 Jul → due Mon 6 Jul.",

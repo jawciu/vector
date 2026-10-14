@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { listVendorUsers, getOrCreateVendorUser } from "@/lib/db";
+import { listVendorUsers, getOrCreateVendorUser, getMinitiRecorder } from "@/lib/db";
 import TeamPanel from "@/app/components/TeamPanel";
+import MeetingRecorderPanel from "@/app/components/MeetingRecorderPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,7 @@ export default async function SettingsPage() {
     email: user.email,
     name: user.user_metadata?.full_name ?? user.email,
   });
-  const users = await listVendorUsers();
+  const [users, recorder] = await Promise.all([listVendorUsers(), getMinitiRecorder()]);
 
   return (
     <div className="max-w-2xl px-6 py-6 md:px-8 md:py-8 h-full overflow-y-auto">
@@ -28,7 +29,13 @@ export default async function SettingsPage() {
         </p>
       </header>
 
-      <TeamPanel initialUsers={users} currentVendorUserId={me.id} />
+      <div className="flex flex-col gap-10">
+        <TeamPanel initialUsers={users} currentVendorUserId={me.id} />
+        <MeetingRecorderPanel
+          users={users}
+          initialRecorder={recorder ? { id: recorder.id, name: recorder.name } : null}
+        />
+      </div>
     </div>
   );
 }
