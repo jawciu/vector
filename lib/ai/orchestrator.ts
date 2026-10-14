@@ -22,7 +22,8 @@
  * items with an owner become undated tasks, vague or anchored dates are
  * inferred from the meeting date (reasoning goes in notes), "right after
  * this call" promises are tasks, notes carry the agreed specifics, blockers
- * (board tasks or plain text for non-task blockers) go in dependsOn, an overwhelmed
+ * (board tasks, other new drafts from the same meeting by draftRef, or plain
+ * text for non-task blockers) go in dependsOn, an overwhelmed
  * customer gets nothing new (our owner gets a circle-back reminder), and
  * existing tasks are cross-checked against what was agreed. Pass 1 decides
  * which of these surface as action items; Pass 2 decides the drafts. The
@@ -85,6 +86,8 @@ export type OrchestratorToolInput = {
   priority?: string;
   blockedByTaskId?: number | null;
   dependsOn?: Prisma.JsonValue;
+  /** create_task_draft: short id ("d1") other drafts' dependsOn can name. */
+  draftRef?: string;
   notes?: string;
   sourceQuote?: string;
   confidence?: string;
@@ -319,7 +322,7 @@ Rules, non-negotiable:
 1. RESOLVE the verbatim mentions to ids:
    - mentionedOwner: match against vendorUsers (by name) → ownerId. If the speaker is a customer-side person, match against customerContacts → assigneeContactId. If neither matches confidently, leave the relevant id null.
    - mentionedDueDate: convert to ISO YYYY-MM-DD relative to the meeting date (today, unless meeting.date says otherwise; e.g. "by Friday" → next Friday's date). Vague and anchored phrases count as dates too; see JUDGEMENT RULES (dates). Only leave dueDate empty when no timing was said at all, or the phrase has no reasonable reading.
-   - mentionedDependency: match against openTasks (use task title + description + notes for the match) → dependsOn [{ taskId: <openTasks id> }]. If the dependency is not a task on the board (mentioned in extraction.externalBlockers or describes a non-task blocker) or is another new item from this same meeting → dependsOn [{ text: "<the blocker in a few words>" }]. See JUDGEMENT RULES E.
+   - mentionedDependency: match against openTasks (use task title + description + notes for the match) → dependsOn [{ taskId: <openTasks id> }]. If it is another new task you are proposing from this same meeting → dependsOn [{ draftRef: "<that draft's draftRef>" }]. If it is not a task at all (mentioned in extraction.externalBlockers or describes a non-task blocker) → dependsOn [{ text: "<the blocker in a few words>" }]. See JUDGEMENT RULES E.
 
 2. NEVER guess. If you can't resolve a mention with reasonable confidence, leave the field null/omitted. The vendor reviews every draft.
 
@@ -360,7 +363,7 @@ D. Notes carry the specifics. Copy into notes the crucial details agreed on the 
 E. Dependencies. When the item can only happen after something else, list every blocker in dependsOn (a task can wait on several things):
    - the blocker is an existing open task → { "taskId": <its openTasks id> }.
    - the blocker is not a task on the board (a sign-off, an approval, another team, an external event) → { "text": "<the blocker, short, in the words used on the call>" }, e.g. { "text": "legal sign-off on the contract" }.
-   - the blocker is another new task you are proposing from this same meeting → { "text": "<that new task's title>" }.
+   - the blocker is another new task you are proposing from this same meeting → { "draftRef": "<that create_task_draft's draftRef>" }. Every create_task_draft you emit carries its own short draftRef ("d1", "d2", ... in the order you propose them, unique within this response), so other drafts can point at it. Never point a draft at itself, and never make two drafts wait on each other.
    This applies to new tasks (create_task_draft.dependsOn) and to existing ones: when the call says an existing open task now waits on something its dependsOn does not already list, put it in match_to_existing_task_draft changes.dependsOn. Do not repeat a blocker the task already has. Do not write "Blocked by" lines in notes.
 
 F. Overwhelmed customer. When the customer says they are overwhelmed, stretched thin, or asks for space before taking on more, put NOTHING new on their plate from that exchange: no customer-owned tasks, no assigneeContactId for them on new work. Instead create one reminder for our own owner (ownerId = the vendor user who owns the relationship or took it on) to circle back, titled like "Check back in with <contact> about <topic>", with dueDate set to the check-in time if one was discussed (rule B), otherwise empty. Put the reason in notes ("Customer asked for space until ...").
@@ -373,14 +376,15 @@ ${GLOBAL_RULES}
 
 Today is {{TODAY}}. This is normally the meeting date; if meeting.date differs, count dates from meeting.date.`;
 
-/** `dependsOn` on both draft tools: board tasks or plain-text blockers. */
+/** `dependsOn` on both draft tools: board tasks, sibling drafts, or plain-text blockers. */
 const DEPENDS_ON_SCHEMA = {
   type: "array",
-  description: "What this task waits on (see JUDGEMENT RULES E). Each item is EITHER { taskId } for an open task on the board OR { text } for anything else: a blocker that is not a task (a sign-off, another team, an external event), or another new task proposed from this same meeting (use its title). Omit when nothing blocks it.",
+  description: "What this task waits on (see JUDGEMENT RULES E). Each item is exactly ONE of: { taskId } for an open task on the board, { draftRef } for another new task you are proposing in this same response (its create_task_draft's draftRef), or { text } for a blocker that is not a task (a sign-off, another team, an external event). Omit when nothing blocks it.",
   items: {
     type: "object",
     properties: {
       taskId: { type: "integer", description: "An id from openTasks." },
+      draftRef: { type: "string", description: "The draftRef of another create_task_draft in this response." },
       text: { type: "string", description: "The blocker in a few words." },
     },
     additionalProperties: false,
@@ -394,6 +398,10 @@ const TOOLS: Tool[] = [
     input_schema: {
       type: "object",
       properties: {
+        draftRef: {
+          type: "string",
+          description: "REQUIRED. A short id for this draft, unique within this response: \"d1\", \"d2\", ... in the order you propose new tasks. Other drafts name it in dependsOn ({ draftRef }) when they wait on this one.",
+        },
         title: {
           type: "string",
           description: "Short imperative task title, max 80 chars.",
@@ -436,7 +444,7 @@ const TOOLS: Tool[] = [
           enum: ["low", "medium", "high"],
         },
       },
-      required: ["title", "phaseId", "priority", "sourceQuote", "confidence"],
+      required: ["draftRef", "title", "phaseId", "priority", "sourceQuote", "confidence"],
     },
   },
   {

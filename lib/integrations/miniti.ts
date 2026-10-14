@@ -25,7 +25,7 @@ import {
   getExternalEvent,
   markExternalEventProcessed,
   setExternalEventOrchestratorIO,
-  createPendingAIChange,
+  createMeetingDrafts,
   getTasksForOnboarding,
   getPhasesForOnboarding,
   listVendorUsers,
@@ -36,10 +36,12 @@ import { noteSourceFor, prepareStoredTaskUpdate } from "@/lib/ai/task-update";
 import {
   filterDependsOn,
   isDependencyOpen,
-  normaliseDependsOn,
+  normaliseDraftDependsOn,
   type DependsOnItem,
   type TaskDependencyView,
 } from "@/lib/task-dependencies";
+import { planDraftRefs } from "@/lib/draft-links";
+import type { CreatePendingAIChangeInput } from "@/lib/db";
 import type { Prisma } from "@/lib/generated/prisma/client";
 
 // ---------------------------------------------------------------------------
@@ -447,7 +449,16 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
   const validOpenTaskIds = new Set(context.openTasks.map((t) => t.id));
   const validPhaseIds = new Set(context.phases.map((p) => p.id));
 
-  const draftIds: number[] = [];
+  // Sibling-draft refs (GAPS-PLAN feature 3): every create draft gets a short
+  // draftRef, and a dependsOn naming another create draft from this response
+  // is validated here (unknown ref → text blocker, self-ref dropped, a loop
+  // between drafts → text). See lib/draft-links.ts.
+  const refPlan = planDraftRefs(result.calls);
+  for (const line of refPlan.log) console.warn(`[miniti] draftRef ${line} (event ${eventId})`);
+
+  // Every draft of the meeting is written in one go at the end, so the
+  // { draftRef } links can be bound to the sibling rows' ids.
+  const rows: CreatePendingAIChangeInput[] = [];
   for (let i = 0; i < result.calls.length; i++) {
     const call = result.calls[i];
     let action: OrchestratorAction;
@@ -484,9 +495,11 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
         delete payload.assigneeContactId;
       }
       // dependsOn (and a legacy blockedByTaskId) → one clean list; task
-      // blockers must be open tasks the model was shown. Text blockers stay.
+      // blockers must be open tasks the model was shown. Text blockers and
+      // sibling-draft links stay.
+      payload.draftRef = refPlan.refs[i] ?? undefined;
       const { kept, dropped } = filterDependsOn(
-        normaliseDependsOn(payload.dependsOn, payload.blockedByTaskId),
+        normaliseDraftDependsOn(refPlan.dependsOn[i], payload.blockedByTaskId),
         validOpenTaskIds
       );
       for (const id of dropped) {
@@ -516,7 +529,11 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
       // Store the normalised shape (every change in `changes`, `action` set to
       // the sub-action older readers branch on) with ids outside the context
       // dropped, like create_task above. See lib/ai/task-update.ts.
-      const prepared = prepareStoredTaskUpdate(call.input, {
+      const refDeps = refPlan.dependsOn[i];
+      const input = refDeps === undefined
+        ? call.input
+        : { ...call.input, changes: { ...((call.input.changes ?? {}) as Record<string, unknown>), dependsOn: refDeps } as Prisma.JsonObject };
+      const prepared = prepareStoredTaskUpdate(input, {
         vendorUserIds: validVendorUserIds,
         contactIds: validContactIds,
         openTaskIds: validOpenTaskIds,
@@ -546,7 +563,7 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
       if (contactName) payload.assigneeContactName = contactName;
     }
 
-    const draft = await createPendingAIChange({
+    rows.push({
       source: "miniti",
       sourceEventId: eventId,
       onboardingId,
@@ -556,8 +573,9 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
       sourceUrl: null,
       confidence: payload.confidence ?? "medium",
     });
-    draftIds.push(draft.id);
   }
+
+  const draftIds = (await createMeetingDrafts(rows)).map((d) => d.id);
 
   await markExternalEventProcessed(eventId);
   return { skipped: false, draftIds, callCount: result.calls.length, durationMs: result.durationMs };

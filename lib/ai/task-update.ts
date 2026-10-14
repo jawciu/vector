@@ -10,7 +10,9 @@
  *     dueDate?, appendNotes?, dependsOn? }, sourceQuote, confidence }
  *
  * `dependsOn` (GAPS-PLAN feature 2) is what the task should additionally wait
- * on: `[{ taskId } | { text }]`, normalised by lib/task-dependencies.ts.
+ * on: `[{ taskId } | { text }]`, normalised by lib/task-dependencies.ts. Since
+ * feature 3 it may also name a create draft from the same meeting
+ * (`{ draftId, draftRef, title }`); lib/draft-links.ts resolves those.
  *
  * Legacy shape (older rows, and the model if it ever falls back to it): one
  * sub-action per draft, `action` = "reassign" | "reprioritise" |
@@ -27,7 +29,7 @@
  * the inbox card.
  */
 
-import { normaliseDependsOn, type DependsOnItem } from "@/lib/task-dependencies";
+import { normaliseDraftDependsOn, type DraftDependsOnItem } from "@/lib/task-dependencies";
 
 export const TASK_UPDATE_PRIORITIES = ["low", "medium", "high"] as const;
 export type TaskUpdatePriority = (typeof TASK_UPDATE_PRIORITIES)[number];
@@ -42,8 +44,9 @@ export type TaskUpdateChanges = {
   dueDate?: string | null;
   /** Text to append to the task's notes (never overwrites). */
   appendNotes?: string;
-  /** Dependencies to ADD to the task (existing ones stay). */
-  dependsOn?: DependsOnItem[];
+  /** Dependencies to ADD to the task (existing ones stay). May name another
+   *  create draft from the same meeting (`{ draftId }`, GAPS-PLAN feature 3). */
+  dependsOn?: DraftDependsOnItem[];
 };
 
 export type TaskUpdateSubAction =
@@ -108,7 +111,7 @@ export function sanitiseChanges(raw: unknown): TaskUpdateChanges {
   else if (typeof r.dueDate === "string" && isIsoDate(r.dueDate.slice(0, 10))) out.dueDate = r.dueDate.slice(0, 10);
   if (typeof r.appendNotes === "string" && r.appendNotes.trim() !== "") out.appendNotes = r.appendNotes.trim();
   if (r.dependsOn !== undefined || r.blockedByTaskId !== undefined) {
-    const deps = normaliseDependsOn(r.dependsOn, r.blockedByTaskId);
+    const deps = normaliseDraftDependsOn(r.dependsOn, r.blockedByTaskId);
     if (deps.length > 0) out.dependsOn = deps;
   }
   return out;

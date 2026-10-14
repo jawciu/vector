@@ -12,7 +12,7 @@ vi.mock("@/lib/db", () => ({
   getExternalEvent: vi.fn(),
   markExternalEventProcessed: vi.fn(),
   setExternalEventOrchestratorIO: vi.fn(),
-  createPendingAIChange: vi.fn(),
+  createMeetingDrafts: vi.fn(async () => []),
   getTasksForOnboarding: vi.fn(),
   getPhasesForOnboarding: vi.fn(),
   listVendorUsers: vi.fn(),

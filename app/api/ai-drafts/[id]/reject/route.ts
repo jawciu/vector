@@ -1,14 +1,20 @@
 /**
  * [POST /api/ai-drafts/[id]/reject] — mark a draft rejected with an optional reason.
  * Rejections feed prompt-tuning later, so the reason is worth capturing.
+ *
+ * Other drafts from the same meeting may wait on this one (GAPS-PLAN feature
+ * 3). Rejecting it keeps that blocker on them as text (lib/db.ts
+ * rejectDraftWithLinks); the response lists them as `dependents` so the inbox
+ * can say so.
  */
 
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import {
   getPendingAIChange,
-  markAIChangeRejected,
+  rejectDraftWithLinks,
   getOrCreateVendorUser,
+  DraftConflictError,
 } from "@/lib/db";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -41,10 +47,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       name: user.user_metadata?.full_name ?? user.email,
     });
 
-    await markAIChangeRejected(draftId, { resolvedBy: vu.id, reason });
+    const { dependents } = await rejectDraftWithLinks(draftId, { resolvedBy: vu.id, reason });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, ...(dependents.length > 0 && { dependents }) });
   } catch (err) {
+    if (err instanceof DraftConflictError) {
+      return NextResponse.json({ error: err.message }, { status: err.status });
+    }
     console.error("[POST /api/ai-drafts/[id]/reject]", err);
     return NextResponse.json(
       { error: (err as Error).message || "Failed to reject draft" },

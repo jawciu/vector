@@ -35,6 +35,19 @@ vi.mock("@/lib/db", () => ({
   DependencyError: class DependencyError extends Error {
     status = 400;
   },
+  DraftConflictError: class DraftConflictError extends Error {
+    status = 409;
+  },
+  // The real one runs `work` in a transaction, resolves sibling-draft links
+  // and marks the draft applied (covered by lib/draft-approval.test.ts). Here:
+  // run `work` with no links and record the applied mark through the
+  // markAIChangeApplied mock, so these tests keep asserting on it.
+  applyDraftApproval: vi.fn(async ({ draftId, resolvedBy, work }) => {
+    const { appliedTaskId, value } = await work({ tx: null, linkDeps: [], afterCommit: [] });
+    const { markAIChangeApplied } = await import("@/lib/db");
+    await markAIChangeApplied(draftId, { resolvedBy, appliedTaskId });
+    return { value, draftLinks: [], resolved: [] };
+  }),
   classifyBlockerTasks: vi.fn(async (_ob: number, ids: number[]) => ({ open: ids, closed: [], missing: [], foreign: [] })),
 }));
 
@@ -51,7 +64,9 @@ import {
   updateTask,
   createComment,
   classifyBlockerTasks,
+  applyDraftApproval,
   DependencyError,
+  DraftConflictError,
 } from "@/lib/db";
 import { POST } from "./route";
 
@@ -526,5 +541,53 @@ describe("POST /api/ai-drafts/[id]/approve — dependencies (GAPS-PLAN feature 2
     expect(res.status).toBe(400);
     expect((await res.json()).error).toMatch(/done or gone/);
     expect(markAIChangeApplied).not.toHaveBeenCalled();
+  });
+
+  // ---- GAPS-PLAN feature 3: links to other drafts from the same meeting ----
+
+  it("create_task hands sibling-draft links to applyDraftApproval and vets only board tasks", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(
+      createDraft({ dependsOn: [{ draftId: 230, draftRef: "d1", title: "Add the metrics block" }, { taskId: 7 }] })
+    );
+    // As if the sibling were still pending: its link comes back as a text placeholder.
+    vi.mocked(applyDraftApproval).mockImplementationOnce(async ({ draftId, resolvedBy, work }) => {
+      const { appliedTaskId, value } = await work({ tx: null as never, linkDeps: [{ text: "Add the metrics block" }], afterCommit: [] });
+      await markAIChangeApplied(draftId, { resolvedBy, appliedTaskId });
+      return { value, draftLinks: [{ draftId: 230, title: "Add the metrics block", state: "pending" as const, dependencyId: 1 }], resolved: [] };
+    });
+    const res = await POST(req(), { params });
+    const body = await res.json();
+    expect(res.status).toBe(200);
+    expect(vi.mocked(applyDraftApproval).mock.calls[0][0].links).toEqual([{ draftId: 230, draftRef: "d1", title: "Add the metrics block" }]);
+    expect(vi.mocked(classifyBlockerTasks).mock.calls[0][1]).toEqual([7]);
+    expect(vi.mocked(createTask).mock.calls[0][0].dependsOn).toEqual([{ taskId: 7 }, { text: "Add the metrics block" }]);
+    expect(body.draftLinks).toEqual([expect.objectContaining({ draftId: 230, state: "pending" })]);
+  });
+
+  it("removing the link in the editor means no link is resolved", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(createDraft({ dependsOn: [{ draftId: 230, title: "A" }, { text: "x" }] }));
+    await POST(req({ overrides: { dependsOn: [{ text: "x" }] } }), { params });
+    expect(vi.mocked(applyDraftApproval).mock.calls[0][0].links).toEqual([]);
+  });
+
+  it("match_existing whose only change is a sibling-draft link still applies (not 'no changes')", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(updateDraft({ dependsOn: [{ draftId: 230, title: "Close the vendor review" }] }));
+    vi.mocked(applyDraftApproval).mockImplementationOnce(async ({ draftId, resolvedBy, work }) => {
+      const { appliedTaskId, value } = await work({ tx: null as never, linkDeps: [{ taskId: 900 }], afterCommit: [] });
+      await markAIChangeApplied(draftId, { resolvedBy, appliedTaskId });
+      return { value, draftLinks: [], resolved: [] };
+    });
+    const res = await POST(req(), { params });
+    expect(res.status).toBe(200);
+    expect(classifyBlockerTasks).not.toHaveBeenCalled();
+    expect(vi.mocked(updateTask).mock.calls[0][2]).toMatchObject({ addDependencies: [{ taskId: 900 }] });
+  });
+
+  it("a draft approved meanwhile (bulk action, second tab) is a 409", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(createDraft({}));
+    vi.mocked(applyDraftApproval).mockRejectedValueOnce(new DraftConflictError("Draft already applied"));
+    const res = await POST(req(), { params });
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toBe("Draft already applied");
   });
 });

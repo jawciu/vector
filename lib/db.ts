@@ -14,8 +14,18 @@ import {
   normaliseDependsOn,
   cleanDependencyLabel,
   type DependsOnItem,
+  type DraftLinkItem,
   type TaskDependencyView,
 } from "./task-dependencies";
+import {
+  bindPayloadLinks,
+  classifyDraftLink,
+  payloadDraftLinks,
+  readDraftLinks,
+  type AppliedDraftLink,
+  type LinkedDraftInfo,
+  type SiblingDraft,
+} from "./draft-links";
 import {
   TASK_STATUSES,
   PRIORITIES,
@@ -769,9 +779,17 @@ export interface CreateTaskInput {
   assigneeContactId?: IdLike | null;
 }
 
+/**
+ * Work to run once the caller's transaction has committed (activity rows and
+ * their notifications). A function given `tx` and an `afterCommit` list pushes
+ * its side effects there instead of running them inside the transaction, so a
+ * rollback never leaves a "created" activity for a task that does not exist.
+ */
+export type AfterCommit = (() => Promise<unknown>)[];
+
 export async function createTask(
   data: CreateTaskInput,
-  { actor, tx = null }: { actor?: Actor | null; tx?: Prisma.TransactionClient | null } = {}
+  { actor, tx = null, afterCommit = null }: { actor?: Actor | null; tx?: Prisma.TransactionClient | null; afterCommit?: AfterCommit | null } = {}
 ) {
   if ("companyId" in data || "number" in data) {
     throw new Error("createTask: callers must not supply companyId or number — both are computed internally");
@@ -880,6 +898,7 @@ export async function createTask(
     : await prisma.$transaction((innerTx) => runWith(innerTx));
 
   if (actor) {
+    const emitCreated = async () => {
     const mapped = mapTask(task);
     await emitActivity({
       onboardingId,
@@ -904,6 +923,9 @@ export async function createTask(
         },
       });
     }
+    };
+    if (afterCommit) afterCommit.push(emitCreated);
+    else await emitCreated();
   }
 
   return mapTask(task);
@@ -928,19 +950,24 @@ async function maybeEmitHealthFlip({
   taskBefore,
   taskAfter,
   actor,
+  client = prisma,
+  afterCommit = null,
 }: {
   onboardingId: number;
   taskBefore: HealthFlipTask;
   taskAfter: HealthFlipTask;
   actor?: Actor | null;
+  /** Read through the caller's transaction, so its uncommitted writes count. */
+  client?: DbClient;
+  afterCommit?: AfterCommit | null;
 }) {
   if (!actor) return;
-  const onboarding = await prisma.onboarding.findUnique({
+  const onboarding = await client.onboarding.findUnique({
     where: { id: onboardingId },
     select: { targetGoLive: true, createdAt: true },
   });
   if (!onboarding) return;
-  const allTasks = await prisma.task.findMany({
+  const allTasks = await client.task.findMany({
     where: { onboardingId },
     select: { id: true, status: true, due: true, dependencies: OPEN_TEXT_BLOCKERS_SELECT },
   });
@@ -949,7 +976,7 @@ async function maybeEmitHealthFlip({
   const before = computeHealthFromTasks(beforeTasks, opts).status;
   const after = computeHealthFromTasks(allTasks, opts).status;
   if (before === after) return;
-  await emitActivity({
+  const emit = () => emitActivity({
     onboardingId,
     actor,
     verb: "health_flipped",
@@ -957,6 +984,8 @@ async function maybeEmitHealthFlip({
     entityId: onboardingId,
     metadata: { from: before, to: after },
   });
+  if (afterCommit) afterCommit.push(emit);
+  else await emit();
 }
 
 /** Update an existing task (partial updates). */
@@ -987,11 +1016,20 @@ export interface UpdateTaskInput {
  * blockers applies all or nothing: a rejected blocker (another onboarding, a
  * loop) leaves the task untouched and the draft pending, and a retry cannot
  * append the note twice.
+ *
+ * With `tx`, every write runs inside the caller's transaction (the AI draft
+ * approval, which also records draft links in it); activity is pushed to
+ * `afterCommit` when given.
  */
 export async function updateTask(
   id: IdLike,
   data: UpdateTaskInput,
-  { actor, addDependencies = [] }: { actor?: Actor | null; addDependencies?: DependsOnItem[] } = {}
+  {
+    actor,
+    addDependencies = [],
+    tx = null,
+    afterCommit = null,
+  }: { actor?: Actor | null; addDependencies?: DependsOnItem[]; tx?: Prisma.TransactionClient | null; afterCommit?: AfterCommit | null } = {}
 ) {
   // Defensive: moving a task to a different onboarding would break the
   // Task.companyId == Onboarding.companyId invariant. The whitelist below
@@ -1004,7 +1042,7 @@ export async function updateTask(
   const taskId = Number(id);
   if (Number.isNaN(taskId)) return null;
 
-  const existing = await prisma.task.findUnique({
+  const existing = await (tx ?? prisma).task.findUnique({
     where: { id: taskId },
     select: { id: true, status: true, due: true, onboardingId: true, title: true, assigneeContactId: true },
   });
@@ -1014,11 +1052,12 @@ export async function updateTask(
   // first task blocker. Dependencies are the source of truth; the column is
   // re-derived from them.
   if (data.blockedByTaskId !== undefined) {
+    if (tx) throw new Error("updateTask: blockedByTaskId cannot be written inside a caller's transaction; use addDependencies");
     await replaceLegacyBlocker(taskId, existing.onboardingId, data.blockedByTaskId);
   }
 
   const deps = normaliseDependsOn(addDependencies);
-  const updated = await prisma.$transaction(async (tx) => {
+  const run = async (tx: Prisma.TransactionClient) => {
    if (deps.length > 0) {
     await insertDependencies(tx, taskId, existing.onboardingId, deps);
     await syncLegacyBlockedBy(tx, taskId);
@@ -1052,18 +1091,21 @@ export async function updateTask(
       onboarding: { select: { company: { select: { prefix: true } } } },
     },
    });
-  });
+  };
+  const updated = tx ? await run(tx) : await prisma.$transaction(run);
 
   const updatedMapped = mapTask(updated);
+  // Side effects: now, or after the caller's commit when it asked for that.
+  const later = (fn: () => Promise<unknown>) => (afterCommit ? (afterCommit.push(fn), undefined) : fn());
   if (actor && data.status !== undefined && existing.status !== updated.status) {
-    await emitActivity({
+    await later(() => emitActivity({
       onboardingId: existing.onboardingId,
       actor,
       verb: updated.status === "Done" ? "completed" : "status_changed",
       entityType: "task",
       entityId: updated.id,
       metadata: { from: existing.status, to: updated.status, title: updated.title, taskId: updatedMapped.taskId },
-    });
+    }));
   }
 
   if (
@@ -1072,7 +1114,7 @@ export async function updateTask(
     existing.assigneeContactId !== updated.assigneeContactId &&
     updated.assigneeContactId != null
   ) {
-    await emitActivity({
+    await later(() => emitActivity({
       onboardingId: existing.onboardingId,
       actor,
       verb: "assigned",
@@ -1085,7 +1127,7 @@ export async function updateTask(
         assigneeName: updated.assigneeContact?.name ?? null,
         previousAssigneeContactId: existing.assigneeContactId,
       },
-    });
+    }));
   }
 
   // Health may have flipped if any input to computeHealth changed.
@@ -1096,6 +1138,8 @@ export async function updateTask(
       taskBefore: { id: existing.id, status: existing.status, due: existing.due ?? "" },
       taskAfter: { id: updated.id, status: updated.status, due: updated.due ?? "" },
       actor,
+      client: tx ?? prisma,
+      afterCommit,
     });
   }
 
@@ -2969,17 +3013,7 @@ export async function setExternalEventOrchestratorIO(
  *  omit it and leave the owner in `payload.ownerId`; we mirror the payload
  *  value into the column so the two can never drift. The column is what the
  *  visibility filters read — the payload copy is legacy and due for removal. */
-export async function createPendingAIChange({
-  source,
-  sourceEventId,
-  onboardingId,
-  action,
-  payload,
-  ownerId = null,
-  sourceQuote = null,
-  sourceUrl = null,
-  confidence = "medium",
-}: {
+export type CreatePendingAIChangeInput = {
   source: string;
   sourceEventId?: IdLike | null;
   onboardingId: IdLike;
@@ -2990,21 +3024,66 @@ export async function createPendingAIChange({
   sourceQuote?: string | null;
   sourceUrl?: string | null;
   confidence?: string;
-}) {
+};
+
+function pendingAIChangeData({
+  source,
+  sourceEventId,
+  onboardingId,
+  action,
+  payload,
+  ownerId = null,
+  sourceQuote = null,
+  sourceUrl = null,
+  confidence = "medium",
+}: CreatePendingAIChangeInput) {
   const resolvedOwnerId = ownerId ?? (payload as DraftPayloadJson | null)?.ownerId ?? null;
-  return prisma.pendingAIChange.create({
-    data: {
-      source,
-      sourceEventId: sourceEventId == null ? null : Number(sourceEventId),
-      onboardingId: Number(onboardingId),
-      action,
-      payload: payload as Prisma.InputJsonObject,
-      ownerId: resolvedOwnerId == null ? null : Number(resolvedOwnerId),
-      sourceQuote,
-      sourceUrl,
-      confidence,
-    },
-  });
+  return {
+    source,
+    sourceEventId: sourceEventId == null ? null : Number(sourceEventId),
+    onboardingId: Number(onboardingId),
+    action,
+    payload: payload as Prisma.InputJsonObject,
+    ownerId: resolvedOwnerId == null ? null : Number(resolvedOwnerId),
+    sourceQuote,
+    sourceUrl,
+    confidence,
+  };
+}
+
+export async function createPendingAIChange(input: CreatePendingAIChangeInput) {
+  return prisma.pendingAIChange.create({ data: pendingAIChangeData(input) });
+}
+
+/**
+ * Write all of one meeting's drafts in ONE transaction, then bind their
+ * sibling-draft links (GAPS-PLAN feature 3): a `{ draftRef: "d2" }` in any
+ * draft's dependsOn becomes `{ draftId, draftRef, title }` pointing at the
+ * create draft that carries that ref. Two passes, because a row id only
+ * exists once the row is written. All or nothing: a meeting never ends up
+ * with half its drafts, or with links that point nowhere.
+ */
+export async function createMeetingDrafts(rows: CreatePendingAIChangeInput[]) {
+  if (rows.length === 0) return [];
+  return prisma.$transaction(async (tx) => {
+    const created: { id: number; action: string; payload: Prisma.JsonValue }[] = [];
+    for (const r of rows) {
+      const row = await tx.pendingAIChange.create({ data: pendingAIChangeData(r) });
+      created.push({ id: row.id, action: row.action, payload: row.payload });
+    }
+    const idByRef = new Map<string, number>();
+    for (const c of created) {
+      const ref = (c.payload as { draftRef?: unknown } | null)?.draftRef;
+      if (c.action === "create_task" && typeof ref === "string" && !idByRef.has(ref)) idByRef.set(ref, c.id);
+    }
+    for (const c of created) {
+      const bound = bindPayloadLinks((c.payload ?? {}) as Record<string, unknown>, idByRef, c.id);
+      if (!bound) continue;
+      await tx.pendingAIChange.update({ where: { id: c.id }, data: { payload: bound as Prisma.InputJsonObject } });
+      c.payload = bound as Prisma.JsonValue;
+    }
+    return created;
+  }, { maxWait: 10_000, timeout: 30_000 });
 }
 
 /** List pending drafts (default: most recent first, status=pending).
@@ -3069,6 +3148,7 @@ export async function listPendingAIChanges({
       : Promise.resolve([] as { id: number; payload: Prisma.JsonValue }[]),
   ]);
   const taskTitleById = new Map(tasks.map((t) => [t.id, t.title]));
+  const linksById = await hydrateDraftLinks(filtered);
   const meetingTitleByEventId = new Map(
     events.map((e) => [e.id, (e.payload as MeetingPayload | null)?.meeting?.title ?? null])
   );
@@ -3098,6 +3178,9 @@ export async function listPendingAIChanges({
     meetingTitle: r.sourceEventId != null
       ? meetingTitleByEventId.get(r.sourceEventId) ?? null
       : null,
+    // Sibling-draft links (GAPS-PLAN feature 3), for the card's "Depends on"
+    // line and the reject warning. Absent when the draft has none.
+    ...(linksById.get(r.id) ?? {}),
   }));
 }
 
@@ -3230,6 +3313,359 @@ export async function markAIChangeRejected(
       resolvedBy: resolvedBy == null ? null : Number(resolvedBy),
     },
   });
+}
+
+// ─── Draft-to-draft links (GAPS-PLAN feature 3) ──────────────
+// A draft may wait on another create draft from the same meeting
+// (`{ draftId }` in its dependsOn). How a link resolves at approval, and how
+// a pending one is held and later completed, is documented in
+// lib/draft-links.ts. The functions below do the writes, each in ONE
+// transaction that first takes a per-meeting advisory lock, so approvals and
+// rejections from one meeting (a bulk action fires them back to back) are
+// applied one at a time and always see each other's results.
+
+/** Approving or rejecting a draft that is no longer pending (or gone). */
+export class DraftConflictError extends Error {
+  status: number;
+  constructor(message: string, status = 409) {
+    super(message);
+    this.name = "DraftConflictError";
+    this.status = status;
+  }
+}
+
+/** Advisory-lock namespace for "drafts of one meeting" (any constant int4). */
+const DRAFT_LINK_LOCK = 730301;
+
+async function lockMeetingDrafts(tx: Prisma.TransactionClient, sourceEventId: number | null) {
+  if (sourceEventId == null) return;
+  await tx.$queryRaw`SELECT 1 AS ok FROM (SELECT pg_advisory_xact_lock(${DRAFT_LINK_LOCK}::int, ${sourceEventId}::int)) AS l`;
+}
+
+type DraftRow = { id: number; action: string; status: string; onboardingId: number; sourceEventId: number | null; payload: Prisma.JsonValue; appliedTaskId: number | null };
+const DRAFT_ROW_SELECT = { id: true, action: true, status: true, onboardingId: true, sourceEventId: true, payload: true, appliedTaskId: true } as const;
+
+/** The pending draft, locked against the other drafts of its meeting. */
+async function lockPendingDraft(tx: Prisma.TransactionClient, draftId: number): Promise<DraftRow> {
+  const first = await tx.pendingAIChange.findUnique({ where: { id: draftId }, select: DRAFT_ROW_SELECT });
+  if (!first) throw new DraftConflictError("Draft not found", 404);
+  await lockMeetingDrafts(tx, first.sourceEventId);
+  // Re-read under the lock: a concurrent approval of the same draft wins once.
+  const draft = await tx.pendingAIChange.findUnique({ where: { id: draftId }, select: DRAFT_ROW_SELECT });
+  if (!draft) throw new DraftConflictError("Draft not found", 404);
+  if (draft.status !== "pending") throw new DraftConflictError(`Draft already ${draft.status}`);
+  return draft;
+}
+
+async function loadSiblingDrafts(client: DbClient, ids: number[]): Promise<Map<number, SiblingDraft>> {
+  const unique = [...new Set(ids)];
+  if (unique.length === 0) return new Map();
+  const rows = await client.pendingAIChange.findMany({ where: { id: { in: unique } }, select: DRAFT_ROW_SELECT });
+  const taskIds = rows.map((r) => r.appliedTaskId).filter((x): x is number => x != null);
+  const tasks = taskIds.length
+    ? await client.task.findMany({ where: { id: { in: taskIds } }, select: { id: true, status: true, onboardingId: true } })
+    : [];
+  const taskById = new Map(tasks.map((t) => [t.id, t]));
+  return new Map(rows.map((r) => [r.id, {
+    id: r.id,
+    status: r.status,
+    onboardingId: r.onboardingId,
+    sourceEventId: r.sourceEventId,
+    title: typeof (r.payload as { title?: unknown } | null)?.title === "string" ? (r.payload as { title: string }).title : null,
+    appliedTask: r.appliedTaskId != null ? taskById.get(r.appliedTaskId) ?? null : null,
+  }]));
+}
+
+/** A dependent's pending link completed (or settled) by a sibling's approval. */
+export type ResolvedDraftLink = { draftId: number; taskId: number | null; state: AppliedDraftLink["state"]; blockedByTaskId: number | null; reason?: string };
+
+/**
+ * Approve a draft, resolving its sibling-draft links, in ONE transaction:
+ *
+ *   1. lock the meeting's drafts; refuse if this draft is no longer pending;
+ *   2. classify each link by the sibling's state now (lib/draft-links.ts
+ *      classifyDraftLink) into a task blocker, a text placeholder, or nothing;
+ *   3. run `work` (the route's createTask / updateTask, on `tx`, with those
+ *      extra dependencies);
+ *   4. mark the draft applied and record what became of each link on its
+ *      payload (`draftLinks`, with the TaskDependency row standing for it);
+ *   5. if this was a create draft, complete every sibling's PENDING link to it:
+ *      the sibling's text placeholder row becomes a task blocker on the new
+ *      task (once: a link already "linked" is left alone), unless that would
+ *      make a loop or someone ticked / deleted the placeholder meanwhile.
+ *
+ * Activity rows are written after the commit. Throws DraftConflictError
+ * (404 / 409) and DependencyError (400) for the route to turn into responses.
+ */
+export async function applyDraftApproval<T>({
+  draftId,
+  resolvedBy,
+  links,
+  work,
+}: {
+  draftId: number;
+  resolvedBy: number | null;
+  /** The draft's sibling links, after the reviewer's edits. */
+  links: DraftLinkItem[];
+  work: (ctx: { tx: Prisma.TransactionClient; linkDeps: DependsOnItem[]; afterCommit: AfterCommit }) => Promise<{ appliedTaskId: number | null; value: T }>;
+}): Promise<{ value: T; draftLinks: AppliedDraftLink[]; resolved: ResolvedDraftLink[] }> {
+  const afterCommit: AfterCommit = [];
+  const out = await prisma.$transaction(async (tx) => {
+    const draft = await lockPendingDraft(tx, draftId);
+    const siblings = await loadSiblingDrafts(tx, links.map((l) => l.draftId).filter((x): x is number => x != null));
+    const classified = links.map((l) => classifyDraftLink(l, l.draftId != null ? siblings.get(l.draftId) : null, draft));
+    const linkDeps = classified.flatMap((c) => (c.dep ? [c.dep] : []));
+
+    const { appliedTaskId, value } = await work({ tx, linkDeps, afterCommit });
+
+    const draftLinks: AppliedDraftLink[] = [];
+    for (const c of classified) {
+      if (c.draftId == null || c.reason === "self") continue;
+      const entry: AppliedDraftLink = { draftId: c.draftId, title: c.title, state: c.state, ...(c.reason && { reason: c.reason }) };
+      if (appliedTaskId != null && c.dep) {
+        const row = "taskId" in c.dep
+          ? await tx.taskDependency.findFirst({ where: { taskId: appliedTaskId, blockedByTaskId: c.dep.taskId }, select: { id: true } })
+          : await tx.taskDependency.findFirst({
+              where: { taskId: appliedTaskId, label: { equals: cleanDependencyLabel(c.dep.text) ?? c.dep.text, mode: "insensitive" } },
+              orderBy: { id: "asc" },
+              select: { id: true },
+            });
+        entry.dependencyId = row?.id ?? null;
+        if ("taskId" in c.dep) entry.blockedByTaskId = c.dep.taskId;
+      }
+      draftLinks.push(entry);
+    }
+
+    const payload = draftLinks.length > 0
+      ? ({ ...((draft.payload ?? {}) as Prisma.JsonObject), draftLinks } as unknown as Prisma.InputJsonObject)
+      : undefined;
+    const marked = await tx.pendingAIChange.updateMany({
+      where: { id: draftId, status: "pending" },
+      data: {
+        status: "applied",
+        resolvedAt: new Date(),
+        resolvedBy: resolvedBy ?? null,
+        appliedTaskId: appliedTaskId ?? null,
+        ...(payload && { payload }),
+      },
+    });
+    if (marked.count !== 1) throw new DraftConflictError("Draft already resolved");
+
+    const resolved = draft.action === "create_task" && appliedTaskId != null
+      ? await completeLinksTo(tx, draft, appliedTaskId)
+      : [];
+    return { value, draftLinks, resolved };
+  }, { maxWait: 10_000, timeout: 30_000 });
+  for (const fn of afterCommit) {
+    await fn().catch((err) => console.warn("[applyDraftApproval] after-commit activity failed", err));
+  }
+  return out;
+}
+
+/** Step 5 of applyDraftApproval: complete the siblings' pending links to `draft`. */
+async function completeLinksTo(tx: Prisma.TransactionClient, draft: DraftRow, newTaskId: number): Promise<ResolvedDraftLink[]> {
+  if (draft.sourceEventId == null) return [];
+  const dependents = await tx.pendingAIChange.findMany({
+    where: { sourceEventId: draft.sourceEventId, onboardingId: draft.onboardingId, status: "applied", id: { not: draft.id } },
+    select: { id: true, payload: true, appliedTaskId: true },
+    orderBy: { id: "asc" },
+  });
+  const out: ResolvedDraftLink[] = [];
+  for (const d of dependents) {
+    const links = readDraftLinks(d.payload);
+    let changed = false;
+    for (const l of links) {
+      if (l.draftId !== draft.id) continue;
+      const taskId = d.appliedTaskId;
+      // A "linked" entry normally needs nothing. The exception: this draft was
+      // put back to pending and its old task deleted (the nightly demo
+      // restore does exactly that), which cascaded the task blocker away. Now
+      // that it is approved again, link to the new task, once: afterwards the
+      // entry points at newTaskId and is skipped.
+      const relink = l.state === "linked";
+      if (relink) {
+        if (taskId == null || l.blockedByTaskId === newTaskId) continue;
+        const oldBlocker = l.blockedByTaskId != null
+          ? await tx.task.findUnique({ where: { id: l.blockedByTaskId }, select: { id: true } })
+          : null;
+        if (oldBlocker) continue;
+      } else if (l.state !== "pending") {
+        continue;
+      }
+      changed = true;
+      // The row standing for the link: the recorded one if it is still a text
+      // placeholder; else (restored under a new id) the open text row with the
+      // sibling's title.
+      let row: { id: number; blockedByTaskId: number | null; resolvedAt: Date | null } | null = null;
+      if (taskId != null) {
+        const byId = l.dependencyId != null
+          ? await tx.taskDependency.findFirst({ where: { id: l.dependencyId, taskId }, select: { id: true, blockedByTaskId: true, resolvedAt: true } })
+          : null;
+        row = byId && (byId.blockedByTaskId == null || byId.blockedByTaskId === newTaskId)
+          ? byId
+          : await tx.taskDependency.findFirst({
+              where: { taskId, blockedByTaskId: null, label: { equals: cleanDependencyLabel(l.title) ?? l.title, mode: "insensitive" } },
+              orderBy: { id: "asc" },
+              select: { id: true, blockedByTaskId: true, resolvedAt: true },
+            });
+      }
+      if (taskId == null) {
+        l.state = "removed";
+      } else if (!row && !relink) {
+        // The placeholder was deleted by hand: leave it deleted.
+        l.state = "removed";
+      } else if (row && row.blockedByTaskId != null) {
+        l.state = "linked";
+        l.blockedByTaskId = row.blockedByTaskId;
+        l.dependencyId = row.id;
+      } else if (row && row.resolvedAt) {
+        l.state = "kept_as_text";
+        l.reason = "ticked off by hand";
+      } else if (taskId === newTaskId || (await findDependencyLoop(tx, taskId, newTaskId))) {
+        l.state = "kept_as_text";
+        l.reason = "would make a loop";
+      } else {
+        const dup = await tx.taskDependency.findFirst({ where: { taskId, blockedByTaskId: newTaskId }, select: { id: true } });
+        if (dup) {
+          if (row) await tx.taskDependency.delete({ where: { id: row.id } });
+          l.dependencyId = dup.id;
+        } else if (row) {
+          await tx.taskDependency.update({ where: { id: row.id }, data: { blockedByTaskId: newTaskId, label: null, resolvedAt: null } });
+          l.dependencyId = row.id;
+        } else {
+          // Re-link with no placeholder left: the task blocker went with the old task.
+          const created = await tx.taskDependency.create({ data: { taskId, blockedByTaskId: newTaskId }, select: { id: true } });
+          l.dependencyId = created.id;
+        }
+        await syncLegacyBlockedBy(tx, taskId);
+        l.state = "linked";
+        l.blockedByTaskId = newTaskId;
+      }
+      out.push({ draftId: d.id, taskId, state: l.state, blockedByTaskId: l.blockedByTaskId ?? null, ...(l.reason && { reason: l.reason }) });
+    }
+    if (changed) {
+      await tx.pendingAIChange.update({
+        where: { id: d.id },
+        data: { payload: { ...((d.payload ?? {}) as Prisma.JsonObject), draftLinks: links } as unknown as Prisma.InputJsonObject },
+      });
+    }
+  }
+  return out;
+}
+
+/** A draft that waits on the one being rejected. */
+export type DependentDraft = { draftId: number; title: string; status: string };
+
+/**
+ * Reject a draft in one transaction under the meeting lock. Siblings that wait
+ * on it keep that blocker as text: an applied one already has the text
+ * placeholder (its link is marked kept_as_text), a pending one gets the text
+ * when it is approved. Returns those siblings so the inbox can say so.
+ * Throws DraftConflictError when the draft is gone or no longer pending.
+ */
+export async function rejectDraftWithLinks(
+  draftId: number,
+  { resolvedBy, reason = null }: { resolvedBy?: number | null; reason?: string | null }
+): Promise<{ dependents: DependentDraft[] }> {
+  return prisma.$transaction(async (tx) => {
+    const draft = await lockPendingDraft(tx, draftId);
+    await tx.pendingAIChange.update({
+      where: { id: draftId },
+      data: { status: "rejected", rejectedReason: reason, resolvedAt: new Date(), resolvedBy: resolvedBy ?? null },
+    });
+    const dependents: DependentDraft[] = [];
+    if (draft.action !== "create_task" || draft.sourceEventId == null) return { dependents };
+    const siblings = await tx.pendingAIChange.findMany({
+      where: { sourceEventId: draft.sourceEventId, onboardingId: draft.onboardingId, status: { in: ["pending", "applied"] }, id: { not: draftId } },
+      select: DRAFT_ROW_SELECT,
+      orderBy: { id: "asc" },
+    });
+    const titles = await siblingTitles(tx, siblings);
+    for (const sib of siblings) {
+      const title = titles.get(sib.id)!;
+      if (sib.status === "pending") {
+        if (payloadDraftLinks(sib.payload).some((l) => l.draftId === draftId)) dependents.push({ draftId: sib.id, title, status: sib.status });
+        continue;
+      }
+      const links = readDraftLinks(sib.payload);
+      let changed = false;
+      for (const l of links) {
+        if (l.draftId !== draftId || l.state !== "pending") continue;
+        l.state = "kept_as_text";
+        l.reason = "rejected";
+        changed = true;
+      }
+      if (!changed) continue;
+      dependents.push({ draftId: sib.id, title, status: sib.status });
+      await tx.pendingAIChange.update({
+        where: { id: sib.id },
+        data: { payload: { ...((sib.payload ?? {}) as Prisma.JsonObject), draftLinks: links } as unknown as Prisma.InputJsonObject },
+      });
+    }
+    return { dependents };
+  }, { maxWait: 10_000, timeout: 30_000 });
+}
+
+/**
+ * How a sibling draft is named to the reviewer: a create draft by its title,
+ * an existing-task update as "Update to <that task's title>".
+ */
+async function siblingTitles(client: DbClient, rows: { id: number; action: string; payload: Prisma.JsonValue }[]): Promise<Map<number, string>> {
+  const taskIds = rows
+    .filter((r) => r.action !== "create_task")
+    .map((r) => Number((r.payload as { taskId?: unknown } | null)?.taskId))
+    .filter((n) => Number.isInteger(n) && n > 0);
+  const tasks = taskIds.length ? await client.task.findMany({ where: { id: { in: taskIds } }, select: { id: true, title: true } }) : [];
+  const taskTitle = new Map(tasks.map((t) => [t.id, t.title]));
+  return new Map(rows.map((r) => {
+    const p = (r.payload ?? {}) as { title?: unknown; taskId?: unknown };
+    if (r.action === "create_task") return [r.id, typeof p.title === "string" && p.title.trim() ? p.title.trim() : "A new task"];
+    const t = taskTitle.get(Number(p.taskId));
+    return [r.id, t ? `Update to ${t}` : "An update to a task"];
+  }));
+}
+
+/**
+ * For the inbox: per draft, the sibling drafts it links to (with their state
+ * and the task code they created) and the siblings that link to it. Reads
+ * every draft of the meetings involved, whatever their status, because a
+ * pending card needs to know a sibling was already applied or rejected.
+ */
+async function hydrateDraftLinks(rows: { id: number; sourceEventId: number | null; payload: Prisma.JsonValue }[]) {
+  const eventIds = [...new Set(rows.map((r) => r.sourceEventId).filter((x): x is number => x != null))];
+  const empty = { linkedDrafts: [] as LinkedDraftInfo[], dependentDrafts: [] as DependentDraft[] };
+  if (eventIds.length === 0) return new Map<number, typeof empty>();
+  const siblings = await prisma.pendingAIChange.findMany({
+    where: { sourceEventId: { in: eventIds } },
+    select: DRAFT_ROW_SELECT,
+  });
+  const anyLinks = siblings.some((s) => payloadDraftLinks(s.payload).length > 0 || readDraftLinks(s.payload).length > 0);
+  if (!anyLinks) return new Map<number, typeof empty>();
+  const taskIds = siblings.map((s) => s.appliedTaskId).filter((x): x is number => x != null);
+  const codes = taskIds.length ? await taskCodes(prisma, taskIds) : new Map<number, string>();
+  const byId = new Map(siblings.map((s) => [s.id, s]));
+  const titles = await siblingTitles(prisma, siblings);
+  const info = (id: number): LinkedDraftInfo | null => {
+    const s = byId.get(id);
+    if (!s) return null;
+    return {
+      id: s.id,
+      status: s.status,
+      title: (s.payload as { title?: unknown } | null)?.title as string | null ?? null,
+      taskCode: s.status === "applied" && s.appliedTaskId != null ? codes.get(s.appliedTaskId) ?? null : null,
+    };
+  };
+  const linksOf = (s: { payload: Prisma.JsonValue }) =>
+    [...new Set([...payloadDraftLinks(s.payload).map((l) => l.draftId!), ...readDraftLinks(s.payload).map((l) => l.draftId)])];
+  const out = new Map<number, typeof empty>();
+  for (const r of rows) {
+    const linkedDrafts = linksOf(r).map(info).filter((x): x is LinkedDraftInfo => x != null);
+    const dependentDrafts = siblings
+      .filter((s) => s.id !== r.id && s.status !== "rejected" && s.sourceEventId === r.sourceEventId && linksOf(s).includes(r.id))
+      .map((s) => ({ draftId: s.id, title: titles.get(s.id)!, status: s.status }));
+    if (linkedDrafts.length || dependentDrafts.length) out.set(r.id, { linkedDrafts, dependentDrafts });
+  }
+  return out;
 }
 
 // ─── AI insights ─────────────────────────────────────────────

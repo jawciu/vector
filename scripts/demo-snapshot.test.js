@@ -175,6 +175,45 @@ describe("restore-state diff", () => {
     expect(plan.ops[0].label).toBe("draft create_task applied → pending");
   });
 
+  it("a sibling linked to a draft put back to pending gets its link reset to the restored placeholder (feature 3)", async () => {
+    const base = { confidence: "high", sourceEvent: { sourceId: "EV-1" }, sourceEventId: 40, rejectedReason: null, resolvedBy: 8 };
+    const blocker = {
+      ...base, id: 7, action: "create_task", status: "applied", sourceQuote: "add the metrics block",
+      createdAt: new Date("2026-09-05T12:00:00.000Z"), resolvedAt: new Date("2026-09-12T09:00:00.000Z"), appliedTaskId: 999,
+      payload: { title: "Add the metrics block" },
+    };
+    const dependent = {
+      ...base, id: 8, action: "create_task", status: "applied", sourceQuote: "then the dashboards",
+      createdAt: new Date("2026-09-05T12:00:01.000Z"), resolvedAt: new Date("2026-09-10T09:00:00.000Z"), appliedTaskId: 102,
+      payload: { title: "Migrate the dashboards", draftLinks: [
+        { draftId: 7, title: "Add the metrics block", state: "linked", dependencyId: 158, blockedByTaskId: 999 },
+        { draftId: 3, title: "Other", state: "kept_as_text" },
+      ] },
+    };
+    const snapDraft = (d, status) => ({
+      key: `create_task|${d.createdAt.toISOString()}|${d.sourceQuote}`, action: "create_task", status, confidence: "high",
+      sourceEventSourceId: "EV-1", sourceQuote: d.sourceQuote, createdAt: d.createdAt.toISOString(),
+      resolvedAt: status === "applied" ? d.resolvedAt.toISOString() : null, rejectedReason: null,
+      appliedTaskNumber: status === "applied" ? 2 : null,
+    });
+    const snap = snapshot({ drafts: [snapDraft(blocker, "pending"), snapDraft(dependent, "applied")] });
+    const plan = planRestoreState(snap, live({ drafts: [blocker, dependent] }));
+    expect(plan.ops.map((o) => o.label)).toEqual([
+      "draft create_task applied → pending",
+      "draft create_task link to a draft put back to pending → pending",
+    ]);
+    const updates = [];
+    const tx = {
+      pendingAIChange: { update: async (a) => updates.push(a) },
+      taskDependency: { findFirst: async ({ where }) => (where.taskId === 102 && where.blockedByTaskId === null ? { id: 201 } : null) },
+    };
+    for (const op of plan.ops) await op.run(tx);
+    expect(updates[1]).toEqual({ where: { id: 8 }, data: { payload: { title: "Migrate the dashboards", draftLinks: [
+      { draftId: 7, title: "Add the metrics block", state: "pending", dependencyId: 201 },
+      { draftId: 3, title: "Other", state: "kept_as_text" },
+    ] } } });
+  });
+
   it("deletes a draft created after the baseline", () => {
     const draft = {
       id: 8, action: "draft_followup", status: "pending", confidence: "low",
