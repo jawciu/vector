@@ -188,6 +188,7 @@ export default function AIDraftInbox({
         ...prev,
         [draft.id]: { status: "applied", taskCode: result.created?.task?.taskId ?? null },
       }));
+      focusAfterCardGone(draft.id);
       setDrafts((prev) => prev.filter((d) => d.id !== draft.id));
       setSelectedIds((prev) => {
         const next = new Set(prev);
@@ -241,6 +242,7 @@ export default function AIDraftInbox({
       }
       const result = await res.json().catch(() => ({}));
       setSiblingStatus((prev) => ({ ...prev, [draft.id]: { status: "rejected", taskCode: null } }));
+      focusAfterCardGone(draft.id);
       // Drafts that waited on this one keep it as a text blocker: say so. A
       // count, not their titles: a toast is two lines at most, and each
       // waiting card already reads "rejected, kept as a text blocker".
@@ -508,7 +510,7 @@ function DraftColumn({
 }: DraftColumnProps) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 40, minWidth: 0 }}>
-      <h2 style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.6 }}>
+      <h2 data-column-heading tabIndex={-1} style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.6 }}>
         {title}
       </h2>
       {buckets.length === 0 && (
@@ -813,6 +815,8 @@ export function DraftCard({
     <div
       ref={cardRef}
       className="draft-card"
+      data-draft-card
+      data-draft-id={draft.id}
       style={{
         padding: 24,
         borderRadius: 20,
@@ -930,6 +934,7 @@ export function DraftCard({
             onClick={editing ? cancelEdit : onReject}
             disabled={busy}
             variant="tertiary"
+            data-dismiss={!editing ? true : undefined}
             style={{ padding: "4px 8px", fontSize: 14, opacity: busy ? 0.5 : 1 }}
           >
             {editing ? "Cancel" : "Dismiss"}
@@ -1088,6 +1093,29 @@ function focusAfterResolve(card: HTMLElement | null) {
       card?.querySelector<HTMLElement>("[data-stale-warning] button:not([disabled])") ??
       card?.querySelector<HTMLElement>("[data-approve]:not([disabled])");
     next?.focus();
+  });
+}
+
+/**
+ * After Approve / Dismiss the card unmounts. Hand focus to the next card's
+ * primary action (or the previous, or the column heading) so keyboard users
+ * are not dropped onto <body>.
+ */
+function focusAfterCardGone(draftId: number) {
+  const card = document.querySelector<HTMLElement>(`[data-draft-card][data-draft-id="${draftId}"]`);
+  const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-draft-card]"));
+  const i = card ? cards.indexOf(card) : -1;
+  const neighbour = i >= 0 ? (cards[i + 1] ?? cards[i - 1]) : null;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const still = neighbour && document.contains(neighbour)
+        ? neighbour
+        : document.querySelector<HTMLElement>("[data-draft-card]");
+      const btn = still?.querySelector<HTMLElement>(
+        "[data-approve]:not([disabled]), [data-dismiss]:not([disabled])"
+      );
+      (btn ?? document.querySelector<HTMLElement>("[data-column-heading]"))?.focus();
+    });
   });
 }
 
@@ -1828,6 +1856,8 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject }: 
   return (
     <div
       className="draft-card"
+      data-draft-card
+      data-draft-id={draft.id}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -1947,6 +1977,7 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject }: 
             onClick={onReject}
             disabled={busy}
             variant="tertiary"
+            data-dismiss
             style={{
               padding: "4px 8px",
               fontSize: 14,
@@ -1964,6 +1995,7 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject }: 
               Open in mail
             </a>
             <Button
+              data-approve
               onClick={() => onApprove({ subject, body })}
               disabled={!canSend}
               variant="secondary"
@@ -2278,6 +2310,8 @@ export function CreateTaskCard({
     <div
       ref={cardRef}
       className="draft-card"
+      data-draft-card
+      data-draft-id={draft.id}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -2362,6 +2396,7 @@ export function CreateTaskCard({
             onClick={handleDismissOrExitEdit}
             disabled={busy || saving}
             variant="tertiary"
+            data-dismiss={cardMode !== "edit" ? true : undefined}
             style={{
               padding: "4px 8px",
               fontSize: 14,
