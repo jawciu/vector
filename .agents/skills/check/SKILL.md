@@ -1,7 +1,6 @@
 ---
 name: check
 description: Run build, lint, and Prisma validation to verify the project is healthy. Use when the user asks to check, validate, or verify the project, or after making significant changes.
-disable-model-invocation: true
 ---
 
 # Project Health Check

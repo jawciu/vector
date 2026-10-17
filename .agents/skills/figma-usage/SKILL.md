@@ -1,7 +1,6 @@
 ---
 name: figma-usage
 description: Fetch design context, icons, assets, and layout data from Figma using the Figma MCP server. Use when the user mentions Figma, shares a Figma link, asks to implement a design, extract an icon or asset from Figma, or convert a Figma frame to code.
-context: fork
 ---
 
 # Figma MCP Usage

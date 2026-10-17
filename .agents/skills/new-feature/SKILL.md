@@ -1,8 +1,6 @@
 ---
 name: new-feature
 description: Scaffold a full-stack feature end-to-end — Prisma schema, migration, db.js query, API route, and component wiring. Use when building a new feature that touches the database, or when the user says "add [model/field/feature]" that needs backend + frontend.
-disable-model-invocation: true
-argument-hint: "[feature description]"
 ---
 
 # New Feature Scaffold

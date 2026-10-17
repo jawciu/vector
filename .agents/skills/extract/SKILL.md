@@ -1,8 +1,6 @@
 ---
 name: extract
 description: Extract logic from oversized components or files into smaller, focused pieces. Use when a component exceeds ~300 lines, when globals.css has redundant classes, or when the user asks to refactor/split/extract a component.
-disable-model-invocation: true
-argument-hint: "[file or component to extract from]"
 ---
 
 # Extract & Decompose

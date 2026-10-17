@@ -1,8 +1,6 @@
 ---
 name: review
 description: Review recently changed code for quality issues — dead code, unused imports, DS token consistency, missing validation, and accessibility. Use when the user asks to review code, or after completing a feature.
-context: fork
-agent: Explore
 allowed-tools: Read, Grep, Glob, Bash
 ---
 
