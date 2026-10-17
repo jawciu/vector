@@ -1,0 +1,113 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "D09B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A09",
+      "title": "Modal — connectivity status call",
+      "date": "2026-06-18T16:00:00Z",
+      "end_time": "2026-06-18T16:12:40Z",
+      "duration_seconds": 760,
+      "language": "en",
+      "summary": "Short status call: Jonas confirmed both connectivity blockers are resolved — the Snowflake service account is provisioned and the static IPs are in the warehouse network policy.",
+      "action_items": [],
+      "key_decisions": ["Connectivity phase items are closed on Modal's side"],
+      "topics": ["connectivity", "service account", "network policy"],
+      "discussion_flow": ["Service account status", "Network policy status", "Wrap-up"],
+      "notes": "Both items from Monday's sync landed early. Scheduled refreshes can now run.",
+      "training": {
+        "talk_ratio_you": 0.42,
+        "speakers": [
+          { "speaker": "Maya Lindqvist", "is_you": true, "word_count": 290, "fillers_per_minute": 1 },
+          { "speaker": "Jonas Beck", "is_you": false, "word_count": 350 }
+        ]
+      },
+      "speaker_count": 2,
+      "speaker_names": { "0": "Jonas Beck", "-1": "Maya Lindqvist" },
+      "transcript": [
+        { "speaker": "Maya Lindqvist", "text": "Hey Jonas — quick one, just chasing the two connectivity items from Monday.", "timestamp": 0 },
+        {
+          "speaker": "Jonas Beck",
+          "text": "Both closed, actually. The Snowflake service account is provisioned — read-only on the ANALYTICS schema, key-pair auth, credentials are in your shared vault. That one's done.",
+          "timestamp": 8.9
+        },
+        { "speaker": "Maya Lindqvist", "text": "Brilliant. And the network policy?", "timestamp": 27.3 },
+        { "speaker": "Jonas Beck", "text": "Also done — the static IPs are added to the warehouse network policy as of yesterday. Your test connection should go straight through now.", "timestamp": 32.6 },
+        { "speaker": "Maya Lindqvist", "text": "It did — I ran a connection test this morning and the scheduled refresh completed clean. So both tasks can move to done on our board.", "timestamp": 47.1 },
+        { "speaker": "Jonas Beck", "text": "Great. Anything you need from me before Monday's sync?", "timestamp": 60.8 },
+        { "speaker": "Maya Lindqvist", "text": "Nothing new — Theo's model PR is already with you for review, but that's existing work, nothing extra. Enjoy the early finish.", "timestamp": 66.4 },
+        { "speaker": "Jonas Beck", "text": "Ha, will do. See you Monday.", "timestamp": 79 }
+      ],
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "jonas@modal.com", "name": "Jonas Beck", "domain": "modal.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "MDL",
+    "companyName": "Modal",
+    "contacts": [
+      { "name": "Jonas Beck", "email": "jonas@modal.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Maya Lindqvist", "email": "maya@vector.test" },
+      { "name": "Theo Okonkwo", "email": "theo@vector.test" }
+    ],
+    "tasks": [
+      {
+        "ref": "t1",
+        "title": "Provision read-only Snowflake service account",
+        "status": "In progress",
+        "owner": "customer",
+        "ownerName": "Jonas Beck",
+        "dueDate": "2026-06-19",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      {
+        "ref": "t2",
+        "title": "Add Quarry static IPs to warehouse network policy",
+        "status": "In progress",
+        "owner": "customer",
+        "ownerName": "Jonas Beck",
+        "dueDate": "2026-06-17",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      {
+        "ref": "t3",
+        "title": "Draft incremental model config for usage events table (PR)",
+        "status": "In progress",
+        "owner": "vendor",
+        "ownerName": "Theo Okonkwo",
+        "dueDate": "2026-06-18",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      {
+        "ref": "t4",
+        "title": "Circulate pilot dashboard list to analytics guild for sign-off",
+        "status": "In progress",
+        "owner": "customer",
+        "ownerName": "Jonas Beck",
+        "dueDate": "2026-06-19",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t5", "title": "Configure Okta SAML SSO", "status": "Not started", "owner": "customer", "ownerName": "Jonas Beck", "dueDate": null, "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "MDL" },
+    "toolCalls": [
+      { "action": "update_status", "existingTaskRef": "t1", "existingTaskTitleContains": "Snowflake service account", "newStatus": "Done" },
+      { "action": "update_status", "existingTaskRef": "t2", "existingTaskTitleContains": "static IPs", "newStatus": "Done" }
+    ],
+    "notes": "Completion report closing two existing connectivity tasks (service account + IP allowlist); no new commitments — the PR review mention is explicitly existing work.",
+    "review": { "verdict": "approved", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

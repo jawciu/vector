@@ -1,0 +1,83 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "E0000020-3D6E-4F1A-8B0C-D5E4F3A2B020",
+      "title": "Flock Freight status call",
+      "date": "2026-06-12T17:00:00Z",
+      "end_time": "2026-06-12T17:14:38Z",
+      "duration_seconds": 878,
+      "language": "en",
+      "summary": "Short, noncommittal status call with Flock Freight. Derek acknowledged the open items are stalled on his side but would not commit to dates — internal quarter-end reporting is consuming the team. Maya offered help; Derek deferred everything to 'after quarter-end' without specifics. No new work agreed.",
+      "action_items": [],
+      "key_decisions": [],
+      "topics": ["stalled items", "quarter-end crunch", "re-engagement"],
+      "discussion_flow": ["Status of open items", "Capacity discussion", "Vague next steps"],
+      "notes": "Derek joined 5 minutes late and dropped early for another call. Engagement noticeably lower than in May.",
+      "speaker_count": 2,
+      "speaker_names": { "0": "Derek Liang", "-1": "Maya Lindqvist" },
+      "training": {
+        "talk_ratio_you": 0.63,
+        "speakers": [
+          { "speaker": "Maya Lindqvist", "is_you": true, "word_count": 920, "fillers_per_minute": 1.6 },
+          { "speaker": "Derek Liang", "is_you": false, "word_count": 540 }
+        ]
+      },
+      "transcript": [
+        { "speaker": "Maya Lindqvist", "text": "Hi Derek — thanks for squeezing this in, I know things are hectic. I wanted to check where the open items stand on your side.", "timestamp": 0 },
+        { "speaker": "Derek Liang", "text": "Yeah, sorry for being slow lately. Honestly, nothing has moved. Quarter-end reporting has eaten the whole team.", "timestamp": 12.4 },
+        { "speaker": "Maya Lindqvist", "text": "Understood. Is there a point in the next couple of weeks where the warehouse permissions work could realistically restart?", "timestamp": 24.1 },
+        { "speaker": "Derek Liang", "text": "Hard to say. Maybe after quarter-end? I'd need to check with our platform person and she's buried too.", "timestamp": 35.8 },
+        { "speaker": "Maya Lindqvist", "text": "Okay. Would it help if we took more of it — for instance we could draft the permission grants so it's a review rather than a build?", "timestamp": 46.5 },
+        { "speaker": "Derek Liang", "text": "Possibly. Let me think about it — I don't want to promise review time I don't have either.", "timestamp": 59.2 },
+        { "speaker": "Maya Lindqvist", "text": "That's fair. And the pilot-group question from May — any movement on who'd be in it?", "timestamp": 68.7 },
+        { "speaker": "Derek Liang", "text": "Not yet. We should probably revisit that once reporting season is over. I just can't put a date on it right now.", "timestamp": 77.3 },
+        { "speaker": "Maya Lindqvist", "text": "Alright. I don't want to pile pressure on a crunch — I'd rather find the realistic restart point than invent deadlines we'll miss.", "timestamp": 89 },
+        { "speaker": "Derek Liang", "text": "Appreciate that. Truthfully, mid-July is my best guess for when we can breathe again, but don't hold me to it.", "timestamp": 101.6 },
+        { "speaker": "Maya Lindqvist", "text": "Noted as a guess, not a promise. I'll keep our side warm so nothing rots in the meantime.", "timestamp": 113.9 },
+        { "speaker": "Derek Liang", "text": "Thanks Maya. Sorry — I have to drop for another call. Talk soon.", "timestamp": 124.4 },
+        { "speaker": "Maya Lindqvist", "text": "No problem, go. Talk soon.", "timestamp": 132 }
+      ],
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "derek@flockfreight.com", "name": "Derek Liang", "domain": "flockfreight.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "FLK",
+    "companyName": "Flock Freight",
+    "contacts": [
+      { "name": "Derek Liang", "email": "derek@flockfreight.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Maya Lindqvist", "email": "maya@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Grant warehouse permissions for Quarry", "status": "Blocked", "owner": "customer", "ownerName": "Derek Liang", "dueDate": "2026-06-05", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Confirm pilot group", "status": "Not started", "owner": "customer", "ownerName": "Derek Liang", "dueDate": "2026-05-29", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Lock semantic layer metric definitions", "status": "Blocked", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-06-05", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Build shipment reporting dashboard", "status": "In progress", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-06-24", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t5", "title": "Go-live", "status": "Not started", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-07-31", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "FLK" },
+    "toolCalls": [
+      {
+        "action": "create_task",
+        "titleLike": "Revisit with Derek",
+        "titleAlternatives": ["Circle back with Derek", "Follow up with Derek"],
+        "owner": "vendor",
+        "assignee": "Maya Lindqvist",
+        "dueDate": "2026-07-15",
+        "kind": "vendor_reminder",
+        "dueDateReason": "Derek: 'mid-July is my best guess' → Wed 15 Jul.",
+        "notesContains": ["pilot group", "warehouse permissions"],
+        "sourceQuoteContains": "mid-July is my best guess for when we can breathe again"
+      }
+    ],
+    "notes": "Champion overwhelmed by quarter-end: Derek commits to nothing, and nothing should go on his plate (no new customer tasks, no re-dating his open tasks t1/t2). But Maya needs plenty from him, so the right output is a reminder on Maya's side to circle back with Derek mid-July (15 Jul) about the pilot group and restarting the warehouse permissions work (or reviewing grants Maya drafts). Previously this was a no-action case; renamed from 20-flockfreight-no-actions.json.",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

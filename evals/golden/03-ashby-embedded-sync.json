@@ -1,0 +1,158 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "D03B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A03",
+      "title": "Ashby embedded analytics — weekly sync",
+      "date": "2026-06-22T13:00:00Z",
+      "end_time": "2026-06-22T13:34:55Z",
+      "duration_seconds": 2095,
+      "language": "en",
+      "summary": "Weekly sync on the Ashby embedded analytics rollout. Agreed sandbox setup with signed JWT auth, the customer_id claim work on Ashby's side, and a write-up of the row-level filtering approach.",
+      "action_items": [
+        "Theo to set up embed sandbox with signed JWT auth and share credentials by June 24",
+        "Ruben to expose customer_id claim in session token on staging by June 26",
+        "Maya to send row-level filtering write-up for multi-tenant embeds by June 25"
+      ],
+      "key_decisions": ["Embeds authenticate via signed JWTs minted by Ashby's backend, not shared links"],
+      "topics": ["embedded analytics", "JWT auth", "multi-tenancy"],
+      "discussion_flow": ["Embed auth options", "Sandbox plan", "Tenant isolation", "Next steps"],
+      "notes": "Ashby wants hiring dashboards inside their recruiting product for their own customers — tenant isolation is the make-or-break requirement.",
+      "training": {
+        "talk_ratio_you": 0.38,
+        "speakers": [
+          { "speaker": "Maya Lindqvist", "is_you": true, "word_count": 760, "fillers_per_minute": 1.3 },
+          { "speaker": "Theo Okonkwo", "is_you": false, "word_count": 720 },
+          { "speaker": "Elise Vandamme", "is_you": false, "word_count": 480 },
+          { "speaker": "Ruben De Smet", "is_you": false, "word_count": 530 }
+        ]
+      },
+      "speaker_count": 4,
+      "speaker_names": { "0": "Theo Okonkwo", "1": "Elise Vandamme", "2": "Ruben De Smet", "-1": "Maya Lindqvist" },
+      "transcript": [
+        { "speaker": "Maya Lindqvist", "text": "Hi both — today is all embedded analytics. Elise, want to restate the goal so we're aligned?", "timestamp": 0 },
+        {
+          "speaker": "Elise Vandamme",
+          "text": "Sure. We want each of our recruiting customers to see their own dashboards inside our product — their pipeline, their time-to-hire, nobody else's. Tenant isolation is non-negotiable.",
+          "timestamp": 9.6
+        },
+        {
+          "speaker": "Theo Okonkwo",
+          "text": "Understood. The right pattern here is signed JWTs: your backend mints a short-lived token per user, the token carries the tenant identity, and the embed respects it.",
+          "timestamp": 27.3
+        },
+        { "speaker": "Ruben De Smet", "text": "That works for us — we already issue session tokens, we'd just extend the claims.", "timestamp": 44.8 },
+        { "speaker": "Maya Lindqvist", "text": "Good. Let's make it concrete. Theo, can you stand up a sandbox they can develop against?", "timestamp": 52.1 },
+        { "speaker": "Theo Okonkwo", "text": "Yes — I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.", "timestamp": 59.4 },
+        { "speaker": "Ruben De Smet", "text": "Then the ball is with me. I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.", "timestamp": 71.9 },
+        { "speaker": "Elise Vandamme", "text": "One question — how does the customer_id claim actually filter the data? Is that per dashboard or global?", "timestamp": 88.2 },
+        {
+          "speaker": "Maya Lindqvist",
+          "text": "Global, enforced at the semantic layer, so a dashboard can't accidentally leak across tenants. I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.",
+          "timestamp": 97.5
+        },
+        { "speaker": "Elise Vandamme", "text": "Great, I'd like our security folks to read that before we go further.", "timestamp": 117 },
+        { "speaker": "Theo Okonkwo", "text": "Sensible. The write-up plus the sandbox should give them everything they need to poke at it.", "timestamp": 124.3 },
+        { "speaker": "Ruben De Smet", "text": "It might be worth load-testing the embeds eventually, but let's see it working first.", "timestamp": 133.8 },
+        { "speaker": "Maya Lindqvist", "text": "Agreed — load testing is a later conversation. So: sandbox Wednesday, write-up Thursday, staging claim Friday. Reconvene next Monday?", "timestamp": 142.6 },
+        { "speaker": "Elise Vandamme", "text": "Works for us. Thanks both.", "timestamp": 156.9 }
+      ],
+      "calendar_event_id": "evt_ash_weekly_0622",
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "elise@ashbyhq.com", "name": "Elise Vandamme", "domain": "ashbyhq.com" },
+        { "email": "ruben@ashbyhq.com", "name": "Ruben De Smet", "domain": "ashbyhq.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "ASH",
+    "companyName": "Ashby",
+    "contacts": [
+      { "name": "Elise Vandamme", "email": "elise@ashbyhq.com" },
+      { "name": "Ruben De Smet", "email": "ruben@ashbyhq.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Maya Lindqvist", "email": "maya@vector.test" },
+      { "name": "Theo Okonkwo", "email": "theo@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Connect dbt repo to Quarry", "status": "In progress", "owner": "customer", "ownerName": "Ruben De Smet", "dueDate": "2026-06-24", "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t2",
+        "title": "Define first 10 metrics in dbt .yml",
+        "status": "In progress",
+        "owner": "customer",
+        "ownerName": "Ruben De Smet",
+        "dueDate": "2026-06-26",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t3", "title": "Configure SSO for Ashby workspace", "status": "Not started", "owner": "customer", "ownerName": "Elise Vandamme", "dueDate": null, "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t4",
+        "title": "Build hiring pipeline dashboard for embed",
+        "status": "Not started",
+        "owner": "vendor",
+        "ownerName": "Theo Okonkwo",
+        "dueDate": "2026-07-10",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t5", "title": "Embedded analytics go-live review", "status": "Not started", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-07-20", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "ASH" },
+    "toolCalls": [
+      {
+        "action": "create_task",
+        "titleLike": "Set up embed sandbox",
+        "notesContains": ["signed JWT", "share credentials"],
+        "owner": "vendor",
+        "assignee": "Theo Okonkwo",
+        "dueDate": "2026-06-24",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Expose customer_id claim in session token on staging",
+        "owner": "customer",
+        "assignee": "Ruben De Smet",
+        "dueDate": "2026-06-26",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll expose the customer_id claim in our session token"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Write up row-level filtering approach for multi-tenant embeds",
+        "owner": "vendor",
+        "assignee": "Maya Lindqvist",
+        "dueDate": "2026-06-25",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll write up the row-level filtering approach for multi-tenant embeds"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Get security approval",
+        "titleAlternatives": ["Security team reviews the embed write-up"],
+        "owner": "customer",
+        "assignee": "Elise Vandamme",
+        "dueDate": null,
+        "kind": "commitment",
+        "dueDateReason": "No date given; it can only start once the write-up and sandbox exist.",
+        "dependsOn": [
+          { "newTaskTitleLike": "Write up row-level filtering approach for multi-tenant embeds", "gap": "depends_on_new_draft" },
+          { "newTaskTitleLike": "Set up embed sandbox", "gap": "depends_on_new_draft" }
+        ],
+        "sourceQuoteContains": "I'd like our security folks to read that before we go further"
+      }
+    ],
+    "notes": "Embedded-analytics sync with three dated commitments. Elise's 'I'd like our security folks to read that before we go further' is a real gate: it becomes a customer task for Elise (security approval) that depends on two new drafts from the same meeting, the write-up and the sandbox. Load testing stays out (explicitly a later conversation, nobody owns it).",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

@@ -1,0 +1,990 @@
+{
+  "label": "smoke",
+  "createdAt": "2026-10-11T21:49:05.208Z",
+  "git": {
+    "sha": "4fcdd62",
+    "dirty": true
+  },
+  "mockLlm": false,
+  "clockShift": true,
+  "model": "claude-sonnet-4-6",
+  "caseCount": 2,
+  "totalCostUsd": 0.106194,
+  "summary": {
+    "cases": 2,
+    "errors": 0,
+    "match": {
+      "count": 2,
+      "total": 2
+    },
+    "heldBeforeAssign": {
+      "count": 0,
+      "total": 0
+    },
+    "dedup": {
+      "count": 0,
+      "total": 0
+    },
+    "totals": {
+      "recall": {
+        "count": 4,
+        "total": 5
+      },
+      "precision": {
+        "count": 4,
+        "total": 6
+      },
+      "action": {
+        "count": 4,
+        "total": 4
+      },
+      "ownerSide": {
+        "count": 2,
+        "total": 2
+      },
+      "assignee": {
+        "count": 2,
+        "total": 2
+      },
+      "dueDate": {
+        "count": 1,
+        "total": 2
+      },
+      "priority": {
+        "count": 0,
+        "total": 1
+      },
+      "status": {
+        "count": 0,
+        "total": 0
+      },
+      "notesPhrases": {
+        "count": 1,
+        "total": 1
+      },
+      "dependencies": {
+        "count": 0,
+        "total": 0
+      },
+      "kindRecall": {
+        "commitment": {
+          "count": 2,
+          "total": 2
+        },
+        "parked_for_later": {
+          "count": 0,
+          "total": 1
+        },
+        "vendor_reminder": {
+          "count": 0,
+          "total": 0
+        }
+      },
+      "groundedQuotes": {
+        "count": 6,
+        "total": 6
+      },
+      "citedIdsValid": {
+        "count": 4,
+        "total": 4
+      },
+      "duplicates": {
+        "count": 0,
+        "total": 3
+      },
+      "gaps": {
+        "count": 0,
+        "total": 3
+      },
+      "gapsByCode": {
+        "existing_task_dependency": {
+          "count": 0,
+          "total": 2
+        },
+        "depends_on_new_draft": {
+          "count": 0,
+          "total": 2
+        },
+        "existing_task_notes": {
+          "count": 0,
+          "total": 1
+        }
+      }
+    }
+  },
+  "cases": [
+    {
+      "case": "11",
+      "file": "11-modal-okta-sso-trap.json",
+      "durationMs": 29016,
+      "costUsd": 0.053211,
+      "aiCalls": 2,
+      "error": null,
+      "score": {
+        "match": {
+          "pass": true,
+          "expected": "MDL",
+          "actual": "MDL",
+          "matchedBy": "domain"
+        },
+        "initial": {
+          "calls": [
+            {
+              "index": 0,
+              "action": "match_existing",
+              "title": "Configure Okta SAML SSO",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 1,
+                "action": "match_existing",
+                "title": "Configure Okta SAML SSO",
+                "score": 1,
+                "by": "ref"
+              },
+              "checks": {
+                "action": {
+                  "expected": "match_existing",
+                  "actual": "match_existing",
+                  "pass": true
+                },
+                "priority": {
+                  "expected": "high",
+                  "actual": null,
+                  "pass": false
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "existing_task_dependency",
+                    "depends_on_new_draft"
+                  ],
+                  "what": "depends on new draft \"Send SAML metadata file and ACS URL to Modal\"",
+                  "met": false
+                }
+              ]
+            },
+            {
+              "index": 1,
+              "action": "create_task",
+              "title": "Send SAML metadata file and ACS URL to Modal",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 2,
+                "action": "create_task",
+                "title": "Send SAML metadata file and ACS URL to Modal",
+                "score": 1.5,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Theo Okonkwo",
+                  "actual": "Theo Okonkwo",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-06-26",
+                  "actual": "2026-06-26",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 2,
+              "action": "create_task",
+              "title": "Filter by GPU type",
+              "kind": "parked_for_later",
+              "paired": false,
+              "pairedWith": null,
+              "checks": {},
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            }
+          ],
+          "unmatchedProposals": [
+            {
+              "draftId": 3,
+              "action": "create_task",
+              "title": "Enforce SSO for pilot group only until go-live, then flip org-wide",
+              "sourceQuote": "Let's agree: pilot group only until go-live, then we flip it org-wide."
+            }
+          ],
+          "proposalsCount": 3,
+          "duplicates": [],
+          "groundedness": {
+            "quotes": {
+              "count": 3,
+              "total": 3
+            },
+            "quoteViolations": [],
+            "quotesFromActionItemsOnly": 0,
+            "citedIds": {
+              "count": 2,
+              "total": 2
+            },
+            "citedIdViolations": []
+          },
+          "totals": {
+            "recall": {
+              "count": 2,
+              "total": 3
+            },
+            "precision": {
+              "count": 2,
+              "total": 3
+            },
+            "action": {
+              "count": 2,
+              "total": 2
+            },
+            "ownerSide": {
+              "count": 1,
+              "total": 1
+            },
+            "assignee": {
+              "count": 1,
+              "total": 1
+            },
+            "dueDate": {
+              "count": 1,
+              "total": 1
+            },
+            "priority": {
+              "count": 0,
+              "total": 1
+            },
+            "status": {
+              "count": 0,
+              "total": 0
+            },
+            "notesPhrases": {
+              "count": 0,
+              "total": 0
+            },
+            "dependencies": {
+              "count": 0,
+              "total": 0
+            },
+            "kindRecall": {
+              "commitment": {
+                "count": 1,
+                "total": 1
+              },
+              "parked_for_later": {
+                "count": 0,
+                "total": 1
+              },
+              "vendor_reminder": {
+                "count": 0,
+                "total": 0
+              }
+            },
+            "groundedQuotes": {
+              "count": 3,
+              "total": 3
+            },
+            "citedIdsValid": {
+              "count": 2,
+              "total": 2
+            },
+            "duplicates": {
+              "count": 0,
+              "total": 2
+            },
+            "gaps": {
+              "count": 0,
+              "total": 1
+            },
+            "gapsByCode": {
+              "existing_task_dependency": {
+                "count": 0,
+                "total": 1
+              },
+              "depends_on_new_draft": {
+                "count": 0,
+                "total": 1
+              }
+            }
+          }
+        },
+        "heldBeforeAssign": null,
+        "afterAssign": null,
+        "dedup": null,
+        "totals": {
+          "recall": {
+            "count": 2,
+            "total": 3
+          },
+          "precision": {
+            "count": 2,
+            "total": 3
+          },
+          "action": {
+            "count": 2,
+            "total": 2
+          },
+          "ownerSide": {
+            "count": 1,
+            "total": 1
+          },
+          "assignee": {
+            "count": 1,
+            "total": 1
+          },
+          "dueDate": {
+            "count": 1,
+            "total": 1
+          },
+          "priority": {
+            "count": 0,
+            "total": 1
+          },
+          "status": {
+            "count": 0,
+            "total": 0
+          },
+          "notesPhrases": {
+            "count": 0,
+            "total": 0
+          },
+          "dependencies": {
+            "count": 0,
+            "total": 0
+          },
+          "kindRecall": {
+            "commitment": {
+              "count": 1,
+              "total": 1
+            },
+            "parked_for_later": {
+              "count": 0,
+              "total": 1
+            },
+            "vendor_reminder": {
+              "count": 0,
+              "total": 0
+            }
+          },
+          "groundedQuotes": {
+            "count": 3,
+            "total": 3
+          },
+          "citedIdsValid": {
+            "count": 2,
+            "total": 2
+          },
+          "duplicates": {
+            "count": 0,
+            "total": 2
+          },
+          "gaps": {
+            "count": 0,
+            "total": 1
+          },
+          "gapsByCode": {
+            "existing_task_dependency": {
+              "count": 0,
+              "total": 1
+            },
+            "depends_on_new_draft": {
+              "count": 0,
+              "total": 1
+            }
+          }
+        }
+      },
+      "actual": {
+        "match": {
+          "companyPrefix": "MDL",
+          "ambiguous": false,
+          "matchedBy": "domain"
+        },
+        "transcript": "Alright, thanks both for joining. Quick agenda: pilot dashboards, then SSO, then anything else.\nSounds good. Dashboards first — the inference-cost dashboard looks great, the team has been using it daily.\nLove to hear it. Any numbers looking off?\nNothing so far. A couple of people asked for a filter by GPU type but that's a nice-to-have, not urgent.\nNoted as a nice-to-have then. Okay, SSO. This is the big one blocking wider rollout.\nYeah, that's me. I looked at the Okta side yesterday and it's straightforward — standard SAML 2.0 app.\nExactly, we're a standard SP-initiated flow. You'll need our metadata to set up the app.\nRight. I'll get the Okta SAML app configured on our side this week — it's already on my list for this sprint.\nPerfect. And on my end, I'll send the SAML metadata file and our ACS URL by end of day Friday, June 26th, so you have everything you need.\nGreat, that works. One question — do we enforce SSO for everyone immediately?\nI'd rather not force the whole org through it before go-live. Can we scope enforcement to the pilot group?\nYes, enforcement is per-group. Let's agree: pilot group only until go-live, then we flip it org-wide.\nAgreed. That de-risks it nicely.\nAnything else before we wrap? No? Okay — Dmitri on the Okta app, me on the metadata by Friday. Talk next week.\nThanks Theo, talk soon.",
+        "actionItemsText": "Dmitri to configure the Okta SAML app on Modal's side this week\nTheo to send SAML metadata file and ACS URL by Friday June 26th",
+        "initial": {
+          "proposals": [
+            {
+              "action": "match_existing",
+              "draftId": 1,
+              "sourceQuote": "I'll get the Okta SAML app configured on our side this week — it's already on my list for this sprint.",
+              "confidence": "high",
+              "draftRef": null,
+              "taskRef": "t1",
+              "updateKind": "update_due_date",
+              "newStatus": null,
+              "newDueDate": "2026-06-28",
+              "newPriority": null,
+              "notes": null,
+              "appendNotes": null
+            },
+            {
+              "action": "create_task",
+              "draftId": 2,
+              "sourceQuote": "I'll send the SAML metadata file and our ACS URL by end of day Friday, June 26th, so you have everything you need.",
+              "confidence": "high",
+              "draftRef": null,
+              "title": "Send SAML metadata file and ACS URL to Modal",
+              "description": "Theo to send the SAML metadata file and ACS URL to Dmitri so he can complete the Okta SAML app configuration on Modal's side.",
+              "notes": "Perfect. And on my end, I'll send the SAML metadata file and our ACS URL by end of day Friday, June 26th, so you have everything you need. Great, that works. One question -- do we enforce SSO for everyone immediately?",
+              "ownerName": "Theo Okonkwo",
+              "assigneeContactName": null,
+              "ownerSide": "vendor",
+              "dueDate": "2026-06-26",
+              "priority": "high",
+              "blockedByRef": null
+            },
+            {
+              "action": "create_task",
+              "draftId": 3,
+              "sourceQuote": "Let's agree: pilot group only until go-live, then we flip it org-wide.",
+              "confidence": "low",
+              "draftRef": null,
+              "title": "Enforce SSO for pilot group only until go-live, then flip org-wide",
+              "description": "SSO enforcement must be scoped to the pilot group only during the pilot phase. Org-wide enforcement is deferred until go-live. This is a firm decision from the 2026-06-24 sync; no explicit owner was named for the configuration step.",
+              "notes": "I'd rather not force the whole org through it before go-live. Can we scope enforcement to the pilot group? Yes, enforcement is per-group. Let's agree: pilot group only until go-live, then we flip it org-wide. Agreed.",
+              "ownerName": null,
+              "assigneeContactName": null,
+              "ownerSide": null,
+              "dueDate": null,
+              "priority": "medium",
+              "blockedByRef": "t1"
+            }
+          ],
+          "rawCalls": [
+            {
+              "tool": "match_to_existing_task_draft",
+              "taskId": 1,
+              "taskRef": "t1",
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll get the Okta SAML app configured on our side this week — it's already on my list for this sprint."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll send the SAML metadata file and our ACS URL by end of day Friday, June 26th, so you have everything you need."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": 1,
+              "blockedByRef": "t1",
+              "sourceQuote": "Let's agree: pilot group only until go-live, then we flip it org-wide."
+            }
+          ],
+          "boardRefs": [
+            "t1",
+            "t2",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "openRefs": [
+            "t1",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "boardTasks": [
+            {
+              "ref": "t1",
+              "title": "Configure Okta SAML SSO",
+              "status": "Not started",
+              "ownerName": "Dmitri Volkov"
+            },
+            {
+              "ref": "t2",
+              "title": "Build inference-cost pilot dashboard",
+              "status": "Done",
+              "ownerName": "Theo Okonkwo"
+            },
+            {
+              "ref": "t3",
+              "title": "Define usage metrics in the semantic layer",
+              "status": "In progress",
+              "ownerName": "Theo Okonkwo"
+            },
+            {
+              "ref": "t4",
+              "title": "Roll out to pilot group",
+              "status": "Not started",
+              "ownerName": "Theo Okonkwo"
+            },
+            {
+              "ref": "t5",
+              "title": "Run admin training for Modal data team",
+              "status": "Not started",
+              "ownerName": "Theo Okonkwo"
+            }
+          ]
+        },
+        "error": null
+      },
+      "logs": [
+        "log [miniti] extraction (pass 1): input ~923 prompt tokens, 4 open tasks",
+        "log [miniti] extraction (pass 1): 4 action items, 2 completions, tone=status update, 10684ms",
+        "log [miniti] orchestrator (pass 2): input ~1597 prompt tokens, 4 open tasks, 4 extracted items",
+        "log [miniti] orchestrator (pass 2): 4 content blocks, 3 tool calls"
+      ]
+    },
+    {
+      "case": "13",
+      "file": "13-functionhealth-service-account-trap.json",
+      "durationMs": 28255,
+      "costUsd": 0.052983,
+      "aiCalls": 2,
+      "error": null,
+      "score": {
+        "match": {
+          "pass": true,
+          "expected": "FN",
+          "actual": "FN",
+          "matchedBy": "domain"
+        },
+        "initial": {
+          "calls": [
+            {
+              "index": 0,
+              "action": "create_task",
+              "title": "Close the security review",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 1,
+                "action": "create_task",
+                "title": "Close out security review (pending platform lead approval)",
+                "score": 1.1,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "customer",
+                  "actual": "customer",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Nadia Kaur",
+                  "actual": "Nadia Kaur",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-06-23",
+                  "actual": "2026-06-22",
+                  "pass": false
+                }
+              },
+              "notes": {
+                "found": [
+                  "platform lead"
+                ],
+                "missing": []
+              },
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 1,
+              "action": "match_existing",
+              "title": "Provision read-only Snowflake service account",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 2,
+                "action": "match_existing",
+                "title": "Provision read-only Snowflake service account",
+                "score": 1,
+                "by": "ref"
+              },
+              "checks": {
+                "action": {
+                  "expected": "match_existing",
+                  "actual": "match_existing",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "existing_task_notes"
+                  ],
+                  "what": "notes on existing task: read-only, ANALYTICS schema, no raw layer",
+                  "met": false
+                },
+                {
+                  "codes": [
+                    "existing_task_dependency",
+                    "depends_on_new_draft"
+                  ],
+                  "what": "depends on new draft \"Close the security review\"",
+                  "met": false
+                }
+              ]
+            }
+          ],
+          "unmatchedProposals": [
+            {
+              "draftId": 3,
+              "action": "match_existing",
+              "title": "Connect dbt repo to Quarry",
+              "sourceQuote": "Once the service account exists we can connect the dbt repo the same day, so the chain unblocks quickly."
+            }
+          ],
+          "proposalsCount": 3,
+          "duplicates": [],
+          "groundedness": {
+            "quotes": {
+              "count": 3,
+              "total": 3
+            },
+            "quoteViolations": [],
+            "quotesFromActionItemsOnly": 0,
+            "citedIds": {
+              "count": 2,
+              "total": 2
+            },
+            "citedIdViolations": []
+          },
+          "totals": {
+            "recall": {
+              "count": 2,
+              "total": 2
+            },
+            "precision": {
+              "count": 2,
+              "total": 3
+            },
+            "action": {
+              "count": 2,
+              "total": 2
+            },
+            "ownerSide": {
+              "count": 1,
+              "total": 1
+            },
+            "assignee": {
+              "count": 1,
+              "total": 1
+            },
+            "dueDate": {
+              "count": 0,
+              "total": 1
+            },
+            "priority": {
+              "count": 0,
+              "total": 0
+            },
+            "status": {
+              "count": 0,
+              "total": 0
+            },
+            "notesPhrases": {
+              "count": 1,
+              "total": 1
+            },
+            "dependencies": {
+              "count": 0,
+              "total": 0
+            },
+            "kindRecall": {
+              "commitment": {
+                "count": 1,
+                "total": 1
+              },
+              "parked_for_later": {
+                "count": 0,
+                "total": 0
+              },
+              "vendor_reminder": {
+                "count": 0,
+                "total": 0
+              }
+            },
+            "groundedQuotes": {
+              "count": 3,
+              "total": 3
+            },
+            "citedIdsValid": {
+              "count": 2,
+              "total": 2
+            },
+            "duplicates": {
+              "count": 0,
+              "total": 1
+            },
+            "gaps": {
+              "count": 0,
+              "total": 2
+            },
+            "gapsByCode": {
+              "existing_task_notes": {
+                "count": 0,
+                "total": 1
+              },
+              "existing_task_dependency": {
+                "count": 0,
+                "total": 1
+              },
+              "depends_on_new_draft": {
+                "count": 0,
+                "total": 1
+              }
+            }
+          }
+        },
+        "heldBeforeAssign": null,
+        "afterAssign": null,
+        "dedup": null,
+        "totals": {
+          "recall": {
+            "count": 2,
+            "total": 2
+          },
+          "precision": {
+            "count": 2,
+            "total": 3
+          },
+          "action": {
+            "count": 2,
+            "total": 2
+          },
+          "ownerSide": {
+            "count": 1,
+            "total": 1
+          },
+          "assignee": {
+            "count": 1,
+            "total": 1
+          },
+          "dueDate": {
+            "count": 0,
+            "total": 1
+          },
+          "priority": {
+            "count": 0,
+            "total": 0
+          },
+          "status": {
+            "count": 0,
+            "total": 0
+          },
+          "notesPhrases": {
+            "count": 1,
+            "total": 1
+          },
+          "dependencies": {
+            "count": 0,
+            "total": 0
+          },
+          "kindRecall": {
+            "commitment": {
+              "count": 1,
+              "total": 1
+            },
+            "parked_for_later": {
+              "count": 0,
+              "total": 0
+            },
+            "vendor_reminder": {
+              "count": 0,
+              "total": 0
+            }
+          },
+          "groundedQuotes": {
+            "count": 3,
+            "total": 3
+          },
+          "citedIdsValid": {
+            "count": 2,
+            "total": 2
+          },
+          "duplicates": {
+            "count": 0,
+            "total": 1
+          },
+          "gaps": {
+            "count": 0,
+            "total": 2
+          },
+          "gapsByCode": {
+            "existing_task_notes": {
+              "count": 0,
+              "total": 1
+            },
+            "existing_task_dependency": {
+              "count": 0,
+              "total": 1
+            },
+            "depends_on_new_draft": {
+              "count": 0,
+              "total": 1
+            }
+          }
+        }
+      },
+      "actual": {
+        "match": {
+          "companyPrefix": "FN",
+          "ambiguous": false,
+          "matchedBy": "domain"
+        },
+        "transcript": "Thanks for making time. I know this project has been stuck behind the security review, so I mostly want to understand where that stands.\nFair. It's taken longer than any of us wanted — the questionnaire touched teams that don't usually review vendors together, and anything touching patient data gets extra scrutiny.\nUnderstood. Is there anything outstanding on our side? More documentation, a call with your reviewers?\nNo, your responses were complete, including the HIPAA and data-handling sections. The remaining answers are drafted internally and I'm waiting on one approval from our platform lead. I expect to close the review out early next week.\nThat's genuinely good news. Oliver, once that lands, what's the path to getting us connected?\nThe moment Nadia signs off, I'll provision the Snowflake service account — read-only on the ANALYTICS schema, exactly as specced. It's a same-day job once the review closes, so I won't put a separate date on it.\nAnd just to confirm scope while we're all here: read-only, ANALYTICS schema only, no raw layer?\nCorrect. Our data governance policy won't allow raw-layer access for external tools — that's where the identifiable lab results live — and honestly you don't need it.\nAgreed, we don't. Once the service account exists we can connect the dbt repo the same day, so the chain unblocks quickly.\nThat's what I'm hoping. We've lost about three weeks; if the connection happens next week we can claw most of that back.\nFrom my side, no further reviews needed after this one. The tool itself was approved — it was the data-sharing terms for the health data that took time.\nGood to know. I won't pile more actions on — the sign-off and the service account are the whole critical path. Anything you need from me?\nNothing right now. If provisioning throws anything weird I'll ping you on Slack.\nPerfect. Let's speak once the account is live. Thanks both.",
+        "actionItemsText": "Nadia to close out the security review early next week (waiting on platform lead approval)\nOliver to provision the Snowflake service account (read-only, ANALYTICS schema) the same day security signs off",
+        "initial": {
+          "proposals": [
+            {
+              "action": "create_task",
+              "draftId": 1,
+              "sourceQuote": "The remaining answers are drafted internally and I'm waiting on one approval from our platform lead. I expect to close the review out early next week.",
+              "confidence": "high",
+              "draftRef": null,
+              "title": "Close out security review (pending platform lead approval)",
+              "description": "Nadia to obtain the final internal approval from the Function Health platform lead and formally close out the security and HIPAA questionnaire review. This is the single blocker on the entire implementation critical path.",
+              "notes": "The remaining answers are drafted internally and I'm waiting on one approval from our platform lead. I expect to close the review out early next week. That's genuinely good news. External blocker: one internal approval from Function Health platform lead outstanding.",
+              "ownerName": null,
+              "assigneeContactName": "Nadia Kaur",
+              "ownerSide": "customer",
+              "dueDate": "2026-06-22",
+              "priority": "high",
+              "blockedByRef": null
+            },
+            {
+              "action": "match_existing",
+              "draftId": 2,
+              "sourceQuote": "The moment Nadia signs off, I'll provision the Snowflake service account — read-only on the ANALYTICS schema, exactly as specced. It's a same-day job once the review closes, so I won't put a separate date on it.",
+              "confidence": "high",
+              "draftRef": null,
+              "taskRef": "t1",
+              "updateKind": "reprioritise",
+              "newStatus": null,
+              "newDueDate": null,
+              "newPriority": "high",
+              "notes": null,
+              "appendNotes": null
+            },
+            {
+              "action": "match_existing",
+              "draftId": 3,
+              "sourceQuote": "Once the service account exists we can connect the dbt repo the same day, so the chain unblocks quickly.",
+              "confidence": "low",
+              "draftRef": null,
+              "taskRef": "t3",
+              "updateKind": "reprioritise",
+              "newStatus": null,
+              "newDueDate": null,
+              "newPriority": "high",
+              "notes": null,
+              "appendNotes": null
+            }
+          ],
+          "rawCalls": [
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "The remaining answers are drafted internally and I'm waiting on one approval from our platform lead. I expect to close the review out early next week."
+            },
+            {
+              "tool": "match_to_existing_task_draft",
+              "taskId": 1,
+              "taskRef": "t1",
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "The moment Nadia signs off, I'll provision the Snowflake service account — read-only on the ANALYTICS schema, exactly as specced. It's a same-day job once the review closes, so I won't put a separate date on it."
+            },
+            {
+              "tool": "match_to_existing_task_draft",
+              "taskId": 3,
+              "taskRef": "t3",
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "Once the service account exists we can connect the dbt repo the same day, so the chain unblocks quickly."
+            }
+          ],
+          "boardRefs": [
+            "t1",
+            "t2",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "openRefs": [
+            "t1",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "boardTasks": [
+            {
+              "ref": "t1",
+              "title": "Provision read-only Snowflake service account",
+              "status": "Blocked",
+              "ownerName": "Oliver Hartley"
+            },
+            {
+              "ref": "t2",
+              "title": "Return completed security questionnaire",
+              "status": "Done",
+              "ownerName": "Sam Whitfield"
+            },
+            {
+              "ref": "t3",
+              "title": "Connect dbt repo to Quarry",
+              "status": "Blocked",
+              "ownerName": "Sam Whitfield"
+            },
+            {
+              "ref": "t4",
+              "title": "Model lab-results marts",
+              "status": "Not started",
+              "ownerName": "Sam Whitfield"
+            },
+            {
+              "ref": "t5",
+              "title": "Run analyst training",
+              "status": "Not started",
+              "ownerName": "Sam Whitfield"
+            }
+          ]
+        },
+        "error": null
+      },
+      "logs": [
+        "log [miniti] extraction (pass 1): input ~1145 prompt tokens, 4 open tasks",
+        "log [miniti] extraction (pass 1): 5 action items, 2 completions, tone=status update, 12713ms",
+        "log [miniti] orchestrator (pass 2): input ~2012 prompt tokens, 4 open tasks, 5 extracted items",
+        "log [miniti] orchestrator (pass 2): 4 content blocks, 3 tool calls"
+      ]
+    }
+  ]
+}

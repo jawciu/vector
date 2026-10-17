@@ -1,0 +1,141 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "D04B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A04",
+      "title": "Loop Returns — dbt modeling working session",
+      "date": "2026-05-28T15:00:00Z",
+      "end_time": "2026-05-28T15:47:30Z",
+      "duration_seconds": 2850,
+      "language": "en",
+      "summary": "Technical working session on Loop's returns models. Walked through fct_returns, agreed the first metrics block, a compiled-SQL review, and a staging backfill for exchange_type.",
+      "action_items": [
+        "Casey to open PR adding metrics block (return_rate, refund_total) to fct_returns.yml by June 1",
+        "Theo to review PR and validate compiled SQL in the dev project by June 2",
+        "Dev to backfill exchange_type column in the staging model by May 29"
+      ],
+      "key_decisions": ["First metrics ship on fct_returns: return_rate and refund_total", "exchange_type nulls are backfilled before metrics go live, not coalesced in the metric"],
+      "topics": ["dbt", "metrics", "returns data"],
+      "discussion_flow": ["fct_returns walkthrough", "Metric definitions", "exchange_type nulls", "Review plan"],
+      "notes": "Pairing session in a shared screen; Loop's analytics engineers are comfortable in dbt, minimal hand-holding needed.",
+      "training": {
+        "talk_ratio_you": 0.44,
+        "speakers": [
+          { "speaker": "Theo Okonkwo", "is_you": true, "word_count": 1450, "fillers_per_minute": 1.6 },
+          { "speaker": "Casey Morgan", "is_you": false, "word_count": 1120 },
+          { "speaker": "Dev Patel", "is_you": false, "word_count": 730 }
+        ]
+      },
+      "speaker_count": 3,
+      "speaker_names": { "0": "Casey Morgan", "1": "Dev Patel", "-1": "Theo Okonkwo" },
+      "transcript": [
+        { "speaker": "Theo Okonkwo", "text": "Sharing my screen — this is your fct_returns model compiled in our dev project. Let's define the first metrics on top of it.", "timestamp": 0 },
+        { "speaker": "Casey Morgan", "text": "The two the leadership team asks for every week are return rate and total refund value. If those two are self-serve we've already won.", "timestamp": 14.7 },
+        {
+          "speaker": "Theo Okonkwo",
+          "text": "Then those are our first metrics block. return_rate as returned orders over total orders, refund_total as a simple sum — both defined in the .yml, next to the model.",
+          "timestamp": 31.2
+        },
+        {
+          "speaker": "Casey Morgan",
+          "text": "I want to write that myself so the team learns the workflow. I'll add the metrics block to fct_returns.yml — return_rate and refund_total — and open the PR by Monday, June 1st.",
+          "timestamp": 52.6
+        },
+        {
+          "speaker": "Theo Okonkwo",
+          "text": "Perfect. And I'll review the PR and validate the compiled SQL in the dev project by Tuesday, June 2nd, so we catch any grain mistakes before anyone builds on it.",
+          "timestamp": 74.9
+        },
+        { "speaker": "Dev Patel", "text": "One data issue before you trust return_rate — exchange_type is null for everything before March. Exchanges will be undercounted.", "timestamp": 93.4 },
+        { "speaker": "Theo Okonkwo", "text": "Good catch. Do we coalesce in the metric or fix the staging model?", "timestamp": 110.8 },
+        {
+          "speaker": "Dev Patel",
+          "text": "Fix it at the source — the mapping exists in the raw events, it just predates the column. I'll backfill the exchange_type column in the staging model by end of week — Friday, May 29th.",
+          "timestamp": 118.3
+        },
+        { "speaker": "Casey Morgan", "text": "That's cleaner. Then my PR can assume exchange_type is trustworthy.", "timestamp": 139 },
+        { "speaker": "Theo Okonkwo", "text": "Agreed — Dev's backfill lands first, then the metrics PR. Anything else while we're in the model?", "timestamp": 146.5 },
+        { "speaker": "Casey Morgan", "text": "Eventually we'll want a returns-by-reason breakdown, but I don't want to scope that today.", "timestamp": 158.2 },
+        { "speaker": "Theo Okonkwo", "text": "Noted for later, not committing to it now. Good session — recap coming your way.", "timestamp": 169.8 },
+        { "speaker": "Dev Patel", "text": "Thanks Theo, this was useful.", "timestamp": 180.4 }
+      ],
+      "attendees": [
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "casey.morgan@loopreturns.com", "name": "Casey Morgan", "domain": "loopreturns.com" },
+        { "email": "dev.patel@loopreturns.com", "name": "Dev Patel", "domain": "loopreturns.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "LOOP",
+    "companyName": "Loop Returns",
+    "contacts": [
+      { "name": "Casey Morgan", "email": "casey.morgan@loopreturns.com" },
+      { "name": "Dev Patel", "email": "dev.patel@loopreturns.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Theo Okonkwo", "email": "theo@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Connect dbt repo to Quarry", "status": "In progress", "owner": "customer", "ownerName": "Dev Patel", "dueDate": "2026-06-02", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Migrate returns-ops dashboards", "status": "Not started", "owner": "vendor", "ownerName": "Theo Okonkwo", "dueDate": "2026-06-26", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Configure Google Workspace SSO", "status": "Not started", "owner": "customer", "ownerName": "Casey Morgan", "dueDate": null, "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t4",
+        "title": "Run dbt metrics training for Loop analysts",
+        "status": "Not started",
+        "owner": "vendor",
+        "ownerName": "Theo Okonkwo",
+        "dueDate": "2026-06-12",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "LOOP" },
+    "toolCalls": [
+      {
+        "action": "create_task",
+        "titleLike": "Add metrics block to fct_returns.yml and open PR",
+        "notesContains": ["return_rate", "refund_total"],
+        "owner": "customer",
+        "assignee": "Casey Morgan",
+        "dueDate": "2026-06-01",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll add the metrics block to fct_returns.yml"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Review metrics PR and validate compiled SQL in dev project",
+        "owner": "vendor",
+        "assignee": "Theo Okonkwo",
+        "dueDate": "2026-06-02",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll review the PR and validate the compiled SQL in the dev project by Tuesday, June 2nd"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Backfill exchange_type column in staging model",
+        "owner": "customer",
+        "assignee": "Dev Patel",
+        "dueDate": "2026-05-29",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll backfill the exchange_type column in the staging model by end of week"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Returns-by-reason breakdown",
+        "owner": "customer",
+        "assignee": "Casey Morgan",
+        "dueDate": null,
+        "kind": "parked_for_later",
+        "dueDateReason": "Casey does not want to scope it yet; deliberately undated.",
+        "sourceQuoteContains": "Eventually we'll want a returns-by-reason breakdown"
+      }
+    ],
+    "notes": "Technical working session with three dated commitments. The returns-by-reason breakdown is parked, but it is a real future need and Theo says 'noted for later', so it lands as an undated task for Casey rather than being dropped.",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

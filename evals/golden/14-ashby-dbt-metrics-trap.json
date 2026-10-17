@@ -1,0 +1,99 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "E0000014-7D0E-4F5A-8B4C-D9E8F7A6B014",
+      "title": "Ashby embedded analytics working session",
+      "date": "2026-06-10T14:00:00Z",
+      "end_time": "2026-06-10T14:52:20Z",
+      "duration_seconds": 3140,
+      "language": "en",
+      "summary": "Technical working session on Ashby's semantic layer. The group walked through the metrics block syntax in dbt and agreed the first tranche of metrics for the embedded dashboards. Bram committed to having the first ten metric definitions in the dbt .yml by Wednesday June 17th. Naming convention agreed: snake_case with a domain prefix.",
+      "action_items": ["Bram to define the first ten metrics in the dbt .yml by Wednesday June 17th"],
+      "key_decisions": [
+        "Metric naming convention: snake_case with a domain prefix (e.g. recruiting_offer_acceptance_rate)",
+        "First tranche is the ten metrics needed by the embedded customer dashboards, not internal reporting"
+      ],
+      "topics": ["semantic layer", "dbt metrics", "embedded analytics", "naming conventions"],
+      "discussion_flow": ["Metrics block syntax walkthrough", "Which metrics first", "Naming convention", "Timeline"],
+      "notes": "Screen-shared through fct_applications.yml as the worked example. Bram was comfortable with the syntax by the end of the session.",
+      "speaker_count": 3,
+      "speaker_names": { "0": "Bram Peeters", "1": "Lotte Janssens", "-1": "Ines Ferreira" },
+      "transcript": [
+        { "speaker": "Ines Ferreira", "text": "Today is hands-on: we'll walk the metrics block syntax together and agree which metrics come first.", "timestamp": 0 },
+        { "speaker": "Bram Peeters", "text": "Perfect. I've got fct_applications open — can we use that as the worked example?", "timestamp": 9.1 },
+        { "speaker": "Ines Ferreira", "text": "Yes, ideal. So under the model you add a metrics block — label, type, then the expression. Let's write offer acceptance rate together.", "timestamp": 16.4 },
+        { "speaker": "Bram Peeters", "text": "Okay… type ratio, numerator is offers accepted, denominator is total offers extended. Like this?", "timestamp": 41.7 },
+        { "speaker": "Ines Ferreira", "text": "Exactly like that. Run dbt parse and you'll see it compile. That's the whole workflow — metrics as code, reviewed in your normal PR flow.", "timestamp": 58.9 },
+        {
+          "speaker": "Lotte Janssens",
+          "text": "Nice. On priorities — the embedded dashboards for customers need about ten metrics. I'd say those come before anything for internal reporting.",
+          "timestamp": 74.2
+        },
+        { "speaker": "Ines Ferreira", "text": "Agreed, embedded first. That's time to hire, offer acceptance rate, and the rest of the list from the discovery doc?", "timestamp": 89.6 },
+        { "speaker": "Lotte Janssens", "text": "That list, yes. Ten metrics, all off fct_applications and fct_interviews.", "timestamp": 101.3 },
+        { "speaker": "Ines Ferreira", "text": "One thing to settle before you write them: naming. We recommend snake_case with a domain prefix so autocomplete groups them.", "timestamp": 112.8 },
+        { "speaker": "Bram Peeters", "text": "Works for me — recruiting_offer_acceptance_rate, pipeline_time_to_hire, that style. Let's lock that in.", "timestamp": 126 },
+        { "speaker": "Lotte Janssens", "text": "Locked. Bram, how long do you need for the first ten?", "timestamp": 138.5 },
+        {
+          "speaker": "Bram Peeters",
+          "text": "Now that I've seen the syntax, not long. I'll have the first ten metric definitions in the dbt yml by Wednesday the 17th — time to hire, offer acceptance rate, the ones we listed.",
+          "timestamp": 145.9
+        },
+        { "speaker": "Ines Ferreira", "text": "Wednesday the 17th is great. Once they compile, they show up in Quarry automatically — no extra step on our side.", "timestamp": 160.2 },
+        { "speaker": "Bram Peeters", "text": "Even better. I'll tag you on the PR so you can sanity-check the expressions.", "timestamp": 172.6 },
+        { "speaker": "Ines Ferreira", "text": "Please do. Good session — same time next week to review them live.", "timestamp": 181 }
+      ],
+      "attendees": [
+        { "email": "ines@vector.test", "name": "Ines Ferreira", "domain": "vector.test" },
+        { "email": "bram@ashbyhq.com", "name": "Bram Peeters", "domain": "ashbyhq.com" },
+        { "email": "lotte@ashbyhq.com", "name": "Lotte Janssens", "domain": "ashbyhq.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "ASH",
+    "companyName": "Ashby",
+    "contacts": [
+      { "name": "Bram Peeters", "email": "bram@ashbyhq.com" },
+      { "name": "Lotte Janssens", "email": "lotte@ashbyhq.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Ines Ferreira", "email": "ines@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Define first 10 metrics in dbt .yml", "status": "Not started", "owner": "customer", "ownerName": "Bram Peeters", "dueDate": null, "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Connect dbt repo to Quarry", "status": "In progress", "owner": "customer", "ownerName": "Lotte Janssens", "dueDate": "2026-06-12", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Set up embed sandbox", "status": "Not started", "owner": "vendor", "ownerName": "Ines Ferreira", "dueDate": "2026-06-24", "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t4",
+        "title": "Build hiring pipeline dashboard for embed",
+        "status": "Not started",
+        "owner": "vendor",
+        "ownerName": "Ines Ferreira",
+        "dueDate": "2026-07-03",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t5", "title": "Internal recruiting reports", "status": "Not started", "owner": "customer", "ownerName": "Lotte Janssens", "dueDate": null, "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "ASH" },
+    "toolCalls": [
+      {
+        "action": "match_existing",
+        "existingTaskRef": "t1",
+        "existingTaskTitleContains": "first 10 metrics",
+        "newDueDate": "2026-06-17",
+        "assignee": "Bram Peeters",
+        "notesContains": ["embedded first", "fct_applications", "fct_interviews", "snake_case", "domain prefix", "time to hire", "offer acceptance rate"],
+        "gap": "existing_task_notes",
+        "sourceQuoteContains": "I'll have the first ten metric definitions in the dbt yml by Wednesday the 17th"
+      }
+    ],
+    "notes": "Trap: Bram's commitment is the existing 'Define first 10 metrics in dbt .yml' task (t1): no duplicate. The update sets the due date to Wed 17 Jun and must capture everything agreed: embedded metrics first, built off fct_applications and fct_interviews, snake_case with a domain prefix so autocomplete groups them, starting with time to hire and offer acceptance rate. Assignee check (Caroline asked): yes, Bram Peeters is the one who commits on the call and he already owns t1, so the assignee stays Bram (no reassign).",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

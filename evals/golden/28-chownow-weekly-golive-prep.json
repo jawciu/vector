@@ -1,0 +1,108 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "5A9D3E62-7C1B-4F84-92A5-C86E0D000028",
+      "title": "ChowNow weekly sync — go-live prep",
+      "date": "2026-06-30T09:00:00Z",
+      "end_time": "2026-06-30T09:28:55Z",
+      "duration_seconds": 1735,
+      "language": "en",
+      "summary": "Weekly sync with ChowNow ahead of go-live. Parity sign-off completed; Ines to run the restaurant success team training next Tuesday, Matthias to write the internal launch announcement.",
+      "action_items": ["Ines to run restaurant success team training next Tuesday", "Matthias to write the internal launch announcement before training"],
+      "key_decisions": ["Parity sign-off accepted — go-live proceeds as planned"],
+      "topics": ["parity sign-off", "training", "launch comms"],
+      "discussion_flow": ["parity results", "training logistics", "launch announcement"],
+      "notes": "Restaurant-performance dashboards matched legacy numbers within tolerance. Legacy tool decommission timing intentionally left open.",
+      "speaker_count": 2,
+      "speaker_names": { "0": "Matthias Krüger", "-1": "Ines Ferreira" },
+      "transcript": [
+        { "speaker": "Ines Ferreira", "text": "Morning Matthias. Big week — how did the parity checks land?", "timestamp": 0 },
+        {
+          "speaker": "Matthias Krüger",
+          "text": "All green. We finished the parity sign-off on Friday — every orders dashboard matches the legacy numbers within tolerance, and I've signed the doc.",
+          "timestamp": 9.4
+        },
+        { "speaker": "Ines Ferreira", "text": "That's the milestone. So go-live proceeds as planned.", "timestamp": 30.1 },
+        { "speaker": "Matthias Krüger", "text": "Yes. The remaining worry is people, not data. The restaurant success team barely touched the new tool.", "timestamp": 40.8 },
+        {
+          "speaker": "Ines Ferreira",
+          "text": "Then let's fix that before launch. I'll run the restaurant success team training next Tuesday — ninety minutes, hands-on with their own dashboards.",
+          "timestamp": 55.3
+        },
+        { "speaker": "Matthias Krüger", "text": "Tuesday works, most of them are in the LA office that day.", "timestamp": 74.9 },
+        { "speaker": "Ines Ferreira", "text": "Good. It also helps if the launch is announced internally before the training, so people know why they're there.", "timestamp": 84.6 },
+        { "speaker": "Matthias Krüger", "text": "Agreed — I'll write the internal launch announcement and get it out before the training session.", "timestamp": 99.2 },
+        { "speaker": "Ines Ferreira", "text": "Perfect. Anything on the legacy side?", "timestamp": 114.7 },
+        {
+          "speaker": "Matthias Krüger",
+          "text": "We'll probably want to turn off access to the old tool eventually, but we haven't decided when. Some teams still have bookmarked reports.",
+          "timestamp": 122.5
+        },
+        { "speaker": "Ines Ferreira", "text": "No rush — most teams run both for a few weeks. Let's decide after launch.", "timestamp": 141 },
+        { "speaker": "Matthias Krüger", "text": "Agreed, after launch.", "timestamp": 153.6 },
+        { "speaker": "Ines Ferreira", "text": "Recap then: parity signed off, training with me next Tuesday, announcement from you before that. See you at training.", "timestamp": 160.2 },
+        { "speaker": "Matthias Krüger", "text": "See you then.", "timestamp": 176.4 }
+      ],
+      "calendar_event_id": "evt_chow_ws_0630",
+      "attendees": [
+        { "email": "ines@vector.test", "name": "Ines Ferreira", "domain": "vector.test" },
+        { "email": "matthias@chownow.com", "name": "Matthias Krüger", "domain": "chownow.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "CHOW",
+    "companyName": "ChowNow",
+    "contacts": [
+      { "name": "Matthias Krüger", "email": "matthias@chownow.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Ines Ferreira", "email": "ines@vector.test" }
+    ],
+    "tasks": [
+      {
+        "ref": "t1",
+        "title": "Validate orders dashboards against legacy numbers (parity sign-off)",
+        "status": "In progress",
+        "owner": "customer",
+        "ownerName": "Matthias Krüger",
+        "dueDate": "2026-06-26",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t2", "title": "Configure Okta SAML SSO", "status": "Done", "owner": "customer", "ownerName": "Matthias Krüger", "dueDate": "2026-06-24", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Go-live", "status": "Not started", "owner": "vendor", "ownerName": "Ines Ferreira", "dueDate": "2026-07-08", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Decommission legacy tool access", "status": "Not started", "owner": "customer", "ownerName": "Matthias Krüger", "dueDate": null, "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t5", "title": "Build restaurant-performance dashboards", "status": "Done", "owner": "vendor", "ownerName": "Ines Ferreira", "dueDate": "2026-06-19", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "CHOW" },
+    "toolCalls": [
+      { "action": "update_status", "existingTaskRef": "t1", "existingTaskTitleContains": "parity sign-off", "newStatus": "Done" },
+      {
+        "action": "create_task",
+        "titleLike": "Run restaurant success team training",
+        "owner": "vendor",
+        "assignee": "Ines Ferreira",
+        "dueDate": "2026-07-07",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll run the restaurant success team training next Tuesday"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Write internal launch announcement",
+        "owner": "customer",
+        "assignee": "Matthias Krüger",
+        "dueDate": "2026-07-06",
+        "kind": "commitment",
+        "dueDateReason": "'before the training session'; training is Tue 7 Jul → Mon 6 Jul at the latest.",
+        "sourceQuoteContains": "I'll write the internal launch announcement and get it out before the training session"
+      }
+    ],
+    "notes": "Ordinary weekly sync near go-live: parity sign-off reported complete (t1 → Done), a dated vendor training task, and a customer announcement whose date is anchored to the training: 'before the training session' on Tue 7 Jul means Mon 6 Jul. Legacy decommission is explicitly undecided, so no task and no change to t4.",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

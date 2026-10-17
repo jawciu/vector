@@ -1,0 +1,89 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "E0000018-1B4C-4D9E-8F8A-B3C2D1E0F018",
+      "title": "ChowNow check-in",
+      "date": "2026-07-06T09:30:00Z",
+      "end_time": "2026-07-06T09:47:22Z",
+      "duration_seconds": 1042,
+      "language": "en",
+      "summary": "Light check-in ahead of the ChowNow go-live. Everything remains on track: dashboards validated, training done, adoption strong. No new work agreed — some loose musing about a second training cohort and usage reporting after launch, nothing committed.",
+      "action_items": [],
+      "key_decisions": [],
+      "topics": ["go-live readiness", "adoption", "future training ideas"],
+      "discussion_flow": ["General status", "Adoption anecdotes", "Post-launch ideas"],
+      "notes": "Deliberately kept short — the readiness checklist was covered in last week's session and nothing has changed since.",
+      "speaker_count": 2,
+      "speaker_names": { "0": "Tobias Brandt", "-1": "Caroline Jaworsky" },
+      "training": {
+        "talk_ratio_you": 0.44,
+        "speakers": [
+          { "speaker": "Caroline Jaworsky", "is_you": true, "word_count": 640, "fillers_per_minute": 1.1 },
+          { "speaker": "Tobias Brandt", "is_you": false, "word_count": 810 }
+        ]
+      },
+      "transcript": [
+        { "speaker": "Caroline Jaworsky", "text": "Morning Tobias. Honestly, this one should be quick — we covered the whole checklist last week and I don't have anything new.", "timestamp": 0 },
+        { "speaker": "Tobias Brandt", "text": "Same here. Everything's still green on our side. The restaurant-ops team has basically stopped opening the old tool.", "timestamp": 10.3 },
+        { "speaker": "Caroline Jaworsky", "text": "That's the best signal there is. Any grumbles from the analysts?", "timestamp": 21.8 },
+        { "speaker": "Tobias Brandt", "text": "Not really. One person misses a keyboard shortcut from the old tool, which I think counts as a compliment.", "timestamp": 28.4 },
+        { "speaker": "Caroline Jaworsky", "text": "I'll take it. So — nothing outstanding from last week's checklist, no data issues, no access problems?", "timestamp": 39 },
+        { "speaker": "Tobias Brandt", "text": "Nothing. We're just waiting for the date to arrive at this point.", "timestamp": 47.6 },
+        { "speaker": "Caroline Jaworsky", "text": "Great place to be. Anything on your mind for after launch?", "timestamp": 54.2 },
+        {
+          "speaker": "Tobias Brandt",
+          "text": "Vaguely. At some point we should probably think about a second training cohort for the marketing folks, but there's no rush and no plan yet.",
+          "timestamp": 60.7
+        },
+        { "speaker": "Caroline Jaworsky", "text": "Makes sense as a someday thing — happy to talk formats whenever you get closer to wanting it.", "timestamp": 74.5 },
+        {
+          "speaker": "Tobias Brandt",
+          "text": "Yeah, we'll see how the first weeks go. Might also be interesting to look at usage reporting eventually, but again, just thinking out loud.",
+          "timestamp": 83.9
+        },
+        { "speaker": "Caroline Jaworsky", "text": "Noted as thinking out loud. Alright, I won't keep you — see you at the go-live call.", "timestamp": 96.1 },
+        { "speaker": "Tobias Brandt", "text": "Looking forward to it. Thanks Caroline.", "timestamp": 104.8 }
+      ],
+      "attendees": [
+        { "email": "caroline@vector.test", "name": "Caroline Jaworsky", "domain": "vector.test" },
+        { "email": "tobias@chownow.com", "name": "Tobias Brandt", "domain": "chownow.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "CHOW",
+    "companyName": "ChowNow",
+    "contacts": [
+      { "name": "Tobias Brandt", "email": "tobias@chownow.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Caroline Jaworsky", "email": "caroline@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Go-live", "status": "Not started", "owner": "vendor", "ownerName": "Caroline Jaworsky", "dueDate": "2026-07-08", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Run restaurant success team training", "status": "Done", "owner": "vendor", "ownerName": "Caroline Jaworsky", "dueDate": "2026-07-01", "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t3",
+        "title": "Validate dashboards against legacy numbers (parity sign-off)",
+        "status": "Done",
+        "owner": "customer",
+        "ownerName": "Tobias Brandt",
+        "dueDate": "2026-06-26",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t4", "title": "Decommission legacy tool access", "status": "Not started", "owner": "customer", "ownerName": "Tobias Brandt", "dueDate": null, "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t5", "title": "Go-live review call", "status": "Not started", "owner": "vendor", "ownerName": "Caroline Jaworsky", "dueDate": "2026-07-07", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "CHOW" },
+    "toolCalls": [
+      { "action": "flag_no_action_items" }
+    ],
+    "notes": "Pure status chatter before go-live: 'should probably think about' and 'thinking out loud' are musings, not commitments — expect flag_no_action_items and nothing else.",
+    "review": { "verdict": "approved", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

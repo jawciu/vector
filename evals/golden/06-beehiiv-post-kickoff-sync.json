@@ -1,0 +1,130 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "D06B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A06",
+      "title": "beehiiv — week 1 sync",
+      "date": "2026-07-02T14:00:00Z",
+      "end_time": "2026-07-02T14:26:10Z",
+      "duration_seconds": 1570,
+      "language": "en",
+      "summary": "First weekly sync after the beehiiv kickoff. Agreed repo access, warehouse connection and first compile, and Redshift IP whitelisting.",
+      "action_items": [
+        "Nina to grant dbt repo access via the quarry-integration GitHub team by July 3",
+        "Maya to connect the warehouse and get the dbt project compiling by July 7",
+        "Marcus to whitelist Quarry's IPs on the Redshift cluster by July 6"
+      ],
+      "key_decisions": ["Connect against the existing dbt production target, not a fork"],
+      "topics": ["kickoff follow-up", "repo access", "Redshift"],
+      "discussion_flow": ["Kickoff recap", "Repo access", "Warehouse connection", "IP whitelisting"],
+      "notes": "Fresh onboarding, high energy — beehiiv wants first dashboards before their end-of-July board meeting.",
+      "training": {
+        "talk_ratio_you": 0.47,
+        "speakers": [
+          { "speaker": "Maya Lindqvist", "is_you": true, "word_count": 830, "fillers_per_minute": 1.2 },
+          { "speaker": "Nina Alvarez", "is_you": false, "word_count": 560 },
+          { "speaker": "Marcus Webb", "is_you": false, "word_count": 390 }
+        ]
+      },
+      "speaker_count": 3,
+      "speaker_names": { "0": "Nina Alvarez", "1": "Marcus Webb", "-1": "Maya Lindqvist" },
+      "transcript": [
+        { "speaker": "Maya Lindqvist", "text": "Great kickoff last week. This week is about getting the plumbing in so we can compile your project. First up: repo access.", "timestamp": 0 },
+        { "speaker": "Nina Alvarez", "text": "Easy one. I'll get you the dbt repo access — invite to the quarry-integration GitHub team by tomorrow, July 3rd.", "timestamp": 12.6 },
+        { "speaker": "Maya Lindqvist", "text": "Perfect. Once I'm in, do we work off main or do you want us on a fork?", "timestamp": 25.9 },
+        { "speaker": "Nina Alvarez", "text": "Off main, against the existing production target. A fork would just drift.", "timestamp": 33.4 },
+        { "speaker": "Maya Lindqvist", "text": "Agreed. Then on our side — I'll connect the warehouse and get the dbt project compiling in Quarry by Tuesday, July 7th.", "timestamp": 41.8 },
+        { "speaker": "Marcus Webb", "text": "That depends on network access though — our Redshift cluster only accepts whitelisted IPs.", "timestamp": 57.2 },
+        { "speaker": "Maya Lindqvist", "text": "Right, I'll send you our static IP ranges after this call. Can you get them whitelisted before Tuesday?", "timestamp": 65.7 },
+        { "speaker": "Marcus Webb", "text": "Yes — I'll whitelist Quarry's IPs on the Redshift cluster by Monday the 6th.", "timestamp": 74.3 },
+        { "speaker": "Nina Alvarez", "text": "For context on urgency: our board meeting is end of July and I'd love the subscriber retention dashboard live for it.", "timestamp": 84.9 },
+        {
+          "speaker": "Maya Lindqvist",
+          "text": "That's a realistic target if the compile lands next week. We'll scope the retention dashboard properly at next Thursday's sync rather than promise it today.",
+          "timestamp": 96.5
+        },
+        { "speaker": "Nina Alvarez", "text": "Fair. Plumbing first.", "timestamp": 112 },
+        { "speaker": "Maya Lindqvist", "text": "So: repo invite tomorrow, IPs Monday, compile Tuesday. Speak Thursday.", "timestamp": 117.8 },
+        { "speaker": "Marcus Webb", "text": "Sounds good, thanks Maya.", "timestamp": 127.1 }
+      ],
+      "calendar_event_id": "evt_bee_week1_0702",
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "nina@beehiiv.com", "name": "Nina Alvarez", "domain": "beehiiv.com" },
+        { "email": "marcus@beehiiv.com", "name": "Marcus Webb", "domain": "beehiiv.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "BEE",
+    "companyName": "beehiiv",
+    "contacts": [
+      { "name": "Nina Alvarez", "email": "nina@beehiiv.com" },
+      { "name": "Marcus Webb", "email": "marcus@beehiiv.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Maya Lindqvist", "email": "maya@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Kickoff: confirm onboarding plan", "status": "Done", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-06-25", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Model subscriber growth marts", "status": "Not started", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-07-17", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Configure SSO for beehiiv workspace", "status": "Not started", "owner": "customer", "ownerName": "Nina Alvarez", "dueDate": null, "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Run analyst training on Quarry", "status": "Not started", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-07-21", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "BEE" },
+    "toolCalls": [
+      {
+        "action": "create_task",
+        "titleLike": "Grant dbt repo access via quarry-integration GitHub team",
+        "owner": "customer",
+        "assignee": "Nina Alvarez",
+        "dueDate": "2026-07-03",
+        "kind": "commitment",
+        "sourceQuoteContains": "invite to the quarry-integration GitHub team by tomorrow, July 3rd"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Send the static IP ranges",
+        "owner": "vendor",
+        "assignee": "Maya Lindqvist",
+        "dueDate": "2026-07-02",
+        "kind": "commitment",
+        "dueDateReason": "'after this call' = the meeting day, Thu 2 Jul.",
+        "sourceQuoteContains": "I'll send you our static IP ranges after this call"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Whitelist Quarry IPs on Redshift cluster",
+        "owner": "customer",
+        "assignee": "Marcus Webb",
+        "dueDate": "2026-07-06",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll whitelist Quarry's IPs on the Redshift cluster by Monday the 6th"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Connect warehouse and get dbt project compiling in Quarry",
+        "owner": "vendor",
+        "assignee": "Maya Lindqvist",
+        "dueDate": "2026-07-07",
+        "kind": "commitment",
+        "dependsOn": { "newTaskTitleLike": "Whitelist Quarry IPs on Redshift cluster", "gap": "depends_on_new_draft" },
+        "sourceQuoteContains": "I'll connect the warehouse and get the dbt project compiling in Quarry by Tuesday, July 7th"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Scope the retention dashboard at next Thursday's sync",
+        "owner": "vendor",
+        "assignee": "Maya Lindqvist",
+        "dueDate": "2026-07-09",
+        "kind": "commitment",
+        "dueDateReason": "'next Thursday's sync' from Thu 2 Jul → Thu 9 Jul.",
+        "sourceQuoteContains": "We'll scope the retention dashboard properly at next Thursday's sync"
+      }
+    ],
+    "notes": "Fresh-onboarding week-1 sync. Besides the three dated commitments: Maya's 'I'll send you our static IP ranges after this call' is a task for today; the warehouse connection depends on Marcus whitelisting the IPs (a new draft from the same meeting); and scoping the retention dashboard is not a distractor but a dated vendor task for next Thursday's sync (9 Jul).",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

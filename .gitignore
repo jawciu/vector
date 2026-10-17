@@ -57,3 +57,7 @@ next-env.d.ts
 
 # Storybook build output
 /storybook-static/
+
+# Golden-set review: raw reviewer notes and the per-case change log stay local
+evals/review-*/reviews/
+evals/review-*/CHANGES.md

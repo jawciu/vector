@@ -1,0 +1,73 @@
+# AI evals: golden-set replay (evals/run-golden.ts, see evals/README.md).
+#
+# - Manual trigger only for now. Weekly / PR triggers are Caroline's call once
+#   the baseline exists (see evals/README.md, "CI").
+# - Runs against a throwaway Postgres the runner starts inside the job
+#   (embedded-postgres on 127.0.0.1). No DATABASE_URL secret: the runner
+#   refuses any non-local database by design.
+# - A real run costs about $1.50-2.00 in Anthropic usage (30 cases, two
+#   Sonnet calls each, plus three after-assignment re-runs). `mock` costs $0.
+name: AI Evals
+
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "Subset of cases, e.g. 01,13 (empty = all 30)"
+        required: false
+        default: ""
+      label:
+        description: "Run label (names the run file)"
+        required: false
+        default: "ci"
+      mock:
+        description: "Mock the LLM (plumbing check, zero spend)"
+        type: boolean
+        required: false
+        default: false
+
+concurrency:
+  group: evals-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    # A full run is ~30 sequential cases at ~30s each; this caps paid spend if
+    # a run wedges (the GitHub default is 360 minutes).
+    timeout-minutes: 40
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate the answer key
+        run: npm run eval:validate
+
+      - name: Run golden evals
+        env:
+          CASES: ${{ inputs.cases }}
+          LABEL: ${{ inputs.label }}
+          MOCK: ${{ inputs.mock }}
+        run: |
+          args=(--label "${LABEL:-ci}" --out eval-run.json)
+          if [ -n "$CASES" ]; then args+=(--cases "$CASES"); fi
+          if [ "$MOCK" = "true" ]; then args+=(--mock-llm); fi
+          npm run eval -- "${args[@]}"
+
+      # Upload even when the run failed: that is when the report matters most.
+      - name: Upload run file
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-run
+          path: eval-run.json
+          if-no-files-found: warn
