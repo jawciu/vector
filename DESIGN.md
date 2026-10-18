@@ -334,6 +334,35 @@ background: linear-gradient(135deg, var(--ai-gradient-from), var(--ai-gradient-t
 
 For SVG fills the gradient must be inlined as a `<linearGradient>` referencing the two stops. The Vector sparkle is fixed at **16×16** with the gradient applied as the icon fill.
 
+### AI draft review patterns — `app/components/AIDraftInbox.tsx`
+
+- `StalePersonWarning` is shared by unavailable owners, assignees and unknown
+  meeting recorders. Use an alert-coloured message and warning icon, without an
+  enclosing border. Resolution pickers keep their normal neutral styling.
+- `UpdateDiffRow` displays each proposed field as current value → **new value**,
+  including **none** for removals. Current values use `text` (lightest off-white) on card hover or
+  focus within. Keep full values readable and retain the screen-reader transition
+  label. Task identity belongs in the card's left column, once per card.
+- Show a proposed dependency on the task that depends on it. A prerequisite's
+  create-task card stays plain; omit the reverse "another task waits on this"
+  notice. Keep the actual dependency and dismissal handling intact.
+- `DraftDependencies` uses plain 14px names without borders in previews.
+  `DraftDependenciesField` holds removable tags inside a single field in both
+  create-task and update-task editors. Multiple tags wrap within the field;
+  the + control adds another, and an empty field shows "Dependencies".
+  Keep the group icon and + control aligned with the first tag row when tags wrap.
+  Keep existing task ID prefixes and tag Remove buttons. Never nest the
+  Remove buttons inside the picker trigger. Put the dependency icon on the group;
+  omit "Depends on", meeting explanations and approval/link-state prose from
+  individual entries. Apply this equally to linked drafts, board tasks and text.
+
+### Dependency list — `app/components/TaskDependenciesField.tsx`
+
+Keep the Dependencies icon on the group heading only. Every dependency row
+starts with the shared `Checkbox`: linked-task checkboxes are disabled and follow
+the linked task's Done status; typed dependencies can be checked and reopened
+manually. Resolved rows are crossed out. Both kinds retain a Remove button.
+
 ### AI generating state — `.ai-generating` + `.is-streaming`
 
 The visual cue Vector uses to say *"I'm producing content right now"*. Apply `.ai-generating` to any positioned card that already has a `border-radius`, then toggle `.is-streaming` on while the underlying request is in flight. The card grows a slow-rotating conic-gradient border on a masked `::after` pseudo-element. Crossfades in over 2s and out over 2s when the class drops.

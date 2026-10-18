@@ -67,6 +67,6 @@ Caroline's review of the golden set (2026-10-11, see `PROGRESS.md`) asked the me
 
 ## Open questions for Caroline
 
-- Should an unresolved text blocker turn the onboarding's health red, the same way a blocked task does?
+- Resolved 2026-10-18: text dependencies do not affect onboarding health; keep `TEXT_BLOCKERS_COUNT_AS_BLOCKED = false`.
 - When the AI appends notes to an existing task, should they be marked as AI-added?
 - After approving a meeting's drafts in bulk, should unresolved draft-to-draft links warn before approving only part of the set?

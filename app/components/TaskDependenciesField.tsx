@@ -6,13 +6,14 @@
  * A task can wait on several things: other tasks on the board, or anything
  * that is not a task ("platform team sign-off"), typed as free text. Each
  * dependency is listed under the field row:
- *   - a task blocker shows its id chip and title (it is resolved by finishing
- *     that task);
+ *   - a task dependency shows a disabled checkbox, id chip and title; its
+ *     checkbox and strikethrough follow the linked task's Done status;
  *   - a text blocker has a tick box to mark it resolved (struck through and
  *     muted once ticked), so the record stays but stops counting;
  *   - both have a remove button.
  * The field row opens a popover with one text box: typing filters the board's
- * tasks and Enter adds what was typed as a text blocker. Every control is a
+ * tasks and Enter adds what was typed as a text blocker, then closes the
+ * popover after a successful save and returns focus to the field row. Every control is a
  * native button, checkbox or input, so it is all keyboard operable; Escape
  * closes the popover and returns focus to the field row.
  *
@@ -112,10 +113,18 @@ export default function TaskDependenciesField({ task, allTasks, open, onToggle, 
   async function addTask(id: number) {
     if (await send(base, "POST", { blockedByTaskId: id })) { setQuery(""); focusInput(); }
   }
-  async function addText() {
+  async function addText(closeOnSuccess = false) {
     // The box stays enabled while saving (disabling it would drop focus), so guard here.
     if (!typed || busy) return;
-    if (await send(base, "POST", { text: typed })) { setQuery(""); focusInput(); }
+    if (await send(base, "POST", { text: typed })) {
+      setQuery("");
+      if (closeOnSuccess) {
+        onClose();
+        rowRef.current?.querySelector<HTMLButtonElement>(".field-main")?.focus();
+      } else {
+        focusInput();
+      }
+    }
   }
 
   async function remove(depId: number, index: number) {
@@ -131,7 +140,7 @@ export default function TaskDependenciesField({ task, allTasks, open, onToggle, 
     focusAfterRemove.current = null;
     const rows = listRef.current?.querySelectorAll("li") ?? [];
     const row = rows[Math.min(i, rows.length - 1)];
-    const target = row?.querySelector<HTMLElement>("[role=checkbox], button")
+    const target = row?.querySelector<HTMLElement>("[role=checkbox]:not(:disabled), button:not(:disabled)")
       ?? rowRef.current?.querySelector<HTMLButtonElement>(".field-main");
     target?.focus();
   }, [deps.length]);
@@ -139,7 +148,7 @@ export default function TaskDependenciesField({ task, allTasks, open, onToggle, 
   function onInputKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
       e.preventDefault();
-      addText();
+      addText(true);
     }
   }
 
@@ -178,7 +187,7 @@ export default function TaskDependenciesField({ task, allTasks, open, onToggle, 
             </div>
             <div role="listbox" aria-label="Blockers to add" className="max-h-40 overflow-y-auto flex flex-col gap-1">
               {typed && (
-                <MenuOption onClick={addText}>
+                <MenuOption onClick={() => addText()}>
                   <span className="min-w-0 break-words">Add &ldquo;{typed}&rdquo; as a blocker</span>
                 </MenuOption>
               )}
@@ -207,16 +216,17 @@ export default function TaskDependenciesField({ task, allTasks, open, onToggle, 
             const resolved = d.blockedByTask ? d.blockedByTask.status === "Done" : !!d.resolvedAt;
             return (
               <li key={d.id} className="group flex items-start gap-2 min-h-6 text-sm leading-6">
-                {d.blockedByTask ? (
-                  <DependenciesIcon className="shrink-0 mt-1 text-text-muted" />
-                ) : (
-                  <Checkbox
-                    checked={resolved}
-                    onChange={(checked) => send(`${base}/${d.id}`, "PATCH", { resolved: checked })}
-                    aria-label={`${resolved ? "Reopen" : "Mark resolved"}: ${name}`}
-                    className="mt-1 shrink-0"
-                  />
-                )}
+                <Checkbox
+                  checked={resolved}
+                  disabled={!!d.blockedByTask}
+                  onChange={(checked) => {
+                    if (!d.blockedByTask) void send(`${base}/${d.id}`, "PATCH", { resolved: checked });
+                  }}
+                  aria-label={d.blockedByTask
+                    ? `${name}: ${resolved ? "Done" : "Not done"} (follows linked task)`
+                    : `${resolved ? "Reopen" : "Mark resolved"}: ${name}`}
+                  className="mt-1 shrink-0"
+                />
                 <span className={`flex-1 min-w-0 break-words ${resolved ? "line-through text-text-muted" : "text-text"}`}>
                   {d.blockedByTask ? (
                     <>

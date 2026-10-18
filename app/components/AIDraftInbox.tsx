@@ -36,6 +36,7 @@ import {
   RECORDER_UNKNOWN_OWNER_MESSAGE,
 } from "@/lib/integrations/recorder";
 import DraftDependencies, { type DraftLinkDescription } from "./DraftDependencies";
+import DraftDependenciesField from "./DraftDependenciesField";
 import Button from "@/app/ui/Button";
 import Textarea from "@/app/ui/Textarea";
 import IconButton from "@/app/ui/IconButton";
@@ -374,26 +375,6 @@ function linkDescriber(draft: AIDraft, overlay?: SiblingStatusOverlay) {
     const entry = id != null ? applied.find((a) => a.draftId === id) ?? null : null;
     return { title: linkTitle(link, sibling), ...draftLinkStatus(sibling, entry) };
   };
-}
-
-/**
- * On a pending create draft that other drafts from the meeting wait on: say
- * that dismissing it keeps it on them as a text blocker (the reject route
- * does exactly that), before the reviewer dismisses it.
- */
-function DependentsNotice({ draft, title, overlay }: { draft: AIDraft; title: string; overlay?: SiblingStatusOverlay }) {
-  const live = (draft.dependentDrafts ?? []).filter((d) => (overlay?.[d.draftId]?.status ?? d.status) !== "rejected");
-  if (live.length === 0) return null;
-  const names = live.map((d) => `“${d.title}”`).join(", ");
-  const one = live.length === 1;
-  return (
-    <p className="flex items-start gap-1.5 break-words text-xs leading-5 text-text-muted">
-      <DependenciesIcon className="mt-0.5 shrink-0" />
-      <span>
-        {names} {one ? "waits" : "wait"} on this task. Dismissing it keeps “{title}” on {one ? "it" : "them"} as a text blocker.
-      </span>
-    </p>
-  );
 }
 
 /** Bucket a draft's createdAt into Today / Yesterday / older (YYYY-MM-DD). */
@@ -871,6 +852,7 @@ export function DraftCard({
           {isUpdate && update ? (
             editing && updateEdits ? (
               <TaskUpdateEditForm
+                taskId={matchedTask?.id}
                 edits={updateEdits}
                 before={before}
                 known={!!matchedTask}
@@ -884,7 +866,6 @@ export function DraftCard({
             ) : (
               <TaskUpdateDiff
                 task={matchedTask}
-                fallbackTitle={taskTitle}
                 changes={proposedChanges}
                 names={{ owner: asName(payload?.ownerName), assignee: asName(payload?.assigneeContactName) }}
                 noteSource={readNoteSource(payload?.noteSource)}
@@ -1224,6 +1205,8 @@ function StalePeopleWarnings({
   );
 }
 
+/** Shared missing-person/recorder warning: colour the message, keep the
+ *  resolution controls neutral, and avoid a second bordered container. */
 function StalePersonWarning({
   message,
   icon,
@@ -1242,10 +1225,16 @@ function StalePersonWarning({
   disabled: boolean;
 }) {
   return (
-    <div role="alert" data-stale-warning className="flex flex-col gap-2 rounded-lg border border-alert px-3 py-2 text-sm">
-      <span className="text-alert">{message}.</span>
+    <div role="alert" data-stale-warning className="flex flex-col gap-2 text-sm">
+      <span className="flex items-start gap-2 text-alert">
+        <svg aria-hidden width="16" height="16" viewBox="0 0 16 16" fill="none" className="mt-0.5 shrink-0">
+          <path d="M7.13 2.5a1 1 0 0 1 1.74 0l5.2 9a1 1 0 0 1-.87 1.5H2.8a1 1 0 0 1-.87-1.5l5.2-9Z" stroke="currentColor" strokeLinejoin="round" />
+          <path d="M8 6v3m0 1.5v.1" stroke="currentColor" strokeLinecap="round" />
+        </svg>
+        <span>{message}.</span>
+      </span>
       {href && (
-        <Link href={href} className="text-sm text-alert underline underline-offset-2 w-fit">
+        <Link href={href} className="text-sm underline underline-offset-2 w-fit">
           Who records meetings
         </Link>
       )}
@@ -1259,7 +1248,6 @@ function StalePersonWarning({
             selected={undefined}
             onSelect={(id) => onPick(id)}
             disabled={disabled}
-            tone="warning"
           />
         </div>
         <Button variant="tertiary" size="xs" onClick={() => onPick(null)} disabled={disabled}>
@@ -1356,7 +1344,8 @@ function asName(x: unknown): string | null {
 /** One field of the update diff: the label on its own line, then
  *  "before → after" below it. Nothing truncates: in the card's narrow
  *  column a long value wraps instead, so every value is readable in full
- *  (no hover-only tooltip, which keyboard users never get). */
+ *  (no hover-only tooltip, which keyboard users never get). Proposed values
+ *  stay bold, including removals; current values lift to primary text on hover. */
 function UpdateDiffRow({
   icon,
   label,
@@ -1375,10 +1364,10 @@ function UpdateDiffRow({
         {label}
       </span>
       <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
-        <span className="break-words text-text-muted">{before}</span>
+        <span className="draft-diff-before break-words text-text-muted">{before}</span>
         <span aria-hidden className="text-text-muted">→</span>
         <span className="sr-only">changes to</span>
-        <span className="break-words text-text">{after}</span>
+        <strong className="break-words font-bold text-text">{after}</strong>
       </span>
     </li>
   );
@@ -1391,11 +1380,10 @@ function beforeLabel(known: boolean, value: string | null) {
   return value ?? "None";
 }
 
-/** Right-column view of an existing-task update: the task, then one
- *  before → after row per proposed change, then the note it would append. */
+/** Right-column view: one before → after row per proposed change, then the
+ *  note it would append. Task identity is already in the card's left column. */
 function TaskUpdateDiff({
   task,
-  fallbackTitle,
   changes,
   flagOnlyReassign,
   before,
@@ -1412,7 +1400,6 @@ function TaskUpdateDiff({
   /** Names sibling-draft blockers and their state. */
   describeLink?: (link: DraftLinkItem) => DraftLinkDescription;
   task: OpenTaskOption | undefined;
-  fallbackTitle: string;
   changes: TaskUpdateChanges;
   /** Names snapshotted when the draft was created, for people no longer listed. */
   names: { owner: string | null; assignee: string | null };
@@ -1428,10 +1415,6 @@ function TaskUpdateDiff({
   const known = !!task;
   return (
     <div className="draft-card-preview flex flex-col gap-3 rounded-lg px-4 py-3">
-      <div className="text-sm leading-snug">
-        {task && <TaskIdChip task={task} />}
-        {task?.title ?? fallbackTitle}
-      </div>
       <ul aria-label="Proposed changes" className="flex flex-col gap-3">
         {changes.ownerId !== undefined && (
           <UpdateDiffRow
@@ -1514,6 +1497,7 @@ function NowHint({ known, value }: { known: boolean; value: string | null }) {
  *  create-task editor, each showing what the task has today, plus the note
  *  to append. Only fields that end up different from today are sent. */
 function TaskUpdateEditForm({
+  taskId,
   edits,
   before,
   known,
@@ -1524,6 +1508,7 @@ function TaskUpdateEditForm({
   openTasks,
   describeLink,
 }: {
+  taskId?: number;
   openTasks: OpenTaskOption[];
   describeLink?: (link: DraftLinkItem) => DraftLinkDescription;
   edits: TaskUpdateEdits;
@@ -1629,22 +1614,13 @@ function TaskUpdateEditForm({
           placeholder="Added to the task's notes as a new dated line (optional)"
         />
       </div>
-      {edits.dependsOn.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <span className="inline-flex items-center gap-2 text-sm text-text-secondary">
-            <DependenciesIcon />
-            Add blockers
-          </span>
-          <DraftDependencies
-            items={edits.dependsOn}
-            tasks={openTasks}
-            disabled={disabled}
-            onRemove={(i) => onChange({ dependsOn: edits.dependsOn.filter((_, j) => j !== i) })}
-            onEmptied={() => document.getElementById(notesId)?.focus()}
-            describeLink={describeLink}
-          />
-        </div>
-      )}
+      <DraftDependenciesField
+        items={edits.dependsOn}
+        tasks={openTasks.filter((task) => task.id !== taskId)}
+        disabled={disabled}
+        onChange={(dependsOn) => onChange({ dependsOn })}
+        describeLink={describeLink}
+      />
     </div>
   );
 }
@@ -2376,8 +2352,6 @@ export function CreateTaskCard({
         />
       )}
 
-      {isPending && <DependentsNotice draft={draft} title={taskTitle} overlay={siblingStatus} />}
-
       <StalePeopleWarnings
         stale={stale}
         vendorUsers={vendorUsers}
@@ -2733,8 +2707,6 @@ function CreateTaskEditForm({
 }) {
   const ownerName = vendorUsers.find((u) => u.id === edits.ownerId)?.name || null;
   const assigneeName = contacts.find((c) => c.id === edits.assigneeContactId)?.name || null;
-  const depsPillRef = useRef<HTMLDivElement>(null);
-  const linkedTaskIds = new Set(edits.dependsOn.flatMap((d) => ("taskId" in d ? [d.taskId] : [])));
   const phaseName = phases.find((p) => p.id === edits.phaseId)?.name || null;
 
   return (
@@ -2802,29 +2774,13 @@ function CreateTaskEditForm({
         disabled={disabled}
       />
 
-      <div ref={depsPillRef} className="flex flex-col gap-2">
-        <SelectPill
-          icon={<DependenciesIcon />}
-          label="Dependencies"
-          valueLabel={edits.dependsOn.length > 0 ? `${edits.dependsOn.length} blocker${edits.dependsOn.length > 1 ? "s" : ""}` : null}
-          options={openTasks
-            .filter((t) => !linkedTaskIds.has(t.id))
-            .map((t) => ({ id: t.id, label: t.title }))}
-          selected={null}
-          onSelect={(taskId) => {
-            if (taskId != null) onChange({ dependsOn: [...edits.dependsOn, { taskId }] });
-          }}
-          disabled={disabled}
-        />
-        <DraftDependencies
-          items={edits.dependsOn}
-          tasks={openTasks}
-          disabled={disabled}
-          onRemove={(i) => onChange({ dependsOn: edits.dependsOn.filter((_, j) => j !== i) })}
-          onEmptied={() => depsPillRef.current?.querySelector<HTMLButtonElement>("button")?.focus()}
-          describeLink={describeLink}
-        />
-      </div>
+      <DraftDependenciesField
+        items={edits.dependsOn}
+        tasks={openTasks}
+        disabled={disabled}
+        onChange={(dependsOn) => onChange({ dependsOn })}
+        describeLink={describeLink}
+      />
 
       {phases.length > 0 && (
         <SelectPill
@@ -2897,7 +2853,6 @@ function SelectPill({
   selected,
   onSelect,
   disabled,
-  tone,
 }: {
   icon: ReactNode;
   label: string;
@@ -2906,8 +2861,6 @@ function SelectPill({
   selected: number | null | undefined;
   onSelect: (id: number | null) => void;
   disabled: boolean;
-  /** "warning": the field needs a decision (e.g. its person is gone). */
-  tone?: "warning";
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -2932,10 +2885,9 @@ function SelectPill({
         data-active={open ? "true" : undefined}
         style={{
           width: "100%",
-          border: `1px solid ${tone === "warning" ? "var(--alert)" : "var(--button-secondary-border)"}`,
+          border: "1px solid var(--button-secondary-border)",
           padding: "6px 10px",
           minHeight: 30,
-          background: "var(--bg)",
           color: valueLabel ? "var(--text)" : "var(--text-muted)",
           fontSize: 14,
           textAlign: "left",
