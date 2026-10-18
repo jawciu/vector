@@ -1,0 +1,125 @@
+{
+  "model": "claude-sonnet-4-6",
+  "answers": {
+    "a2_needs_external_0": {
+      "choice": "yes"
+    },
+    "a2_needs_external_1": {
+      "choice": "yes"
+    },
+    "a3_action": {
+      "choice": "create_task"
+    },
+    "a3_task": {
+      "choice": "none"
+    },
+    "a3_owner": {
+      "choice": "vendor1"
+    },
+    "a3_needs_a1": {
+      "choice": "no"
+    },
+    "a3_needs_a2": {
+      "choice": "no"
+    },
+    "a3_needs_a4": {
+      "choice": "no"
+    },
+    "a3_needs_task_t1": {
+      "choice": "no"
+    },
+    "a3_needs_task_t2": {
+      "choice": "no"
+    },
+    "a3_needs_task_t3": {
+      "choice": "no"
+    },
+    "a3_needs_task_t4": {
+      "choice": "no"
+    },
+    "a3_needs_task_t5": {
+      "choice": "no"
+    },
+    "a3_needs_external_0": {
+      "choice": "yes"
+    },
+    "a3_needs_external_1": {
+      "choice": "no"
+    },
+    "a4_action": {
+      "choice": "match_existing"
+    },
+    "a4_task": {
+      "choice": "t2"
+    },
+    "a4_owner": {
+      "choice": "vendor1"
+    },
+    "a4_needs_a1": {
+      "choice": "no"
+    },
+    "a4_needs_a2": {
+      "choice": "no"
+    },
+    "a4_needs_a3": {
+      "choice": "no"
+    },
+    "a4_needs_task_t1": {
+      "choice": "no"
+    },
+    "a4_needs_task_t2": {
+      "choice": "no"
+    },
+    "a4_needs_task_t3": {
+      "choice": "no"
+    }
+  },
+  "raw": {
+    "model": "claude-sonnet-4-6",
+    "id": "msg_011Cg9unJmWvjteK2gNhrtEq",
+    "type": "message",
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"a2_needs_external_0\":\"yes\",\"a2_needs_external_1\":\"yes\",\"a3_action\":\"create_task\",\"a3_task\":\"none\",\"a3_owner\":\"vendor1\",\"a3_needs_a1\":\"no\",\"a3_needs_a2\":\"no\",\"a3_needs_a4\":\"no\",\"a3_needs_task_t1\":\"no\",\"a3_needs_task_t2\":\"no\",\"a3_needs_task_t3\":\"no\",\"a3_needs_task_t4\":\"no\",\"a3_needs_task_t5\":\"no\",\"a3_needs_external_0\":\"yes\",\"a3_needs_external_1\":\"no\",\"a4_action\":\"match_existing\",\"a4_task\":\"t2\",\"a4_owner\":\"vendor1\",\"a4_needs_a1\":\"no\",\"a4_needs_a2\":\"no\",\"a4_needs_a3\":\"no\",\"a4_needs_task_t1\":\"no\",\"a4_needs_task_t2\":\"no\",\"a4_needs_task_t3\":\"no\"}"
+      }
+    ],
+    "container": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "stop_details": null,
+    "usage": {
+      "input_tokens": 11043,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 253,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "diagnostics": null
+  },
+  "durationMs": 4798.4858749999985,
+  "usage": {
+    "input_tokens": 11043,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 253,
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "estimatedCostUsd": 0.036924,
+  "hash": "5ca1a9254931c1bf3bc6cb61efc9a955152b5efab91f83b498d68288de46dde0",
+  "version": "decision-comparison-v3",
+  "modelRequested": "claude-sonnet-4-6"
+}

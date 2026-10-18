@@ -1,0 +1,301 @@
+{
+  "model": "claude-sonnet-4-6",
+  "answers": {
+    "a1_action": {
+      "choice": "create_task"
+    },
+    "a1_task": {
+      "choice": "none"
+    },
+    "a1_owner": {
+      "choice": "vendor2"
+    },
+    "a1_needs_a2": {
+      "choice": "no"
+    },
+    "a1_needs_a3": {
+      "choice": "no"
+    },
+    "a1_needs_a4": {
+      "choice": "no"
+    },
+    "a1_needs_a5": {
+      "choice": "no"
+    },
+    "a1_needs_task_t1": {
+      "choice": "no"
+    },
+    "a1_needs_task_t2": {
+      "choice": "no"
+    },
+    "a1_needs_task_t3": {
+      "choice": "no"
+    },
+    "a1_needs_task_t4": {
+      "choice": "no"
+    },
+    "a1_needs_task_t5": {
+      "choice": "no"
+    },
+    "a1_needs_external_0": {
+      "choice": "no"
+    },
+    "a2_action": {
+      "choice": "create_task"
+    },
+    "a2_task": {
+      "choice": "none"
+    },
+    "a2_owner": {
+      "choice": "customer2"
+    },
+    "a2_needs_a1": {
+      "choice": "no"
+    },
+    "a2_needs_a3": {
+      "choice": "no"
+    },
+    "a2_needs_a4": {
+      "choice": "no"
+    },
+    "a2_needs_a5": {
+      "choice": "no"
+    },
+    "a2_needs_task_t1": {
+      "choice": "no"
+    },
+    "a2_needs_task_t2": {
+      "choice": "no"
+    },
+    "a2_needs_task_t3": {
+      "choice": "no"
+    },
+    "a2_needs_task_t4": {
+      "choice": "no"
+    },
+    "a2_needs_task_t5": {
+      "choice": "no"
+    },
+    "a2_needs_external_0": {
+      "choice": "no"
+    },
+    "a3_action": {
+      "choice": "create_task"
+    },
+    "a3_task": {
+      "choice": "none"
+    },
+    "a3_owner": {
+      "choice": "vendor1"
+    },
+    "a3_needs_a1": {
+      "choice": "no"
+    },
+    "a3_needs_a2": {
+      "choice": "no"
+    },
+    "a3_needs_a4": {
+      "choice": "no"
+    },
+    "a3_needs_a5": {
+      "choice": "no"
+    },
+    "a3_needs_task_t1": {
+      "choice": "no"
+    },
+    "a3_needs_task_t2": {
+      "choice": "no"
+    },
+    "a3_needs_task_t3": {
+      "choice": "no"
+    },
+    "a3_needs_task_t4": {
+      "choice": "no"
+    },
+    "a3_needs_task_t5": {
+      "choice": "no"
+    },
+    "a3_needs_external_0": {
+      "choice": "no"
+    },
+    "a4_action": {
+      "choice": "ignore"
+    },
+    "a4_task": {
+      "choice": "none"
+    },
+    "a4_owner": {
+      "choice": "unknown"
+    },
+    "a4_needs_a1": {
+      "choice": "no"
+    },
+    "a4_needs_a2": {
+      "choice": "no"
+    },
+    "a4_needs_a3": {
+      "choice": "no"
+    },
+    "a4_needs_a5": {
+      "choice": "no"
+    },
+    "a4_needs_task_t1": {
+      "choice": "no"
+    },
+    "a4_needs_task_t2": {
+      "choice": "no"
+    },
+    "a4_needs_task_t3": {
+      "choice": "no"
+    },
+    "a4_needs_task_t4": {
+      "choice": "no"
+    },
+    "a4_needs_task_t5": {
+      "choice": "no"
+    },
+    "a4_needs_external_0": {
+      "choice": "no"
+    },
+    "a5_action": {
+      "choice": "ignore"
+    },
+    "a5_task": {
+      "choice": "none"
+    },
+    "a5_owner": {
+      "choice": "unknown"
+    },
+    "a5_needs_a1": {
+      "choice": "no"
+    },
+    "a5_needs_a2": {
+      "choice": "no"
+    },
+    "a5_needs_a3": {
+      "choice": "no"
+    },
+    "a5_needs_a4": {
+      "choice": "no"
+    },
+    "a5_needs_task_t1": {
+      "choice": "no"
+    },
+    "a5_needs_task_t2": {
+      "choice": "no"
+    },
+    "a5_needs_task_t3": {
+      "choice": "no"
+    },
+    "a5_needs_task_t4": {
+      "choice": "no"
+    },
+    "a5_needs_task_t5": {
+      "choice": "no"
+    },
+    "a5_needs_external_0": {
+      "choice": "no"
+    }
+  },
+  "durationMs": 13007.091085000004,
+  "estimatedCostUsd": 0.10717499999999999,
+  "usage": {
+    "input_tokens": 32320,
+    "output_tokens": 681
+  },
+  "raw": [
+    {
+      "model": "claude-sonnet-4-6",
+      "id": "msg_011Cg9uie2HkC24MF8m35Mhp",
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"a1_action\":\"create_task\",\"a1_task\":\"none\",\"a1_owner\":\"vendor2\",\"a1_needs_a2\":\"no\",\"a1_needs_a3\":\"no\",\"a1_needs_a4\":\"no\",\"a1_needs_a5\":\"no\",\"a1_needs_task_t1\":\"no\",\"a1_needs_task_t2\":\"no\",\"a1_needs_task_t3\":\"no\",\"a1_needs_task_t4\":\"no\",\"a1_needs_task_t5\":\"no\",\"a1_needs_external_0\":\"no\",\"a2_action\":\"create_task\",\"a2_task\":\"none\",\"a2_owner\":\"customer2\",\"a2_needs_a1\":\"no\",\"a2_needs_a3\":\"no\",\"a2_needs_a4\":\"no\",\"a2_needs_a5\":\"no\",\"a2_needs_task_t1\":\"no\",\"a2_needs_task_t2\":\"no\",\"a2_needs_task_t3\":\"no\",\"a2_needs_task_t4\":\"no\"}"
+        }
+      ],
+      "container": null,
+      "stop_reason": "end_turn",
+      "stop_sequence": null,
+      "stop_details": null,
+      "usage": {
+        "input_tokens": 11652,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 251,
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      },
+      "diagnostics": null
+    },
+    {
+      "model": "claude-sonnet-4-6",
+      "id": "msg_011Cg9uiwcChxFrToKwKT4bC",
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"a2_needs_task_t5\":\"no\",\"a2_needs_external_0\":\"no\",\"a3_action\":\"create_task\",\"a3_task\":\"none\",\"a3_owner\":\"vendor1\",\"a3_needs_a1\":\"no\",\"a3_needs_a2\":\"no\",\"a3_needs_a4\":\"no\",\"a3_needs_a5\":\"no\",\"a3_needs_task_t1\":\"no\",\"a3_needs_task_t2\":\"no\",\"a3_needs_task_t3\":\"no\",\"a3_needs_task_t4\":\"no\",\"a3_needs_task_t5\":\"no\",\"a3_needs_external_0\":\"no\",\"a4_action\":\"ignore\",\"a4_task\":\"none\",\"a4_owner\":\"unknown\",\"a4_needs_a1\":\"no\",\"a4_needs_a2\":\"no\",\"a4_needs_a3\":\"no\",\"a4_needs_a5\":\"no\",\"a4_needs_task_t1\":\"no\",\"a4_needs_task_t2\":\"no\"}"
+        }
+      ],
+      "container": null,
+      "stop_reason": "end_turn",
+      "stop_sequence": null,
+      "stop_details": null,
+      "usage": {
+        "input_tokens": 11650,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 247,
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      },
+      "diagnostics": null
+    },
+    {
+      "model": "claude-sonnet-4-6",
+      "id": "msg_011Cg9ujMSvAQYpQgY16yZRE",
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"a4_needs_task_t3\":\"no\",\"a4_needs_task_t4\":\"no\",\"a4_needs_task_t5\":\"no\",\"a4_needs_external_0\":\"no\",\"a5_action\":\"ignore\",\"a5_task\":\"none\",\"a5_owner\":\"unknown\",\"a5_needs_a1\":\"no\",\"a5_needs_a2\":\"no\",\"a5_needs_a3\":\"no\",\"a5_needs_a4\":\"no\",\"a5_needs_task_t1\":\"no\",\"a5_needs_task_t2\":\"no\",\"a5_needs_task_t3\":\"no\",\"a5_needs_task_t4\":\"no\",\"a5_needs_task_t5\":\"no\",\"a5_needs_external_0\":\"no\"}"
+        }
+      ],
+      "container": null,
+      "stop_reason": "end_turn",
+      "stop_sequence": null,
+      "stop_details": null,
+      "usage": {
+        "input_tokens": 9018,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 183,
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      },
+      "diagnostics": null
+    }
+  ],
+  "hash": "d242ef60f0b9c97e06d416676588f601a4be274ed895c146a4204501e45f1eef",
+  "version": "decision-comparison-v3",
+  "modelRequested": "claude-sonnet-4-6"
+}

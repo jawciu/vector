@@ -1,0 +1,77 @@
+{
+  "version": "decision-comparison-v3",
+  "source": "evals/runs/2026-10-14-feature4-r1.json",
+  "sourceSha256": "95481b2f67bb729e551a6e09b398669ebf8d414979eae33b868c0be90fb36f44",
+  "sourceGit": {
+    "sha": "705efdf",
+    "dirty": false
+  },
+  "sourceModel": "claude-sonnet-4-6",
+  "cases": [
+    "01",
+    "02",
+    "03",
+    "13",
+    "15",
+    "17",
+    "20",
+    "26"
+  ],
+  "models": {
+    "claude": "claude-sonnet-4-6",
+    "jev": "jev-1.14.0"
+  },
+  "questionBatchSize": 24,
+  "jevTransport": "gateway",
+  "checksums": [
+    {
+      "case": "01",
+      "requestSha256": "2c051d780d6c7db940423d2ec733c75a50c5b844354d62dca3238ec2f2a858f4",
+      "answerKeySha256": "8a8f8841ddb42827d18d23415537a572dbe6aa0a22377df6cc9c55ca407959c5"
+    },
+    {
+      "case": "02",
+      "requestSha256": "70f365f22e79e2125ed4b49449d3cadc94fa49222215d508d5ced0664d853c07",
+      "answerKeySha256": "d8b2edbe84bd6a6d5a04caf8aa981930fa81100fdcf0e6bb39c068dc39b7c98b"
+    },
+    {
+      "case": "03",
+      "requestSha256": "d242ef60f0b9c97e06d416676588f601a4be274ed895c146a4204501e45f1eef",
+      "answerKeySha256": "35bb93da4eadbb40ade7eec591a6eeb2c656f9f1ebbe1e69661554d4a7d6c24d"
+    },
+    {
+      "case": "13",
+      "requestSha256": "88652a959e317b35e9f7accc2ef79474daed8fbd0fc36272e215a0eba4899bdf",
+      "answerKeySha256": "86e191aece953c97ec854f820d08082a9fe23cf9fd9c54ce2cd0fa0c400c1050"
+    },
+    {
+      "case": "15",
+      "requestSha256": "bef10972cb0885ffcfdad6532d8a2c5efefcdd9d104212f88d1860f54a1c106c",
+      "answerKeySha256": "b2237307226c706207c4209f15ad2bd31ea324a0119a09e9d0ab3203794e4bd5"
+    },
+    {
+      "case": "17",
+      "requestSha256": "c5a0b649cbad4e47987c6d37e0d3a7877f10cf6e032306295020892fb985b721",
+      "answerKeySha256": "8420923590fb2482b67a51908ce30a157ac68b93ec049588f85aab038f78c11a"
+    },
+    {
+      "case": "20",
+      "requestSha256": "d5a3bd02c6d06100b9eb9040ac96344af9480f0110414606eb76b623e849d986",
+      "answerKeySha256": "72f840a880c951723305155c409a7edf1fdb979ec688066a7a128dbf60417fcc"
+    },
+    {
+      "case": "26",
+      "requestSha256": "3939d62bb756f0a642ca94d451defce1e6662e904c7daf4bbdec103c1217a34c",
+      "answerKeySha256": "804e4b5be2dcb13a02b6c0938f619990d62e0eab687291344e60a3a7fbb6f608"
+    }
+  ],
+  "protocol": "Fixed saved extraction, identical state and questions, shared projection/scorer, no production writes. Exploratory error-enriched sample; not held-out.",
+  "excluded": [
+    "customer matching",
+    "date arithmetic",
+    "priority",
+    "notes quality",
+    "draft prose",
+    "approval execution"
+  ]
+}
