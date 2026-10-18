@@ -343,9 +343,17 @@ For SVG fills the gradient must be inlined as a `<linearGradient>` referencing t
   including **none** for removals. Current values use `text` (lightest off-white) on card hover or
   focus within. Keep full values readable and retain the screen-reader transition
   label. Task identity belongs in the card's left column, once per card.
+- Right-align update metadata, matching create-task cards. Both task draft
+  previews retain two columns and show a note icon and bold count of 1 when
+  a note exists; never render its body or source stamp in the card. Full notes
+  stay in Edit. Omit the comment indicator from create-task previews. All
+  existing-task update kinds use this shared pattern in onboarding Actions
+  and inline meeting drafts.
 - Show a proposed dependency on the task that depends on it. A prerequisite's
   create-task card stays plain; omit the reverse "another task waits on this"
   notice. Keep the actual dependency and dismissal handling intact.
+- Within each meeting/date group, show prerequisite task drafts above the
+  drafts that depend on them. Preserve unrelated ordering and group boundaries.
 - `DraftDependencies` uses plain 14px names without borders in previews.
   `DraftDependenciesField` holds removable tags inside a single field in both
   create-task and update-task editors. Multiple tags wrap within the field;

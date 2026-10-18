@@ -24,13 +24,13 @@ import { ActionIcon } from "./DraftActionIcon";
 import { TASK_STATUSES, STATUS_COLORS } from "@/lib/constants";
 import {
   normaliseTaskUpdate,
-  readNoteSource,
   staleContactMessage,
   staleOwnerMessage,
 } from "@/lib/ai/task-update";
-import type { NoteSource, TaskUpdateChanges } from "@/lib/ai/task-update";
+import type { TaskUpdateChanges } from "@/lib/ai/task-update";
 import { draftDependsOn, type DraftDependsOnItem, type DraftLinkItem } from "@/lib/task-dependencies";
 import { draftLinkStatus, linkTitle, readDraftLinks } from "@/lib/draft-links";
+import { orderDraftsByDependencies } from "@/lib/draft-order";
 import {
   RECORDER_SETTINGS_HREF,
   RECORDER_UNKNOWN_OWNER_MESSAGE,
@@ -434,8 +434,8 @@ function groupBucketByMeeting(drafts: AIDraft[]) {
   }
   const meetingGroups = [...byEvent.entries()]
     .sort((a, b) => b[0] - a[0])
-    .map(([eventId, drafts]) => ({ eventId, drafts }));
-  return { meetingGroups, looseDrafts };
+    .map(([eventId, drafts]) => ({ eventId, drafts: orderDraftsByDependencies(drafts) }));
+  return { meetingGroups, looseDrafts: orderDraftsByDependencies(looseDrafts) };
 }
 
 interface DateBucket {
@@ -811,7 +811,9 @@ export function DraftCard({
         outline: selected ? "2px solid var(--action)" : "none",
       }}
     >
-      <div style={{ display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }}>
+      <div style={editing
+        ? { display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }
+        : { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 20, alignItems: "stretch" }}>
         <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {isPending && (
@@ -868,7 +870,6 @@ export function DraftCard({
                 task={matchedTask}
                 changes={proposedChanges}
                 names={{ owner: asName(payload?.ownerName), assignee: asName(payload?.assigneeContactName) }}
-                noteSource={readNoteSource(payload?.noteSource)}
                 flagOnlyReassign={update.action === "reassign" && Object.keys(proposedChanges).length === 0}
                 before={before}
                 vendorUsers={vendorUsers}
@@ -1358,12 +1359,12 @@ function UpdateDiffRow({
   after: string;
 }) {
   return (
-    <li className="flex min-w-0 flex-col gap-0.5 text-sm">
+    <li className="flex w-full min-w-0 flex-col items-end gap-0.5 text-right text-sm">
       <span className="inline-flex items-center gap-1.5 text-xs text-text-muted">
         {icon}
         {label}
       </span>
-      <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
+      <span className="flex min-w-0 flex-wrap items-baseline justify-end gap-x-1.5">
         <span className="draft-diff-before break-words text-text-muted">{before}</span>
         <span aria-hidden className="text-text-muted">→</span>
         <span className="sr-only">changes to</span>
@@ -1380,8 +1381,8 @@ function beforeLabel(known: boolean, value: string | null) {
   return value ?? "None";
 }
 
-/** Right-column view: one before → after row per proposed change, then the
- *  note it would append. Task identity is already in the card's left column. */
+/** Right-aligned preview: field changes and a compact note count only.
+ *  Full note text stays in Edit; task identity stays in the left column. */
 function TaskUpdateDiff({
   task,
   changes,
@@ -1391,7 +1392,6 @@ function TaskUpdateDiff({
   contacts,
   onPickOwner,
   names,
-  noteSource,
   openTasks,
   describeLink,
 }: {
@@ -1403,8 +1403,6 @@ function TaskUpdateDiff({
   changes: TaskUpdateChanges;
   /** Names snapshotted when the draft was created, for people no longer listed. */
   names: { owner: string | null; assignee: string | null };
-  /** Where the appended note will be stamped from (meeting day + source). */
-  noteSource: NoteSource | null;
   flagOnlyReassign: boolean;
   before: TaskBefore;
   vendorUsers: VendorUserOption[];
@@ -1414,8 +1412,8 @@ function TaskUpdateDiff({
 }) {
   const known = !!task;
   return (
-    <div className="draft-card-preview flex flex-col gap-3 rounded-lg px-4 py-3">
-      <ul aria-label="Proposed changes" className="flex flex-col gap-3">
+    <div className="draft-card-preview flex flex-col items-end gap-3 text-right">
+      <ul aria-label="Proposed changes" className="flex w-full flex-col items-end gap-3">
         {changes.ownerId !== undefined && (
           <UpdateDiffRow
             icon={<OwnerIcon />}
@@ -1449,7 +1447,7 @@ function TaskUpdateDiff({
           />
         )}
         {flagOnlyReassign && (
-          <li className="flex flex-wrap items-center gap-1.5 text-sm text-text-muted">
+          <li className="flex flex-wrap items-center justify-end gap-1.5 text-sm text-text-muted">
             <OwnerIcon />
             Reassignment discussed.
             {onPickOwner && (
@@ -1460,27 +1458,14 @@ function TaskUpdateDiff({
           </li>
         )}
       </ul>
-      {changes.appendNotes && (
-        <div className="flex flex-col gap-1 text-sm">
-          <span className="inline-flex flex-wrap items-center gap-1.5 text-text-muted">
-            <NotesIcon />
-            Adds note
-            {noteSource && (
-              <span className="text-xs">
-                (dated {formatDay(noteSource.date)}, {noteSource.label})
-              </span>
-            )}
-          </span>
-          <p className="whitespace-pre-wrap leading-normal text-text-secondary">{changes.appendNotes}</p>
-        </div>
-      )}
+      <DraftNoteIndicator note={changes.appendNotes} />
       {changes.dependsOn && changes.dependsOn.length > 0 && (
-        <div className="flex flex-col gap-1 text-sm">
+        <div className="flex w-full flex-col items-end gap-1 text-sm">
           <span className="inline-flex items-center gap-1.5 text-text-muted">
             <DependenciesIcon />
             Adds blockers
           </span>
-          <DraftDependencies items={changes.dependsOn} tasks={openTasks} describeLink={describeLink} />
+          <DraftDependencies items={changes.dependsOn} tasks={openTasks} align="end" describeLink={describeLink} />
         </div>
       )}
     </div>
@@ -2480,7 +2465,7 @@ function payloadsEqual(a: CreateTaskEdits, b: CreateTaskEdits) {
 /** Two-column compact view.
  *  Left: heading (✓ Create task) + task-name code block + meta (✨ miniti · confidence).
  *  Right: the metadata the task would be created with — due date, status,
- *  owner, notes/comments, priority. Rests dim, lifts on row hover. It is NOT a
+ *  owner, note count, priority. Rests dim, lifts on row hover. It is NOT a
  *  card and deliberately does not repeat the task title, which is already the
  *  most prominent thing on the left. */
 function CreateTaskCompact({
@@ -2507,7 +2492,7 @@ function CreateTaskCompact({
   openTasks?: OpenTaskOption[];
 }) {
   return (
-    <div style={{ display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 20, alignItems: "stretch" }}>
       <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {isPending && onToggleSelect && (
@@ -2603,7 +2588,6 @@ function CreateTaskPreview({
     ? due.toLocaleDateString("en-GB", { day: "numeric", month: "short" })
     : null;
   const dueAgo = due ? formatDueAgo(due) : null;
-  const noteCount = payload.notes && payload.notes.trim() ? 1 : 0;
   const ownerName = vendorUsers.find((u) => u.id === payload.ownerId)?.name || null;
   // A task created from a draft always starts here, so the colour is fixed —
   // but read it from the same map the kanban card uses rather than hardcoding.
@@ -2648,17 +2632,8 @@ function CreateTaskPreview({
         </span>
       )}
 
-      {/* Row 4: notes + comments */}
-      <span className="text-sm" style={{ display: "inline-flex", alignItems: "center", gap: 12 }}>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }} title="Notes">
-          <NotesIcon />
-          {noteCount}
-        </span>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }} title="Comments">
-          <CommentsIcon />
-          0
-        </span>
-      </span>
+      {/* Row 4: a note exists; its full text is available in Edit. */}
+      <DraftNoteIndicator note={payload.notes} />
 
       {/* Row 5: priority */}
       <PriorityIcon priority={payload.priority} size={18} />
@@ -3093,6 +3068,17 @@ function TasksBreadcrumbIcon() {
   );
 }
 
+/** Preview signifier only; the full note remains available in the editor. */
+function DraftNoteIndicator({ note }: { note?: string | null }) {
+  if (!note?.trim()) return null;
+  return (
+    <span className="inline-flex items-center gap-1 text-sm" aria-label="1 note" title="Notes">
+      <NotesIcon />
+      <strong className="font-bold">1</strong>
+    </span>
+  );
+}
+
 function NotesIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "currentColor", flexShrink: 0 }}>
@@ -3104,14 +3090,6 @@ function NotesIcon() {
           <rect width="14" height="14" fill="white" />
         </clipPath>
       </defs>
-    </svg>
-  );
-}
-
-function CommentsIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "currentColor", flexShrink: 0 }}>
-      <path d="M2 4a1.5 1.5 0 0 1 1.5-1.5h7A1.5 1.5 0 0 1 12 4v4a1.5 1.5 0 0 1-1.5 1.5H6.5L4 12V9.5h-.5A1.5 1.5 0 0 1 2 8V4Z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round" />
     </svg>
   );
 }

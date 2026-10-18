@@ -60,6 +60,28 @@ Caroline's review of the golden set (2026-10-11, see `PROGRESS.md`) asked the me
 - Recorder known: their commitments are owned by them. Recorder unknown: the draft arrives without an owner and the inbox says "Said by the person who recorded the meeting: pick an owner", with a link to settings.
 - Eval harness: no fake "You" user; Maya Lindqvist is the workspace recorder. Answer key assignees `"You"` become `"Maya Lindqvist"`.
 
+### Follow-up: per-meeting recorder identity from Miniti
+
+Caroline confirmed on 2026-10-18 that Ian is adding the recorder's identity to
+Miniti's meeting payload. Resume this integration when the confirmed payload is
+available; no scheduled polling or further model calls are required now.
+
+- Confirm the exact identity fields and that they identify the person behind
+  transcript speaker "You", rather than only the calendar organiser.
+- Match that identity to an existing Vector teammate for each meeting and use
+  it for task ownership, rather than relying on one recorder for the workspace.
+- Preserve explicit owner selection for unknown/unmatched identities. Do not
+  retroactively reassign stored drafts merely because settings changed.
+- Verify two meetings recorded by different teammates, plus unknown/unmatched
+  recorder cases. Do not guess field names before Ian supplies the contract.
+
+Review clarification, 2026-10-18: Caroline confirmed that task creation/update
+suggestions should remain shared in the onboarding's Actions view, including
+unowned suggestions. `draft_followup` remains owner-filtered in list/count/badge
+queries. Its approve/reject/edit routes do not enforce that owner-only boundary;
+this is a separate permission question, not a reason to make task suggestions
+private. No permission change has been requested.
+
 ## Scoring support (do alongside step 1 of the order)
 
 - `evals/scoring.js` reads the new answer-key fields (`assignee`, `notesContains`, `dependsOn`, `priority`, `kind`, `afterAssign`, `board`) and reports gap expectations as their own metric ("gap expectations met: N of M").

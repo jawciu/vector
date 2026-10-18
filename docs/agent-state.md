@@ -8,20 +8,25 @@ not the old July `EVALS_PLAN.md` status section.
 
 ## Active work
 
-- **Task:** Jev experiment remains stopped. Caroline authorized committing and pushing all work so far, then requested prerequisite-first ordering for dependent task drafts. Product review continues on the local server.
-- **Verified:** 2026-10-18. Branch `codex/jev-eval`, based on `feat/recorder-identity` (`a593fe9`). Publishing the current checkpoint is authorized; no production deployment or merge is authorized.
+- **Latest review:** Caroline confirmed new-task/task-update suggestions should remain shared in the onboarding's Actions view, including unowned ones. Follow-up email drafts remain owner-filtered in list/count/badge queries; their edit/approve/reject APIs currently do not enforce that ownership boundary. Explained the difference between interface filtering and server permission checks; no access changes requested or made. Ian is adding per-meeting recorder identity in Miniti; the Vector mapping is a dependency-based to-do in evals/GAPS-PLAN.md, to resume when the payload contract arrives. No polling or messages to Ian. No access-rule change.
+
+- **Task:** Jev experiment remains stopped. Caroline approved committing and pushing the reviewed prerequisite-first ordering and compact two-column task cards, including bold note counts. The shared renderer applies across Actions views and inline meeting drafts.
+- **Verified:** 2026-10-18. Branch `codex/jev-eval`, tracking `origin/codex/jev-eval`. This publishing checkpoint follows `b5805f8` and `e1ac467`, based on `feat/recorder-identity` (`a593fe9`). It includes ordering code/tests, compact note previews and the recorded product decisions. No production deployment or merge.
 - **Location:** `/Users/caro/.codex/worktrees/jev-eval/onboarding` (managed worktree attached to this chat). Original `/Users/caro/Code/onboarding` checkout remains clean.
-- **Changed:** Added `eval:decisions` and an isolated experiment under `evals/decision-comparison/`. It imports no app/DB client, uses identical saved extractions for both models, hides expected answers, and checkpoints each API batch. No schema or production-code change.
+- **Changed:** Published the offline decision experiment, local review fixtures, reviewed dependency fields and warning/diff improvements. Added prerequisite-first display ordering in `lib/draft-order.ts`, used by AIDraftInbox's meeting groups. No schema change or migration to production.
 - **State:** Claude arm complete on eight development cases / 37 fixed candidates. Caroline added `AI_GATEWAY_API_KEY` to `/Users/caro/Code/onboarding/.env` and resolved card verification. Inference now returns a DIFFERENT HTTP 403: `no_providers_available` / `RestrictedModelsError`, saying free Gateway credits cannot access this model and paid credits are required. Confirmed for Jev 1.14 and stable 1.13 on small diagnostic requests. No Jev eval call has completed. Do not infer a Jev quality verdict from the account blocker. The agent has not purchased credits or changed billing.
 - **Protocol:** `decision-comparison-v3`, now pinned Jev 1.14 / Sonnet 4.6. Jev version updated to the October 15 Gateway release before any successful Jev call. Claude's inputs/cache are unchanged. Same 24-question batches, independent requests. Output counts missing actions/owners as failures and measures dependency precision as well as recall. Dates, notes, prose drafting, customer matching and execution are excluded. This error-enriched sample is exploratory, not held out.
 - **Evidence:** `evals/decision-comparison/results/REPORT.md`, exact requests, raw answers, score checks and checksums. Claude v3 successful calls cost an estimated $0.7366. Earlier schema experiments under `results-schema-v1/` and `results-schema-v2/` are archived separately and excluded; v1 had three successful calls ($0.2684), then a grammar-size error, and v2 had an invalid-length array response (cost not captured). These were response-format changes; labels/questions were not tuned from model results.
 - **Finding:** Case 03's security-approval task and case 17's guide-forwarding task are absent from the fixed extraction. Replacing downstream decisions cannot recover candidates it is not given. Candidate matching is heuristic and the report calls for human checking.
-- **Validation:** 9 core tests, 6 provider tests and 51 existing scorer tests. Targeted TypeScript and ESLint checks. No app build or e2e was run because this is an offline CLI with no application changes; e2e's shared-auth side effects are unnecessary here. TypeSafe and Gateway HTTP contracts are mock-tested; live Gateway inference is blocked by the paid-credit restriction.
+- **Validation:** Before publishing: Prisma validation/generation, ESLint (warnings only), all 384 unit tests and production build passed in an isolated copy. After ordering: 11 ordering tests, all 395 unit tests, targeted lint, TypeScript and production build pass. Browser verifies A/B/C all display metrics before dashboard. No shared-auth e2e, paid eval calls, migrations or production writes. TypeSafe/Gateway HTTP contracts remain mock-tested; live Jev is still blocked by paid-credit eligibility.
 - **Next:** Do not resume Jev calls or spend unless Caroline asks to resume the experiment. Preserve the worktree, adapter and Claude results. If explicitly resumed later, funding is required before `npm run eval:decisions -- --provider jev --env /Users/caro/Code/onboarding/.env`; do not rerun saved Claude calls. Skip `vercel ai-gateway setup`: unnecessary coding-agent configuration.
 - **Merge review (2026-10-18):** All five PRs remain open, stacked main ← #27 evals ← #28 richer updates ← #29 free-text dependencies ← #30 draft dependencies ← #31 recorder identity. GitHub reports clean merges against their current parent branches and green lint/test/build/audit checks dated October 13–14; no submitted GitHub reviews. Latest feature stack is 7 commits behind main. This is not renewed integration validation against main. Local root checkout remains clean. Read-only DB transaction against the root `.env` target found no TaskDependency table and no corresponding applied migration record; Vercel's production target was not independently inspected. No mutation flows, migrations or merges were run. Recorded evals show #30 recall 89→78% and only 1–2/11 expected draft links. #31 improves owner assignment but still misattributes case 17; it currently inherits #30. Review #27/#28 first, coordinate #29's migration and product decisions, hold #30's AI change pending investigation, and consider isolating #31 if shipping it sooner. Product review should use an isolated database because later branches require the unapplied table and previews may share demo data.
 - **Standing:** Do not commit, push, merge, migrate, or write production data without Caroline's explicit current authorization.
 
 ## Publishing checkpoint — 2026-10-18
+
+- Pushed `e1ac467` (offline comparison/local review fixtures) and `b5805f8`
+  (reviewed product UI/health documentation) to `origin/codex/jev-eval`.
 
 - Full current diff reviewed. The offline comparison, recorded outputs and local
   fixture scripts are included alongside the reviewed UI changes. Credentials,
@@ -29,10 +34,19 @@ not the old July `EVALS_PLAN.md` status section.
 - Prisma validation/generation, ESLint (warnings only), all 384 unit tests and
   a production build passed in an isolated temporary copy with placeholder
   credentials, preserving the running local review server and its database.
-- Next change: order task drafts so a prerequisite appears above its dependent
-  within the existing meeting/date groups. Preserve links and approval behavior.
+- New ordering work is implemented but not included in that published checkpoint:
+  prerequisites precede dependents within existing meeting/date groups; explicit
+  task/draft IDs or refs only, stable unrelated order, cycle fallback, no link or
+  approval mutations. Caroline authorized its publication with the compact card updates.
+- Review guidance: A/B test either creation order producing the same link. Caroline
+  explicitly approved C: retain the typed dependency when its prerequisite
+  suggestion is dismissed; no behavior change. Recorder ownership maps first-person
+  commitments to the configured recorder; when unknown, choose an owner or leave
+  unassigned. Settings affect future processing, not existing stored drafts.
 
 ## Local product review — 2026-10-18
+
+- **Compact task notes:** Create/update draft cards share a note icon + bold 1 marker when notes exist, omitting note bodies/source stamps and the create-card comment counter. Compact previews retain two columns even in the narrower review pane; update metadata is right-aligned like create metadata. Full notes remain in Edit. Browser verified Ashby's 522-character update note and 206-character create note remain intact in their editors; both card types have two columns and 700-weight counts. No draft was saved/approved/dismissed. Targeted lint has 0 errors (existing warnings); TypeScript passes on the final version; 11 ordering tests also pass. Screenshot `.local-review/compact-task-note-bold.jpg`. The shared renderer covers onboarding/global Actions and inline meeting drafts, including all normalised existing-task update kinds.
 
 - **Wrapped tag alignment:** Dependency icon and + control now stay at the first tag row as the field grows. Verified with two wrapping tags in browser using unsaved edits; targeted lint passes. Screenshot `.local-review/dependency-tags-top-aligned.jpg`.
 
