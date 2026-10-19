@@ -5,7 +5,8 @@ import { cn } from "./cn";
 
 /**
  * Checkbox — DS primitive, the dropdown-row checkbox ("the one we use in
- * drop downs", Caroline's review 2026-08-11).
+ * drop downs", Caroline's review 2026-08-11). Also used for bulk draft selection
+ * so selecting cards stays distinct from marking tasks complete.
  *
  * Extracted from the member-picker dropdowns (TaskDrawer.js ~1104 /
  * CreateTaskModal.js ~640, identical svgs; ContactsPanel.js's `Checkbox` is

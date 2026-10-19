@@ -11,18 +11,15 @@
  * Velocity is only evaluated when a targetGoLive date exists.
  *
  * Text blockers (TaskDependency rows with a label, GAPS-PLAN feature 2) do NOT
- * affect health unless TEXT_BLOCKERS_COUNT_AS_BLOCKED is switched on: Caroline
- * has not decided yet whether "waiting on platform team sign-off" should turn
- * an onboarding red like a Blocked task does.
+ * affect health. Caroline confirmed on 2026-10-18 that a dependency such as
+ * waiting on platform sign-off is not itself a Blocked task.
  */
 
 import type { HealthResult, HealthStatus } from "./types";
 
 /**
- * OPEN DECISION (Caroline): should an unresolved text blocker count like a
- * task with status "Blocked"? false = no (today's behaviour, health is
- * unchanged by text blockers). true = a task that is not Done and has at least
- * one unresolved text blocker counts towards the blocked share.
+ * Product decision, 2026-10-18: keep false. Text dependencies do not change
+ * onboarding health. Explicitly Blocked tasks still use the existing rule.
  */
 export const TEXT_BLOCKERS_COUNT_AS_BLOCKED = false;
 

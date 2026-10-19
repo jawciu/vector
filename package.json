@@ -26,6 +26,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "eval": "tsx evals/run-golden.ts",
+    "eval:decisions": "tsx evals/decision-comparison/run.ts",
+    "review:local": "tsx scripts/local-review/server.ts",
     "eval:validate": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON evals/validate-golden.mjs"
   },
   "dependencies": {

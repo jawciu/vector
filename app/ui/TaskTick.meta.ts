@@ -8,7 +8,7 @@ export const meta: DsMeta = {
   ],
   dontUseWhen: [
     "Selection in dropdowns and pickers — that's Checkbox (square, `action`).",
-    "Bulk-selecting AI inbox drafts — that circular idiom is `action`-coloured selection, not done-state; not absorbed yet.",
+    "Bulk-selecting AI inbox drafts — use Checkbox (square, `action`) so selection is distinct from task completion.",
     "Anything that isn't completion — the `success` fill and bounce read specifically as \"done\".",
   ],
   a11y: [

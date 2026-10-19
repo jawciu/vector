@@ -1,0 +1,33 @@
+{
+  "version": "decision-comparison-v2",
+  "source": "evals/runs/2026-10-14-feature4-r1.json",
+  "sourceSha256": "95481b2f67bb729e551a6e09b398669ebf8d414979eae33b868c0be90fb36f44",
+  "sourceGit": {
+    "sha": "705efdf",
+    "dirty": false
+  },
+  "sourceModel": "claude-sonnet-4-6",
+  "cases": [
+    "01",
+    "02",
+    "03",
+    "13",
+    "15",
+    "17",
+    "20",
+    "26"
+  ],
+  "models": {
+    "claude": "claude-sonnet-4-6",
+    "jev": "jev-1.13.0"
+  },
+  "protocol": "Fixed saved extraction, identical state and questions, shared projection/scorer, no production writes. Exploratory error-enriched sample; not held-out.",
+  "excluded": [
+    "customer matching",
+    "date arithmetic",
+    "priority",
+    "notes quality",
+    "draft prose",
+    "approval execution"
+  ]
+}

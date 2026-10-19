@@ -34,19 +34,24 @@
  * Pass 1 missed the action (re-tune extraction prompt) or Pass 2 made
  * the wrong call (re-tune decision prompt). Single-pass blurs the two.
  *
- * Each Pass-2 tool call becomes one PendingAIChange row.
+ * Pass 2 emits one complete batch, unpacked into individual draft calls.
+ * Each contained call becomes one PendingAIChange row.
  *
  * Used by:
  *   - app/api/integrations/miniti/webhook/route.js (after the 200 ack)
  *   - future Linear/Attio webhooks (same shape, smaller context payload)
  */
 
-import type { TextBlock, Tool, ToolUseBlock } from "@anthropic-ai/sdk/resources/messages";
+import type { TextBlock, Tool } from "@anthropic-ai/sdk/resources/messages";
 import type { Prisma } from "@/lib/generated/prisma/client";
 import type { OrchestratorContext } from "@/lib/integrations/miniti";
 import { anthropic, computeCost } from "@/lib/ai/client";
 import { logAICall } from "@/lib/db";
 import { GLOBAL_RULES } from "@/lib/ai/global-rules";
+import { buildMeetingCalendar, buildRelativeDateHints, normaliseRelativeDraftDates } from "@/lib/ai/meeting-calendar";
+import { excludeMeetingAdministration } from "@/lib/ai/draft-eligibility";
+import { normaliseRecorderOwnership } from "@/lib/ai/draft-ownership";
+import { normaliseDraftQuotes } from "@/lib/ai/draft-evidence";
 
 const MODEL = "claude-sonnet-4-6";
 
@@ -56,6 +61,8 @@ const MODEL = "claude-sonnet-4-6";
 
 /** One Pass 1 action item. Fields mirror EXTRACTION_SCHEMA. */
 export type ExtractionActionItem = {
+  /** Explicit activity classification, independent of whether the promise was firm. */
+  category?: "onboarding_work" | "meeting_administration";
   claim: string;
   sourceQuote: string;
   speaker?: string;
@@ -64,6 +71,8 @@ export type ExtractionActionItem = {
   mentionedDependency?: string;
   firmness: "firm" | "tentative" | "vague";
   notesSnippet?: string;
+  /** Verbatim execution details, including facts stated outside the commitment turn. */
+  details?: string[];
 };
 
 /** Pass 1 output (parsed model JSON). Stored on ExternalEvent.orchestratorExtraction. */
@@ -143,6 +152,7 @@ The recorder: the transcript labels whoever recorded the meeting as "You" (Minit
 Produce a single JSON object with these arrays:
 
 actionItems[]: every concrete commitment surfaced anywhere in the transcript or in meeting.actionItems. For each one capture:
+  - category: "meeting_administration" for routine meeting recaps, calendar housekeeping and conversational sign-offs; otherwise "onboarding_work". This is independent of firmness: a firm promise to recap a meeting is still administration. Delivering a substantive agreed work artifact is onboarding_work, even immediately after the call.
   - claim: a short imperative summary of what was committed to ("Send security questionnaire").
   - sourceQuote: ONE continuous passage copied word for word from a single speaker's turn in the transcript. Never join separate turns or speakers, never paraphrase, and never quote the meeting's summary, notes or key decisions. Only if the commitment appears nowhere in the transcript, use the exact wording of the matching meeting.actionItems entry instead.
   - speaker: who said it (use the name from the transcript verbatim, e.g. "Ian Ahuja", "Marco", "unknown" if not attributable).
@@ -151,6 +161,7 @@ actionItems[]: every concrete commitment surfaced anywhere in the transcript or 
   - mentionedDependency: VERBATIM phrasing of any blocker mentioned ("blocked on the SSO setup", "waiting for legal sign-off") or "" if no dependency mentioned. This includes things that are not tasks (a sign-off, another team, an approval) and other action items from this same meeting ("once the export is done"). DO NOT match to a task id.
   - firmness: "firm" (clear commitment with timing or owner), "tentative" (commitment but vague timing/owner, including a parked item that someone has taken on; see below), "vague" (someone mused about it but didn't commit and nobody took it on).
   - notesSnippet: ~200 char verbatim transcript window around the commitment so the next pass has surrounding context. When the specifics that were agreed (scope, names of the things involved, audience, constraints, who to send it to) sit near the commitment, pick the window that contains them.
+  - details: short VERBATIM facts needed to carry out or verify this work: named files/metrics, comparison/reference systems, scope, audience, constraints and delivery instructions. Gather relevant facts from other turns too; the ~200 char notesSnippet is not a limit on these details. Preserve exclusions and negations. Use [] if no execution details were agreed. Progress percentages alone are not execution instructions.
 
 reportedCompletions[]: every claim that an existing piece of work is now done. ("Data migration is complete", "we've signed the DPA"). Each item has:
   - claim, sourceQuote, speaker.
@@ -168,11 +179,20 @@ Rules:
 
 What counts as an action item (judgement rules; these refine rule 2, they do not loosen rule 1):
 A. Promises to do something "right after this call", "straight after we hang up", "later today" are action items like any other. People get distracted after calls. Mark them firm, with the timing phrase as mentionedDueDate.
-B. Parked items ARE action items. The test is: is it a SPECIFIC piece of work (you could write it as a task title) that one side said they will want, need or do later ("later on we'll need...", "one day we'll have to...", "not today, but...", "let's park that", "phase two")? If yes, capture it as "tentative" with mentionedDueDate = "" unless a time was given. mentionedOwner = the person who should carry it forward: whoever said they'd note or track it; otherwise whoever raised the need; if the vendor side acknowledged it ("I'll keep that on my list", "we'll come back to it"), that vendor person.
-   Example (different domain): "Later on we'll need the delivery report split by region, not this quarter though." "I'll keep that on my list." → tentative item "Delivery report split by region", owner = the person keeping it on their list.
-   NOT action items: vague musing with no concrete deliverable ("it'd be great to be more data-driven someday"), hypotheticals, opinions, descriptions of how things work today, and ideas that were raised and then explicitly rejected ("actually, let's not").
+B. Separate immediate delivery, recording a concrete request for later, and speculation:
+   - A specific future output that the meeting agrees to retain is PARKED WORK. "Noted for later", "noted as a nice-to-have" and "I'll note it for the roadmap" record the request. Extract it as tentative and undated. "Not committing now", "not urgent", "not in this phase" or "nothing to do now" deny current delivery, not remembering the agreed future output. Do not discard the request because it is deferred.
+   - Ownership follows the future output, not the acknowledgement. Customer-owned reports/models stay with the customer requester even when a vendor says "noted"; that is not a handover. Vendor-product changes stay vendor-owned. A teammate explicitly saying "I'll note/track it for the roadmap" takes on remembering that request. Title the parked item as the future output itself, not "Track request" or "Note wish". Do not invent a delivery deadline or promise to ship it.
+   - A vague possible future product/opportunity, without a specific requested output accepted for tracking, is speculation. "A future module might need analytics" stays out. "We will need this report split by region", acknowledged for later, stays in as one parked task.
+   - Cheap optional checks supporting an already committed deliverable are instructions on that task, not independently parked work. "If easy, include before/after timings with the migration" goes in the migration's details. Only an independent promise to deliver/track those measurements separately makes a separate action.
 C. When the customer says they are overwhelmed, stretched, or asks for space or time before taking on more, do NOT surface new work for the customer from that exchange. If the vendor side agrees to check back in (or it is clearly the vendor's job to pick it up again later), surface that as one vendor-owned action item ("Check back in with <contact> about <topic>"), with any timing that was discussed as mentionedDueDate.
 D. Updates to work that already exists count too: if someone restates, re-times, or hands over a piece of work that looks like it is already on openTasks, surface it as an action item with the new owner or timing as said, so the next pass can compare it against the board.
+E. Keep separate commitments even when one starts only after another. "Once X is ready, I will do Y" includes Y as its own action, with X in mentionedDependency. A dependency does not swallow the downstream deliverable.
+   If somebody is also responsible for obtaining/providing X, extract that work separately as well. An owned approval/sign-off action is still work; only an external condition with no committed action stays solely a blocker.
+   A concrete request for the speaker's own team to review an artifact before proceeding is such work, even when phrased as "I'd like our team to review it" rather than "I'll obtain approval". Capture the requested review, with that speaker coordinating it, and the required artifacts as dependencies. Do not reduce this to a blocker label on the artifact-producing task.
+F. Read every turn for commitments, including short replies and collective plans, not just sentences beginning "I will". Resolve "it", "that" and "both" from nearby turns in the claim, while keeping sourceQuote verbatim. "I'll pass it on" is separate recipient-owned hand-off work, not just a note on the sender's delivery. "Once the inputs arrive, we load the archive" commits to the later load even if no one repeats it in the closing recap. If a reply both requests information and promises a response after receiving it, capture each side's actual commitment with its own speaker and owner. Do not assign the response to whoever supplies the information. For a turn like "Tell us when you choose and we will revise the estimate", extract the speaker's promised revision separately from the other person's notification. Keep both actors distinct even if they refer to the same future input. The vendor response is a follow-up/check-back commitment, not merely a description of the eventual event. Capture it even when a larger task already names that event.
+   For every extracted action, scan the preceding AND following turns for explicit prerequisite evidence. Carry all agreed inputs in mentionedDependency even when another speaker states them or their delivery is promised later in the call. "You'll need the export to run this" and a later offer to send the export establish the same relation as "waiting for the export". Preserve the exact evidence wording; do not invent prerequisites from ordinary workflow assumptions. A later clarification that work can proceed in parallel overrides a suspected dependency.
+G. A cheap optional measurement supporting another deliverable is execution detail of that deliverable, not an independent commitment. Carry it in that action's details with its qualification. Extract separate measurement work only if someone commits to delivering or tracking it independently.
+H. Routine recaps and scheduling of this check-in itself, sign-offs and invitations to ask for help do not become onboarding work by themselves. Coordinating an actual onboarding deliverable or promising a response to a pending customer decision is onboarding_work, not meeting administration. Preserve substantive deliverables promised immediately after a call, such as sending an agreed artifact. Do not turn conversational closing remarks into a follow-up task.
 
 ${GLOBAL_RULES}
 
@@ -187,6 +207,7 @@ const EXTRACTION_SCHEMA = {
         type: "object",
         properties: {
           claim: { type: "string" },
+          category: { type: "string", enum: ["onboarding_work", "meeting_administration"] },
           sourceQuote: { type: "string" },
           speaker: { type: "string" },
           mentionedOwner: { type: "string" },
@@ -194,8 +215,9 @@ const EXTRACTION_SCHEMA = {
           mentionedDependency: { type: "string" },
           firmness: { type: "string", enum: ["firm", "tentative", "vague"] },
           notesSnippet: { type: "string" },
+          details: { type: "array", items: { type: "string" } },
         },
-        required: ["claim", "sourceQuote", "firmness"],
+        required: ["claim", "sourceQuote", "firmness", "details", "category"],
         additionalProperties: false,
       },
     },
@@ -243,10 +265,7 @@ export async function runMinitiExtraction({ context }: { context: OrchestratorCo
 
   const response = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 4000,
-    // Low temperature so the same transcript yields the same extraction
-    // across runs. We still need >0 so Claude can phrase claim/notesSnippet
-    // naturally rather than echoing the prompt format too rigidly.
+    max_tokens: 6000,
     temperature: 0.2,
     system: [
       { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
@@ -255,6 +274,14 @@ export async function runMinitiExtraction({ context }: { context: OrchestratorCo
     output_config: { format: { type: "json_schema", schema: EXTRACTION_SCHEMA } },
   });
 
+  const durationMs = Date.now() - startedAt;
+  await logAICall({
+    kind: "miniti_extraction", scopeId: String(context.meeting?.id ?? ""), model: response.model,
+    inputTokens: response.usage.input_tokens ?? 0, cacheReadTokens: response.usage.cache_read_input_tokens ?? 0,
+    cacheWriteTokens: response.usage.cache_creation_input_tokens ?? 0, outputTokens: response.usage.output_tokens ?? 0,
+    costUsd: computeCost(response.model, response.usage), durationMs, requestId: response.id,
+  }).catch((err) => console.warn("[orchestrator] extraction logAICall failed", err));
+  if (response.stop_reason === "max_tokens") throw new Error("Pass 1 extraction exceeded max_tokens");
   const textBlock = response.content.find((b): b is TextBlock => b.type === "text");
   if (!textBlock) {
     throw new Error("Pass 1 returned no text block");
@@ -266,25 +293,11 @@ export async function runMinitiExtraction({ context }: { context: OrchestratorCo
     throw new Error(`Pass 1 JSON parse failed: ${(err as Error).message}`);
   }
 
-  const durationMs = Date.now() - startedAt;
   console.log(
     `[miniti] extraction (pass 1): ${extraction.actionItems?.length ?? 0} action items, ` +
       `${extraction.reportedCompletions?.length ?? 0} completions, ` +
       `tone=${extraction.meetingTone}, ${durationMs}ms`
   );
-
-  await logAICall({
-    kind: "miniti_extraction",
-    scopeId: String(context.meeting?.id ?? ""),
-    model: response.model,
-    inputTokens: response.usage.input_tokens ?? 0,
-    cacheReadTokens: response.usage.cache_read_input_tokens ?? 0,
-    cacheWriteTokens: response.usage.cache_creation_input_tokens ?? 0,
-    outputTokens: response.usage.output_tokens ?? 0,
-    costUsd: computeCost(response.model, response.usage),
-    durationMs,
-    requestId: response.id,
-  }).catch((err) => console.warn("[orchestrator] extraction logAICall failed", err));
 
   return {
     extraction,
@@ -299,92 +312,57 @@ export async function runMinitiExtraction({ context }: { context: OrchestratorCo
 // Pass 2 — Decision (tool-use)
 // ---------------------------------------------------------------------------
 
-const SYSTEM_PROMPT = `You are Vector. You take pre-extracted facts from a B2B onboarding meeting (Pass 1) and decide what to do with them — match to existing tasks, create new ones, mark completions, or flag none. Another reviewer will approve every tool call before anything writes to the database.
+const SYSTEM_PROMPT = `You are Vector. Propose reviewable onboarding task drafts from a meeting. Nothing is executed until a human approves.
 
-You will receive a JSON context with:
-- meeting.title, meeting.date, meeting.summary, meeting.transcript (you can re-read if needed)
-- extraction: Pass 1's structured findings:
-    - actionItems[]: { claim, sourceQuote, speaker, mentionedOwner, mentionedDueDate, mentionedDependency, firmness, notesSnippet }
-    - reportedCompletions[]: { claim, sourceQuote, speaker }
-    - externalBlockers[]: string[]
-    - meetingTone: short label
-- openTasks: existing OPEN tasks for this onboarding, each with id, taskId (human-readable e.g. "AC-12"), title, status, phaseId, due, ownerId (a vendorUsers id), priority, assigneeContactId (a customerContacts id), description, notes, dependsOn (what it already waits on: [{ taskId } | { text }], taskId being another openTasks id). When referring to a task in sourceQuote or notes, you may use its taskId (e.g. "blocked on AC-7") for readability.
-- customerContacts: [{ id, name, email }] — for assigneeContactId
-- vendorUsers: [{ id, name, email }] — Caroline's team; for ownerId
-- recorder: { id, name } of the person who recorded the meeting, or null when nobody has said who that is
-- phases: [{ id, name, isComplete }]
-- today: today's ISO date
+INPUT
+meeting contains the speaker-labelled transcript and Miniti actionItems. extraction contains verbatim facts: actionItems (claim, sourceQuote, speaker, mentionedOwner, mentionedDueDate, mentionedDependency, firmness, notesSnippet, details), reportedCompletions, externalBlockers. openTasks contains the current board (ids, titles, descriptions, notes, owners, assignees, dates, priorities, dependencies). vendorUsers, customerContacts and phases are the only permitted ids. recorder identifies the vendor teammate labelled "You", or is null. meetingCalendar and relativeDateHints are calculated in code from the meeting date, not today's processing date.
 
-meeting.transcript has one turn per line as "<speaker>: <words>"; the label is not part of the quote. The speaker "You" is the person who recorded the meeting: someone on our (vendor) side, never a customer contact.
+PROPOSE ONE COMPLETE BATCH
+Call propose_meeting_drafts once, containing every warranted create_task_draft, match_to_existing_task_draft and update_task_status_draft. These proposals do not execute work or return task ids. Assign each new task a unique draftRef (d1, d2, ...); dependencies may refer forward to another draft in this same batch. Do not wait for tool results. Use flag_no_action_items alone only when no new or changed work is warranted.
 
-For each extraction.actionItems entry, decide:
-- If it maps to an existing open task by topic, call match_to_existing_task_draft (don't duplicate). Every change to that task goes in the one draft's \`changes\` object.
-- Otherwise call create_task_draft. This includes commitments where the actor is vendor-side (Caroline's team) — internal vendor work IS roadmap work and belongs as a draft on this onboarding too. Don't filter by who owns it.
-- If it's a "vague" item with no clear owner AND no clear commitment, skip it. Tentative items with a credible owner still get a create_task_draft (mark confidence "low"). Parked items that someone owns remembering are tentative items with an owner: draft them undated (see JUDGEMENT RULES).
+DECIDE THE WORK BEFORE ITS FIELDS
+1. Identify each actual deliverable and whose job it is. Include concrete immediate promises, owned parked requests and dependent work. "After A, we will do B" includes B now as a draft, with A as its dependency. Include short recipient hand-offs and commitments expressed as collective plans. Exclude routine recaps, calendar administration, conversational sign-offs, speculative product ideas with no specific requested deliverable, and rejected ideas. A concrete future output recorded for later is eligible even if delivery is explicitly not committed now. "Nothing to do now", "not in this phase" or "not urgent" does not cancel a request that someone agrees to note/track. Preserve it as an undated, low-priority task owned by whoever carries the future work; do not promise delivery. Mere acknowledgement of a vague possible product/opportunity without a specific agreed output stays out. Exception: cheap optional checks supporting an already committed deliverable are instructions for that task, even if accepted; they are not separately parked work. Put their exact measurement, before/after requirement and qualification in that task's notes. For example "if easy, include before/after timings with the migration" belongs on the migration task. This exception takes precedence over the parked-work rule and over an extraction that mistakenly lists the check separately.
+2. Compare the finished outcome with the board. Update only the SAME deliverable, never merely the same topic. A task waiting for an input is different from producing that input. Reviewing/commenting on an artifact is different from finalising the work that awaits that review. Create the separately owned input when it is absent from the board. If the SAME input is already on the board, update it. Do not split an implementation into duplicate tasks merely because its delivery is a PR; put its technical scope in that task's notes.
+3. A promised later response or coordination step is separate follow-up work, even if it concerns an existing event or milestone. Preserve the speaker's own commitment as a task rather than burying it in the milestone's notes. When another team's decision is still unknown, create a separate undated vendor reminder to follow up on that choice and make the promised adjustment. Give it the vendor speaker as owner and the unresolved choice as a typed dependency. An existing delivery/event task does not cover this reminder: running an event and following up on an undecided input have different completion conditions. Do not replace the reminder with a milestone update or with a customer notification task. The undecided choice itself is pending-input context, not a task to make a decision nobody has taken on. A courtesy "will do / let you know" acknowledgement about an undecided external choice stays in the vendor reminder's typed dependency; do not create another customer reminder solely for that acknowledgement. This narrow exception applies only to pending-choice acknowledgements. This rule never excludes a customer's concrete hand-off. An explicit promise to send/forward a document, file or email to an internal team is independently owned work even if quick, internal or already mentioned in the sender's notes. Create that recipient-owned hand-off with the sender's delivery as its dependency; do not decide it is too routine to track. Do not assign that response to the person who will supply the input. If a customer is overwhelmed or asks for space, do not create new work for them from that exchange; preserve the vendor's promised check-in instead.
+4. For an existing deliverable, propose ONE update containing only changes agreed for THAT task. Keep its owner, assignee, priority and deadline unchanged when only a prerequisite changes. A prerequisite's deadline is not a deadline for the waiting task, and cannot be used to reset its old date. If speakers explicitly single out the task itself as the main blocker to rollout/go-live, that is high-priority evidence for that task. A new prerequisite link alone is not evidence to re-prioritise its parent. A dependency-only update contains only changes.dependsOn and, if needed, genuinely new execution context in changes.appendNotes. Never infer a parent deadline from the input chain. An unchanged restatement needs no update. Reported completion of a board task uses update_task_status_draft with newStatus Done.
 
-For each extraction.reportedCompletions entry, call update_task_status_draft against the matching task (newStatus = "Done").
+OWNERS AND RECIPIENTS
+For parked requests, title the requested future output, not the act of acknowledging it. Keep a customer-owned report/model with its customer requester; a vendor merely saying "noted" has not taken over that implementation. Vendor-product changes stay vendor-owned. An explicit "I'll note/track it for the roadmap" does make that teammate responsible for remembering the request.
+The actor who commits to doing the work owns it. Match a vendor actor to vendorUsers via ownerId, or a customer actor to customerContacts via assigneeContactId. A recipient, reviewer being notified or person supplying a prerequisite does not become the owner of somebody else's action. Do not set both ownerId and assigneeContactId just to record who receives the result; put recipients in notes. A genuine handover changes the corresponding field on the SAME existing task.
+The recorder: "You" is the vendor person who recorded the meeting, never a customer. Resolve their commitments with ownerId = recorder.id. If recorder is null, nobody has said who recorded the meeting: leave ownerId empty and set ownerFromRecorder: true on create_task_draft. Never guess the recorder from vendorUsers. Leave other unresolved owners empty too.
 
-flag_no_action_items is the LAST RESORT. Call it only when extraction.actionItems is literally empty AND extraction.reportedCompletions is literally empty. If Pass 1 surfaced even one firm or tentative actionItem, you must emit a draft for it — never substitute flag_no_action_items as a "this isn't relevant enough" judgment call. The vendor reviews every draft and will dismiss what isn't useful.
+DEPENDENCIES
+Once all the deliverables are identified, connect them. Put every explicitly required input on the task that waits for it:
+- an existing board task: { taskId: its id }
+- another new task in this batch: { draftRef: its draftRef }
+- an external condition without an owned task: { text: short blocker wording }
+An owned approval/review is work, not merely a text label. A review or verification can require both an artifact and a working environment when the meeting names both as its inputs. Inspect the surrounding turns, including later clarifications; do not rely only on mentionedDependency. Explicitly parallel work must stay independent. Do not invent dependencies from general workflow assumptions, self-links, cycles, or repeat links already on the board. Do not substitute a review/approval step for the named input just because review normally precedes its delivery. If the meeting says work waits for the implementation, link to that implementation task rather than inferring that a reviewer finishing is sufficient. For an existing task, add new links through changes.dependsOn without reassigning or re-timing it. Do not put blocker prose in notes.
 
-Rules, non-negotiable:
+DATES
+Only give a task a deadline when timing was stated for that task's own work. Use relativeDateHints for the action with the matching sourceQuote. These dates are computed from the meeting date. Use meetingCalendar for weekday lookups. Never move a task's date to accommodate a prerequisite, or label a date with the wrong weekday.
+- Explicit calendar dates win over inference.
+- by/on a weekday means its next occurrence after the meeting.
+- this week / end of the week means this week's Friday; early next week means next Tuesday; end of next week means next Friday; tomorrow means the next day.
+- right after this call / today / later today means the meeting day.
+- mid-month means the 15th; end of the month means the last day.
+- before/ahead of a dated event means the working day before it; by/at the event means its date.
+- A conditional event with no fixed date (once an input lands, within a day of approval) stays undated. Do not copy its prerequisite's deadline.
+- changes.dueDate = null only when this task's own deadline was explicitly removed.
+For a vendor check-back reminder, a stated customer re-engagement window can schedule the reminder even if approximate (mid-month = the 15th). Explain that this is an inferred reminder date, use low confidence, and never turn it into a customer deadline or change the waiting board task's due date. With no stated window, the reminder stays undated.
+For timing not covered by a code hint, explain inferred dates in a final, separate "Due date:" paragraph in notes/appendNotes. Code adds that paragraph for resolved relativeDateHints.
 
-1. RESOLVE the verbatim mentions to ids:
-   - mentionedOwner: match against vendorUsers (by name) → ownerId. If the speaker is a customer-side person, match against customerContacts → assigneeContactId. If neither matches confidently, leave the relevant id null.
-   - The recorder ("You"): when the person who said they'd do it is "You" (mentionedOwner "You", or speaker "You" saying "I'll ..."), resolve them like any named vendor speaker: ownerId = recorder.id. If recorder is null, nobody has said who recorded the meeting: leave ownerId empty and set ownerFromRecorder: true on the create_task_draft, so the reviewer is asked to pick the owner. Never guess the recorder from vendorUsers, and never give their work to a customer contact.
-   - mentionedDueDate: convert to ISO YYYY-MM-DD relative to the meeting date (today, unless meeting.date says otherwise; e.g. "by Friday" → next Friday's date). Vague and anchored phrases count as dates too; see JUDGEMENT RULES (dates). Only leave dueDate empty when no timing was said at all, or the phrase has no reasonable reading.
-   - mentionedDependency: match against openTasks (use task title + description + notes for the match) → dependsOn [{ taskId: <openTasks id> }]. If it is another new task you are proposing from this same meeting → dependsOn [{ draftRef: "<that draft's draftRef>" }]. If it is not a task at all (mentioned in extraction.externalBlockers or describes a non-task blocker) → dependsOn [{ text: "<the blocker in a few words>" }]. See JUDGEMENT RULES E.
+EXECUTION NOTES
+Preserve each relevant extraction.details fact: exact names of files/systems/metrics, scope, audience, exclusions and negations, acceptance criteria, references, delivery destination, reviewer tagging and measurement instructions. Consult the transcript if details are missing. Use concise sentences without a one/two-sentence cap; never dump the transcript. A dependency removes only its blocker sentence from notes, not the work's other instructions. Optional checks or measurements requested only if cheap belong in the main task's notes. Do not create a separate task unless someone separately commits to tracking or delivering that measurement as its own outcome. For an existing task, changes.appendNotes contains only genuinely new agreed information and never repeats unchanged board details. A progress percentage or unchanged status alone is not new execution scope.
 
-2. NEVER guess. If you can't resolve a mention with reasonable confidence, leave the field null/omitted. The vendor reviews every draft.
-
-3. Match before you create. If extraction.claim plausibly maps to an existing open task (compare title + description + notes), use match_to_existing_task_draft. Don't duplicate work. Several action items about the same existing task become ONE match_to_existing_task_draft with all their changes (see JUDGEMENT RULES G and H).
-
-4. phaseId is REQUIRED on create_task_draft and MUST be from the phases array. Pick the phase that semantically fits (Discovery / Setup / Migration / Go-Live etc.). If unclear, pick the first non-complete phase.
-
-5. Every tool call MUST include sourceQuote. Use the same sourceQuote that Pass 1 surfaced — don't invent a new one. When several action items merge into one draft (e.g. one update carrying several changes to the same task), use the quote of the most important change; never join quotes together.
-
-6. Never invent task ids, contact ids, vendor user ids, or phase ids. Use only ids that appear in the context.
-
-7. Confidence on the tool call:
-   - high   = mentioned owner explicitly named + clear deadline + firm extraction
-   - medium = clear commitment, one of (owner, deadline) inferred or vague
-   - low    = implied or ambiguous; flag for the vendor to verify
-
-8. Firm items always produce a draft. Tentative items with any credible owner (vendor or customer) produce a draft (confidence: low). Only skip pure "vague" items with no owner and no commitment.
-
-9. Notes: write the create_task_draft notes in your own words, concisely, from notesSnippet and the transcript. They hold the crucial specifics agreed on the call (see JUDGEMENT RULES), then any "Due date: ..." reasoning. Do not paste a raw transcript window. Blockers do not go in notes; they go in dependsOn (rule E), including relevant ones from extraction.externalBlockers.
-
-JUDGEMENT RULES (how an experienced onboarding manager listens; apply them when deciding and filling drafts):
-
-A. Parked items become undated tasks. When extraction surfaced a parked item (a specific piece of work one side said they'll want, need or do later), create a task with NO dueDate (unless a time was actually given), owned by the person extraction named: the vendor user via ownerId, or the customer contact via assigneeContactId. Priority "low", confidence "low" or "medium". Title it as the deliverable itself, and say in notes that it was parked and why ("Parked: not in scope until after launch").
-   Do NOT create a task for: vague musing with no concrete deliverable, hypotheticals, opinions, descriptions of how things work today, ideas explicitly rejected, or general goodwill ("we should catch up sometime"). The line is concreteness: a nameable deliverable someone wants later is a task; a general wish is not.
-
-B. Dates. Turn vague and anchored timing into a concrete date, counting from the meeting date and its weekday (given below):
-   - "by <weekday>" / "on <weekday>" = the next occurrence of that weekday after the meeting.
-   - "early next week" = the Tuesday of next week; "end of next week" = the Friday of next week; "end of the week" = this week's Friday; "tomorrow" = the next day; "mid-<month>" = the 15th; "end of the month" = the last day of the month.
-   - "right after this call", "today", "later today" = the meeting date itself.
-   - Anchored to another event ("before the review on <date>", "ahead of the launch on <date>") = the working day before that event. "By" or "at" an event = the event's date.
-   - Explicit dates win over inference.
-   Whenever you inferred a date rather than read it directly, add one short line to notes: "Due date: <phrase> from <meeting weekday + date> = <result>." Example: "Due date: 'ahead of the stocktake on Wed 9 Apr' = Tue 8 Apr."
-
-C. "Right after this call" promises are tasks like any other. Draft them with the meeting date as dueDate. Do not skip them because they sound immediate or trivial.
-
-D. Notes carry the specifics. Copy into notes the crucial details agreed on the call: scope (what is in and what is out), names of the specific things involved, the audience, constraints, and who to send it to. Short, in your own words, a few comma-separated phrases or one or two sentences, never a raw transcript dump. Prefer the exact names people used for the things involved, so a reader can search for them. If nothing specific was agreed, keep notes short.
-
-E. Dependencies. When the item can only happen after something else, list every blocker in dependsOn (a task can wait on several things):
-   - the blocker is an existing open task → { "taskId": <its openTasks id> }.
-   - the blocker is not a task on the board (a sign-off, an approval, another team, an external event) → { "text": "<the blocker, short, in the words used on the call>" }, e.g. { "text": "legal sign-off on the contract" }.
-   - the blocker is another new task you are proposing from this same meeting → { "draftRef": "<that create_task_draft's draftRef>" }. Every create_task_draft you emit carries its own short draftRef ("d1", "d2", ... in the order you propose them, unique within this response), so other drafts can point at it. Never point a draft at itself, and never make two drafts wait on each other.
-   This applies to new tasks (create_task_draft.dependsOn) and to existing ones: when the call says an existing open task now waits on something its dependsOn does not already list, put it in match_to_existing_task_draft changes.dependsOn. Do not repeat a blocker the task already has. Do not write "Blocked by" lines in notes.
-
-F. Overwhelmed customer. When the customer says they are overwhelmed, stretched thin, or asks for space before taking on more, put NOTHING new on their plate from that exchange: no customer-owned tasks, no assigneeContactId for them on new work. Instead create one reminder for our own owner (ownerId = the vendor user who owns the relationship or took it on) to circle back, titled like "Check back in with <contact> about <topic>", with dueDate set to the check-in time if one was discussed (rule B), otherwise empty. Put the reason in notes ("Customer asked for space until ...").
-
-G. Cross-check existing tasks. When the call touches an existing open task (it maps via match_to_existing_task_draft, or someone talks about that work), compare its owner, assignee, due date and priority against what was agreed on the call. Propose ONE match_to_existing_task_draft per existing task, carrying every change in its \`changes\` object: ownerId / assigneeContactId when the work changed hands, dueDate when the timing moved (rule B applies; null when the call says the date no longer applies), priority when it was re-ranked. Do not split one task's changes across several drafts. Only include a field when the call disagrees with the board; do not restate what the board already says.
-
-H. Add what was agreed to existing tasks. When the call adds information to an existing task (scope, names of the specific things involved, audience, constraints, who to send it to), put it in changes.appendNotes, following rule D. A new blocker goes in changes.dependsOn (rule E), not in notes. It is appended to the task's notes as a new dated line, never replacing what is there, so write only what is new, not a restatement of the existing notes. Add any "Due date: ..." reasoning line (rule B) there too. A call that adds information but changes nothing else is still worth one update with appendNotes only.
+OUTPUT INTEGRITY
+Each sourceQuote is one continuous passage copied verbatim from a single speaker's turn, preferably the quote from extraction. Never join speakers, paraphrase quotes or use summary/notes as a quote. Only if the commitment is absent from the transcript may its verbatim Miniti actionItems entry be used. The speaker label is not part of the quote. Multiple changes to one deliverable use the most informative single quote.
+Task titles name the action and outcome in at most 80 characters. Put waiting conditions, implementation scope and narrative in dependencies/notes, not in an oversized title. Preserve the scope in those fields.
+Every create_task_draft needs a phaseId from phases; choose the best fitting phase, or the first incomplete phase. Use only supplied task/contact/user/phase ids. Confidence high means a clear commitment with owner and timing; medium means one is inferred/unclear; low means tentative work. Never guess missing fields.
+Before emitting the batch, account for each eligible extraction item and completion, verify dependent work is present, and check there is only one update per existing task. Do not create no-op updates just to cover restatements.
 
 ${GLOBAL_RULES}
 
-Today is {{TODAY}}. This is normally the meeting date; if meeting.date differs, count dates from meeting.date.`;
+Today is {{TODAY}}. Dates spoken in the meeting are relative to meeting.date when it differs.`;
 
 /** `dependsOn` on both draft tools: board tasks, sibling drafts, or plain-text blockers. */
 const DEPENDS_ON_SCHEMA = {
@@ -401,7 +379,7 @@ const DEPENDS_ON_SCHEMA = {
   },
 };
 
-const TOOLS: Tool[] = [
+const DRAFT_TOOLS: Tool[] = [
   {
     name: "create_task_draft",
     description: "Propose creating a new task. Use when an action item is a fresh commitment not covered by any existing open task. Fill in as many fields as the extraction supports; leave the rest null/omitted.",
@@ -414,7 +392,8 @@ const TOOLS: Tool[] = [
         },
         title: {
           type: "string",
-          description: "Short imperative task title, max 80 chars.",
+          description: "Short imperative task title, max 80 chars. Conditions and background belong in dependencies/notes.",
+          maxLength: 80,
         },
         description: {
           type: "string",
@@ -463,7 +442,7 @@ const TOOLS: Tool[] = [
   },
   {
     name: "match_to_existing_task_draft",
-    description: "Propose updating an existing open task instead of creating a duplicate. Use when an action item maps to a task already in the openTasks list. One draft per task: put EVERY change agreed on the call for that task in `changes` (new owner or assignee, new due date, new priority, notes to append, new blockers). Only include fields that differ from the board.",
+    description: "Propose updating an existing open task instead of creating a duplicate. Use only for the SAME deliverable already in openTasks. Shared topic or a separate prerequisite in its notes is insufficient; propose that distinct work as create_task_draft. One draft per task: put EVERY change agreed on the call for that task in `changes` (new owner or assignee, new due date, new priority, notes to append, new blockers). Only include fields that differ from the board.",
     input_schema: {
       type: "object",
       properties: {
@@ -533,6 +512,56 @@ const TOOLS: Tool[] = [
   },
 ];
 
+/** One tool contains the complete proposal graph. Separate tool calls allowed
+ * the model to plan dependent drafts but emit only the first ready calls, then
+ * wait for tool results that this proposal-only pipeline never sends. */
+const BATCH_TOOL: Tool = {
+  name: "propose_meeting_drafts",
+  description: "Submit the COMPLETE meeting review batch once. Each calls entry is a draft proposal, not an executed task. Include prerequisites, dependent tasks, existing-task updates and completions together; draftRefs can point forward within this batch. No tool results are needed. Use flag_no_action_items alone only when no draft is warranted.",
+  input_schema: {
+    type: "object",
+    properties: {
+      calls: {
+        type: "array",
+        minItems: 1,
+        items: {
+          oneOf: DRAFT_TOOLS.map((tool) => ({
+            type: "object",
+            description: tool.description,
+            properties: {
+              tool: { type: "string", const: tool.name },
+              input: tool.input_schema,
+            },
+            required: ["tool", "input"],
+            additionalProperties: false,
+          })),
+        },
+      },
+    },
+    required: ["calls"],
+    additionalProperties: false,
+  },
+};
+
+/** Decode one batch atomically into the existing per-draft persistence format. */
+export function readOrchestratorCalls(content: unknown[]): OrchestratorToolCall[] {
+  const blocks = content.filter((block): block is Record<string, unknown> => !!block && typeof block === "object" && (block as { type?: string }).type === "tool_use");
+  if (blocks.length !== 1 || blocks[0].name !== BATCH_TOOL.name) throw new Error("Pass 2 must return one complete draft batch");
+  const batch = blocks[0];
+  const calls = (batch.input as { calls?: unknown } | null)?.calls;
+  if (!Array.isArray(calls) || calls.length === 0) throw new Error("Pass 2 returned an empty or malformed draft batch");
+  const names = new Set(DRAFT_TOOLS.map((tool) => tool.name));
+  const decoded = calls.map((call: unknown, index): OrchestratorToolCall => {
+    const item = call as { tool?: unknown; input?: unknown } | null;
+    if (!item || typeof item.tool !== "string" || !names.has(item.tool) || !item.input || typeof item.input !== "object" || Array.isArray(item.input)) {
+      throw new Error(`Pass 2 returned a malformed draft at batch index ${index}`);
+    }
+    return { tool: item.tool, input: item.input as OrchestratorToolInput, id: `${String(batch.id)}_${index}` };
+  });
+  if (decoded.length > 1 && decoded.some((call) => call.tool === "flag_no_action_items")) throw new Error("Pass 2 mixed no-action with draft proposals");
+  return decoded;
+}
+
 /**
  * Pass 2: take Pass 1's extraction + onboarding context and emit tool
  * calls. Returns normalised tool calls + cost/usage.
@@ -556,7 +585,9 @@ export async function runMinitiOrchestrator({
   const today = new Date(context.today || new Date().toISOString().slice(0, 10));
   const systemPrompt = SYSTEM_PROMPT.replace("{{TODAY}}", promptDate(today));
 
-  const userPayload = { ...context, extraction };
+  const meetingCalendar = buildMeetingCalendar(context.meeting?.date) ?? buildMeetingCalendar(context.today);
+  const relativeDateHints = buildRelativeDateHints(extraction?.actionItems ?? [], meetingCalendar?.meetingDate ?? context.today);
+  const userPayload = { ...context, extraction, meetingCalendar, relativeDateHints };
   const approxTokens = Math.ceil(JSON.stringify(userPayload).length / 4);
   console.log(
     `[miniti] orchestrator (pass 2): input ~${approxTokens} prompt tokens, ` +
@@ -568,32 +599,18 @@ export async function runMinitiOrchestrator({
     model: MODEL,
     // A busy meeting proposes many drafts, each with a description, notes and
     // source quote. 2000 was hit in practice and cut the last draft short, so
-    // leave plenty of headroom; the warning below flags it if it happens again.
-    max_tokens: 8000,
-    // Same Pass 1 → same draft set, run after run. The decision logic
-    // is rule-based enough that we want repeatable tool calls, not creative
-    // re-interpretation each time.
-    temperature: 0.2,
+    // leave headroom; a token-limited batch is rejected below, never persisted.
+    max_tokens: 10000,
+    thinking: { type: "enabled", budget_tokens: 1024 },
     system: [
       { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
     ],
     messages: [{ role: "user", content: JSON.stringify(userPayload) }],
-    tools: TOOLS,
+    tools: [BATCH_TOOL],
+    // Forced tool selection suppresses thinking before the tool call. The
+    // decoder still requires exactly one complete batch before persistence.
+    tool_choice: { type: "auto" },
   });
-
-  const calls: OrchestratorToolCall[] = response.content
-    .filter((b): b is ToolUseBlock => b.type === "tool_use")
-    .map((b) => ({ tool: b.name, input: b.input as OrchestratorToolInput, id: b.id }));
-
-  console.log(
-    `[miniti] orchestrator (pass 2): ${response.content.length} content blocks, ` +
-      `${calls.length} tool calls`
-  );
-  if (response.stop_reason === "max_tokens") {
-    console.warn(
-      `[miniti] orchestrator (pass 2): hit max_tokens; the last draft may be incomplete`
-    );
-  }
 
   const durationMs = Date.now() - startedAt;
 
@@ -609,6 +626,16 @@ export async function runMinitiOrchestrator({
     durationMs,
     requestId: response.id,
   }).catch((err) => console.warn("[orchestrator] logAICall failed", err));
+
+  if (response.stop_reason === "max_tokens") throw new Error("Pass 2 draft batch exceeded max_tokens; refusing a partial review batch");
+  const calls = normaliseRelativeDraftDates(
+    normaliseRecorderOwnership(excludeMeetingAdministration(normaliseDraftQuotes(readOrchestratorCalls(response.content), extraction, context), extraction), extraction, context.recorder),
+    relativeDateHints, meetingCalendar?.meetingDate ?? context.today,
+  );
+  console.log(
+    `[miniti] orchestrator (pass 2): ${response.content.length} content blocks, ` +
+      `${calls.length} draft proposals`
+  );
 
   return {
     calls,

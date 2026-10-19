@@ -58,24 +58,25 @@
       "toolCalls": [
         {
           "action": "create_task",
-          "titleLike": "Three new staging models, stg_events becomes a thin union",
-          "titleAlternatives": ["Split stg_events into three staging models"],
-          "owner": "customer",
-          "assignee": "Speaker 1",
-          "kind": "commitment",
-          "notesContains": ["downstream untouched"],
-          "sourceQuoteContains": "three new staging models, stg_events becomes a thin union"
-        },
-        {
-          "action": "create_task",
-          "titleLike": "Refactor PR open",
+          "titleLike": "Refactor stg_events into three staging models and open PR",
           "owner": "customer",
           "assignee": "Speaker 1",
           "dueDate": "2026-06-09",
           "kind": "commitment",
-          "dueDateReason": "'by Tuesday' from Fri 5 Jun → Tue 9 Jun.",
-          "notesContains": ["tag me", "compile-time numbers"],
-          "sourceQuoteContains": "I can get the refactor PR open by Tuesday"
+          "dueDateReason": "'by Tuesday' from Fri 5 Jun \u2192 Tue 9 Jun.",
+          "notesContains": [
+            "three source-aligned",
+            "staging models",
+            "thin union",
+            "downstream untouched",
+            "tag me",
+            "compile-time numbers"
+          ],
+          "sourceQuoteContains": "I can get the refactor PR open by Tuesday",
+          "titleAlternatives": [
+            "Refactor PR open",
+            "Open stg_events refactor PR"
+          ]
         },
         {
           "action": "create_task",
@@ -83,12 +84,12 @@
           "owner": "vendor",
           "assignee": "Maya Lindqvist",
           "kind": "commitment",
-          "dependsOn": { "newTaskTitleLike": "Refactor PR open", "gap": "depends_on_new_draft" },
+          "dependsOn": { "newTaskTitleLike": "Refactor stg_events into three staging models and open PR", "gap": "depends_on_new_draft" },
           "sourceQuoteContains": "I'll review the PR within a day of it landing"
         }
       ]
     },
-    "notes": "No attendees, generic title, pure dbt shop-talk: must land in Needs-your-input as matchAmbiguous. After assignment (Ashby chosen: a webhook feed plus an app database fits an ATS product, and 'measures wait' lines up with the 10 Jun metrics working session), the agreed refactor becomes a customer task with the constraint 'downstream untouched for now', and the PR becomes a task due Tue 9 Jun noting to tag the reviewer and grab compile-time numbers if cheap. The vendor review is a promise too, dependent on the PR opening; its date is relative ('within a day of it landing') so no fixed due date is scored.",
-    "review": { "verdict": "approved", "reviewedAt": "2026-10-11", "by": "Caroline" }
+    "notes": "After assignment to Ashby: ONE customer task covers the three source-aligned staging models, stg_events retained as a thin union, downstream references untouched for now, and opening the PR by Tue 9 Jun. Notes retain reviewer tagging and optional compile-time numbers if cheap. A separate vendor task reviews the PR within a day of landing, dependent on the PR and with no fixed date. Caroline confirmed the combined implementation/PR grouping on 2026-10-18; the earlier three-task key is archived in evals/quality-investigation/answer-key-before-round2/. Extra notes checks preserve the implementation scope previously checked through a separate task title.",
+    "review": { "verdict": "approved", "reviewedAt": "2026-10-18", "by": "Caroline" }
   }
 }

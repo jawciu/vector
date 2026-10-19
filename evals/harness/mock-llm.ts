@@ -30,6 +30,11 @@ let counter = 0;
 
 function response(content: unknown[]) {
   counter += 1;
+  const toolCalls = content as { type: string; name?: string; input?: unknown }[];
+  if (toolCalls.some((block) => block.type === "tool_use")) {
+    content = [{ type: "tool_use", id: `toolu_mock_batch_${counter}`, name: "propose_meeting_drafts",
+      input: { calls: toolCalls.map((block) => ({ tool: block.name, input: block.input })) } }];
+  }
   return {
     id: `msg_mock_${counter}`,
     type: "message",
@@ -70,7 +75,7 @@ export function mockCreate(params: CreateParams) {
       type: "tool_use",
       id: `toolu_mock_${counter}_${i}`,
       name: "create_task_draft",
-      input: { title: title.slice(0, 80), phaseId, priority: "medium", sourceQuote: title, confidence: "low" },
+      input: { draftRef: `d${i + 1}`, title: title.slice(0, 80), phaseId, priority: "medium", sourceQuote: title, confidence: "low" },
     }))
   );
 }

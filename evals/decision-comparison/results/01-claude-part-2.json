@@ -1,0 +1,125 @@
+{
+  "model": "claude-sonnet-4-6",
+  "answers": {
+    "a2_needs_task_t5": {
+      "choice": "no"
+    },
+    "a2_needs_external_0": {
+      "choice": "no"
+    },
+    "a3_action": {
+      "choice": "match_existing"
+    },
+    "a3_task": {
+      "choice": "t1"
+    },
+    "a3_owner": {
+      "choice": "customer2"
+    },
+    "a3_needs_a1": {
+      "choice": "no"
+    },
+    "a3_needs_a2": {
+      "choice": "no"
+    },
+    "a3_needs_a4": {
+      "choice": "no"
+    },
+    "a3_needs_a5": {
+      "choice": "no"
+    },
+    "a3_needs_task_t1": {
+      "choice": "no"
+    },
+    "a3_needs_task_t2": {
+      "choice": "no"
+    },
+    "a3_needs_task_t3": {
+      "choice": "no"
+    },
+    "a3_needs_task_t4": {
+      "choice": "no"
+    },
+    "a3_needs_task_t5": {
+      "choice": "no"
+    },
+    "a3_needs_external_0": {
+      "choice": "no"
+    },
+    "a4_action": {
+      "choice": "create_task"
+    },
+    "a4_task": {
+      "choice": "none"
+    },
+    "a4_owner": {
+      "choice": "customer1"
+    },
+    "a4_needs_a1": {
+      "choice": "no"
+    },
+    "a4_needs_a2": {
+      "choice": "no"
+    },
+    "a4_needs_a3": {
+      "choice": "no"
+    },
+    "a4_needs_a5": {
+      "choice": "no"
+    },
+    "a4_needs_task_t1": {
+      "choice": "no"
+    },
+    "a4_needs_task_t2": {
+      "choice": "no"
+    }
+  },
+  "raw": {
+    "model": "claude-sonnet-4-6",
+    "id": "msg_011Cg9ugtshGg7BKGbvyYEDK",
+    "type": "message",
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"a2_needs_task_t5\":\"no\",\"a2_needs_external_0\":\"no\",\"a3_action\":\"match_existing\",\"a3_task\":\"t1\",\"a3_owner\":\"customer2\",\"a3_needs_a1\":\"no\",\"a3_needs_a2\":\"no\",\"a3_needs_a4\":\"no\",\"a3_needs_a5\":\"no\",\"a3_needs_task_t1\":\"no\",\"a3_needs_task_t2\":\"no\",\"a3_needs_task_t3\":\"no\",\"a3_needs_task_t4\":\"no\",\"a3_needs_task_t5\":\"no\",\"a3_needs_external_0\":\"no\",\"a4_action\":\"create_task\",\"a4_task\":\"none\",\"a4_owner\":\"customer1\",\"a4_needs_a1\":\"no\",\"a4_needs_a2\":\"no\",\"a4_needs_a3\":\"no\",\"a4_needs_a5\":\"no\",\"a4_needs_task_t1\":\"no\",\"a4_needs_task_t2\":\"no\"}"
+      }
+    ],
+    "container": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "stop_details": null,
+    "usage": {
+      "input_tokens": 11643,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 251,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "diagnostics": null
+  },
+  "durationMs": 7533.801917,
+  "usage": {
+    "input_tokens": 11643,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 251,
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "estimatedCostUsd": 0.038694,
+  "hash": "2a5a1b42c1386c7b2024a20990a49b9375957753cdef42819999bf5d114160a8",
+  "version": "decision-comparison-v3",
+  "modelRequested": "claude-sonnet-4-6"
+}

@@ -5,10 +5,10 @@ export const meta: DsMeta = {
   useWhen: [
     "Multi-select rows inside dropdowns and pickers — the TaskDrawer / CreateTaskModal member lists, ContactsPanel bulk rows (Phase 7 retrofits them onto this).",
     "Any binary include/exclude toggle rendered as a small square box.",
+    "Bulk-selecting task draft cards in Actions and inline meeting drafts; selection is separate from task completion.",
   ],
   dontUseWhen: [
     "Marking a task done — that's TaskTick (circular, `success`, bounce animation).",
-    "Bulk-selecting draft cards in the AI inbox — that surface uses the circular `action` SelectCheckbox idiom, not the square box; not absorbed yet.",
     "Select-all headers needing an indeterminate state — not absorbed yet; ContactsPanel keeps its local version.",
     "On/off settings that apply immediately — a switch idiom (nothing in the DS yet), not a checkbox.",
   ],

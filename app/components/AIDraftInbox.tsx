@@ -24,19 +24,21 @@ import { ActionIcon } from "./DraftActionIcon";
 import { TASK_STATUSES, STATUS_COLORS } from "@/lib/constants";
 import {
   normaliseTaskUpdate,
-  readNoteSource,
   staleContactMessage,
   staleOwnerMessage,
 } from "@/lib/ai/task-update";
-import type { NoteSource, TaskUpdateChanges } from "@/lib/ai/task-update";
+import type { TaskUpdateChanges } from "@/lib/ai/task-update";
 import { draftDependsOn, type DraftDependsOnItem, type DraftLinkItem } from "@/lib/task-dependencies";
 import { draftLinkStatus, linkTitle, readDraftLinks } from "@/lib/draft-links";
+import { orderDraftsByDependencies } from "@/lib/draft-order";
 import {
   RECORDER_SETTINGS_HREF,
   RECORDER_UNKNOWN_OWNER_MESSAGE,
 } from "@/lib/integrations/recorder";
 import DraftDependencies, { type DraftLinkDescription } from "./DraftDependencies";
+import DraftDependenciesField from "./DraftDependenciesField";
 import Button from "@/app/ui/Button";
+import Checkbox from "@/app/ui/Checkbox";
 import Textarea from "@/app/ui/Textarea";
 import IconButton from "@/app/ui/IconButton";
 import type { ToastAction } from "@/app/ui/Toast";
@@ -376,26 +378,6 @@ function linkDescriber(draft: AIDraft, overlay?: SiblingStatusOverlay) {
   };
 }
 
-/**
- * On a pending create draft that other drafts from the meeting wait on: say
- * that dismissing it keeps it on them as a text blocker (the reject route
- * does exactly that), before the reviewer dismisses it.
- */
-function DependentsNotice({ draft, title, overlay }: { draft: AIDraft; title: string; overlay?: SiblingStatusOverlay }) {
-  const live = (draft.dependentDrafts ?? []).filter((d) => (overlay?.[d.draftId]?.status ?? d.status) !== "rejected");
-  if (live.length === 0) return null;
-  const names = live.map((d) => `“${d.title}”`).join(", ");
-  const one = live.length === 1;
-  return (
-    <p className="flex items-start gap-1.5 break-words text-xs leading-5 text-text-muted">
-      <DependenciesIcon className="mt-0.5 shrink-0" />
-      <span>
-        {names} {one ? "waits" : "wait"} on this task. Dismissing it keeps “{title}” on {one ? "it" : "them"} as a text blocker.
-      </span>
-    </p>
-  );
-}
-
 /** Bucket a draft's createdAt into Today / Yesterday / older (YYYY-MM-DD). */
 function getDateBucket(iso: string | null | undefined): string {
   if (!iso) return "older";
@@ -453,8 +435,8 @@ function groupBucketByMeeting(drafts: AIDraft[]) {
   }
   const meetingGroups = [...byEvent.entries()]
     .sort((a, b) => b[0] - a[0])
-    .map(([eventId, drafts]) => ({ eventId, drafts }));
-  return { meetingGroups, looseDrafts };
+    .map(([eventId, drafts]) => ({ eventId, drafts: orderDraftsByDependencies(drafts) }));
+  return { meetingGroups, looseDrafts: orderDraftsByDependencies(looseDrafts) };
 }
 
 interface DateBucket {
@@ -830,11 +812,13 @@ export function DraftCard({
         outline: selected ? "2px solid var(--action)" : "none",
       }}
     >
-      <div style={{ display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }}>
+      <div style={editing
+        ? { display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }
+        : { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 20, alignItems: "stretch" }}>
         <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {isPending && (
-              <SelectCheckbox selected={selected} onToggle={onToggleSelect} disabled={busy} />
+              <Checkbox checked={selected} onChange={onToggleSelect} disabled={busy} aria-label={selected ? "Unselect this draft" : "Select this draft"} className="shrink-0" />
             )}
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <ActionIcon action={action} payload={payload} />
@@ -871,6 +855,7 @@ export function DraftCard({
           {isUpdate && update ? (
             editing && updateEdits ? (
               <TaskUpdateEditForm
+                taskId={matchedTask?.id}
                 edits={updateEdits}
                 before={before}
                 known={!!matchedTask}
@@ -884,10 +869,8 @@ export function DraftCard({
             ) : (
               <TaskUpdateDiff
                 task={matchedTask}
-                fallbackTitle={taskTitle}
                 changes={proposedChanges}
                 names={{ owner: asName(payload?.ownerName), assignee: asName(payload?.assigneeContactName) }}
-                noteSource={readNoteSource(payload?.noteSource)}
                 flagOnlyReassign={update.action === "reassign" && Object.keys(proposedChanges).length === 0}
                 before={before}
                 vendorUsers={vendorUsers}
@@ -1224,6 +1207,8 @@ function StalePeopleWarnings({
   );
 }
 
+/** Shared missing-person/recorder warning: colour the message, keep the
+ *  resolution controls neutral, and avoid a second bordered container. */
 function StalePersonWarning({
   message,
   icon,
@@ -1242,10 +1227,16 @@ function StalePersonWarning({
   disabled: boolean;
 }) {
   return (
-    <div role="alert" data-stale-warning className="flex flex-col gap-2 rounded-lg border border-alert px-3 py-2 text-sm">
-      <span className="text-alert">{message}.</span>
+    <div role="alert" data-stale-warning className="flex flex-col gap-2 text-sm">
+      <span className="flex items-start gap-2 text-alert">
+        <svg aria-hidden width="16" height="16" viewBox="0 0 16 16" fill="none" className="mt-0.5 shrink-0">
+          <path d="M7.13 2.5a1 1 0 0 1 1.74 0l5.2 9a1 1 0 0 1-.87 1.5H2.8a1 1 0 0 1-.87-1.5l5.2-9Z" stroke="currentColor" strokeLinejoin="round" />
+          <path d="M8 6v3m0 1.5v.1" stroke="currentColor" strokeLinecap="round" />
+        </svg>
+        <span>{message}.</span>
+      </span>
       {href && (
-        <Link href={href} className="text-sm text-alert underline underline-offset-2 w-fit">
+        <Link href={href} className="text-sm underline underline-offset-2 w-fit">
           Who records meetings
         </Link>
       )}
@@ -1259,7 +1250,6 @@ function StalePersonWarning({
             selected={undefined}
             onSelect={(id) => onPick(id)}
             disabled={disabled}
-            tone="warning"
           />
         </div>
         <Button variant="tertiary" size="xs" onClick={() => onPick(null)} disabled={disabled}>
@@ -1356,7 +1346,8 @@ function asName(x: unknown): string | null {
 /** One field of the update diff: the label on its own line, then
  *  "before → after" below it. Nothing truncates: in the card's narrow
  *  column a long value wraps instead, so every value is readable in full
- *  (no hover-only tooltip, which keyboard users never get). */
+ *  (no hover-only tooltip, which keyboard users never get). Proposed values
+ *  stay bold, including removals; current values lift to primary text on hover. */
 function UpdateDiffRow({
   icon,
   label,
@@ -1369,16 +1360,16 @@ function UpdateDiffRow({
   after: string;
 }) {
   return (
-    <li className="flex min-w-0 flex-col gap-0.5 text-sm">
+    <li className="flex w-full min-w-0 flex-col items-end gap-0.5 text-right text-sm">
       <span className="inline-flex items-center gap-1.5 text-xs text-text-muted">
         {icon}
         {label}
       </span>
-      <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
-        <span className="break-words text-text-muted">{before}</span>
+      <span className="flex min-w-0 flex-wrap items-baseline justify-end gap-x-1.5">
+        <span className="draft-diff-before break-words text-text-muted">{before}</span>
         <span aria-hidden className="text-text-muted">→</span>
         <span className="sr-only">changes to</span>
-        <span className="break-words text-text">{after}</span>
+        <strong className="break-words font-bold text-text">{after}</strong>
       </span>
     </li>
   );
@@ -1391,11 +1382,10 @@ function beforeLabel(known: boolean, value: string | null) {
   return value ?? "None";
 }
 
-/** Right-column view of an existing-task update: the task, then one
- *  before → after row per proposed change, then the note it would append. */
+/** Right-aligned preview: field changes and a compact note count only.
+ *  Full note text stays in Edit; task identity stays in the left column. */
 function TaskUpdateDiff({
   task,
-  fallbackTitle,
   changes,
   flagOnlyReassign,
   before,
@@ -1403,7 +1393,6 @@ function TaskUpdateDiff({
   contacts,
   onPickOwner,
   names,
-  noteSource,
   openTasks,
   describeLink,
 }: {
@@ -1412,12 +1401,9 @@ function TaskUpdateDiff({
   /** Names sibling-draft blockers and their state. */
   describeLink?: (link: DraftLinkItem) => DraftLinkDescription;
   task: OpenTaskOption | undefined;
-  fallbackTitle: string;
   changes: TaskUpdateChanges;
   /** Names snapshotted when the draft was created, for people no longer listed. */
   names: { owner: string | null; assignee: string | null };
-  /** Where the appended note will be stamped from (meeting day + source). */
-  noteSource: NoteSource | null;
   flagOnlyReassign: boolean;
   before: TaskBefore;
   vendorUsers: VendorUserOption[];
@@ -1427,12 +1413,8 @@ function TaskUpdateDiff({
 }) {
   const known = !!task;
   return (
-    <div className="draft-card-preview flex flex-col gap-3 rounded-lg px-4 py-3">
-      <div className="text-sm leading-snug">
-        {task && <TaskIdChip task={task} />}
-        {task?.title ?? fallbackTitle}
-      </div>
-      <ul aria-label="Proposed changes" className="flex flex-col gap-3">
+    <div className="draft-card-preview flex flex-col items-end gap-3 text-right">
+      <ul aria-label="Proposed changes" className="flex w-full flex-col items-end gap-3">
         {changes.ownerId !== undefined && (
           <UpdateDiffRow
             icon={<OwnerIcon />}
@@ -1466,7 +1448,7 @@ function TaskUpdateDiff({
           />
         )}
         {flagOnlyReassign && (
-          <li className="flex flex-wrap items-center gap-1.5 text-sm text-text-muted">
+          <li className="flex flex-wrap items-center justify-end gap-1.5 text-sm text-text-muted">
             <OwnerIcon />
             Reassignment discussed.
             {onPickOwner && (
@@ -1477,27 +1459,14 @@ function TaskUpdateDiff({
           </li>
         )}
       </ul>
-      {changes.appendNotes && (
-        <div className="flex flex-col gap-1 text-sm">
-          <span className="inline-flex flex-wrap items-center gap-1.5 text-text-muted">
-            <NotesIcon />
-            Adds note
-            {noteSource && (
-              <span className="text-xs">
-                (dated {formatDay(noteSource.date)}, {noteSource.label})
-              </span>
-            )}
-          </span>
-          <p className="whitespace-pre-wrap leading-normal text-text-secondary">{changes.appendNotes}</p>
-        </div>
-      )}
+      <DraftNoteIndicator note={changes.appendNotes} />
       {changes.dependsOn && changes.dependsOn.length > 0 && (
-        <div className="flex flex-col gap-1 text-sm">
+        <div className="flex w-full flex-col items-end gap-1 text-sm">
           <span className="inline-flex items-center gap-1.5 text-text-muted">
             <DependenciesIcon />
             Adds blockers
           </span>
-          <DraftDependencies items={changes.dependsOn} tasks={openTasks} describeLink={describeLink} />
+          <DraftDependencies items={changes.dependsOn} tasks={openTasks} align="end" describeLink={describeLink} />
         </div>
       )}
     </div>
@@ -1514,6 +1483,7 @@ function NowHint({ known, value }: { known: boolean; value: string | null }) {
  *  create-task editor, each showing what the task has today, plus the note
  *  to append. Only fields that end up different from today are sent. */
 function TaskUpdateEditForm({
+  taskId,
   edits,
   before,
   known,
@@ -1524,6 +1494,7 @@ function TaskUpdateEditForm({
   openTasks,
   describeLink,
 }: {
+  taskId?: number;
   openTasks: OpenTaskOption[];
   describeLink?: (link: DraftLinkItem) => DraftLinkDescription;
   edits: TaskUpdateEdits;
@@ -1629,22 +1600,13 @@ function TaskUpdateEditForm({
           placeholder="Added to the task's notes as a new dated line (optional)"
         />
       </div>
-      {edits.dependsOn.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <span className="inline-flex items-center gap-2 text-sm text-text-secondary">
-            <DependenciesIcon />
-            Add blockers
-          </span>
-          <DraftDependencies
-            items={edits.dependsOn}
-            tasks={openTasks}
-            disabled={disabled}
-            onRemove={(i) => onChange({ dependsOn: edits.dependsOn.filter((_, j) => j !== i) })}
-            onEmptied={() => document.getElementById(notesId)?.focus()}
-            describeLink={describeLink}
-          />
-        </div>
-      )}
+      <DraftDependenciesField
+        items={edits.dependsOn}
+        tasks={openTasks.filter((task) => task.id !== taskId)}
+        disabled={disabled}
+        onChange={(dependsOn) => onChange({ dependsOn })}
+        describeLink={describeLink}
+      />
     </div>
   );
 }
@@ -2376,8 +2338,6 @@ export function CreateTaskCard({
         />
       )}
 
-      {isPending && <DependentsNotice draft={draft} title={taskTitle} overlay={siblingStatus} />}
-
       <StalePeopleWarnings
         stale={stale}
         vendorUsers={vendorUsers}
@@ -2506,7 +2466,7 @@ function payloadsEqual(a: CreateTaskEdits, b: CreateTaskEdits) {
 /** Two-column compact view.
  *  Left: heading (✓ Create task) + task-name code block + meta (✨ miniti · confidence).
  *  Right: the metadata the task would be created with — due date, status,
- *  owner, notes/comments, priority. Rests dim, lifts on row hover. It is NOT a
+ *  owner, note count, priority. Rests dim, lifts on row hover. It is NOT a
  *  card and deliberately does not repeat the task title, which is already the
  *  most prominent thing on the left. */
 function CreateTaskCompact({
@@ -2533,11 +2493,11 @@ function CreateTaskCompact({
   openTasks?: OpenTaskOption[];
 }) {
   return (
-    <div style={{ display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 20, alignItems: "stretch" }}>
       <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {isPending && onToggleSelect && (
-            <SelectCheckbox selected={!!selected} onToggle={onToggleSelect} disabled={busy} />
+            <Checkbox checked={!!selected} onChange={onToggleSelect} disabled={busy} aria-label={selected ? "Unselect this draft" : "Select this draft"} className="shrink-0" />
           )}
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <TasksBreadcrumbIcon />
@@ -2629,7 +2589,6 @@ function CreateTaskPreview({
     ? due.toLocaleDateString("en-GB", { day: "numeric", month: "short" })
     : null;
   const dueAgo = due ? formatDueAgo(due) : null;
-  const noteCount = payload.notes && payload.notes.trim() ? 1 : 0;
   const ownerName = vendorUsers.find((u) => u.id === payload.ownerId)?.name || null;
   // A task created from a draft always starts here, so the colour is fixed —
   // but read it from the same map the kanban card uses rather than hardcoding.
@@ -2674,17 +2633,8 @@ function CreateTaskPreview({
         </span>
       )}
 
-      {/* Row 4: notes + comments */}
-      <span className="text-sm" style={{ display: "inline-flex", alignItems: "center", gap: 12 }}>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }} title="Notes">
-          <NotesIcon />
-          {noteCount}
-        </span>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }} title="Comments">
-          <CommentsIcon />
-          0
-        </span>
-      </span>
+      {/* Row 4: a note exists; its full text is available in Edit. */}
+      <DraftNoteIndicator note={payload.notes} />
 
       {/* Row 5: priority */}
       <PriorityIcon priority={payload.priority} size={18} />
@@ -2733,8 +2683,6 @@ function CreateTaskEditForm({
 }) {
   const ownerName = vendorUsers.find((u) => u.id === edits.ownerId)?.name || null;
   const assigneeName = contacts.find((c) => c.id === edits.assigneeContactId)?.name || null;
-  const depsPillRef = useRef<HTMLDivElement>(null);
-  const linkedTaskIds = new Set(edits.dependsOn.flatMap((d) => ("taskId" in d ? [d.taskId] : [])));
   const phaseName = phases.find((p) => p.id === edits.phaseId)?.name || null;
 
   return (
@@ -2802,29 +2750,13 @@ function CreateTaskEditForm({
         disabled={disabled}
       />
 
-      <div ref={depsPillRef} className="flex flex-col gap-2">
-        <SelectPill
-          icon={<DependenciesIcon />}
-          label="Dependencies"
-          valueLabel={edits.dependsOn.length > 0 ? `${edits.dependsOn.length} blocker${edits.dependsOn.length > 1 ? "s" : ""}` : null}
-          options={openTasks
-            .filter((t) => !linkedTaskIds.has(t.id))
-            .map((t) => ({ id: t.id, label: t.title }))}
-          selected={null}
-          onSelect={(taskId) => {
-            if (taskId != null) onChange({ dependsOn: [...edits.dependsOn, { taskId }] });
-          }}
-          disabled={disabled}
-        />
-        <DraftDependencies
-          items={edits.dependsOn}
-          tasks={openTasks}
-          disabled={disabled}
-          onRemove={(i) => onChange({ dependsOn: edits.dependsOn.filter((_, j) => j !== i) })}
-          onEmptied={() => depsPillRef.current?.querySelector<HTMLButtonElement>("button")?.focus()}
-          describeLink={describeLink}
-        />
-      </div>
+      <DraftDependenciesField
+        items={edits.dependsOn}
+        tasks={openTasks}
+        disabled={disabled}
+        onChange={(dependsOn) => onChange({ dependsOn })}
+        describeLink={describeLink}
+      />
 
       {phases.length > 0 && (
         <SelectPill
@@ -2897,7 +2829,6 @@ function SelectPill({
   selected,
   onSelect,
   disabled,
-  tone,
 }: {
   icon: ReactNode;
   label: string;
@@ -2906,8 +2837,6 @@ function SelectPill({
   selected: number | null | undefined;
   onSelect: (id: number | null) => void;
   disabled: boolean;
-  /** "warning": the field needs a decision (e.g. its person is gone). */
-  tone?: "warning";
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -2932,10 +2861,9 @@ function SelectPill({
         data-active={open ? "true" : undefined}
         style={{
           width: "100%",
-          border: `1px solid ${tone === "warning" ? "var(--alert)" : "var(--button-secondary-border)"}`,
+          border: "1px solid var(--button-secondary-border)",
           padding: "6px 10px",
           minHeight: 30,
-          background: "var(--bg)",
           color: valueLabel ? "var(--text)" : "var(--text-muted)",
           fontSize: 14,
           textAlign: "left",
@@ -3141,6 +3069,17 @@ function TasksBreadcrumbIcon() {
   );
 }
 
+/** Preview signifier only; the full note remains available in the editor. */
+function DraftNoteIndicator({ note }: { note?: string | null }) {
+  if (!note?.trim()) return null;
+  return (
+    <span className="inline-flex items-center gap-1 text-sm" aria-label="1 note" title="Notes">
+      <NotesIcon />
+      <strong className="font-bold">1</strong>
+    </span>
+  );
+}
+
 function NotesIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "currentColor", flexShrink: 0 }}>
@@ -3156,85 +3095,12 @@ function NotesIcon() {
   );
 }
 
-function CommentsIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "currentColor", flexShrink: 0 }}>
-      <path d="M2 4a1.5 1.5 0 0 1 1.5-1.5h7A1.5 1.5 0 0 1 12 4v4a1.5 1.5 0 0 1-1.5 1.5H6.5L4 12V9.5h-.5A1.5 1.5 0 0 1 2 8V4Z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 function CheckCircleIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden style={{ color: "var(--text-muted)", flexShrink: 0 }}>
       <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.1" />
       <path d="M4.5 7L6.25 8.75L9.5 5.25" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-/** Bulk-selection toggle, mirroring the Kanban board's CheckboxButton
- *  (TaskCardView): empty circle + ghost check when unselected whose
- *  outline animates to colour on hover, and a filled circle-check when
- *  selected. Uses --action (not --success) since this is a selection
- *  affordance in the inbox, not a "done" state. */
-function SelectCheckbox({
-  selected,
-  onToggle,
-  disabled,
-}: {
-  selected: boolean;
-  onToggle: () => void;
-  disabled: boolean;
-}) {
-  const [hovered, setHovered] = useState(false);
-  const strokeColor = hovered && !disabled ? "var(--action)" : "var(--icon-tertiary)";
-  return (
-    // eslint-disable-next-line no-restricted-syntax -- circle + ghost check, not the square DS Checkbox; a retrofit would change the shape
-    <button
-      type="button"
-      role="checkbox"
-      aria-checked={selected}
-      aria-label={selected ? "Unselect this draft" : "Select this draft"}
-      onClick={onToggle}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      disabled={disabled}
-      className="flex-shrink-0"
-      style={{
-        background: "none",
-        border: "none",
-        padding: "4px",
-        margin: "-4px",
-        cursor: disabled ? "default" : "pointer",
-        display: "flex",
-      }}
-    >
-      {selected ? (
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M7 0C10.866 0 14 3.13401 14 7C14 10.866 10.866 14 7 14C3.13401 14 0 10.866 0 7C0 3.13401 3.13401 0 7 0ZM10.8125 4.10938C10.5969 3.93687 10.2819 3.97187 10.1094 4.1875L6.42773 8.78906L3.82031 6.61621C3.60827 6.43951 3.29304 6.46781 3.11621 6.67969C2.93951 6.89173 2.96781 7.20696 3.17969 7.38379L6.17969 9.88379L6.57129 10.2109L6.89062 9.8125L10.8906 4.8125C11.0631 4.59687 11.0281 4.28188 10.8125 4.10938Z"
-            fill="var(--action)"
-          />
-        </svg>
-      ) : (
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden xmlns="http://www.w3.org/2000/svg">
-          <circle
-            cx="7"
-            cy="7"
-            r="6.5"
-            stroke={strokeColor}
-            style={{ transition: "stroke 0.15s ease" }}
-          />
-          <path
-            d="M3.5 7L6.5 9.5L10.5 4.5"
-            stroke={strokeColor}
-            strokeLinecap="round"
-            style={{ transition: "stroke 0.15s ease" }}
-          />
-        </svg>
-      )}
-    </button>
   );
 }
 
