@@ -29,8 +29,9 @@ import {
   staleOwnerMessage,
 } from "@/lib/ai/task-update";
 import type { NoteSource, TaskUpdateChanges } from "@/lib/ai/task-update";
-import { draftDependsOn, type DependsOnItem } from "@/lib/task-dependencies";
-import DraftDependencies from "./DraftDependencies";
+import { draftDependsOn, type DraftDependsOnItem, type DraftLinkItem } from "@/lib/task-dependencies";
+import { draftLinkStatus, linkTitle, readDraftLinks } from "@/lib/draft-links";
+import DraftDependencies, { type DraftLinkDescription } from "./DraftDependencies";
 import Button from "@/app/ui/Button";
 import Textarea from "@/app/ui/Textarea";
 import IconButton from "@/app/ui/IconButton";
@@ -102,6 +103,7 @@ export default function AIDraftInbox({
   const [selectedIds, setSelectedIds] = useState(new Set<number>());
   const { toasts, push: pushToast, dismiss: dismissToast } = useToasts();
   const [drawerEventId, setDrawerEventId] = useState<number | null>(null);
+  const [siblingStatus, setSiblingStatus] = useState<SiblingStatusOverlay>({});
 
   // Toast owns its own timing, hover-pause and exit animation.
   function flashToast(message: string, action: ToastAction | null = null) {
@@ -181,6 +183,12 @@ export default function AIDraftInbox({
         throw new Error(errBody.error || `Approve failed (${res.status})`);
       }
       const result = await res.json().catch(() => ({}));
+      // Cards waiting on this draft now read "created as RAY-n, will link".
+      setSiblingStatus((prev) => ({
+        ...prev,
+        [draft.id]: { status: "applied", taskCode: result.created?.task?.taskId ?? null },
+      }));
+      focusAfterCardGone(draft.id);
       setDrafts((prev) => prev.filter((d) => d.id !== draft.id));
       setSelectedIds((prev) => {
         const next = new Set(prev);
@@ -200,8 +208,13 @@ export default function AIDraftInbox({
         // push the new one in. Without this the card only appears on reload.
         if (onTaskCreated) onTaskCreated(task);
         const label = task.taskId || "task";
+        // Tasks approved earlier that were waiting on this draft are now linked to it.
+        const linked = Array.isArray(result.resolvedLinks)
+          ? result.resolvedLinks.filter((l: { state?: string }) => l.state === "linked").length
+          : 0;
+        const linkedNote = linked > 0 ? `; linked ${linked} task${linked > 1 ? "s" : ""} waiting on it` : "";
         flashToast(
-          phaseName ? `Created ${label} in ${phaseName}` : `Created ${label}`,
+          (phaseName ? `Created ${label} in ${phaseName}` : `Created ${label}`) + linkedNote,
           onboardingId && task.id
             ? { href: `/onboardings/${onboardingId}?tab=tasks&task=${task.id}`, label: "View" }
             : null
@@ -226,6 +239,17 @@ export default function AIDraftInbox({
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
         throw new Error(errBody.error || `Reject failed (${res.status})`);
+      }
+      const result = await res.json().catch(() => ({}));
+      setSiblingStatus((prev) => ({ ...prev, [draft.id]: { status: "rejected", taskCode: null } }));
+      focusAfterCardGone(draft.id);
+      // Drafts that waited on this one keep it as a text blocker: say so. A
+      // count, not their titles: a toast is two lines at most, and each
+      // waiting card already reads "rejected, kept as a text blocker".
+      const dependents: { title: string }[] = Array.isArray(result.dependents) ? result.dependents : [];
+      if (dependents.length > 0) {
+        const one = dependents.length === 1;
+        flashToast(`${one ? "1 draft" : `${dependents.length} drafts`} depended on this; ${one ? "it keeps" : "they keep"} it as a text blocker`);
       }
       setDrafts((prev) => prev.filter((d) => d.id !== draft.id));
       setSelectedIds((prev) => {
@@ -290,6 +314,7 @@ export default function AIDraftInbox({
           contacts={contacts}
           phases={phases}
           openTasks={openTasks}
+          siblingStatus={siblingStatus}
           onMeetingClick={setDrawerEventId}
         />
         <DraftColumn
@@ -307,6 +332,7 @@ export default function AIDraftInbox({
           contacts={contacts}
           phases={phases}
           openTasks={openTasks}
+          siblingStatus={siblingStatus}
           onMeetingClick={setDrawerEventId}
         />
       </div>
@@ -316,6 +342,53 @@ export default function AIDraftInbox({
         onClose={() => setDrawerEventId(null)}
       />
     </div>
+  );
+}
+
+/**
+ * Sibling drafts this inbox approved or rejected since it loaded, layered over
+ * the server's `linkedDrafts` so a waiting card updates without a reload
+ * (GAPS-PLAN feature 3).
+ */
+export type SiblingStatusOverlay = Record<number, { status: string; taskCode: string | null }>;
+
+/** How each sibling-draft link on `draft` reads: title + what approval does / did. */
+function linkDescriber(draft: AIDraft, overlay?: SiblingStatusOverlay) {
+  const applied = draft.status === "pending" ? [] : readDraftLinks(draft.payload);
+  return (link: DraftLinkItem): DraftLinkDescription => {
+    const id = link.draftId;
+    const base = id != null ? draft.linkedDrafts?.find((l) => l.id === id) ?? null : null;
+    const local = id != null ? overlay?.[id] : undefined;
+    const sibling = id != null && (base || local)
+      ? {
+          id,
+          title: base?.title ?? link.title ?? null,
+          status: local?.status ?? base?.status ?? "pending",
+          taskCode: local ? local.taskCode : base?.taskCode ?? null,
+        }
+      : null;
+    const entry = id != null ? applied.find((a) => a.draftId === id) ?? null : null;
+    return { title: linkTitle(link, sibling), ...draftLinkStatus(sibling, entry) };
+  };
+}
+
+/**
+ * On a pending create draft that other drafts from the meeting wait on: say
+ * that dismissing it keeps it on them as a text blocker (the reject route
+ * does exactly that), before the reviewer dismisses it.
+ */
+function DependentsNotice({ draft, title, overlay }: { draft: AIDraft; title: string; overlay?: SiblingStatusOverlay }) {
+  const live = (draft.dependentDrafts ?? []).filter((d) => (overlay?.[d.draftId]?.status ?? d.status) !== "rejected");
+  if (live.length === 0) return null;
+  const names = live.map((d) => `“${d.title}”`).join(", ");
+  const one = live.length === 1;
+  return (
+    <p className="flex items-start gap-1.5 break-words text-xs leading-5 text-text-muted">
+      <DependenciesIcon className="mt-0.5 shrink-0" />
+      <span>
+        {names} {one ? "waits" : "wait"} on this task. Dismissing it keeps “{title}” on {one ? "it" : "them"} as a text blocker.
+      </span>
+    </p>
   );
 }
 
@@ -398,6 +471,7 @@ interface DraftListContext {
   contacts: ContactOption[];
   phases: PhaseOption[];
   openTasks: OpenTaskOption[];
+  siblingStatus?: SiblingStatusOverlay;
   onMeetingClick?: ((eventId: number) => void) | null;
 }
 
@@ -431,11 +505,12 @@ function DraftColumn({
   contacts,
   phases,
   openTasks,
+  siblingStatus,
   onMeetingClick,
 }: DraftColumnProps) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 40, minWidth: 0 }}>
-      <h2 style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.6 }}>
+      <h2 data-column-heading tabIndex={-1} style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.6 }}>
         {title}
       </h2>
       {buckets.length === 0 && (
@@ -487,6 +562,7 @@ function DraftColumn({
                               contacts,
                               phases,
                               openTasks,
+                              siblingStatus,
                             })
                           )}
                         </div>
@@ -505,6 +581,7 @@ function DraftColumn({
                         contacts,
                         phases,
                         openTasks,
+                        siblingStatus,
                       })
                     )}
                   </>
@@ -558,6 +635,7 @@ function renderActionCard(draft: AIDraft, ctx: DraftListContext) {
         contacts={ctx.contacts}
         phases={ctx.phases}
         openTasks={ctx.openTasks}
+        siblingStatus={ctx.siblingStatus}
       />
     );
   }
@@ -575,6 +653,7 @@ function renderActionCard(draft: AIDraft, ctx: DraftListContext) {
       openTasks={ctx.openTasks}
       vendorUsers={ctx.vendorUsers}
       contacts={ctx.contacts}
+      siblingStatus={ctx.siblingStatus}
     />
   );
 }
@@ -636,6 +715,8 @@ export interface DraftCardProps {
   openTasks?: OpenTaskOption[];
   vendorUsers?: VendorUserOption[];
   contacts?: ContactOption[];
+  /** Sibling drafts approved / rejected in this session (feature 3). */
+  siblingStatus?: SiblingStatusOverlay;
   /** Passed by InlineEventDrafts but never read by DraftCard. */
   onStartEdit?: () => void;
   /** Passed by InlineEventDrafts but never read by DraftCard. */
@@ -654,6 +735,7 @@ export function DraftCard({
   openTasks = [],
   vendorUsers = [],
   contacts = [],
+  siblingStatus,
 }: DraftCardProps) {
   const { action, payload, confidence, source, status, rejectedReason } = draft;
   const isPending = mode === "pending";
@@ -733,6 +815,8 @@ export function DraftCard({
     <div
       ref={cardRef}
       className="draft-card"
+      data-draft-card
+      data-draft-id={draft.id}
       style={{
         padding: 24,
         borderRadius: 20,
@@ -791,6 +875,7 @@ export function DraftCard({
                 contacts={contacts}
                 disabled={busy}
                 openTasks={openTasks}
+                describeLink={linkDescriber(draft, siblingStatus)}
               />
             ) : (
               <TaskUpdateDiff
@@ -805,6 +890,7 @@ export function DraftCard({
                 contacts={contacts}
                 onPickOwner={isPending && !busy ? openEdit : undefined}
                 openTasks={openTasks}
+                describeLink={linkDescriber(draft, siblingStatus)}
               />
             )
           ) : editing ? (
@@ -848,6 +934,7 @@ export function DraftCard({
             onClick={editing ? cancelEdit : onReject}
             disabled={busy}
             variant="tertiary"
+            data-dismiss={!editing ? true : undefined}
             style={{ padding: "4px 8px", fontSize: 14, opacity: busy ? 0.5 : 1 }}
           >
             {editing ? "Cancel" : "Dismiss"}
@@ -1006,6 +1093,29 @@ function focusAfterResolve(card: HTMLElement | null) {
       card?.querySelector<HTMLElement>("[data-stale-warning] button:not([disabled])") ??
       card?.querySelector<HTMLElement>("[data-approve]:not([disabled])");
     next?.focus();
+  });
+}
+
+/**
+ * After Approve / Dismiss the card unmounts. Hand focus to the next card's
+ * primary action (or the previous, or the column heading) so keyboard users
+ * are not dropped onto <body>.
+ */
+function focusAfterCardGone(draftId: number) {
+  const card = document.querySelector<HTMLElement>(`[data-draft-card][data-draft-id="${draftId}"]`);
+  const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-draft-card]"));
+  const i = card ? cards.indexOf(card) : -1;
+  const neighbour = i >= 0 ? (cards[i + 1] ?? cards[i - 1]) : null;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const still = neighbour && document.contains(neighbour)
+        ? neighbour
+        : document.querySelector<HTMLElement>("[data-draft-card]");
+      const btn = still?.querySelector<HTMLElement>(
+        "[data-approve]:not([disabled]), [data-dismiss]:not([disabled])"
+      );
+      (btn ?? document.querySelector<HTMLElement>("[data-column-heading]"))?.focus();
+    });
   });
 }
 
@@ -1168,8 +1278,8 @@ type TaskUpdateEdits = {
   dueDate: string;
   priority: Priority | null;
   appendNotes: string;
-  /** Blockers the update adds (lib/task-dependencies.ts). */
-  dependsOn: DependsOnItem[];
+  /** Blockers the update adds (lib/task-dependencies.ts), sibling drafts included. */
+  dependsOn: DraftDependsOnItem[];
 };
 
 function initialUpdateEdits(changes: TaskUpdateChanges, before: TaskBefore): TaskUpdateEdits {
@@ -1275,9 +1385,12 @@ function TaskUpdateDiff({
   names,
   noteSource,
   openTasks,
+  describeLink,
 }: {
   /** To name blocker tasks in changes.dependsOn. */
   openTasks: OpenTaskOption[];
+  /** Names sibling-draft blockers and their state. */
+  describeLink?: (link: DraftLinkItem) => DraftLinkDescription;
   task: OpenTaskOption | undefined;
   fallbackTitle: string;
   changes: TaskUpdateChanges;
@@ -1364,7 +1477,7 @@ function TaskUpdateDiff({
             <DependenciesIcon />
             Adds blockers
           </span>
-          <DraftDependencies items={changes.dependsOn} tasks={openTasks} />
+          <DraftDependencies items={changes.dependsOn} tasks={openTasks} describeLink={describeLink} />
         </div>
       )}
     </div>
@@ -1389,8 +1502,10 @@ function TaskUpdateEditForm({
   contacts,
   disabled,
   openTasks,
+  describeLink,
 }: {
   openTasks: OpenTaskOption[];
+  describeLink?: (link: DraftLinkItem) => DraftLinkDescription;
   edits: TaskUpdateEdits;
   before: TaskBefore;
   /** Whether the task (and so its current values) is in the loaded list. */
@@ -1506,6 +1621,7 @@ function TaskUpdateEditForm({
             disabled={disabled}
             onRemove={(i) => onChange({ dependsOn: edits.dependsOn.filter((_, j) => j !== i) })}
             onEmptied={() => document.getElementById(notesId)?.focus()}
+            describeLink={describeLink}
           />
         </div>
       )}
@@ -1740,6 +1856,8 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject }: 
   return (
     <div
       className="draft-card"
+      data-draft-card
+      data-draft-id={draft.id}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -1859,6 +1977,7 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject }: 
             onClick={onReject}
             disabled={busy}
             variant="tertiary"
+            data-dismiss
             style={{
               padding: "4px 8px",
               fontSize: 14,
@@ -1876,6 +1995,7 @@ export function FollowupCard({ draft, mode, busy, error, onApprove, onReject }: 
               Open in mail
             </a>
             <Button
+              data-approve
               onClick={() => onApprove({ subject, body })}
               disabled={!canSend}
               variant="secondary"
@@ -2025,8 +2145,8 @@ type CreateTaskEdits = {
   dueDate: string;
   phaseId: number | null;
   priority: Priority;
-  /** What the new task waits on: board tasks and text blockers. */
-  dependsOn: DependsOnItem[];
+  /** What the new task waits on: board tasks, text blockers, sibling drafts. */
+  dependsOn: DraftDependsOnItem[];
   notes: string;
 };
 
@@ -2043,6 +2163,8 @@ export interface CreateTaskCardProps {
   contacts?: ContactOption[];
   phases?: PhaseOption[];
   openTasks?: OpenTaskOption[];
+  /** Sibling drafts approved / rejected in this session (feature 3). */
+  siblingStatus?: SiblingStatusOverlay;
 }
 
 export function CreateTaskCard({
@@ -2058,7 +2180,9 @@ export function CreateTaskCard({
   contacts = [],
   phases = [],
   openTasks = [],
+  siblingStatus,
 }: CreateTaskCardProps) {
+  const describeLink = linkDescriber(draft, siblingStatus);
   const isPending = mode === "pending";
   const original = useMemo(() => normaliseCreateTaskPayload(draft.payload), [draft.payload]);
 
@@ -2186,6 +2310,8 @@ export function CreateTaskCard({
     <div
       ref={cardRef}
       className="draft-card"
+      data-draft-card
+      data-draft-id={draft.id}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -2206,6 +2332,7 @@ export function CreateTaskCard({
           busy={busy}
           vendorUsers={vendorUsers}
           openTasks={openTasks}
+          describeLink={describeLink}
         />
       ) : (
         <CreateTaskHeader draft={draft} taskTitle={taskTitle} generatedDate={generatedDate} isPending={isPending} />
@@ -2224,8 +2351,11 @@ export function CreateTaskCard({
           phases={phases}
           openTasks={openTasks}
           disabled={busy || saving}
+          describeLink={describeLink}
         />
       )}
+
+      {isPending && <DependentsNotice draft={draft} title={taskTitle} overlay={siblingStatus} />}
 
       <StalePeopleWarnings
         stale={stale}
@@ -2266,6 +2396,7 @@ export function CreateTaskCard({
             onClick={handleDismissOrExitEdit}
             disabled={busy || saving}
             variant="tertiary"
+            data-dismiss={cardMode !== "edit" ? true : undefined}
             style={{
               padding: "4px 8px",
               fontSize: 14,
@@ -2367,7 +2498,9 @@ function CreateTaskCompact({
   busy,
   vendorUsers = [],
   openTasks = [],
+  describeLink,
 }: {
+  describeLink?: (link: DraftLinkItem) => DraftLinkDescription;
   draft: AIDraft;
   taskTitle: string;
   payload: CreateTaskEdits;
@@ -2411,7 +2544,7 @@ function CreateTaskCompact({
         </div>
       </div>
       <div style={{ flex: "1 1 240px", minWidth: 0 }}>
-        <CreateTaskPreview payload={payload} vendorUsers={vendorUsers} openTasks={openTasks} />
+        <CreateTaskPreview payload={payload} vendorUsers={vendorUsers} openTasks={openTasks} describeLink={describeLink} />
       </div>
     </div>
   );
@@ -2463,7 +2596,9 @@ function CreateTaskPreview({
   payload,
   vendorUsers = [],
   openTasks = [],
+  describeLink,
 }: {
+  describeLink?: (link: DraftLinkItem) => DraftLinkDescription;
   payload: CreateTaskEdits;
   vendorUsers?: VendorUserOption[];
   openTasks?: OpenTaskOption[];
@@ -2537,7 +2672,7 @@ function CreateTaskPreview({
       {payload.dependsOn.length > 0 && (
         <div className="flex w-full min-w-0 items-start justify-end gap-1.5">
           <DependenciesIcon className="shrink-0 mt-1" />
-          <DraftDependencies items={payload.dependsOn} tasks={openTasks} align="end" />
+          <DraftDependencies items={payload.dependsOn} tasks={openTasks} align="end" describeLink={describeLink} />
         </div>
       )}
     </div>
@@ -2564,7 +2699,9 @@ function CreateTaskEditForm({
   phases,
   openTasks,
   disabled,
+  describeLink,
 }: {
+  describeLink?: (link: DraftLinkItem) => DraftLinkDescription;
   edits: CreateTaskEdits;
   onChange: (patch: Partial<CreateTaskEdits>) => void;
   vendorUsers: VendorUserOption[];
@@ -2664,6 +2801,7 @@ function CreateTaskEditForm({
           disabled={disabled}
           onRemove={(i) => onChange({ dependsOn: edits.dependsOn.filter((_, j) => j !== i) })}
           onEmptied={() => depsPillRef.current?.querySelector<HTMLButtonElement>("button")?.focus()}
+          describeLink={describeLink}
         />
       </div>
 

@@ -31,6 +31,14 @@
  *      health_flipped verb is deliberately not reconstructed.
  *   3. Drafts from the newest ~3 meetings stay pending so /ai-drafts has a live inbox.
  *
+ * Draft-to-draft links (GAPS-PLAN feature 3): a create draft may wait on another
+ * create draft from the same meeting (`{ draftId }` in its dependsOn). Drafts
+ * are resolved blockers-first within the run, so such a link becomes a task
+ * blocker on the sibling's new task, or a text blocker with the sibling's title
+ * when the sibling is rejected (or was skipped). The outcome is recorded on the
+ * draft's payload as `draftLinks`, as the approve route does. Updates' blockers
+ * are not applied by this script (unchanged from before).
+ *
  * SAFETY: DEFAULTS TO DRY-RUN. It prints exactly what it would change and writes
  * nothing unless you pass --write. Idempotent: only pending drafts are resolved and
  * event backdating is a fixed target, so re-running is safe.
@@ -45,6 +53,27 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../lib/generated/prisma/client";
 import { draftDependsOn } from "../lib/task-dependencies.ts";
+
+/** Resolve blockers first: a draft linked to by a sibling in `list` comes before it. Stable otherwise. */
+function orderForLinks(list) {
+  const byId = new Map(list.map((d) => [d.id, d]));
+  const linksOf = (d) => {
+    const p = d.payload ?? {};
+    return [...draftDependsOn(p), ...draftDependsOn(p.changes ?? {})]
+      .filter((x) => x.draftId != null && byId.has(x.draftId))
+      .map((x) => x.draftId);
+  };
+  const out = [];
+  const seen = new Set();
+  const visit = (d) => {
+    if (seen.has(d.id)) return; // also stops a (never stored) loop
+    seen.add(d.id);
+    for (const id of linksOf(d)) visit(byId.get(id));
+    out.push(d);
+  };
+  for (const d of list) visit(d);
+  return out;
+}
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
@@ -212,12 +241,21 @@ async function main() {
     orderBy: { id: "asc" },
   });
 
-  const resolvable = drafts.filter((d) => {
+  const resolvable = orderForLinks(drafts.filter((d) => {
     const ev = eventById.get(d.sourceEventId);
     if (!ev) return false;                          // no parent event → leave alone
     if (protectedEventIds.has(ev.id)) return false; // newest meetings stay pending
     return daysBetween(now, ev.occurredAt) > CUTOFF_DAYS;
-  });
+  }));
+
+  // Sibling-draft links: what each linked draft became in this run (or before it).
+  const linkedIds = [...new Set(resolvable.flatMap((d) => draftDependsOn(d.payload ?? {}).filter((x) => x.draftId != null).map((x) => x.draftId)))];
+  const linkedRows = linkedIds.length
+    ? await prisma.pendingAIChange.findMany({ where: { id: { in: linkedIds } }, select: { id: true, status: true, appliedTaskId: true, payload: true } })
+    : [];
+  const linkedById = new Map(linkedRows.map((r) => [r.id, r]));
+  /** draftId → { status, taskId } decided during this run (taskId only exists with --write). */
+  const runOutcome = new Map();
 
   console.log(
     `PendingAIChange (miniti, pending): ${drafts.length} total, ${resolvable.length} eligible to resolve ` +
@@ -244,6 +282,7 @@ async function main() {
           data: { status: "rejected", rejectedReason: reason, createdAt: created, resolvedAt: resolved, resolvedBy },
         });
       }
+      runOutcome.set(draft.id, { status: "rejected", taskId: null });
       continue;
     }
 
@@ -268,12 +307,33 @@ async function main() {
           `  draft ${draft.id} [create_task] APPROVE → new task "${merged.title}"` +
             `${edited ? `  (edited: ${JSON.stringify(overrides)})` : ""}  createdAt=${iso(resolved).slice(0, 10)}`
         );
+        // Sibling-draft links → a task blocker on the sibling's task, else a text blocker.
+        const draftLinks = [];
+        const linkDeps = [];
+        for (const l of draftDependsOn(merged).filter((x) => !("taskId" in x) && !("text" in x))) {
+          const before = l.draftId != null ? linkedById.get(l.draftId) : null;
+          const outcome = l.draftId != null ? runOutcome.get(l.draftId) : null;
+          const title = (typeof before?.payload?.title === "string" && before.payload.title) || l.title || "Another task from this meeting";
+          const status = outcome?.status ?? before?.status ?? "missing";
+          const taskId = outcome ? outcome.taskId : before?.status === "applied" ? before.appliedTaskId : null;
+          if (status === "applied") {
+            console.log(`      waits on draft ${l.draftId} "${title}" → task blocker${taskId ? ` (task ${taskId})` : ""}`);
+            if (taskId) linkDeps.push({ taskId });
+            draftLinks.push({ draftId: l.draftId, title, state: "linked", blockedByTaskId: taskId });
+          } else {
+            console.log(`      waits on draft ${l.draftId} "${title}" (${status}) → text blocker`);
+            linkDeps.push({ text: title });
+            draftLinks.push({ draftId: l.draftId, title, state: "kept_as_text", reason: status });
+          }
+        }
+        if (!WRITE) runOutcome.set(draft.id, { status: "applied", taskId: null });
         if (WRITE) {
+          let createdTaskId = null;
           await prisma.$transaction(async (tx) => {
             // Dependencies (GAPS-PLAN feature 2): the draft's dependsOn, or an
             // older draft's single blockedByTaskId. Task blockers must still be
             // open tasks on this onboarding, as the approve route requires.
-            const wanted = draftDependsOn(merged);
+            const wanted = [...draftDependsOn(merged).filter((x) => "taskId" in x || "text" in x), ...linkDeps];
             const wantedIds = wanted.filter((d) => "taskId" in d).map((d) => d.taskId);
             const openIds = new Set(
               wantedIds.length === 0 ? [] : (await tx.task.findMany({
@@ -320,8 +380,12 @@ async function main() {
             }
             await tx.pendingAIChange.update({
               where: { id: draft.id },
-              data: { status: "applied", createdAt: created, resolvedAt: resolved, resolvedBy, appliedTaskId: task.id },
+              data: {
+                status: "applied", createdAt: created, resolvedAt: resolved, resolvedBy, appliedTaskId: task.id,
+                ...(draftLinks.length > 0 && { payload: { ...payload, draftLinks } }),
+              },
             });
+            createdTaskId = task.id;
             // Mirror createTask's emitActivity: a `created` row, plus `assigned`
             // when the new task was created with a contact assignee.
             const code =
@@ -346,6 +410,7 @@ async function main() {
             }
             stats.activityRows++;
           });
+          runOutcome.set(draft.id, { status: "applied", taskId: createdTaskId });
         }
         continue;
       }

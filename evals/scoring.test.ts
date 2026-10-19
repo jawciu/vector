@@ -238,6 +238,61 @@ describe("scorePhase", () => {
     expect(scorePhase(expected, phase(proposals), sources).totals.gaps).toEqual(count(1, 1));
   });
 
+  it("meets it from the stored shape: a draftId pointing at the paired proposal (feature 3)", () => {
+    const expected: ExpectedToolCall[] = [
+      { action: "create_task", titleLike: "Refactor PR open" },
+      { action: "create_task", titleLike: "Review the refactor PR", dependsOn: { newTaskTitleLike: "Refactor PR open", gap: "depends_on_new_draft" } },
+    ];
+    const proposals: Proposal[] = [
+      create({ draftId: 41, title: "Open the refactor PR", draftRef: "d1" }),
+      create({ draftId: 42, title: "Review the refactor PR", draftRef: "d2", dependsOn: [{ draftId: 41, draftRef: "d1", title: "Open the refactor PR" }] }),
+    ];
+    expect(scorePhase(expected, phase(proposals), sources).totals.gaps).toEqual(count(1, 1));
+  });
+
+  it("a link to the wrong sibling is not met, even with a similar title snapshot", () => {
+    const expected: ExpectedToolCall[] = [
+      { action: "create_task", titleLike: "Refactor PR open" },
+      { action: "create_task", titleLike: "Plan the team offsite" },
+      { action: "create_task", titleLike: "Review the refactor PR", dependsOn: { newTaskTitleLike: "Refactor PR open", gap: "depends_on_new_draft" } },
+    ];
+    const proposals: Proposal[] = [
+      create({ draftId: 41, title: "Open the refactor PR", draftRef: "d1" }),
+      create({ draftId: 43, title: "Plan the team offsite", draftRef: "d3" }),
+      create({ draftId: 42, title: "Review the refactor PR", draftRef: "d2", dependsOn: [{ draftId: 43, draftRef: "d3", title: "Open the refactor PR" }] }),
+    ];
+    expect(scorePhase(expected, phase(proposals), sources).totals.gaps).toEqual(count(0, 1));
+  });
+
+  it("an existing-task update can wait on a new draft from the same meeting", () => {
+    const expected: ExpectedToolCall[] = [
+      { action: "create_task", titleLike: "Close the security review" },
+      {
+        action: "match_existing",
+        existingTaskRef: "t1",
+        dependsOn: { newTaskTitleLike: "Close the security review", gap: ["existing_task_dependency", "depends_on_new_draft"] },
+      },
+    ];
+    const proposals: Proposal[] = [
+      create({ draftId: 3, title: "Close the security review", draftRef: "d1" }),
+      { action: "match_existing", draftId: 4, taskRef: "t1", updateKind: "add_dependency", dependsOn: [{ draftId: 3, draftRef: "d1", title: "Close the security review" }] },
+    ];
+    const s = scorePhase(expected, phase(proposals), sources);
+    expect(s.totals.gapsByCode).toEqual({ existing_task_dependency: count(1, 1), depends_on_new_draft: count(1, 1) });
+  });
+
+  it("a text blocker naming the other draft (before feature 3) does not meet it", () => {
+    const expected: ExpectedToolCall[] = [
+      { action: "create_task", titleLike: "Refactor PR open" },
+      { action: "create_task", titleLike: "Review the refactor PR", dependsOn: { newTaskTitleLike: "Refactor PR open", gap: "depends_on_new_draft" } },
+    ];
+    const proposals: Proposal[] = [
+      create({ draftId: 1, title: "Open the refactor PR" }),
+      create({ draftId: 2, title: "Review the refactor PR", dependsOn: [{ text: "Open the refactor PR" }] }),
+    ];
+    expect(scorePhase(expected, phase(proposals), sources).totals.gaps).toEqual(count(0, 1));
+  });
+
   it("an unpaired call misses its gap expectations too", () => {
     const expected: ExpectedToolCall[] = [{ action: "create_task", titleLike: "Row-level security", dependsOn: { freeText: "pilot", gap: "free_text_dependency" } }];
     expect(scorePhase(expected, phase([]), sources).totals.gaps).toEqual(count(0, 1));
