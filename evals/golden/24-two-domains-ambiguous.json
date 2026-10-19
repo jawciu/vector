@@ -1,0 +1,49 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "2D8A6E93-4B7F-4C15-9D28-E63B1A000024",
+      "title": "Joint data platform intro",
+      "date": "2026-06-10T15:00:00Z",
+      "end_time": "2026-06-10T15:29:50Z",
+      "duration_seconds": 1790,
+      "language": "en",
+      "summary": "Intro call with data leads from two customers who know each other; compared notes on rollout approach and agreed to swap pilot learnings.",
+      "action_items": ["Theo to send the pilot rollout checklist to both teams", "Dara and Elena to swap pilot survey templates"],
+      "key_decisions": ["Both teams will run a two-week pilot before wider rollout"],
+      "topics": ["pilot rollout", "adoption", "survey"],
+      "discussion_flow": ["introductions", "pilot approaches", "next steps"],
+      "notes": "Informal joint call — both data leads asked for the same rollout checklist.",
+      "speaker_count": 3,
+      "speaker_names": { "0": "Dara Okafor", "1": "Elena Voss", "-1": "Theo Okonkwo" },
+      "transcript": [
+        { "speaker": "Theo Okonkwo", "text": "Thanks both for joining — you asked for an intro since you're at similar stages of rollout.", "timestamp": 0 },
+        { "speaker": "Dara Okafor", "text": "Yeah, we're about to pick our pilot group and I heard Elena's team already ran theirs.", "timestamp": 13.6 },
+        { "speaker": "Elena Voss", "text": "We did a two-week pilot with eight engineers. The survey at the end was the most useful part.", "timestamp": 27.2 },
+        { "speaker": "Dara Okafor", "text": "How did you pick the eight?", "timestamp": 44.9 },
+        { "speaker": "Elena Voss", "text": "People who already asked data questions in Slack every week. Self-selected power users.", "timestamp": 51.3 },
+        { "speaker": "Theo Okonkwo", "text": "That matches what we see elsewhere. A pilot of five to ten heavy users, two weeks, then a survey before wider rollout.", "timestamp": 68 },
+        { "speaker": "Dara Okafor", "text": "Okay, we'll do the same — two-week pilot before we open it up.", "timestamp": 84.5 },
+        { "speaker": "Elena Voss", "text": "Same here for our second wave. Theo, you mentioned a rollout checklist you use with customers?", "timestamp": 96.1 },
+        { "speaker": "Theo Okonkwo", "text": "Yes — I'll send the pilot rollout checklist to both of your teams after this call.", "timestamp": 108.7 },
+        { "speaker": "Dara Okafor", "text": "Appreciate it. Elena, could you share your pilot survey template too?", "timestamp": 121.3 },
+        { "speaker": "Elena Voss", "text": "Sure, I'll send you our survey template this week, and I'd love yours back once you've adapted it.", "timestamp": 130.8 },
+        { "speaker": "Dara Okafor", "text": "Deal.", "timestamp": 146 },
+        { "speaker": "Theo Okonkwo", "text": "Great — short and useful. I'll leave you two connected and follow up separately in your own syncs.", "timestamp": 151.4 },
+        { "speaker": "Elena Voss", "text": "Thanks Theo, this was helpful.", "timestamp": 165.9 }
+      ],
+      "calendar_event_id": "evt_joint_intro_0610",
+      "attendees": [
+        { "email": "theo@vector.test", "name": "Theo Okonkwo", "domain": "vector.test" },
+        { "email": "dara@modal.com", "name": "Dara Okafor", "domain": "modal.com" },
+        { "email": "elena@raycast.com", "name": "Elena Voss", "domain": "raycast.com" }
+      ]
+    }
+  },
+  "expected": {
+    "match": { "ambiguous": true },
+    "toolCalls": [],
+    "notes": "Edge case: attendees span two cast-company domains (modal.com + raycast.com) and no other signal disambiguates — must land as matchAmbiguous in 'Needs your input' with no drafts until manually assigned.",
+    "review": { "verdict": "approved", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

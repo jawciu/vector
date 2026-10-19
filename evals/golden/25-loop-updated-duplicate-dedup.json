@@ -1,0 +1,93 @@
+{
+  "payload": {
+    "event": "meeting.updated",
+    "meeting": {
+      "id": "6B3D9F42-1A8E-4C67-B5D0-F82C4E000025",
+      "title": "Loop Returns weekly sync",
+      "date": "2026-06-05T15:00:00Z",
+      "end_time": "2026-06-05T15:26:40Z",
+      "duration_seconds": 1600,
+      "language": "en",
+      "summary": "Weekly sync with Loop Returns. dbt repo connection confirmed done; Maya to draft the returns KPI one-pager by next Wednesday.",
+      "action_items": ["Maya to draft the returns KPI one-pager by next Wednesday"],
+      "key_decisions": ["KPI one-pager will anchor the next working session"],
+      "topics": ["repo connection", "KPIs"],
+      "discussion_flow": ["repo status", "KPI planning"],
+      "notes": "Regenerated insights on a persisted meeting — same meeting.id as the original save.",
+      "speaker_count": 2,
+      "speaker_names": { "0": "Jonah Fields", "-1": "Maya Lindqvist" },
+      "transcript": [
+        { "speaker": "Maya Lindqvist", "text": "Quick one today. Where did we land on connecting the dbt repo?", "timestamp": 0 },
+        { "speaker": "Jonah Fields", "text": "Done — we connected the dbt repo on Tuesday and the project compiles clean in Quarry. You can mark that one off.", "timestamp": 9.8 },
+        { "speaker": "Maya Lindqvist", "text": "Excellent, that unblocks everything downstream.", "timestamp": 27.4 },
+        { "speaker": "Jonah Fields", "text": "Next question from our side is which KPIs we standardize on. Every team defines return rate differently.", "timestamp": 36 },
+        { "speaker": "Maya Lindqvist", "text": "That's a classic. Best fix is a one-pager with the canonical definitions before we model anything.", "timestamp": 52.7 },
+        { "speaker": "Jonah Fields", "text": "Can you take a first pass? You've seen how other returns teams define these.", "timestamp": 68.3 },
+        { "speaker": "Maya Lindqvist", "text": "Yes — I'll draft the returns KPI one-pager and get it to you by next Wednesday.", "timestamp": 78.9 },
+        { "speaker": "Jonah Fields", "text": "Perfect, we'll review it in the working session after.", "timestamp": 94.5 },
+        { "speaker": "Maya Lindqvist", "text": "It might be worth looping in finance on refund value eventually, but let's not block on that.", "timestamp": 103.2 },
+        { "speaker": "Jonah Fields", "text": "Agreed. That's everything from me.", "timestamp": 117.8 },
+        { "speaker": "Maya Lindqvist", "text": "Short and sweet. Talk next week.", "timestamp": 124.6 }
+      ],
+      "calendar_event_id": "evt_loop_ws_0605",
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "jonah@loopreturns.com", "name": "Jonah Fields", "domain": "loopreturns.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "LOOP",
+    "companyName": "Loop Returns",
+    "contacts": [
+      { "name": "Jonah Fields", "email": "jonah@loopreturns.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Maya Lindqvist", "email": "maya@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Connect dbt repo to Quarry", "status": "In progress", "owner": "customer", "ownerName": "Jonah Fields", "dueDate": "2026-06-05", "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t2",
+        "title": "Add metrics block to fct_returns.yml",
+        "status": "In progress",
+        "owner": "customer",
+        "ownerName": "Jonah Fields",
+        "dueDate": "2026-06-12",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t3", "title": "Migrate returns-ops dashboards", "status": "Not started", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-06-26", "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t4",
+        "title": "Run dbt metrics training for Loop analysts",
+        "status": "Not started",
+        "owner": "vendor",
+        "ownerName": "Maya Lindqvist",
+        "dueDate": "2026-06-17",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "LOOP" },
+    "toolCalls": [
+      { "action": "update_status", "existingTaskRef": "t1", "existingTaskTitleContains": "Connect dbt repo", "newStatus": "Done" },
+      {
+        "action": "create_task",
+        "titleLike": "Draft returns KPI one-pager",
+        "owner": "vendor",
+        "assignee": "Maya Lindqvist",
+        "dueDate": "2026-06-10",
+        "kind": "commitment",
+        "notesContains": ["review working session"],
+        "sourceQuoteContains": "I'll draft the returns KPI one-pager and get it to you by next Wednesday"
+      }
+    ],
+    "notes": "What this case tests, in plain English: Miniti can send the same meeting to Vector more than once (here as 'meeting.updated', e.g. after it regenerates the summary). The eval runner sends this exact payload TWICE. The first delivery should behave like any normal meeting: mark 'Connect dbt repo' done and draft the KPI one-pager task (noting to set up a review working session with the customer once it's done). The second delivery has the same meeting id, so Vector must recognise it as already processed and do nothing: no second event, no duplicate drafts. If you ever see two copies of the KPI one-pager draft in the inbox after a single meeting, this is the case that should have caught it.",
+    "review": { "verdict": "unsure", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

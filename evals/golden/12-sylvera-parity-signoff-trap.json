@@ -1,0 +1,92 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "E0000012-5B8C-4D3E-8F2A-B7C6D5E4F012",
+      "title": "Sylvera go-live readiness review",
+      "date": "2026-07-01T10:00:00Z",
+      "end_time": "2026-07-01T10:41:35Z",
+      "duration_seconds": 2495,
+      "language": "en",
+      "summary": "Go-live readiness review with Sylvera. Training is complete and adoption is good. The only remaining blocker is the parity validation against Looker: six dashboards still need their numbers checked. Callum committed to finishing the parity checks and delivering formal sign-off by Friday July 3rd, keeping the July 8th go-live on track.",
+      "action_items": ["Callum to finish parity checks on the remaining six dashboards and deliver formal sign-off by Friday July 3rd"],
+      "key_decisions": ["Go-live date of July 8th holds, contingent on parity sign-off landing by July 3rd"],
+      "topics": ["go-live", "parity validation", "Looker migration", "training recap"],
+      "discussion_flow": ["Training recap", "Parity validation status", "Remaining dashboards", "Go-live date confirmation"],
+      "notes": "Discrepancies found so far were all timezone-related and have been resolved in the dbt models. No open data issues.",
+      "speaker_count": 3,
+      "speaker_names": { "0": "Callum Reid", "1": "Freya Nilsen", "-1": "Maya Lindqvist" },
+      "transcript": [
+        { "speaker": "Maya Lindqvist", "text": "Hi both — this is the readiness review, so let's walk the checklist. Training first: how did the second session land?", "timestamp": 0 },
+        { "speaker": "Freya Nilsen", "text": "Really well. Most of the analytics team is already building in Quarry day to day, which is more than I expected at this stage.", "timestamp": 9.4 },
+        { "speaker": "Maya Lindqvist", "text": "That's great adoption. Okay, the big remaining item: parity validation against Looker. Callum, where are we?", "timestamp": 22.1 },
+        { "speaker": "Callum Reid", "text": "I've validated fourteen of the twenty dashboards. Six left — the carbon ratings pack and the two revenue ones.", "timestamp": 31.8 },
+        { "speaker": "Maya Lindqvist", "text": "Any discrepancies in the fourteen you've done?", "timestamp": 44.5 },
+        { "speaker": "Callum Reid", "text": "Two, both timezone-related. Your team fixed them in the dbt models last week and they re-validated clean.", "timestamp": 50.2 },
+        { "speaker": "Maya Lindqvist", "text": "Good. So what's realistic for the remaining six? Go-live is pencilled for the 8th and I don't want sign-off landing the night before.", "timestamp": 63.7 },
+        {
+          "speaker": "Callum Reid",
+          "text": "I've blocked out Thursday for it. I'll finish the parity checks on the remaining six dashboards and get you formal sign-off by Friday, July 3rd.",
+          "timestamp": 75.9
+        },
+        { "speaker": "Maya Lindqvist", "text": "Friday the 3rd works — that gives us two clear working days of buffer before go-live.", "timestamp": 89.3 },
+        { "speaker": "Freya Nilsen", "text": "And to be explicit: if parity sign-off is in by the 3rd, we're confirming July 8th as the go-live date?", "timestamp": 98.6 },
+        { "speaker": "Maya Lindqvist", "text": "Confirmed. July 8th holds, contingent only on that sign-off.", "timestamp": 107 },
+        { "speaker": "Callum Reid", "text": "Understood. It'll be there.", "timestamp": 114.8 },
+        { "speaker": "Maya Lindqvist", "text": "Brilliant. Anything else? Comms plan for the wider team is already drafted on your side, right Freya?", "timestamp": 120.5 },
+        { "speaker": "Freya Nilsen", "text": "Yes, that's ready to go, no help needed there.", "timestamp": 129.9 },
+        { "speaker": "Maya Lindqvist", "text": "Then we're in good shape. Speak Friday when the sign-off lands.", "timestamp": 136.2 }
+      ],
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "callum@sylvera.com", "name": "Callum Reid", "domain": "sylvera.com" },
+        { "email": "freya@sylvera.com", "name": "Freya Nilsen", "domain": "sylvera.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "SYL",
+    "companyName": "Sylvera",
+    "contacts": [
+      { "name": "Callum Reid", "email": "callum@sylvera.com" },
+      { "name": "Freya Nilsen", "email": "freya@sylvera.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Maya Lindqvist", "email": "maya@vector.test" }
+    ],
+    "tasks": [
+      {
+        "ref": "t1",
+        "title": "Validate migrated numbers against legacy dashboards (parity sign-off)",
+        "status": "In progress",
+        "owner": "customer",
+        "ownerName": "Callum Reid",
+        "dueDate": "2026-06-30",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t2", "title": "Run second analyst training session", "status": "Done", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-06-25", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Draft comms plan for wider team", "status": "In progress", "owner": "customer", "ownerName": "Freya Nilsen", "dueDate": "2026-07-03", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Go-live on 8 Jul", "status": "Not started", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-07-08", "priority": null, "notes": "", "blockedBy": "t1" },
+      { "ref": "t5", "title": "Fix timezone discrepancies in dbt models", "status": "Done", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-06-26", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "SYL" },
+    "toolCalls": [
+      {
+        "action": "match_existing",
+        "existingTaskRef": "t1",
+        "existingTaskTitleContains": "parity sign-off",
+        "newDueDate": "2026-07-03",
+        "dueDateReason": "Callum: 'formal sign-off by Friday, July 3rd'; the board still says 30 Jun.",
+        "notesContains": ["six dashboards"],
+        "gap": "existing_task_notes",
+        "sourceQuoteContains": "I'll finish the parity checks on the remaining six dashboards and get you formal sign-off by Friday, July 3rd"
+      }
+    ],
+    "notes": "Trap: Callum's commitment IS the existing parity sign-off task (t1). 'Link to it' means: the draft must point at that existing task instead of creating a new one. The update must cross-check the due date (board says 30 Jun, the call says Fri 3 Jul, so move it to 3 Jul) and note the remaining scope: six dashboards left (carbon ratings pack and the two revenue ones). The comms plan is already drafted on Sylvera's side, so no change there. Transcript fixed: the team builds 'in Quarry' (the analytics product), not in Vector.",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

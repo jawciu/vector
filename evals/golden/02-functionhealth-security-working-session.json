@@ -1,0 +1,154 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "D02B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A02",
+      "title": "Function Health security review — working session",
+      "date": "2026-06-03T10:00:00Z",
+      "end_time": "2026-06-03T10:38:12Z",
+      "duration_seconds": 2292,
+      "language": "en",
+      "summary": "Working session to unstick the Function Health security review (health-data infosec). Agreed the questionnaire handoff, the pen test evidence, and the service account provisioning sequence.",
+      "action_items": ["Ines to return completed SIG Lite questionnaire by June 5", "Freya to upload pen test summary to the portal by June 8", "Oliver to provision read-only Snowflake service account by June 10"],
+      "key_decisions": ["Service account provisioning proceeds immediately after security sign-off, no separate change board review"],
+      "topics": ["security review", "SIG Lite", "service account"],
+      "discussion_flow": ["Where the review is stuck", "Questionnaire", "Pen test evidence", "Provisioning sequence"],
+      "notes": "The health-data security review has been the blocking chain for three weeks; this session set concrete dates on each link.",
+      "training": {
+        "talk_ratio_you": 0.36,
+        "speakers": [
+          { "speaker": "Ines Ferreira", "is_you": true, "word_count": 820, "fillers_per_minute": 0.9 },
+          { "speaker": "Sam Whitfield", "is_you": false, "word_count": 450 },
+          { "speaker": "Oliver Hartley", "is_you": false, "word_count": 690 },
+          { "speaker": "Freya Dunn", "is_you": false, "word_count": 510 }
+        ]
+      },
+      "speaker_count": 4,
+      "speaker_names": { "0": "Sam Whitfield", "1": "Oliver Hartley", "2": "Freya Dunn", "-1": "Ines Ferreira" },
+      "transcript": [
+        { "speaker": "Ines Ferreira", "text": "Thanks for making time, both. The goal today is to get the security review moving again — it's been the blocker for three weeks.", "timestamp": 0 },
+        {
+          "speaker": "Freya Dunn",
+          "text": "Honest answer from our side: the review is stuck because we're missing two inputs — your completed SIG Lite questionnaire and evidence from a recent penetration test. Handling patient lab results, our infosec team can't wave either through.",
+          "timestamp": 12.4
+        },
+        {
+          "speaker": "Ines Ferreira",
+          "text": "The questionnaire is ninety percent done, our security lead has the last section. I'll send the completed SIG Lite questionnaire back to Freya by June 5th.",
+          "timestamp": 29.8
+        },
+        { "speaker": "Freya Dunn", "text": "Friday works. If I have it Friday, I can start the internal review the following week.", "timestamp": 44.1 },
+        { "speaker": "Sam Whitfield", "text": "And the pen test — we have the Q1 report from our external testers. Do you need the full report or a summary?", "timestamp": 52.7 },
+        {
+          "speaker": "Freya Dunn",
+          "text": "A summary with scope and findings severity is enough. Actually, easier if it lives with the rest of the evidence — I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.",
+          "timestamp": 63.9
+        },
+        { "speaker": "Sam Whitfield", "text": "I'll email it to you right after this call, it's ready to go.", "timestamp": 82.3 },
+        {
+          "speaker": "Oliver Hartley",
+          "text": "Then the last link in the chain is me. The warehouse team won't create the service account until security signs off — and with PHI in the schema they're strict about it.",
+          "timestamp": 88.6
+        },
+        { "speaker": "Ines Ferreira", "text": "Can we pre-agree the shape so it's a same-day job once you get the green light?", "timestamp": 100.9 },
+        {
+          "speaker": "Oliver Hartley",
+          "text": "Yes — read-only, scoped to the ANALYTICS schema, key-pair auth. I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th.",
+          "timestamp": 108.5
+        },
+        { "speaker": "Freya Dunn", "text": "That's realistic if the questionnaire lands Friday.", "timestamp": 128 },
+        { "speaker": "Sam Whitfield", "text": "Do we need your change advisory board for the account creation? That added two weeks last time at another customer.", "timestamp": 133.7 },
+        { "speaker": "Oliver Hartley", "text": "No — we agreed internally last month that read-only analytics accounts skip the change board. It goes straight through.", "timestamp": 145.2 },
+        {
+          "speaker": "Ines Ferreira",
+          "text": "Excellent. So: questionnaire Friday the 5th, pen test summary Monday the 8th, service account Wednesday the 10th. That's the chain unblocked.",
+          "timestamp": 158.9
+        },
+        { "speaker": "Freya Dunn", "text": "Agreed. Nice to have dates on it at last.", "timestamp": 174.3 },
+        { "speaker": "Ines Ferreira", "text": "Thanks all — I'll recap in the portal after this.", "timestamp": 180.1 }
+      ],
+      "calendar_event_id": "evt_fn_sec_0603",
+      "attendees": [
+        { "email": "ines@vector.test", "name": "Ines Ferreira", "domain": "vector.test" },
+        { "email": "sam@vector.test", "name": "Sam Whitfield", "domain": "vector.test" },
+        { "email": "oliver.hartley@functionhealth.com", "name": "Oliver Hartley", "domain": "functionhealth.com" },
+        { "email": "freya.dunn@functionhealth.com", "name": "Freya Dunn", "domain": "functionhealth.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "FN",
+    "companyName": "Function Health",
+    "contacts": [
+      { "name": "Oliver Hartley", "email": "oliver.hartley@functionhealth.com" },
+      { "name": "Freya Dunn", "email": "freya.dunn@functionhealth.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Ines Ferreira", "email": "ines@vector.test" },
+      { "name": "Sam Whitfield", "email": "sam@vector.test" }
+    ],
+    "tasks": [
+      {
+        "ref": "t1",
+        "title": "Complete Function Health security review",
+        "status": "Blocked",
+        "owner": "customer",
+        "ownerName": "Freya Dunn",
+        "dueDate": "2026-05-22",
+        "priority": "high",
+        "notes": "Waiting on SIG Lite questionnaire and pen test evidence.",
+        "blockedBy": null
+      },
+      { "ref": "t2", "title": "Connect dbt repo and warehouse to Quarry", "status": "Blocked", "owner": "vendor", "ownerName": "Sam Whitfield", "dueDate": null, "priority": null, "notes": "", "blockedBy": "t1" },
+      { "ref": "t3", "title": "Model lab-results marts", "status": "Not started", "owner": "vendor", "ownerName": "Sam Whitfield", "dueDate": "2026-06-26", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Build member health dashboard", "status": "Not started", "owner": "vendor", "ownerName": "Ines Ferreira", "dueDate": "2026-07-10", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t5", "title": "Run analyst training", "status": "Not started", "owner": "vendor", "ownerName": "Ines Ferreira", "dueDate": "2026-07-21", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "FN" },
+    "toolCalls": [
+      {
+        "action": "create_task",
+        "titleLike": "Return completed SIG Lite questionnaire to Function Health security",
+        "owner": "vendor",
+        "assignee": "Ines Ferreira",
+        "dueDate": "2026-06-05",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Share pen test summary with Freya",
+        "owner": "vendor",
+        "assignee": "Sam Whitfield",
+        "dueDate": "2026-06-03",
+        "kind": "commitment",
+        "dueDateReason": "'right after this call' = the meeting day, Wed 3 Jun.",
+        "sourceQuoteContains": "I'll email it to you right after this call"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Upload pen test summary to portal",
+        "owner": "customer",
+        "assignee": "Freya Dunn",
+        "dueDate": "2026-06-08",
+        "kind": "commitment",
+        "dependsOn": { "newTaskTitleLike": "Share pen test summary with Freya", "gap": "depends_on_new_draft" },
+        "sourceQuoteContains": "I'll get the pen test summary uploaded to your portal by Monday, June 8th"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Provision read-only Snowflake service account",
+        "owner": "customer",
+        "assignee": "Oliver Hartley",
+        "dueDate": "2026-06-10",
+        "kind": "commitment",
+        "dependsOn": { "freeText": "security sign-off", "gap": "free_text_dependency" },
+        "sourceQuoteContains": "I'll provision the read-only Snowflake service account as soon as security signs off"
+      }
+    ],
+    "notes": "Unblocking session with dated commitments split vendor/customer. Sam's 'I'll email it right after this call' still becomes a task (people get distracted), and Freya's upload depends on it. Oliver's service account depends on security signing off, which is not a task on the board, so the dependency is free text.",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

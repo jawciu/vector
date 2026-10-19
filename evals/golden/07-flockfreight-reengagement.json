@@ -1,0 +1,132 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "D07B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A07",
+      "title": "Flock Freight — implementation sync (restart)",
+      "date": "2026-06-10T17:00:00Z",
+      "end_time": "2026-06-10T17:29:45Z",
+      "duration_seconds": 1785,
+      "language": "en",
+      "summary": "Re-engagement sync after two quiet weeks on the Flock Freight onboarding. Agreed a review of the metric definitions doc, a rebuild of the shipment reporting dashboard with the new lane dimension, and pilot user confirmation.",
+      "action_items": [
+        "Derek to review metric definitions doc and leave comments by June 12",
+        "Ines to rebuild shipment reporting dashboard with the lane dimension by June 17",
+        "Hannah to confirm pilot user list from the operations team by June 15"
+      ],
+      "key_decisions": ["Dashboard rebuild waits for the lane dimension rather than shipping and reworking"],
+      "topics": ["re-engagement", "metric definitions", "shipment reporting"],
+      "discussion_flow": ["Why things stalled", "Metric definitions doc", "Lane dimension", "Pilot users"],
+      "notes": "First call in two weeks — Derek was heads-down on quarter-end. Momentum needs rebuilding; dates were set deliberately tight.",
+      "training": {
+        "talk_ratio_you": 0.43,
+        "speakers": [
+          { "speaker": "Ines Ferreira", "is_you": true, "word_count": 910, "fillers_per_minute": 1.4 },
+          { "speaker": "Derek Chao", "is_you": false, "word_count": 700 },
+          { "speaker": "Hannah Ellis", "is_you": false, "word_count": 380 }
+        ]
+      },
+      "speaker_count": 3,
+      "speaker_names": { "0": "Derek Chao", "1": "Hannah Ellis", "-1": "Ines Ferreira" },
+      "transcript": [
+        { "speaker": "Ines Ferreira", "text": "Good to have you both back. No blame — quarter-end happens — but let's rebuild momentum with a few tight, concrete steps.", "timestamp": 0 },
+        { "speaker": "Derek Chao", "text": "Appreciated, and yes, I went dark. Quarter-end reporting ate the whole team. I'm back on this now.", "timestamp": 13.5 },
+        {
+          "speaker": "Ines Ferreira",
+          "text": "The thing blocking us is the metric definitions doc — it's been sitting with you since mid-May. Without your comments we can't lock the semantic layer.",
+          "timestamp": 24.8
+        },
+        {
+          "speaker": "Derek Chao",
+          "text": "That's fair. I'll review the metric definitions doc and leave comments by Friday, June 12th. Realistically it's two hours of work, I just need to sit down with it.",
+          "timestamp": 40.2
+        },
+        { "speaker": "Ines Ferreira", "text": "Friday works. Next: the shipment reporting dashboard. You mentioned the lane dimension changed?", "timestamp": 59.6 },
+        { "speaker": "Derek Chao", "text": "Yes — we restructured so every shipment now rolls up to a lane. The current dashboard predates that, so its groupings are wrong.", "timestamp": 69.1 },
+        { "speaker": "Ines Ferreira", "text": "Then rather than patch it, I'll rebuild the shipment reporting dashboard with the new lane dimension by Wednesday, June 17th.", "timestamp": 85.7 },
+        { "speaker": "Hannah Ellis", "text": "Should we wait for the definitions review before that rebuild, or can they run in parallel?", "timestamp": 102.3 },
+        { "speaker": "Ines Ferreira", "text": "Parallel — the lane dimension work doesn't touch the contested metric definitions. If Derek's comments change anything I'll fold it in.", "timestamp": 110.9 },
+        {
+          "speaker": "Hannah Ellis",
+          "text": "Okay. Then on pilot users — the operations team gave me eight names but two are leaving the company. I'll confirm the list of pilot users from the operations team by Monday, June 15th.",
+          "timestamp": 124.4
+        },
+        { "speaker": "Ines Ferreira", "text": "Great. And I'd gently suggest we keep this slot weekly even in busy periods — a fifteen-minute check-in beats a two-week gap.", "timestamp": 143 },
+        { "speaker": "Derek Chao", "text": "Agreed, keep the invite recurring.", "timestamp": 155.8 },
+        { "speaker": "Ines Ferreira", "text": "Done. So: comments Friday, pilot list Monday, dashboard Wednesday. Talk next week.", "timestamp": 161.2 },
+        { "speaker": "Hannah Ellis", "text": "Thanks Ines.", "timestamp": 171.5 }
+      ],
+      "calendar_event_id": "evt_flk_restart_0610",
+      "attendees": [
+        { "email": "ines@vector.test", "name": "Ines Ferreira", "domain": "vector.test" },
+        { "email": "derek@flockfreight.com", "name": "Derek Chao", "domain": "flockfreight.com" },
+        { "email": "hannah@flockfreight.com", "name": "Hannah Ellis", "domain": "flockfreight.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "FLK",
+    "companyName": "Flock Freight",
+    "contacts": [
+      { "name": "Derek Chao", "email": "derek@flockfreight.com" },
+      { "name": "Hannah Ellis", "email": "hannah@flockfreight.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Ines Ferreira", "email": "ines@vector.test" }
+    ],
+    "tasks": [
+      {
+        "ref": "t1",
+        "title": "Lock semantic layer metric definitions",
+        "status": "Blocked",
+        "owner": "vendor",
+        "ownerName": "Ines Ferreira",
+        "dueDate": "2026-05-29",
+        "priority": null,
+        "notes": "Waiting on Derek's comments on the definitions doc.",
+        "blockedBy": null
+      },
+      {
+        "ref": "t2",
+        "title": "Grant warehouse permissions for Quarry",
+        "status": "In progress",
+        "owner": "customer",
+        "ownerName": "Derek Chao",
+        "dueDate": "2026-06-05",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t3", "title": "Configure Okta SAML SSO", "status": "In progress", "owner": "customer", "ownerName": "Hannah Ellis", "dueDate": "2026-06-26", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Go-live readiness review", "status": "Not started", "owner": "vendor", "ownerName": "Ines Ferreira", "dueDate": "2026-07-15", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "FLK" },
+    "toolCalls": [
+      {
+        "action": "create_task",
+        "titleLike": "Review metric definitions doc and leave comments",
+        "owner": "customer",
+        "dueDate": "2026-06-12",
+        "sourceQuoteContains": "I'll review the metric definitions doc and leave comments by Friday, June 12th"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Rebuild shipment reporting dashboard with lane dimension",
+        "owner": "vendor",
+        "dueDate": "2026-06-17",
+        "sourceQuoteContains": "rebuild the shipment reporting dashboard with the new lane dimension by Wednesday, June 17th"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Confirm pilot user list from operations team",
+        "owner": "customer",
+        "dueDate": "2026-06-15",
+        "sourceQuoteContains": "I'll confirm the list of pilot users from the operations team by Monday, June 15th"
+      }
+    ],
+    "notes": "Champion-gone-quiet re-engagement call: three tight dated commitments; the recurring-invite agreement is process, not a task.",
+    "review": { "verdict": "approved", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

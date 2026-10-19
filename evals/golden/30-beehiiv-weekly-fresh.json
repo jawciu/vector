@@ -1,0 +1,95 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "0D2F7A85-4E6B-4C93-A7D2-E19B5F000030",
+      "title": "beehiiv weekly sync",
+      "date": "2026-07-03T14:30:00Z",
+      "end_time": "2026-07-03T14:57:10Z",
+      "duration_seconds": 1630,
+      "language": "en",
+      "summary": "Second weekly sync with beehiiv, one week after kickoff. BigQuery connection confirmed working; Caroline to share the tailored onboarding plan Monday, Tessa to invite her analysts by Wednesday.",
+      "action_items": ["Caroline to share the tailored onboarding plan on Monday", "Tessa to invite the two analysts to the workspace by Wednesday"],
+      "key_decisions": ["Start modeling with the newsletter-engagement marts, not the ad-revenue data"],
+      "topics": ["warehouse connection", "onboarding plan", "workspace invites"],
+      "discussion_flow": ["connection status", "modeling starting point", "team access"],
+      "notes": "Fresh onboarding, week two. Newsletter-engagement data is the first modeling target — cleanest source they have.",
+      "speaker_count": 2,
+      "speaker_names": { "0": "Tessa Okoye", "-1": "Caroline" },
+      "transcript": [
+        { "speaker": "Caroline", "text": "Hi Tessa — week two! Last week ended with the warehouse connection half done. Where did it land?", "timestamp": 0 },
+        { "speaker": "Tessa Okoye", "text": "Landed well. We got the BigQuery connection working on Tuesday — Quarry reads from the analytics dataset without a hitch. Mark it done.", "timestamp": 12.1 },
+        { "speaker": "Caroline", "text": "Great start. Next decision is where to begin modeling — you mentioned the newsletter-engagement data is your cleanest.", "timestamp": 31.7 },
+        { "speaker": "Tessa Okoye", "text": "By far. The ad-revenue tables are a mess of legacy columns; sends and opens are what the growth team actually asks about daily.", "timestamp": 46.3 },
+        { "speaker": "Caroline", "text": "Then we start with the newsletter-engagement marts. I'll fold that into a tailored onboarding plan and share it with you on Monday.", "timestamp": 62.9 },
+        { "speaker": "Tessa Okoye", "text": "Perfect. What do you need from us to keep pace?", "timestamp": 81.5 },
+        { "speaker": "Caroline", "text": "Mainly your analysts in the workspace early, so they learn the tool while we build rather than after.", "timestamp": 89 },
+        { "speaker": "Tessa Okoye", "text": "Makes sense. I'll invite our two analysts to the workspace by Wednesday — they're excited to poke around anyway.", "timestamp": 103.6 },
+        { "speaker": "Caroline", "text": "That's exactly the energy we want in week two.", "timestamp": 119.2 },
+        { "speaker": "Tessa Okoye", "text": "Longer term we'd love ad-revenue attribution out of this too — sponsorship performance and so on — but I know that's a later phase.", "timestamp": 127.8 },
+        { "speaker": "Caroline", "text": "It is, and it'll be a good one. I'll note it for the roadmap conversation, nothing to do now.", "timestamp": 144.4 },
+        { "speaker": "Tessa Okoye", "text": "Great. So plan from you Monday, invites from me by Wednesday.", "timestamp": 156 },
+        { "speaker": "Caroline", "text": "Exactly. Enjoy the long weekend, Tessa.", "timestamp": 164.7 }
+      ],
+      "calendar_event_id": "evt_bee_ws_0703",
+      "attendees": [
+        { "email": "caroline@vector.test", "name": "Caroline", "domain": "vector.test" },
+        { "email": "tessa@beehiiv.com", "name": "Tessa Okoye", "domain": "beehiiv.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "BEE",
+    "companyName": "beehiiv",
+    "contacts": [
+      { "name": "Tessa Okoye", "email": "tessa@beehiiv.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Caroline", "email": "caroline@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Set up BigQuery connection", "status": "In progress", "owner": "vendor", "ownerName": "Caroline", "dueDate": "2026-07-01", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Kickoff: confirm onboarding plan", "status": "Done", "owner": "vendor", "ownerName": "Caroline", "dueDate": "2026-06-26", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Configure SSO for beehiiv workspace", "status": "Not started", "owner": "customer", "ownerName": "Tessa Okoye", "dueDate": null, "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Run analyst training on Quarry", "status": "Not started", "owner": "vendor", "ownerName": "Caroline", "dueDate": "2026-07-21", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t5", "title": "Build subscriber growth dashboard", "status": "Not started", "owner": "vendor", "ownerName": "Caroline", "dueDate": "2026-07-24", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "BEE" },
+    "toolCalls": [
+      { "action": "update_status", "existingTaskRef": "t1", "existingTaskTitleContains": "BigQuery connection", "newStatus": "Done" },
+      {
+        "action": "create_task",
+        "titleLike": "Share tailored onboarding plan",
+        "owner": "vendor",
+        "assignee": "Caroline",
+        "dueDate": "2026-07-06",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll fold that into a tailored onboarding plan and share it with you on Monday"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Invite two analysts to the workspace",
+        "owner": "customer",
+        "assignee": "Tessa Okoye",
+        "dueDate": "2026-07-08",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll invite our two analysts to the workspace by Wednesday"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Ad-revenue attribution",
+        "notesContains": ["sponsorship performance"],
+        "owner": "vendor",
+        "assignee": "Caroline",
+        "dueDate": null,
+        "kind": "parked_for_later",
+        "dueDateReason": "Explicitly a later phase; no date, but Caroline said 'I'll note it'.",
+        "sourceQuoteContains": "I'll note it for the roadmap conversation"
+      }
+    ],
+    "notes": "Ordinary weekly sync on a fresh onboarding: warehouse connection reported done (t1 → Done), dated vendor and customer tasks. The ad-revenue attribution wish is a later phase, but Caroline says 'I'll note it for the roadmap conversation', so she owns remembering it: it lands as an undated task for Caroline. Contrast with case 18, where 'thinking out loud' with nobody owning it stays out.",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

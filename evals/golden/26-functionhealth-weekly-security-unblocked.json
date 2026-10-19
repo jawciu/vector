@@ -1,0 +1,127 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "8F5C2A17-9D4B-4E38-A6C1-D30F7B000026",
+      "title": "Function Health weekly sync",
+      "date": "2026-06-23T11:00:00Z",
+      "end_time": "2026-06-23T11:34:20Z",
+      "duration_seconds": 2060,
+      "language": "en",
+      "summary": "Weekly sync with Function Health. Infosec questionnaire finally signed off; Sam to send the static IP allowlist, Oliver to create the Snowflake service account by Friday.",
+      "action_items": ["Sam to send the Quarry static IP list by tomorrow", "Oliver to create the Snowflake service account by Friday"],
+      "key_decisions": ["Security sign-off unblocks the warehouse connection chain"],
+      "topics": ["security review", "service account", "network policy"],
+      "discussion_flow": ["security review status", "unblocking warehouse access", "next steps"],
+      "notes": "Three-week security stall finally resolved. Warehouse connection chain can now move.",
+      "speaker_count": 3,
+      "speaker_names": { "0": "Oliver Hartley", "1": "Nadia Rahman", "-1": "Sam Whitfield" },
+      "transcript": [
+        { "speaker": "Sam Whitfield", "text": "Morning both. Nadia, I'm hoping you have news on the security review.", "timestamp": 0 },
+        { "speaker": "Nadia Rahman", "text": "I do — good news finally. We signed off the infosec questionnaire yesterday afternoon. That review is done from our side.", "timestamp": 10.5 },
+        { "speaker": "Sam Whitfield", "text": "Fantastic. That's been the long pole for three weeks, so everything downstream can move now.", "timestamp": 29.8 },
+        { "speaker": "Oliver Hartley", "text": "Which means the service account is on me next. What exactly do you need?", "timestamp": 43.2 },
+        {
+          "speaker": "Sam Whitfield",
+          "text": "A read-only Snowflake service account scoped to the analytics schema — the de-identified marts, not the raw PHI — and our static IPs added to your network policy.",
+          "timestamp": 54.7
+        },
+        { "speaker": "Nadia Rahman", "text": "The IP allowlist goes through my team — send us the list and we'll process it with the sign-off paperwork.", "timestamp": 72.4 },
+        { "speaker": "Sam Whitfield", "text": "Will do — I'll send over the Quarry static IP list by tomorrow so your team can add it to the network policy.", "timestamp": 85.1 },
+        { "speaker": "Oliver Hartley", "text": "And I'll get the Snowflake service account created by Friday. Platform team has capacity this week.", "timestamp": 101.6 },
+        { "speaker": "Sam Whitfield", "text": "Perfect. Once both land, we connect the warehouse and the repo the same day.", "timestamp": 116.9 },
+        { "speaker": "Oliver Hartley", "text": "One thing to flag — our HIPAA audit season starts in August, so we may want to think about access reviews before then.", "timestamp": 129.3 },
+        { "speaker": "Sam Whitfield", "text": "Noted, let's scope that once we're connected rather than now.", "timestamp": 143 },
+        { "speaker": "Nadia Rahman", "text": "Fine by me. It was mostly a heads-up.", "timestamp": 152.7 },
+        { "speaker": "Sam Whitfield", "text": "Great. So: questionnaire is done, IP list from me tomorrow, service account from Oliver by Friday. Real progress.", "timestamp": 160.2 },
+        { "speaker": "Oliver Hartley", "text": "Feels good to be moving again. Thanks Sam.", "timestamp": 176.8 }
+      ],
+      "calendar_event_id": "evt_fn_ws_0623",
+      "attendees": [
+        { "email": "sam@vector.test", "name": "Sam Whitfield", "domain": "vector.test" },
+        { "email": "oliver@functionhealth.com", "name": "Oliver Hartley", "domain": "functionhealth.com" },
+        { "email": "nadia@functionhealth.com", "name": "Nadia Rahman", "domain": "functionhealth.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "FN",
+    "companyName": "Function Health",
+    "contacts": [
+      { "name": "Oliver Hartley", "email": "oliver@functionhealth.com" },
+      { "name": "Nadia Rahman", "email": "nadia@functionhealth.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Sam Whitfield", "email": "sam@vector.test" }
+    ],
+    "tasks": [
+      {
+        "ref": "t1",
+        "title": "Provision read-only Snowflake service account",
+        "status": "Blocked",
+        "owner": "customer",
+        "ownerName": "Oliver Hartley",
+        "dueDate": "2026-06-10",
+        "priority": "high",
+        "notes": "",
+        "blockedBy": "t2"
+      },
+      { "ref": "t2", "title": "Complete infosec questionnaire review", "status": "Blocked", "owner": "customer", "ownerName": "Nadia Rahman", "dueDate": "2026-06-12", "priority": "high", "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Model lab-results marts", "status": "Not started", "owner": "vendor", "ownerName": "Sam Whitfield", "dueDate": "2026-07-03", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Build member health dashboard", "status": "Not started", "owner": "vendor", "ownerName": "Sam Whitfield", "dueDate": "2026-07-10", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t5", "title": "Run analyst training", "status": "Not started", "owner": "vendor", "ownerName": "Sam Whitfield", "dueDate": "2026-07-21", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "FN" },
+    "toolCalls": [
+      { "action": "update_status", "existingTaskRef": "t2", "existingTaskTitleContains": "infosec questionnaire", "newStatus": "Done" },
+      {
+        "action": "create_task",
+        "titleLike": "Send Quarry static IP list for network policy",
+        "owner": "vendor",
+        "assignee": "Sam Whitfield",
+        "dueDate": "2026-06-24",
+        "kind": "commitment",
+        "sourceQuoteContains": "I'll send over the Quarry static IP list by tomorrow"
+      },
+      {
+        "action": "match_existing",
+        "existingTaskRef": "t1",
+        "existingTaskTitleContains": "Snowflake service account",
+        "assignee": "Oliver Hartley",
+        "newDueDate": "2026-06-26",
+        "dueDateReason": "'by Friday' from Tue 23 Jun → Fri 26 Jun; the board still says 10 Jun.",
+        "notesContains": ["read-only", "analytics schema", "de-identified marts", "not the raw PHI"],
+        "gap": "existing_task_notes",
+        "sourceQuoteContains": "I'll get the Snowflake service account created by Friday"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Connect the warehouse and the repo",
+        "owner": "vendor",
+        "assignee": "Sam Whitfield",
+        "dueDate": null,
+        "kind": "commitment",
+        "dueDateReason": "'the same day' both land; no fixed date.",
+        "dependsOn": [
+          { "existingTaskRef": "t1" },
+          { "newTaskTitleLike": "Send Quarry static IP list for network policy", "gap": "depends_on_new_draft" }
+        ],
+        "sourceQuoteContains": "we connect the warehouse and the repo the same day"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Access reviews before HIPAA audit season in August",
+        "owner": "vendor",
+        "assignee": "Sam Whitfield",
+        "dueDate": null,
+        "kind": "parked_for_later",
+        "dueDateReason": "Sam: 'let's scope that once we're connected'; no date, but he owns remembering it.",
+        "sourceQuoteContains": "we may want to think about access reviews before then"
+      }
+    ],
+    "notes": "Ordinary weekly sync, mixed actions. The infosec questionnaire is reported signed off (t2 → Done). Sam's IP list is new vendor work. Oliver's service account is the existing task t1 (no duplicate): owner checked against the call and correct (Oliver Hartley), due date moves from the stale 10 Jun to Fri 26 Jun, and the notes must carry the scope Sam spelled out (read-only, analytics schema, the de-identified marts, not the raw PHI). Sam's 'once both land, we connect the warehouse and the repo' becomes an undated vendor task dependent on the service account and the IP list. The HIPAA access-review heads-up becomes an undated task for Sam so he doesn't forget.",
+    "review": { "verdict": "change", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

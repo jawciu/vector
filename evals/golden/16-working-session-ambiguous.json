@@ -1,0 +1,94 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "E0000016-9F2A-4B7C-8D6E-F1A0B9C8D016",
+      "title": "Working session",
+      "date": "2026-06-05T15:00:00Z",
+      "end_time": "2026-06-05T15:48:10Z",
+      "duration_seconds": 2890,
+      "language": "en",
+      "summary": "Technical working session on the staging model refactor. Agreed to split the oversized staging model into three sources before defining any measures on top of it. The customer engineer will open the refactor PR by Tuesday; the vendor engineer will review it within a day of it landing.",
+      "action_items": ["Open the staging model refactor PR by Tuesday", "Review the refactor PR within one day of it landing"],
+      "key_decisions": ["Split stg_events into three source-aligned staging models before building measures on top"],
+      "topics": ["dbt refactor", "staging models", "code review"],
+      "discussion_flow": ["Problem with stg_events", "Refactor approach", "PR and review timeline"],
+      "notes": "The single staging model currently unions three unrelated sources, which is why compile times ballooned.",
+      "speaker_count": 2,
+      "speaker_names": { "0": "Speaker 1", "-1": "You" },
+      "transcript": [
+        { "speaker": "You", "text": "So, the thing we parked last week: stg_events. It unions three unrelated sources and it's slowing everything down.", "timestamp": 0 },
+        { "speaker": "Speaker 1", "text": "Yeah, it's a mess. It predates me — someone bolted the webhook feed and the app database onto the same model.", "timestamp": 12.5 },
+        { "speaker": "You", "text": "The clean fix is three staging models, one per source, and a thin union on top only where you genuinely need all three.", "timestamp": 24.1 },
+        { "speaker": "Speaker 1", "text": "That matches what I sketched. My worry is the downstream refs — about a dozen models select from stg_events directly.", "timestamp": 38.8 },
+        { "speaker": "You", "text": "Keep stg_events as the union view for now, so downstream refs don't break, and migrate them one by one afterwards.", "timestamp": 52.3 },
+        { "speaker": "Speaker 1", "text": "Okay, that de-risks it. Let me say it back: three new staging models, stg_events becomes a thin union, downstream untouched for now.", "timestamp": 66.7 },
+        { "speaker": "You", "text": "Exactly. And I'd hold off defining any measures on top until the refactor lands, otherwise we're building on sand.", "timestamp": 80.2 },
+        { "speaker": "Speaker 1", "text": "Agreed, measures wait. I can get the refactor PR open by Tuesday — it's mostly mechanical once the pattern is set.", "timestamp": 93.6 },
+        { "speaker": "You", "text": "Tuesday's good. Tag me on it and I'll review the PR within a day of it landing so you're not blocked on us.", "timestamp": 106.4 },
+        { "speaker": "Speaker 1", "text": "Deal. One more thing — do you want the compile-time numbers before and after? Might be a nice proof point.", "timestamp": 118.9 },
+        { "speaker": "You", "text": "If it's cheap to grab, sure, but don't burn time on it. The refactor is the priority.", "timestamp": 129.5 },
+        { "speaker": "Speaker 1", "text": "Understood. PR by Tuesday, then it's on you.", "timestamp": 139 },
+        { "speaker": "You", "text": "On me. Good session — this unblocks the whole modeling phase.", "timestamp": 146.8 }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "ASH",
+    "companyName": "Ashby",
+    "contacts": [
+      { "name": "Speaker 1", "email": null }
+    ],
+    "vendorUsers": [
+      { "name": "You", "email": null },
+      { "name": "Theo Okonkwo", "email": "theo@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Connect dbt repo to Quarry", "status": "In progress", "owner": "customer", "ownerName": "Speaker 1", "dueDate": "2026-06-12", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Define first 10 metrics in dbt .yml", "status": "Not started", "owner": "customer", "ownerName": "Speaker 1", "dueDate": null, "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Set up embed sandbox", "status": "Not started", "owner": "vendor", "ownerName": "Theo Okonkwo", "dueDate": "2026-06-24", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Configure SSO for Ashby workspace", "status": "Not started", "owner": "customer", "ownerName": "Speaker 1", "dueDate": null, "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "ambiguous": true },
+    "toolCalls": [],
+    "afterAssign": {
+      "companyPrefix": "ASH",
+      "toolCalls": [
+        {
+          "action": "create_task",
+          "titleLike": "Three new staging models, stg_events becomes a thin union",
+          "titleAlternatives": ["Split stg_events into three staging models"],
+          "owner": "customer",
+          "assignee": "Speaker 1",
+          "kind": "commitment",
+          "notesContains": ["downstream untouched"],
+          "sourceQuoteContains": "three new staging models, stg_events becomes a thin union"
+        },
+        {
+          "action": "create_task",
+          "titleLike": "Refactor PR open",
+          "owner": "customer",
+          "assignee": "Speaker 1",
+          "dueDate": "2026-06-09",
+          "kind": "commitment",
+          "dueDateReason": "'by Tuesday' from Fri 5 Jun → Tue 9 Jun.",
+          "notesContains": ["tag me", "compile-time numbers"],
+          "sourceQuoteContains": "I can get the refactor PR open by Tuesday"
+        },
+        {
+          "action": "create_task",
+          "titleLike": "Review the refactor PR",
+          "owner": "vendor",
+          "assignee": "You",
+          "kind": "commitment",
+          "dependsOn": { "newTaskTitleLike": "Refactor PR open", "gap": "depends_on_new_draft" },
+          "sourceQuoteContains": "I'll review the PR within a day of it landing"
+        }
+      ]
+    },
+    "notes": "No attendees, generic title, pure dbt shop-talk: must land in Needs-your-input as matchAmbiguous. After assignment (Ashby chosen: a webhook feed plus an app database fits an ATS product, and 'measures wait' lines up with the 10 Jun metrics working session), the agreed refactor becomes a customer task with the constraint 'downstream untouched for now', and the PR becomes a task due Tue 9 Jun noting to tag the reviewer and grab compile-time numbers if cheap. The vendor review is a promise too, dependent on the PR opening; its date is relative ('within a day of it landing') so no fixed due date is scored.",
+    "review": { "verdict": "approved", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

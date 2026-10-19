@@ -1,0 +1,84 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "D10B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A10",
+      "title": "Sylvera — parity sign-off",
+      "date": "2026-07-06T09:00:00Z",
+      "end_time": "2026-07-06T09:16:20Z",
+      "duration_seconds": 980,
+      "language": "en",
+      "summary": "Tom confirmed parity validation of the carbon ratings dashboard against Looker is complete and signed off. Go-live confidence confirmed; no new work agreed.",
+      "action_items": [],
+      "key_decisions": ["Parity sign-off recorded; July 13 go-live confirmed"],
+      "topics": ["parity validation", "go-live"],
+      "discussion_flow": ["Parity results", "Sign-off", "Go-live confirmation"],
+      "notes": "The July 2 decision gate passed late but clean — the last two discrepancies were confirmed as Looker timezone bugs, not data issues.",
+      "training": {
+        "talk_ratio_you": 0.35,
+        "speakers": [
+          { "speaker": "Ines Ferreira", "is_you": true, "word_count": 280, "fillers_per_minute": 0.7 },
+          { "speaker": "Tom Whitmore", "is_you": false, "word_count": 420 }
+        ]
+      },
+      "speaker_count": 2,
+      "speaker_names": { "0": "Tom Whitmore", "-1": "Ines Ferreira" },
+      "transcript": [
+        { "speaker": "Ines Ferreira", "text": "Morning Tom — I saw your message on Friday but wanted to hear it properly. Where did parity land?", "timestamp": 0 },
+        {
+          "speaker": "Tom Whitmore",
+          "text": "Parity validation is complete — every number on the carbon ratings dashboard matches Looker to the decimal. Sign-off is done, I've recorded it in the tracker.",
+          "timestamp": 9.8
+        },
+        { "speaker": "Ines Ferreira", "text": "And the two discrepancies you flagged in the last sync?", "timestamp": 26.5 },
+        { "speaker": "Tom Whitmore", "text": "Both confirmed as timezone bugs in the old Looker explore. Your numbers were right in both cases, which honestly helped the internal pitch.", "timestamp": 33.1 },
+        { "speaker": "Ines Ferreira", "text": "That's the best possible outcome. So the parity task goes to done and the go-live gate is passed — July 13th holds.", "timestamp": 49.7 },
+        { "speaker": "Tom Whitmore", "text": "July 13th holds, yes. The team's actually excited — the training sessions last week went down well.", "timestamp": 61.2 },
+        { "speaker": "Ines Ferreira", "text": "Glad to hear it. Anything new you need from us this week? I don't want to invent work — the runway is set.", "timestamp": 74.6 },
+        { "speaker": "Tom Whitmore", "text": "Nothing new. Everything left is already on the board.", "timestamp": 86.3 },
+        { "speaker": "Ines Ferreira", "text": "Perfect. Then next time we speak it's the go-live review. Congratulations on the sign-off.", "timestamp": 92 },
+        { "speaker": "Tom Whitmore", "text": "Thanks Ines — see you at the review.", "timestamp": 102.4 }
+      ],
+      "calendar_event_id": "evt_syl_parity_0706",
+      "attendees": [
+        { "email": "ines@vector.test", "name": "Ines Ferreira", "domain": "vector.test" },
+        { "email": "tom.whitmore@sylvera.com", "name": "Tom Whitmore", "domain": "sylvera.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "SYL",
+    "companyName": "Sylvera",
+    "contacts": [
+      { "name": "Tom Whitmore", "email": "tom.whitmore@sylvera.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Ines Ferreira", "email": "ines@vector.test" }
+    ],
+    "tasks": [
+      {
+        "ref": "t1",
+        "title": "Validate migrated numbers against legacy dashboards (parity sign-off)",
+        "status": "In progress",
+        "owner": "customer",
+        "ownerName": "Tom Whitmore",
+        "dueDate": "2026-07-02",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t2", "title": "Go-live on 13 Jul", "status": "Not started", "owner": "vendor", "ownerName": "Ines Ferreira", "dueDate": "2026-07-13", "priority": null, "notes": "", "blockedBy": "t1" },
+      { "ref": "t3", "title": "Enable AI analyst for pilot group", "status": "In progress", "owner": "vendor", "ownerName": "Ines Ferreira", "dueDate": "2026-07-06", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Draft internal launch comms", "status": "In progress", "owner": "customer", "ownerName": "Tom Whitmore", "dueDate": "2026-07-03", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t5", "title": "Run developer training sessions", "status": "Done", "owner": "vendor", "ownerName": "Ines Ferreira", "dueDate": "2026-07-03", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "SYL" },
+    "toolCalls": [
+      { "action": "update_status", "existingTaskRef": "t1", "existingTaskTitleContains": "parity", "newStatus": "Done" }
+    ],
+    "notes": "Completion report: customer states parity validation against Looker is complete and signed off — existing parity task moves to Done; both speakers confirm no new work.",
+    "review": { "verdict": "approved", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

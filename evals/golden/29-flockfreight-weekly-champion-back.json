@@ -1,0 +1,88 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "3E6B8D14-5A9C-4E27-B1F8-A75C2E000029",
+      "title": "Flock Freight weekly sync",
+      "date": "2026-07-07T17:00:00Z",
+      "end_time": "2026-07-07T17:36:05Z",
+      "duration_seconds": 2165,
+      "language": "en",
+      "summary": "First sync in three weeks with Flock Freight — Owen back from parental leave. Okta SSO reported done; metric definitions picked back up; Maya to re-baseline the timeline, Owen to deliver the shipment data dictionary.",
+      "action_items": ["Maya to re-baseline the implementation timeline by Thursday", "Owen to draft the first ten metric definitions", "Owen to deliver the shipment data dictionary by end of next week"],
+      "key_decisions": ["Restart the rollout with a re-baselined timeline rather than chasing the original dates"],
+      "topics": ["SSO", "metric definitions", "timeline reset", "data dictionary"],
+      "discussion_flow": ["catch-up after absence", "SSO status", "open tasks review", "timeline reset"],
+      "notes": "Three-week stall explained by champion's leave, not disengagement. Momentum restored.",
+      "speaker_count": 2,
+      "speaker_names": { "0": "Owen Brennan", "-1": "Maya Lindqvist" },
+      "transcript": [
+        { "speaker": "Maya Lindqvist", "text": "Owen! Good to have you back — congratulations again.", "timestamp": 0 },
+        { "speaker": "Owen Brennan", "text": "Thanks Maya. Sorry the project went dark for three weeks, that was me, not the team losing interest.", "timestamp": 8.9 },
+        { "speaker": "Maya Lindqvist", "text": "No apology needed. Let's rebuild the picture — where do things actually stand?", "timestamp": 24.6 },
+        { "speaker": "Owen Brennan", "text": "Better than you'd think. IT finished the Okta SAML SSO configuration while I was out — it's done, tested, people log in through Okta now.", "timestamp": 35.2 },
+        { "speaker": "Maya Lindqvist", "text": "Excellent, I'll stop chasing that one. The other open item on my board is the metric definitions.", "timestamp": 55.8 },
+        {
+          "speaker": "Owen Brennan",
+          "text": "Yeah, that one's still on me and still not started. We still owe you the metric definitions — I'll get the first ten drafted in the yml now that I'm back.",
+          "timestamp": 68.4
+        },
+        { "speaker": "Maya Lindqvist", "text": "Good. Given the gap, I don't want to pretend the old dates still hold.", "timestamp": 89 },
+        { "speaker": "Owen Brennan", "text": "Agreed, chasing the original timeline would just stress everyone out.", "timestamp": 99.7 },
+        { "speaker": "Maya Lindqvist", "text": "Then I'll re-baseline the implementation timeline and send you the updated plan by Thursday.", "timestamp": 108.3 },
+        { "speaker": "Owen Brennan", "text": "Perfect. One more thing from our side — your team asked what fields we track per shipment.", "timestamp": 123.9 },
+        { "speaker": "Maya Lindqvist", "text": "Yes, we need that to model the shipment marts properly.", "timestamp": 138.5 },
+        { "speaker": "Owen Brennan", "text": "I'll deliver the shipment data dictionary by end of next week — it exists, it just needs cleaning up before I share it.", "timestamp": 147.1 },
+        { "speaker": "Maya Lindqvist", "text": "That unblocks the modeling work nicely. Anything else in flight I should know about?", "timestamp": 165.7 },
+        { "speaker": "Owen Brennan", "text": "There's vague talk of a carrier-scorecard module on our roadmap that might want dashboards, but it's a quarter away at least.", "timestamp": 175.3 },
+        { "speaker": "Maya Lindqvist", "text": "Noted for later, not for the plan. Great to have you back, Owen.", "timestamp": 192.9 },
+        { "speaker": "Owen Brennan", "text": "Good to be back. Talk Thursday when the plan lands.", "timestamp": 202.5 }
+      ],
+      "calendar_event_id": "evt_flk_ws_0707",
+      "attendees": [
+        { "email": "maya@vector.test", "name": "Maya Lindqvist", "domain": "vector.test" },
+        { "email": "owen@flockfreight.com", "name": "Owen Brennan", "domain": "flockfreight.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "FLK",
+    "companyName": "Flock Freight",
+    "contacts": [
+      { "name": "Owen Brennan", "email": "owen@flockfreight.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Maya Lindqvist", "email": "maya@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Configure Okta SAML SSO", "status": "In progress", "owner": "customer", "ownerName": "Owen Brennan", "dueDate": "2026-06-26", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Define first 10 metrics in dbt .yml", "status": "Not started", "owner": "customer", "ownerName": "Owen Brennan", "dueDate": "2026-06-19", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t3", "title": "Build shipment reporting dashboard", "status": "Done", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-06-17", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t4", "title": "Model shipment marts", "status": "Not started", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-07-24", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t5", "title": "Go-live", "status": "Not started", "owner": "vendor", "ownerName": "Maya Lindqvist", "dueDate": "2026-08-14", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "FLK" },
+    "toolCalls": [
+      { "action": "update_status", "existingTaskRef": "t1", "existingTaskTitleContains": "Okta SAML SSO", "newStatus": "Done" },
+      { "action": "match_existing", "existingTaskRef": "t2", "existingTaskTitleContains": "first 10 metrics" },
+      {
+        "action": "create_task",
+        "titleLike": "Re-baseline implementation timeline",
+        "owner": "vendor",
+        "dueDate": "2026-07-09",
+        "sourceQuoteContains": "I'll re-baseline the implementation timeline and send you the updated plan by Thursday"
+      },
+      {
+        "action": "create_task",
+        "titleLike": "Deliver shipment data dictionary",
+        "owner": "customer",
+        "dueDate": "2026-07-17",
+        "sourceQuoteContains": "I'll deliver the shipment data dictionary by end of next week"
+      }
+    ],
+    "notes": "Ordinary weekly sync, all three action types: SSO done (update_status), metric-definitions commitment maps to the existing open 'Define first 10 metrics' task (match_existing, must NOT duplicate), plus one vendor and one customer create_task; the carrier-scorecard roadmap talk is not a task.",
+    "review": { "verdict": "approved", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}

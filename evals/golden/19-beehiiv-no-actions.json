@@ -1,0 +1,83 @@
+{
+  "payload": {
+    "event": "meeting.saved",
+    "meeting": {
+      "id": "E0000019-2C5D-4E0F-9A9B-C4D3E2F1A019",
+      "title": "beehiiv intro chat",
+      "date": "2026-06-26T15:30:00Z",
+      "end_time": "2026-06-26T15:53:05Z",
+      "duration_seconds": 1385,
+      "language": "en",
+      "summary": "Relationship-building call a week after the beehiiv kickoff. Hannah shared context on the team, their subscriber-growth analytics ambitions, and how they used their previous BI tool. No work was agreed — the existing kickoff plan already covers everything discussed.",
+      "action_items": [],
+      "key_decisions": [],
+      "topics": ["team context", "previous BI setup", "analytics ambitions"],
+      "discussion_flow": ["Introductions", "How the data team works today", "Longer-term ideas"],
+      "notes": "Purely a get-to-know-you call. All concrete work is already tracked from the kickoff session last week.",
+      "speaker_count": 2,
+      "speaker_names": { "0": "Hannah Ostrowski", "-1": "Ines Ferreira" },
+      "transcript": [
+        { "speaker": "Ines Ferreira", "text": "Hannah, lovely to properly meet you. No agenda today — the kickoff covered the plan, so this is just context and getting to know each other.", "timestamp": 0 },
+        { "speaker": "Hannah Ostrowski", "text": "Perfect, I prefer these anyway. So — data team of three, counting me, supporting the whole operation.", "timestamp": 11.8 },
+        { "speaker": "Ines Ferreira", "text": "Small but mighty. What does the split look like day to day?", "timestamp": 23.4 },
+        {
+          "speaker": "Hannah Ostrowski",
+          "text": "I do the strategy and stakeholder side, and the two analysts split ops and growth. Everyone writes SQL, nobody wants to maintain dashboards by hand.",
+          "timestamp": 30.9
+        },
+        { "speaker": "Ines Ferreira", "text": "You're the classic profile for metrics-as-code then. What were you using before?", "timestamp": 45.2 },
+        { "speaker": "Hannah Ostrowski", "text": "A pile of notebooks and one very haunted spreadsheet that runs the weekly ops review. Everyone's a little afraid of it.", "timestamp": 53.7 },
+        { "speaker": "Ines Ferreira", "text": "The haunted spreadsheet is a rite of passage. Retiring it is usually the emotional milestone of these projects.", "timestamp": 67.3 },
+        {
+          "speaker": "Hannah Ostrowski",
+          "text": "Honestly, if that spreadsheet dies I'll throw a party. Longer term I keep daydreaming about cohort-retention analytics for the newsletter side, but that's well past onboarding.",
+          "timestamp": 76
+        },
+        { "speaker": "Ines Ferreira", "text": "It's a good daydream — the modeling work we're doing now is exactly the foundation for it. Nothing we need to change in the plan.", "timestamp": 91.6 },
+        { "speaker": "Hannah Ostrowski", "text": "That's what I hoped. And team-wise, the analysts are excited. Nervous about dbt, but excited.", "timestamp": 104.9 },
+        { "speaker": "Ines Ferreira", "text": "Nervous-but-excited is the ideal starting state — the training session in the plan is built for exactly that.", "timestamp": 115.4 },
+        { "speaker": "Hannah Ostrowski", "text": "Good to know. Nothing else from me — mostly wanted to put faces to names.", "timestamp": 127.1 },
+        { "speaker": "Ines Ferreira", "text": "Mission accomplished then. Everything concrete stays as scheduled from kickoff — speak at the weekly.", "timestamp": 135.8 }
+      ],
+      "attendees": [
+        { "email": "ines@vector.test", "name": "Ines Ferreira", "domain": "vector.test" },
+        { "email": "hannah@beehiiv.com", "name": "Hannah Ostrowski", "domain": "beehiiv.com" }
+      ]
+    }
+  },
+  "board": {
+    "companyPrefix": "BEE",
+    "companyName": "beehiiv",
+    "contacts": [
+      { "name": "Hannah Ostrowski", "email": "hannah@beehiiv.com" }
+    ],
+    "vendorUsers": [
+      { "name": "Ines Ferreira", "email": "ines@vector.test" }
+    ],
+    "tasks": [
+      { "ref": "t1", "title": "Kickoff: confirm onboarding plan", "status": "Done", "owner": "vendor", "ownerName": "Ines Ferreira", "dueDate": "2026-06-19", "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t2", "title": "Grant dbt repo access", "status": "Not started", "owner": "customer", "ownerName": "Hannah Ostrowski", "dueDate": "2026-07-03", "priority": null, "notes": "", "blockedBy": null },
+      {
+        "ref": "t3",
+        "title": "Connect warehouse and get dbt project compiling in Quarry",
+        "status": "Not started",
+        "owner": "vendor",
+        "ownerName": "Ines Ferreira",
+        "dueDate": "2026-07-07",
+        "priority": null,
+        "notes": "",
+        "blockedBy": null
+      },
+      { "ref": "t4", "title": "Retire weekly ops review spreadsheet", "status": "Not started", "owner": "customer", "ownerName": "Hannah Ostrowski", "dueDate": null, "priority": null, "notes": "", "blockedBy": null },
+      { "ref": "t5", "title": "Run analyst dbt training", "status": "Not started", "owner": "vendor", "ownerName": "Ines Ferreira", "dueDate": "2026-07-21", "priority": null, "notes": "", "blockedBy": null }
+    ]
+  },
+  "expected": {
+    "match": { "companyPrefix": "BEE" },
+    "toolCalls": [
+      { "action": "flag_no_action_items" }
+    ],
+    "notes": "Post-kickoff relationship call: all talk is context, daydreams, or work already tracked from kickoff — no firm commitments, so flag_no_action_items.",
+    "review": { "verdict": "approved", "reviewedAt": "2026-10-11", "by": "Caroline" }
+  }
+}
