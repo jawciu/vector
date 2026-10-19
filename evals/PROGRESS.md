@@ -23,7 +23,8 @@ A running record of how Vector's meeting AI is evaluated and improved: what was 
 | 2026-10-12/13 | Feature 1 (richer updates to existing tasks) built, reviewed in three evaluator rounds, eval run 3 times (~$4.70). Results below. |
 | 2026-10-13 | Feature 2 (free-text dependencies, new `TaskDependency` table) built, reviewed in two evaluator rounds, eval run 3 times (~$4.50). Results below. |
 | 2026-10-14 | Feature 3 (dependencies between new drafts from the same meeting) built; restore-orphan fix; eval run 3 times (~$4.59). Results below. |
-| _next_ | Feature 4 (recorder identity), measured by the eval. |
+| 2026-10-14 | Feature 4 (recorder identity) built; eval run 3 times (~$4.83). Results below. |
+| _next_ | Remaining open product questions from the review, then Linear and Attio. |
 
 ---
 
@@ -238,6 +239,30 @@ Feature 3 lets a new task from a meeting wait on another new task from the same 
 - **The product path works** (unit tests cover approval order, rejection-as-text, and a snapshot-restore that used to leave a sibling pointing at a deleted task). The eval shows the model starting to emit `draftRef`, but only on 1–2 of the 11 cases that need it. Same pattern as feature 2: plumbing landed, the model still rarely uses the new field.
 - **Recall dropped about 11 points**, spread across several meetings rather than one fluke (cases 02, 03, 06, 13, 26, 29 among them). Precision held because it also proposed fewer drafts. Not tuned against the golden set; worth a later look as a general "did the extra tool surface crowd out ordinary creates?" question.
 - One run had six errors (laptop sleep); it was discarded and repeated. The three runs above are all 30 of 30.
+
+### Feature 4: recorder identity (3 runs, 2026-10-14)
+
+Feature 4 says who Miniti's speaker `"You"` is (a settings pick, stored on the Miniti integration). Their promises are drafted as theirs. If nobody is set, the draft arrives without an owner and the inbox asks for one. The eval harness sets Maya Lindqvist as the recorder instead of inventing a vendor user named You. Compared with feature 3 (3 runs each):
+
+| Metric | Feature 3 | Feature 4 |
+|---|---|---|
+| Total recall | avg 78% (77–79%) | avg 82% (77–85%) |
+| Precision | avg 82% | avg 78% (77–79%) |
+| Owner side right | avg 81% (77–83%) | **avg 87% (86–87%)** |
+| Assignee right | avg 82% | **avg 89% (89–90%)** |
+| Parked "for later" items | avg 60% | **avg 80%** (4 of 5 every run) |
+| Reminders for our own team | avg 83% | **2 of 2 every run** |
+| Due date right | avg 97% | avg 96% |
+| Notes captured | avg 65% | avg 67% |
+| Quotes found verbatim | 100% | 99.6% |
+| Gap expectations met | 4–5 of 18 | 3–10 of 18 |
+| Cost per run | ~$1.53 | ~$1.61 |
+
+**Reading it:**
+- **The feature closes the gap it was built for on the clearest case.** Case 15's "I'll share a draft of the executive dashboard" (said by You) is owned by Maya all three runs; it used to fail owner every time.
+- **Case 16 follows when the task is found** (Maya on the PR review in r1). r2 and r3 missed the review task itself, so there was nothing to assign.
+- **Case 17 still attributes You's promises to the customer** all three runs (SSO guide and the workshop reminder). The model is not setting `ownerFromRecorder` there; the plumbing is not the miss. Worth a later look as a general "anonymous catchup, two speakers" problem, not by tuning against this meeting.
+- Owner and assignee each rose about 6–7 points, with ranges that barely overlap feature 3. Parked items and team reminders also settled higher. Recall recovered some of the feature 3 dip (ranges overlap). Precision slipped about 4 points as it proposed more drafts again.
 
 ## Material for the case study
 

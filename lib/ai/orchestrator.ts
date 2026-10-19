@@ -88,6 +88,9 @@ export type OrchestratorToolInput = {
   dependsOn?: Prisma.JsonValue;
   /** create_task_draft: short id ("d1") other drafts' dependsOn can name. */
   draftRef?: string;
+  /** create_task_draft: the recorder ("You") made this commitment but nobody
+   *  has said who records meetings, so the owner is left empty. */
+  ownerFromRecorder?: boolean;
   notes?: string;
   sourceQuote?: string;
   confidence?: string;
@@ -129,10 +132,13 @@ const EXTRACTION_PROMPT = `You are Vector. Your job is FACT EXTRACTION from a B2
 
 You will receive a JSON context with:
 - meeting.title, meeting.date, meeting.summary, meeting.notes
-- meeting.transcript: the FULL meeting transcript as a single concatenated string
+- meeting.transcript: the FULL meeting transcript, one turn per line as "<speaker>: <words>". The label before the first colon says who is talking; it is not part of what they said, so never copy it into a quote.
 - meeting.actionItems: Miniti's pre-extracted action items (strings)
 - openTasks, customerContacts, vendorUsers, phases (for reference only — DO NOT resolve to ids in this pass)
+- recorder: { id, name } of the person who recorded the meeting, or null when nobody has said who that is (see the rule on the recorder below)
 - today: today's ISO date
+
+The recorder: the transcript labels whoever recorded the meeting as "You" (Miniti's own microphone, never a customer). They are on the vendor side, one of our own team. Treat "You" like any other named speaker: what they promise is an action item, with speaker "You" and mentionedOwner "You" when they said they'd do it.
 
 Produce a single JSON object with these arrays:
 
@@ -305,8 +311,11 @@ You will receive a JSON context with:
 - openTasks: existing OPEN tasks for this onboarding, each with id, taskId (human-readable e.g. "AC-12"), title, status, phaseId, due, ownerId (a vendorUsers id), priority, assigneeContactId (a customerContacts id), description, notes, dependsOn (what it already waits on: [{ taskId } | { text }], taskId being another openTasks id). When referring to a task in sourceQuote or notes, you may use its taskId (e.g. "blocked on AC-7") for readability.
 - customerContacts: [{ id, name, email }] — for assigneeContactId
 - vendorUsers: [{ id, name, email }] — Caroline's team; for ownerId
+- recorder: { id, name } of the person who recorded the meeting, or null when nobody has said who that is
 - phases: [{ id, name, isComplete }]
 - today: today's ISO date
+
+meeting.transcript has one turn per line as "<speaker>: <words>"; the label is not part of the quote. The speaker "You" is the person who recorded the meeting: someone on our (vendor) side, never a customer contact.
 
 For each extraction.actionItems entry, decide:
 - If it maps to an existing open task by topic, call match_to_existing_task_draft (don't duplicate). Every change to that task goes in the one draft's \`changes\` object.
@@ -321,6 +330,7 @@ Rules, non-negotiable:
 
 1. RESOLVE the verbatim mentions to ids:
    - mentionedOwner: match against vendorUsers (by name) → ownerId. If the speaker is a customer-side person, match against customerContacts → assigneeContactId. If neither matches confidently, leave the relevant id null.
+   - The recorder ("You"): when the person who said they'd do it is "You" (mentionedOwner "You", or speaker "You" saying "I'll ..."), resolve them like any named vendor speaker: ownerId = recorder.id. If recorder is null, nobody has said who recorded the meeting: leave ownerId empty and set ownerFromRecorder: true on the create_task_draft, so the reviewer is asked to pick the owner. Never guess the recorder from vendorUsers, and never give their work to a customer contact.
    - mentionedDueDate: convert to ISO YYYY-MM-DD relative to the meeting date (today, unless meeting.date says otherwise; e.g. "by Friday" → next Friday's date). Vague and anchored phrases count as dates too; see JUDGEMENT RULES (dates). Only leave dueDate empty when no timing was said at all, or the phrase has no reasonable reading.
    - mentionedDependency: match against openTasks (use task title + description + notes for the match) → dependsOn [{ taskId: <openTasks id> }]. If it is another new task you are proposing from this same meeting → dependsOn [{ draftRef: "<that draft's draftRef>" }]. If it is not a task at all (mentioned in extraction.externalBlockers or describes a non-task blocker) → dependsOn [{ text: "<the blocker in a few words>" }]. See JUDGEMENT RULES E.
 
@@ -412,7 +422,11 @@ const TOOLS: Tool[] = [
         },
         ownerId: {
           type: "integer",
-          description: "Vendor team-mate who owns this work. MUST be an id from vendorUsers. Omit if not determinable.",
+          description: "Vendor team-mate who owns this work. MUST be an id from vendorUsers. When the recorder (\"You\") made the commitment, recorder.id. Omit if not determinable.",
+        },
+        ownerFromRecorder: {
+          type: "boolean",
+          description: "true ONLY when the person who recorded the meeting (\"You\") made this commitment and recorder is null, so ownerId is left empty. Omit otherwise.",
         },
         assigneeContactId: {
           type: "integer",

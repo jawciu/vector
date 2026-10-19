@@ -40,7 +40,9 @@ company named in `expected.afterAssign.companyPrefix`.
 - `companyPrefix`, `companyName`: the customer.
 - `contacts`: customer-side people (`name`, `email`). Attendees plus anyone named on the call.
   In the anonymous transcripts the customer is "Speaker 1" / "Speaker 2" with no email.
-- `vendorUsers`: Quarry people who use Vector. "You" is the person who recorded an anonymous call.
+- `vendorUsers`: Quarry people who use Vector. The transcript's "You" is the
+  meeting recorder (Miniti speaker -1), not a team member: the harness sets
+  Maya Lindqvist as the workspace recorder.
 - `tasks`: each has `ref` (t1, t2...), `title`, `status` (Not started / In progress / Blocked /
   Done), `owner` (vendor or customer), `ownerName`, `dueDate` (or null), `priority` (or null),
   `notes`, and `blockedBy` (another task's ref, or null).

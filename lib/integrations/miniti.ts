@@ -29,7 +29,9 @@ import {
   getTasksForOnboarding,
   getPhasesForOnboarding,
   listVendorUsers,
+  getMinitiRecorder,
 } from "@/lib/db";
+import { settleRecorderOwner, transcriptLine } from "@/lib/integrations/recorder";
 import { runMinitiExtraction, runMinitiOrchestrator, toolCallToAction } from "@/lib/ai/orchestrator";
 import type { MinitiExtraction, OrchestratorAction } from "@/lib/ai/orchestrator";
 import { noteSourceFor, prepareStoredTaskUpdate } from "@/lib/ai/task-update";
@@ -120,6 +122,8 @@ type ContextTask = {
 type ContextContact = { id: number; name: string; email?: string | null };
 type ContextPhase = { id: number; name: string; isComplete: boolean; sortOrder: number };
 type ContextVendorUser = { id: number; name: string; email: string };
+/** Who recorded the meeting (Miniti's "You"), when the workspace has said. */
+type ContextRecorder = { id: number; name: string };
 
 /** Throws on invalid payload; returns parsed { event, meeting }. */
 export function validateMinitiPayload(body: unknown): MinitiPayload {
@@ -343,12 +347,17 @@ export async function runMeetingExtractionOnly(
   // Build a minimal context — the extraction prompt explicitly tolerates
   // empty onboarding-scoped lists ("for reference only — DO NOT resolve
   // to ids in this pass") so we can give it [] for tasks/contacts/etc.
+  const recorder = await getMinitiRecorder().catch((err) => {
+    console.warn(`[miniti] reading the meeting recorder failed for event ${eventId}`, err);
+    return null;
+  });
   const context = buildOrchestratorContext({
     meeting,
     tasks: [],
     contacts: [],
     phases: [],
     vendorUsers: [],
+    recorder,
   });
 
   let extraction: MinitiExtraction | null = null;
@@ -388,12 +397,16 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
   const meeting = (event.payload as { meeting?: MinitiMeeting } | null)?.meeting;
   if (!meeting) throw new Error(`event ${eventId} has no meeting payload`);
 
-  const [tasks, contacts, phases, allVendorUsers, onboarding] = await Promise.all([
+  const [tasks, contacts, phases, allVendorUsers, onboarding, configuredRecorder] = await Promise.all([
     getTasksForOnboarding(onboardingId),
     getContactsForOnboarding(onboardingId),
     getPhasesForOnboarding(onboardingId),
     listVendorUsers(),
     getOnboarding(onboardingId),
+    getMinitiRecorder().catch((err) => {
+      console.warn(`[miniti] reading the meeting recorder failed for event ${eventId}`, err);
+      return null;
+    }),
   ]);
   // Stamp for notes an update draft appends: the meeting's own day + "call
   // with <Company>" (lib/ai/task-update.ts). Stored on the draft at creation.
@@ -405,7 +418,13 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
     .filter((u) => u.role === "admin" || u.role === "member")
     .map((u) => ({ id: u.id, name: u.name, email: u.email }));
 
-  const context = buildOrchestratorContext({ meeting, tasks, contacts, phases, vendorUsers });
+  // The recorder ("You" in the transcript) owns what they promise, but only
+  // as someone on the owner list above.
+  const recorder = configuredRecorder && vendorUsers.some((u) => u.id === configuredRecorder.id)
+    ? { id: configuredRecorder.id, name: configuredRecorder.name }
+    : null;
+
+  const context = buildOrchestratorContext({ meeting, tasks, contacts, phases, vendorUsers, recorder });
 
   // ---- Pass 1: extract structured facts from the transcript ----
   // If the webhook already ran a standalone Pass 1 (ambiguous match path),
@@ -486,6 +505,9 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
     const payload = { ...call.input };
 
     if (action === "create_task") {
+      // A commitment the recorder made: theirs if we know who they are,
+      // otherwise left unowned and flagged so the inbox can ask.
+      settleRecorderOwner(payload, recorder?.id ?? null);
       if (payload.ownerId != null && !validVendorUserIds.has(payload.ownerId)) {
         console.warn(`[miniti] dropping invalid ownerId=${payload.ownerId} on create_task draft (event ${eventId})`);
         delete payload.ownerId;
@@ -589,7 +611,7 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
  * truth so prompt and producer don't drift.
  *
  * What we send and why:
- *   - meeting.transcript      Full concatenated transcript text. Path B: lets
+ *   - meeting.transcript      Full transcript, one "<speaker>: <words>" line per turn. Path B: lets
  *                             Claude find action items, deadlines, and owners
  *                             that Miniti's action_items list missed.
  *   - meeting.actionItems     Miniti's pre-distilled list — kept as a strong
@@ -602,6 +624,8 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
  *   - customerContacts        Same as before — Claude picks `assigneeContactId`
  *                             when a customer-side person is the actor.
  *   - phases                  Required for picking phaseId on new tasks.
+ *   - recorder                { id, name } of the person Miniti calls "You"
+ *                             (Settings → Meetings), or null if not set.
  */
 /**
  * A board task's open dependencies as `[{ taskId } | { text }]`. Tasks that
@@ -623,6 +647,7 @@ export function buildOrchestratorContext({
   contacts,
   phases,
   vendorUsers = [],
+  recorder = null,
   today = new Date(),
 }: {
   meeting: MinitiMeeting;
@@ -630,6 +655,7 @@ export function buildOrchestratorContext({
   contacts: ContextContact[];
   phases: ContextPhase[];
   vendorUsers?: ContextVendorUser[] | null;
+  recorder?: ContextRecorder | null;
   today?: Date;
 }) {
   const openTasks = tasks
@@ -673,10 +699,11 @@ export function buildOrchestratorContext({
     email: u.email,
   }));
 
-  // Concat the full transcript into a single string. Path B unlocks owner /
-  // due-date / dependency extraction Miniti's action_items list misses.
+  // The full transcript, one turn per line as "<speaker>: <words>". Path B
+  // unlocks owner / due-date / dependency extraction Miniti's action_items
+  // list misses, and the speaker is what tells whose promise it was.
   const transcriptText = Array.isArray(meeting.transcript)
-    ? meeting.transcript.map((t) => t?.text).filter(Boolean).join("\n")
+    ? meeting.transcript.map(transcriptLine).filter(Boolean).join("\n")
     : "";
 
   return {
@@ -697,5 +724,8 @@ export function buildOrchestratorContext({
     phases: phasesLite,
     customerContacts,
     vendorUsers: vendorUsersLite,
+    // Who "You" is in the transcript (the person who recorded the meeting),
+    // or null when the workspace has not said.
+    recorder: recorder ? { id: recorder.id, name: recorder.name } : null,
   };
 }

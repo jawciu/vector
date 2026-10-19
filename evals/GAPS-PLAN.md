@@ -13,7 +13,7 @@ Caroline's review of the golden set (2026-10-11, see `PROGRESS.md`) asked the me
 | 1 | Richer updates to existing tasks | `existing_task_notes`, `multi_field_existing_update` | S-M | none |
 | 2 | Free-text dependencies | `free_text_dependency`, `existing_task_dependency` | M | yes |
 | 3 | Dependencies between drafts from the same meeting | `depends_on_new_draft` | M | none (uses 2) |
-| 4 | Resolve the recorder ("You") to a real person | owner checks in 15, 17 | S | maybe one column |
+| 4 | Recorder identity | (owner of "You" commitments) | S | none |
 
 ---
 
@@ -50,17 +50,15 @@ Caroline's review of the golden set (2026-10-11, see `PROGRESS.md`) asked the me
 - On approval of the dependent task: if the blocker draft is already approved, link to its created task; if it's still pending, store the link and resolve it when the blocker is approved; if the blocker is rejected, fall back to a text dependency with the blocker's title (needs feature 2).
 - Inbox shows "depends on draft d1" on the card, and approving both in one bulk action keeps the order right.
 
-## 4. Resolve the recorder ("You") to a real person
+## 4. Recorder identity
 
-**Found by the eval (2026-10-12), not by the review.** Miniti labels whoever recorded the meeting as speaker -1, "You", instead of by name. Nothing in Vector maps "You" to a vendor user, so commitments made by the recorder ("I'll send the guide") arrive with no owner. In the golden set this fails the owner check in cases 15 and 17 on every run of every prompt version; in real use it affects any meeting where the recorder speaks.
+**Today:** Miniti labels whoever recorded the call as speaker -1, `"You"`, with no attendee for them. Vector treated that as a missing owner (and the eval harness invented a vendor user named "You"). Cases 15, 16 and 17 fail owner whenever the recorder makes a commitment.
 
 **Build:**
-- Record which vendor user a Miniti connection belongs to (today the integration is workspace-level; the connecting user is the recorder), and pass that user to the pipeline as `recorder: { id, name }`.
-- In the extraction and decision context, state that speaker "You" is that person, so ownership resolves like any named speaker.
-- Fallback when unknown: keep the draft unowned but flag it on the card ("Said by the person who recorded the meeting: pick an owner"), using the same warning pattern as people who have left.
-- Eval: the harness passes the recorder for the case's vendor user; cases 15 and 17 then measure it.
-
-**Size:** S. **Schema:** possibly one nullable column on the integration settings; dry-run first.
+- Settings: pick who records Miniti meetings. Stored on the Miniti integration config (`recorderVendorUserId`).
+- Pipeline: Pass 1 and Pass 2 know the recorder; `create_task_draft` can set `ownerFromRecorder`.
+- Recorder known: their commitments are owned by them. Recorder unknown: the draft arrives without an owner and the inbox says "Said by the person who recorded the meeting: pick an owner", with a link to settings.
+- Eval harness: no fake "You" user; Maya Lindqvist is the workspace recorder. Answer key assignees `"You"` become `"Maya Lindqvist"`.
 
 ## Scoring support (do alongside step 1 of the order)
 

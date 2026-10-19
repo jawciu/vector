@@ -15,7 +15,8 @@
  *   - exactly one Active onboarding per company with the default phases
  *     (two onboardings for one company would make every match ambiguous);
  *   - the Quarry vendor team (Maya, Theo, Ines, Sam, Caroline) plus any extra
- *     vendor user a board names (the anonymous recorder "You");
+ *     vendor user a board names. "You" is the Miniti recorder label, not a
+ *     person: skipped if a board lists it, and Maya is set as the recorder.
  *   - the case's `board` (contacts, tasks, blockedBy → TaskDependency rows
  *     plus the legacy column) on its company's
  *     onboarding. Every other onboarding is empty.
@@ -106,6 +107,7 @@ export async function seedCase(client: pg.Client, board: Board | undefined): Pro
     //      (case 30 calls Caroline "Caroline"); board-only users are added.
     const vendors = new Map<string, string>(VENDOR_TEAM.map((u) => [u.email, u.name]));
     for (const u of board?.vendorUsers ?? []) {
+      if (u.name === "You") continue;
       vendors.set(u.email || placeholderEmail(u.name), u.name);
     }
     const vendorIdByName = new Map<string, number>();
@@ -119,6 +121,12 @@ export async function seedCase(client: pg.Client, board: Board | undefined): Pro
     }
     const boardOwnerName = board?.vendorUsers.find((u) => u.name !== "You")?.name ?? board?.vendorUsers[0]?.name;
     const defaultOwnerId = vendorIdByName.get(boardOwnerName ?? "Maya Lindqvist") ?? vendorIdByName.get("Maya Lindqvist")!;
+    const recorderId = vendorIdByName.get("Maya Lindqvist");
+    if (recorderId == null) throw new Error("Maya Lindqvist is missing from the vendor team");
+    await client.query(
+      `INSERT INTO "IntegrationConnection" (source, status, config) VALUES ('miniti', 'connected', $1::jsonb)`,
+      [JSON.stringify({ recorderVendorUserId: recorderId })]
+    );
 
     // ---- Companies, one onboarding each, default phases.
     const phaseIdByName = new Map<string, number>(); // for the board's onboarding only

@@ -34,6 +34,7 @@ import {
   ONBOARDING_STATUSES,
   DEFAULT_PHASES,
 } from "./constants";
+import { MINITI_SOURCE, RECORDER_CONFIG_KEY, canOwnWork, readRecorderId } from "./integrations/recorder";
 
 /** Anything callers pass as an id: route params arrive as strings, Prisma rows as numbers. */
 type IdLike = number | string;
@@ -183,6 +184,61 @@ export async function listVendorUsers() {
     orderBy: [{ id: "asc" }],
     select: { id: true, name: true, email: true, role: true, authUserId: true, createdAt: true },
   });
+}
+
+// ── Integration settings ─────────────────────────────────────────────────────
+
+/** An integration's `config` JSON as an object; `{}` when there is no row yet. */
+export async function getIntegrationConfig(source: string): Promise<Prisma.JsonObject> {
+  const row = await prisma.integrationConnection.findUnique({ where: { source }, select: { config: true } });
+  const config = row?.config;
+  return config && typeof config === "object" && !Array.isArray(config) ? (config as Prisma.JsonObject) : {};
+}
+
+/**
+ * Merge `patch` into an integration's config, creating the row if there is
+ * none yet (Miniti is connected by its env token alone, so a workspace may
+ * have no row). A `null` value removes that key.
+ */
+export async function updateIntegrationConfig(source: string, patch: Record<string, Prisma.JsonValue | null>) {
+  return prisma.$transaction(async (tx) => {
+    const row = await tx.integrationConnection.findUnique({ where: { source }, select: { config: true } });
+    const current = row?.config && typeof row.config === "object" && !Array.isArray(row.config)
+      ? { ...(row.config as Prisma.JsonObject) }
+      : {};
+    for (const [k, v] of Object.entries(patch)) {
+      if (v === null) delete current[k];
+      else current[k] = v;
+    }
+    const config = current as Prisma.InputJsonObject;
+    await tx.integrationConnection.upsert({
+      where: { source },
+      create: { source, config },
+      update: { config },
+    });
+    return current;
+  });
+}
+
+/**
+ * Who records Miniti meetings (the transcript's "You"), from the Miniti
+ * config's `recorderVendorUserId`. Null when nobody is set, or the person set
+ * is gone or can no longer own work (see lib/integrations/recorder.ts).
+ */
+export async function getMinitiRecorder(): Promise<{ id: number; name: string; email: string } | null> {
+  const id = readRecorderId(await getIntegrationConfig(MINITI_SOURCE));
+  if (id == null) return null;
+  const user = await prisma.vendorUser.findUnique({
+    where: { id },
+    select: { id: true, name: true, email: true, role: true },
+  });
+  if (!user || !canOwnWork(user.role)) return null;
+  return { id: user.id, name: user.name, email: user.email };
+}
+
+/** Set (or clear, with null) who records Miniti meetings. */
+export async function setMinitiRecorder(vendorUserId: number | null) {
+  await updateIntegrationConfig(MINITI_SOURCE, { [RECORDER_CONFIG_KEY]: vendorUserId });
 }
 
 /** Add a team member by name + email. Auth account is optional — `authUserId`
@@ -3250,7 +3306,7 @@ export async function getVendorUserById(id: IdLike) {
   if (Number.isNaN(vId)) return null;
   return prisma.vendorUser.findUnique({
     where: { id: vId },
-    select: { id: true, name: true, email: true },
+    select: { id: true, name: true, email: true, role: true },
   });
 }
 

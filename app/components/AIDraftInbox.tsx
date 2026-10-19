@@ -31,6 +31,10 @@ import {
 import type { NoteSource, TaskUpdateChanges } from "@/lib/ai/task-update";
 import { draftDependsOn, type DraftDependsOnItem, type DraftLinkItem } from "@/lib/task-dependencies";
 import { draftLinkStatus, linkTitle, readDraftLinks } from "@/lib/draft-links";
+import {
+  RECORDER_SETTINGS_HREF,
+  RECORDER_UNKNOWN_OWNER_MESSAGE,
+} from "@/lib/integrations/recorder";
 import DraftDependencies, { type DraftLinkDescription } from "./DraftDependencies";
 import Button from "@/app/ui/Button";
 import Textarea from "@/app/ui/Textarea";
@@ -1032,7 +1036,7 @@ function DraftEditPanel({ action, overrides, onChange, disabled }: DraftEditPane
 type PeopleChoice = { ownerId?: number | null; assigneeContactId?: number | null };
 
 type StalePeople = {
-  owner: { message: string } | null;
+  owner: { message: string; pickLabel?: string; href?: string } | null;
   assignee: { message: string } | null;
 };
 
@@ -1053,6 +1057,7 @@ function stalePeople(
     ownerName?: unknown;
     assigneeContactId?: unknown;
     assigneeContactName?: unknown;
+    ownerFromRecorder?: unknown;
   }
 ): StalePeople {
   const nameFor = (id: number, proposedId: unknown, name: unknown) =>
@@ -1061,10 +1066,17 @@ function stalePeople(
     && !vendorUsers.some((u) => u.id === current.ownerId);
   const assigneeGone = current.assigneeContactId != null && contacts.length > 0
     && !contacts.some((c) => c.id === current.assigneeContactId);
+  const recorderUnknown = proposed.ownerFromRecorder === true && current.ownerId == null && !ownerGone;
   return {
     owner: ownerGone
       ? { message: staleOwnerMessage(nameFor(current.ownerId!, proposed.ownerId, proposed.ownerName)) }
-      : null,
+      : recorderUnknown
+        ? {
+            message: RECORDER_UNKNOWN_OWNER_MESSAGE,
+            pickLabel: "Pick an owner",
+            href: RECORDER_SETTINGS_HREF,
+          }
+        : null,
     assignee: assigneeGone
       ? { message: staleContactMessage(nameFor(current.assigneeContactId!, proposed.assigneeContactId, proposed.assigneeContactName)) }
       : null,
@@ -1191,7 +1203,8 @@ function StalePeopleWarnings({
         <StalePersonWarning
           message={stale.owner.message}
           icon={<OwnerIcon />}
-          pickLabel="Pick a new owner"
+          pickLabel={stale.owner.pickLabel ?? "Pick a new owner"}
+          href={stale.owner.href}
           options={vendorUsers.map((u) => ({ id: u.id, label: u.name || u.email }))}
           onPick={(ownerId) => onResolve({ ownerId })}
           disabled={disabled}
@@ -1215,6 +1228,7 @@ function StalePersonWarning({
   message,
   icon,
   pickLabel,
+  href,
   options,
   onPick,
   disabled,
@@ -1222,6 +1236,7 @@ function StalePersonWarning({
   message: string;
   icon: ReactNode;
   pickLabel: string;
+  href?: string;
   options: SelectPillOption[];
   onPick: (id: number | null) => void;
   disabled: boolean;
@@ -1229,6 +1244,11 @@ function StalePersonWarning({
   return (
     <div role="alert" data-stale-warning className="flex flex-col gap-2 rounded-lg border border-alert px-3 py-2 text-sm">
       <span className="text-alert">{message}.</span>
+      {href && (
+        <Link href={href} className="text-sm text-alert underline underline-offset-2 w-fit">
+          Who records meetings
+        </Link>
+      )}
       <div className="flex flex-wrap items-center gap-2">
         <div className="min-w-48 flex-1">
           <SelectPill
@@ -2224,6 +2244,7 @@ export function CreateTaskCard({
           ownerName: draft.payload?.ownerName,
           assigneeContactId: draft.payload?.assigneeContactId,
           assigneeContactName: draft.payload?.assigneeContactName,
+          ownerFromRecorder: draft.payload?.ownerFromRecorder === true && !("ownerId" in resolved),
         }
       )
     : NO_STALE;
