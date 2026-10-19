@@ -32,6 +32,10 @@ vi.mock("@/lib/db", () => ({
   updateTask: vi.fn(),
   createComment: vi.fn(),
   getOrCreateVendorUser: vi.fn(async () => ({ id: 1, name: "Caroline Jaworsky" })),
+  DependencyError: class DependencyError extends Error {
+    status = 400;
+  },
+  classifyBlockerTasks: vi.fn(async (_ob: number, ids: number[]) => ({ open: ids, closed: [], missing: [], foreign: [] })),
 }));
 
 import {
@@ -46,6 +50,8 @@ import {
   getContactsForOnboarding,
   updateTask,
   createComment,
+  classifyBlockerTasks,
+  DependencyError,
 } from "@/lib/db";
 import { POST } from "./route";
 
@@ -406,5 +412,119 @@ describe("POST /api/ai-drafts/[id]/approve — match_existing updates", () => {
 
     expect((await POST(req(), { params })).status).toBe(400);
     expect(updateTask).not.toHaveBeenCalled();
+  });
+});
+
+describe("POST /api/ai-drafts/[id]/approve — dependencies (GAPS-PLAN feature 2)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    partialMock(createTask).mockResolvedValue({ id: 999, title: "Rebuild the report", phaseId: 338 });
+    partialMock(getTaskOnboardingId).mockResolvedValue(63);
+    partialMock(getTaskNotes).mockResolvedValue("");
+    vi.mocked(classifyBlockerTasks).mockImplementation(async (_ob, ids) => ({ open: ids, closed: [], missing: [], foreign: [] }));
+  });
+
+  function createDraft(payload: Record<string, unknown>) {
+    return { id: 232, action: "create_task", status: "pending", onboardingId: 63, payload: { title: "Rebuild the report", phaseId: 338, ...payload } };
+  }
+  type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
+  function updateDraft(changes: { [k: string]: Json }) {
+    return { id: 232, action: "match_existing", status: "pending", onboardingId: 63, payload: { taskId: 501, action: "add_dependency", changes } };
+  }
+
+  it("create_task passes task and text blockers to createTask as dependsOn", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(
+      createDraft({ dependsOn: [{ taskId: 7 }, { text: "platform team sign-off" }] })
+    );
+    const res = await POST(req(), { params });
+    expect(res.status).toBe(200);
+    expect(vi.mocked(createTask).mock.calls[0][0].dependsOn).toEqual([{ taskId: 7 }, { text: "platform team sign-off" }]);
+    expect(vi.mocked(createTask).mock.calls[0][0]).not.toHaveProperty("blockedByTaskId");
+  });
+
+  it("an older draft's blockedByTaskId is folded into dependsOn", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(createDraft({ blockedByTaskId: 7 }));
+    await POST(req(), { params });
+    expect(vi.mocked(createTask).mock.calls[0][0].dependsOn).toEqual([{ taskId: 7 }]);
+  });
+
+  it("the editor's dependsOn override replaces the stored list", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(createDraft({ dependsOn: [{ taskId: 7 }, { text: "x sign-off" }] }));
+    await POST(req({ overrides: { dependsOn: [{ text: "x sign-off" }] } }), { params });
+    expect(vi.mocked(createTask).mock.calls[0][0].dependsOn).toEqual([{ text: "x sign-off" }]);
+  });
+
+  it("a blocker task from another onboarding is a 400 and nothing is created", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(createDraft({ dependsOn: [{ taskId: 7 }] }));
+    vi.mocked(classifyBlockerTasks).mockResolvedValue({ open: [], closed: [], missing: [], foreign: [7] });
+    const res = await POST(req(), { params });
+    expect(res.status).toBe(400);
+    expect(createTask).not.toHaveBeenCalled();
+    expect(markAIChangeApplied).not.toHaveBeenCalled();
+  });
+
+  it("a blocker that is done or deleted since drafting is skipped and reported", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(
+      createDraft({ dependsOn: [{ taskId: 7 }, { taskId: 8 }, { taskId: 9 }, { text: "legal ok" }] })
+    );
+    vi.mocked(classifyBlockerTasks).mockResolvedValue({ open: [9], closed: [7], missing: [8], foreign: [] });
+    const res = await POST(req(), { params });
+    const body = await res.json();
+    expect(res.status).toBe(200);
+    expect(vi.mocked(createTask).mock.calls[0][0].dependsOn).toEqual([{ taskId: 9 }, { text: "legal ok" }]);
+    expect(body.skippedDependencies.sort()).toEqual([7, 8]);
+  });
+
+  it("match_existing adds the dependencies to the target task", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(updateDraft({ dependsOn: [{ taskId: 7 }, { text: "security review closes" }] }));
+    const res = await POST(req(), { params });
+    expect(res.status).toBe(200);
+    expect(updateTask).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(updateTask).mock.calls[0][1]).toEqual({});
+    expect(vi.mocked(updateTask).mock.calls[0][2]).toMatchObject({ addDependencies: [{ taskId: 7 }, { text: "security review closes" }] });
+    expect(markAIChangeApplied).toHaveBeenCalledWith(232, { resolvedBy: 1, appliedTaskId: 501 });
+  });
+
+  it("match_existing with notes and a dependency applies both", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(updateDraft({ appendNotes: "Scope agreed.", dependsOn: [{ text: "budget approval" }] }));
+    const res = await POST(req(), { params });
+    expect(res.status).toBe(200);
+    // Notes and blockers go through ONE updateTask call (one transaction).
+    expect(updateTask).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(updateTask).mock.calls[0][1]).toHaveProperty("notes");
+    expect(vi.mocked(updateTask).mock.calls[0][2]).toMatchObject({ addDependencies: [{ text: "budget approval" }] });
+  });
+
+  it("match_existing refuses a foreign blocker before writing anything", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(updateDraft({ appendNotes: "x", dependsOn: [{ taskId: 7 }] }));
+    vi.mocked(classifyBlockerTasks).mockResolvedValue({ open: [], closed: [], missing: [], foreign: [7] });
+    const res = await POST(req(), { params });
+    expect(res.status).toBe(400);
+    expect(updateTask).not.toHaveBeenCalled();
+  });
+
+  it("match_existing refuses the task depending on itself", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(updateDraft({ dependsOn: [{ taskId: 501 }] }));
+    const res = await POST(req(), { params });
+    expect(res.status).toBe(400);
+    expect(updateTask).not.toHaveBeenCalled();
+  });
+
+  it("a loop refused by the database layer is a 400 with its message, and the draft stays pending", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(updateDraft({ appendNotes: "x", dependsOn: [{ taskId: 7 }] }));
+    vi.mocked(updateTask).mockRejectedValueOnce(new DependencyError("RAY-7 can't block RAY-8: RAY-7 waits on RAY-8, so this would make a loop"));
+    const res = await POST(req(), { params });
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/would make a loop/);
+    expect(markAIChangeApplied).not.toHaveBeenCalled();
+  });
+
+  it("match_existing whose only blockers are done is a 400 that says why", async () => {
+    partialMock(getPendingAIChange).mockResolvedValue(updateDraft({ dependsOn: [{ taskId: 7 }] }));
+    vi.mocked(classifyBlockerTasks).mockResolvedValue({ open: [], closed: [7], missing: [], foreign: [] });
+    const res = await POST(req(), { params });
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/done or gone/);
+    expect(markAIChangeApplied).not.toHaveBeenCalled();
   });
 });

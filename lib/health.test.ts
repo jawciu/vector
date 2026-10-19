@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { computeHealth } from "./health";
+import { computeHealth, countsAsBlocked, TEXT_BLOCKERS_COUNT_AS_BLOCKED } from "./health";
 
 // computeHealth reads the real clock, so every test runs against a frozen
 // "now" — otherwise overdue/velocity results would drift day by day.
@@ -196,5 +196,30 @@ describe("computeHealth", () => {
       expect(result.status).toBe("Blocked");
       expect(result.reasons).toContain("No tasks completed in 14d");
     });
+  });
+});
+
+describe("text blockers and health (open decision, TEXT_BLOCKERS_COUNT_AS_BLOCKED)", () => {
+  const withTextBlocker = (overrides = {}) =>
+    task({ status: "In progress", dependencies: [{ label: "platform team sign-off", resolvedAt: null }], ...overrides });
+
+  it("defaults to NOT affecting health", () => {
+    expect(TEXT_BLOCKERS_COUNT_AS_BLOCKED).toBe(false);
+    expect(computeHealth([withTextBlocker(), task(), task(), task()])).toEqual({ status: "On track", reasons: [] });
+  });
+
+  it("when switched on, an unresolved text blocker counts like a Blocked task", () => {
+    expect(computeHealth([withTextBlocker(), task(), task(), task()], {}, true).status).toBe("At risk");
+    expect(computeHealth([withTextBlocker(), task()], {}, true).status).toBe("Blocked");
+  });
+
+  it("when switched on, resolved blockers and Done tasks do not count", () => {
+    const resolved = task({ status: "In progress", dependencies: [{ label: "x", resolvedAt: "2026-07-01" }] });
+    const done = withTextBlocker({ status: "Done" });
+    expect(countsAsBlocked(resolved, true)).toBe(false);
+    expect(countsAsBlocked(done, true)).toBe(false);
+    expect(countsAsBlocked(withTextBlocker(), true)).toBe(true);
+    // task blockers never change health on their own (status still rules)
+    expect(countsAsBlocked(task({ dependencies: [{ label: null }] }), true)).toBe(false);
   });
 });

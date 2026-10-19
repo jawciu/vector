@@ -17,6 +17,7 @@ function live(overrides = {}) {
     comments = [],
     drafts = [],
     obStatus = "Active",
+    dependencies = {},
   } = overrides;
   const phase = { id: 10, name: "Kickoff", sortOrder: 0, isComplete: false, targetDate: null };
   const tasks = [1, 2].map((n) => ({
@@ -36,8 +37,9 @@ function live(overrides = {}) {
     assigneeContact: null,
     members: [],
     previousStatus: null,
-    blockedByTaskId: null,
+    blockedByTaskId: dependencies[n]?.find((d) => d.blockedByTask)?.blockedByTask.id ?? null,
     blockedByTask: null,
+    dependencies: dependencies[n] ?? [],
     phase: { name: "Kickoff" },
     comments: comments.filter((c) => c.taskNumber === n),
   }));
@@ -187,5 +189,52 @@ describe("restore-state diff", () => {
     const plan = planRestoreState(snapshot(), [{ prefix: "RAY", onboardings: [] }]);
     expect(plan.ops).toEqual([]);
     expect(plan.skipped[0]).toMatch(/missing/);
+  });
+});
+
+describe("restore-state: dependencies (GAPS-PLAN feature 2)", () => {
+  const taskDep = (n) => ({ id: 900 + n, label: null, resolvedAt: null, blockedByTask: { id: 100 + n, number: n } });
+  const textDep = (label, resolvedAt = null) => ({ id: 950, label, resolvedAt, blockedByTask: null });
+
+  it("an old snapshot (no dependencies field) means exactly its single blocker: a visitor's text blocker goes", () => {
+    const plan = planRestoreState(snapshot(), live({ dependencies: { 2: [textDep("visitor note")] } }));
+    expect(kinds(plan)).toEqual(["TaskDependency:reset"]);
+    expect(plan.ops[0].label).toBe('RAY-2 dependencies ["visitor note"] → []');
+  });
+
+  it("restores a snapshot's task and text blockers, and the legacy column follows the first task blocker", async () => {
+    const snap = snapshot();
+    snap.companies[0].onboardings[0].tasks[1].dependencies = [
+      { label: "platform sign-off", resolvedAt: null },
+      { blockedByNumber: 1 },
+    ];
+    snap.companies[0].onboardings[0].tasks[1].blockedByNumber = 1;
+    const plan = planRestoreState(snap, live());
+    expect(kinds(plan).sort()).toEqual(["Task:reset", "TaskDependency:reset"]);
+    const created = [];
+    const tx = {
+      task: { update: async () => {} },
+      taskDependency: { deleteMany: async () => {}, create: async ({ data }) => created.push(data) },
+    };
+    for (const op of plan.ops) await op.run(tx);
+    expect(created).toEqual([
+      { taskId: 102, label: "platform sign-off", resolvedAt: null },
+      { taskId: 102, blockedByTaskId: 101 },
+    ]);
+    expect(plan.ops.find((o) => o.table === "Task").label).toBe("RAY-2 blockedBy");
+  });
+
+  it("an un-ticked text blocker a visitor resolved is put back to open", () => {
+    const snap = snapshot();
+    snap.companies[0].onboardings[0].tasks[1].dependencies = [{ label: "budget approval", resolvedAt: null }];
+    const plan = planRestoreState(snap, live({ dependencies: { 2: [textDep("budget approval", new Date("2026-09-12T10:00:00Z"))] } }));
+    expect(kinds(plan)).toEqual(["TaskDependency:reset"]);
+  });
+
+  it("nothing to do when live dependencies already match", () => {
+    const snap = snapshot();
+    snap.companies[0].onboardings[0].tasks[1].dependencies = [{ blockedByNumber: 1 }];
+    snap.companies[0].onboardings[0].tasks[1].blockedByNumber = 1;
+    expect(planRestoreState(snap, live({ dependencies: { 2: [taskDep(1)] } })).ops).toEqual([]);
   });
 });

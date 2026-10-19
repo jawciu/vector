@@ -138,9 +138,13 @@ reflects the miss.
 - **Duplicates**: a new-task title with word overlap of 0.6 or more against an open board task.
 - **Gap expectations** are met only by a draft of the expected action (a duplicate `create_task`
   paired with an existing-task expectation earns nothing), and only through structured fields
-  that do not exist yet (`dependsOn`, `draftRef`, `appendNotes`). Notes on an existing task count
-  only as `appendNotes`, never the draft's own notes field. One exception: a free-text blocker
-  written into a new task's notes counts, because that is what today's prompt asks for.
+  (`appendNotes` since feature 1, `dependsOn` since feature 2, `draftRef` with feature 3). Notes
+  on an existing task count only as `appendNotes`, never the draft's own notes field.
+  `free_text_dependency` is met by a `{ text }` dependency matching the expected phrase (notes
+  phrase rules); `existing_task_dependency` by an update whose `dependsOn` names the expected
+  board task. One exception kept for older run files: a "Blocked by: ..." line in a new task's
+  notes still counts, because that is what the prompt asked for before feature 2 (so every
+  stored run rescores identically).
 
 These live as named constants in `scoring.ts` (`PAIR_THRESHOLD`, `QUOTE_ASSISTED_THRESHOLD`,
 `NOTES_WINDOW`, `DUPLICATE_THRESHOLD`) and are covered by `scoring.test.ts`. After changing any of

@@ -7,9 +7,15 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, Prisma } from "./generated/prisma/client";
 import type { ActivityLog } from "./generated/prisma/client";
 import type { Actor, HealthStatus } from "./types";
-import { computeHealth as computeHealthFromTasks } from "./health";
+import { computeHealth as computeHealthFromTasks, countsAsBlocked } from "./health";
 import { sendTaskAssigned, sendTaskCommented } from "./email";
 import { derivePrefix } from "./companies";
+import {
+  normaliseDependsOn,
+  cleanDependencyLabel,
+  type DependsOnItem,
+  type TaskDependencyView,
+} from "./task-dependencies";
 import {
   TASK_STATUSES,
   PRIORITIES,
@@ -59,7 +65,9 @@ type MapTaskInput = {
   number?: number | null;
   onboarding?: { company?: { prefix?: string | null } | null } | null;
 };
-type Mapped<T> = T & { taskId: string | null };
+// `dependencies` rows come back mapped to TaskDependencyView (mapDependency).
+type Mapped<T> = Omit<T, "dependencies"> & { taskId: string | null } &
+  ("dependencies" extends keyof T ? { dependencies: TaskDependencyView[] } : unknown);
 function mapTask<T extends MapTaskInput>(task: T): Mapped<T>;
 function mapTask<T extends MapTaskInput>(task: T | null): Mapped<T> | null;
 function mapTask<T extends MapTaskInput>(task: T | null | undefined): Mapped<T> | null | undefined;
@@ -68,12 +76,31 @@ function mapTask<T extends MapTaskInput>(task: T | null | undefined): Mapped<T> 
   const prefix = task?.onboarding?.company?.prefix ?? null;
   const number = task?.number ?? null;
   const blocker = (task as { blockedByTask?: MapTaskInput | null }).blockedByTask;
+  const deps = (task as { dependencies?: RawDependency[] }).dependencies;
   return {
     ...task,
     taskId: prefix && number ? `${prefix}-${number}` : null,
     // The blocker renders its own id chip on the card, so give it a taskId too.
     ...(blocker && { blockedByTask: mapTask(blocker) }),
-  };
+    ...(Array.isArray(deps) && { dependencies: deps.map(mapDependency) }),
+  } as unknown as Mapped<T>;
+}
+
+/** A TaskDependency row as loaded with DEPENDENCIES_INCLUDE. */
+type RawDependency = {
+  id: number;
+  label: string | null;
+  resolvedAt: Date | null;
+  blockedByTask: (MapTaskInput & { id: number; title: string; status: string }) | null;
+};
+
+/** The client shape of one dependency (lib/task-dependencies.ts TaskDependencyView). */
+function mapDependency(d: RawDependency): TaskDependencyView {
+  if (d.blockedByTask) {
+    const b = mapTask(d.blockedByTask);
+    return { id: d.id, blockedByTask: { id: b.id, taskId: b.taskId, title: b.title, status: b.status } };
+  }
+  return { id: d.id, label: d.label, resolvedAt: d.resolvedAt ? d.resolvedAt.toISOString() : null };
 }
 
 /** Blocker fields the board card needs, including what mapTask composes taskId from. */
@@ -83,6 +110,23 @@ const BLOCKED_BY_TASK_SELECT = {
   status: true,
   number: true,
   onboarding: { select: { company: { select: { prefix: true } } } },
+};
+
+/** A task's dependencies, oldest first, with what the card needs of each blocker task. */
+const DEPENDENCIES_INCLUDE = {
+  orderBy: [{ createdAt: "asc" as const }, { id: "asc" as const }],
+  select: {
+    id: true,
+    label: true,
+    resolvedAt: true,
+    blockedByTask: { select: BLOCKED_BY_TASK_SELECT },
+  },
+};
+
+/** Health only needs to know which text blockers are still open (lib/health.ts). */
+const OPEN_TEXT_BLOCKERS_SELECT = {
+  where: { label: { not: null }, resolvedAt: null },
+  select: { label: true, resolvedAt: true },
 };
 
 /**
@@ -599,7 +643,10 @@ export async function getOnboardings(statusFilter?: string | null) {
     include: {
       company: true,
       tasks: {
-        include: { blockedByTask: { select: { id: true, status: true } } },
+        include: {
+          blockedByTask: { select: { id: true, status: true } },
+          dependencies: OPEN_TEXT_BLOCKERS_SELECT,
+        },
       },
     },
     orderBy: { id: "asc" },
@@ -609,9 +656,9 @@ export async function getOnboardings(statusFilter?: string | null) {
       targetGoLive: ob.targetGoLive,
       createdAt: ob.createdAt,
     });
-    const blockedCount = ob.tasks.filter((t) => isTaskBlocked(t)).length;
+    const blockedCount = ob.tasks.filter((t) => countsAsBlocked(t)).length;
     const nextTask = ob.tasks.find(
-      (t) => t.status !== "Done" && !isTaskBlocked(t)
+      (t) => t.status !== "Done" && !countsAsBlocked(t)
     );
     return {
       id: String(ob.id),
@@ -660,6 +707,7 @@ export async function getTasksForOnboarding(onboardingId: IdLike) {
     where: { onboardingId: id },
     include: {
       blockedByTask: { select: BLOCKED_BY_TASK_SELECT },
+      dependencies: DEPENDENCIES_INCLUDE,
       assigneeContact: { select: { id: true, name: true } },
       files: { orderBy: { createdAt: "desc" } },
       onboarding: { select: { company: { select: { prefix: true } } } },
@@ -683,6 +731,7 @@ export async function getTasksForOnboarding(onboardingId: IdLike) {
     previousStatus: t.previousStatus || null,
     blockedByTaskId: t.blockedByTaskId,
     blockedByTask: t.blockedByTask || null,
+    dependencies: t.dependencies,
     assigneeContactId: t.assigneeContactId,
     assigneeContact: t.assigneeContact || null,
     files: t.files || [],
@@ -715,6 +764,8 @@ export interface CreateTaskInput {
   notes?: string | null;
   priority?: string | null;
   blockedByTaskId?: IdLike | null;
+  /** What the task waits on: board tasks and/or text blockers. Task ids must be on the same onboarding. */
+  dependsOn?: DependsOnItem[] | null;
   assigneeContactId?: IdLike | null;
 }
 
@@ -736,6 +787,11 @@ export async function createTask(
 
   const assigneeContactId = data.assigneeContactId != null ? Number(data.assigneeContactId) : null;
   const ownerId = data.ownerId != null ? Number(data.ownerId) : null;
+  // `dependsOn` (task or text blockers) and the legacy single blockedByTaskId
+  // are one list; the old column keeps the first task blocker (add-then-tighten).
+  const dependsOn = normaliseDependsOn(data.dependsOn, data.blockedByTaskId);
+  const firstBlocker = dependsOn.find((d): d is { taskId: number } => "taskId" in d);
+  const firstBlockerTaskId = firstBlocker ? firstBlocker.taskId : null;
 
   // Inner worker: assumes a Prisma client/tx is in scope. Performs the
   // atomic counter bump, computes sortOrder for the target phase, and
@@ -776,7 +832,7 @@ export async function createTask(
     const number = Number(rows[0].number);
     const companyId = Number(rows[0].companyId);
 
-    return await client.task.create({
+    const created = await client.task.create({
       data: {
         onboardingId,
         phaseId,
@@ -790,13 +846,26 @@ export async function createTask(
         notes: data.notes || "",
         sortOrder,
         priority: data.priority || null,
-        blockedByTaskId: data.blockedByTaskId ? Number(data.blockedByTaskId) : null,
+        blockedByTaskId: firstBlockerTaskId,
         assigneeContactId,
         companyId,
         number,
       },
       include: {
         blockedByTask: { select: BLOCKED_BY_TASK_SELECT },
+        assigneeContact: { select: { id: true, name: true } },
+        onboarding: { select: { company: { select: { prefix: true } } } },
+      },
+    });
+    if (dependsOn.length === 0) return created;
+    // Dependencies go in with the task, in the same transaction. The legacy
+    // column already holds the first task blocker (set above).
+    await insertDependencies(client, created.id, onboardingId, dependsOn);
+    return client.task.findUniqueOrThrow({
+      where: { id: created.id },
+      include: {
+        blockedByTask: { select: BLOCKED_BY_TASK_SELECT },
+        dependencies: DEPENDENCIES_INCLUDE,
         assigneeContact: { select: { id: true, name: true } },
         onboarding: { select: { company: { select: { prefix: true } } } },
       },
@@ -873,9 +942,9 @@ async function maybeEmitHealthFlip({
   if (!onboarding) return;
   const allTasks = await prisma.task.findMany({
     where: { onboardingId },
-    select: { id: true, status: true, due: true },
+    select: { id: true, status: true, due: true, dependencies: OPEN_TEXT_BLOCKERS_SELECT },
   });
-  const beforeTasks = allTasks.map((t) => (t.id === taskAfter.id ? taskBefore : t));
+  const beforeTasks = allTasks.map((t) => (t.id === taskAfter.id ? { ...taskBefore, dependencies: t.dependencies } : t));
   const opts = { targetGoLive: onboarding.targetGoLive, createdAt: onboarding.createdAt };
   const before = computeHealthFromTasks(beforeTasks, opts).status;
   const after = computeHealthFromTasks(allTasks, opts).status;
@@ -912,7 +981,18 @@ export interface UpdateTaskInput {
   onboardingId?: never;
 }
 
-export async function updateTask(id: IdLike, data: UpdateTaskInput, { actor }: { actor?: Actor | null } = {}) {
+/**
+ * `addDependencies` adds blockers in the SAME transaction as the field update,
+ * so an AI update draft that changes fields (e.g. appends a note) and adds
+ * blockers applies all or nothing: a rejected blocker (another onboarding, a
+ * loop) leaves the task untouched and the draft pending, and a retry cannot
+ * append the note twice.
+ */
+export async function updateTask(
+  id: IdLike,
+  data: UpdateTaskInput,
+  { actor, addDependencies = [] }: { actor?: Actor | null; addDependencies?: DependsOnItem[] } = {}
+) {
   // Defensive: moving a task to a different onboarding would break the
   // Task.companyId == Onboarding.companyId invariant. The whitelist below
   // already excludes it, but make the rule explicit so accidental future
@@ -930,7 +1010,20 @@ export async function updateTask(id: IdLike, data: UpdateTaskInput, { actor }: {
   });
   if (!existing) return null;
 
-  const updated = await prisma.task.update({
+  // Legacy single-blocker writes (older clients, scripts): replace the task's
+  // first task blocker. Dependencies are the source of truth; the column is
+  // re-derived from them.
+  if (data.blockedByTaskId !== undefined) {
+    await replaceLegacyBlocker(taskId, existing.onboardingId, data.blockedByTaskId);
+  }
+
+  const deps = normaliseDependsOn(addDependencies);
+  const updated = await prisma.$transaction(async (tx) => {
+   if (deps.length > 0) {
+    await insertDependencies(tx, taskId, existing.onboardingId, deps);
+    await syncLegacyBlockedBy(tx, taskId);
+   }
+   return tx.task.update({
     where: { id: taskId },
     data: {
       ...(data.title !== undefined && { title: data.title }),
@@ -948,18 +1041,17 @@ export async function updateTask(id: IdLike, data: UpdateTaskInput, { actor }: {
       ...(data.previousStatus !== undefined && { previousStatus: data.previousStatus }),
       ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
       ...(data.phaseId !== undefined && { phaseId: Number(data.phaseId) }),
-      ...(data.blockedByTaskId !== undefined && {
-        blockedByTaskId: data.blockedByTaskId ? Number(data.blockedByTaskId) : null,
-      }),
       ...(data.assigneeContactId !== undefined && {
         assigneeContactId: data.assigneeContactId != null ? Number(data.assigneeContactId) : null,
       }),
     },
     include: {
       blockedByTask: { select: BLOCKED_BY_TASK_SELECT },
+      dependencies: DEPENDENCIES_INCLUDE,
       assigneeContact: { select: { id: true, name: true } },
       onboarding: { select: { company: { select: { prefix: true } } } },
     },
+   });
   });
 
   const updatedMapped = mapTask(updated);
@@ -998,7 +1090,7 @@ export async function updateTask(id: IdLike, data: UpdateTaskInput, { actor }: {
 
   // Health may have flipped if any input to computeHealth changed.
   const healthInputs = ["status", "due", "blockedByTaskId"] as const;
-  if (healthInputs.some((k) => data[k] !== undefined)) {
+  if (healthInputs.some((k) => data[k] !== undefined) || deps.length > 0) {
     await maybeEmitHealthFlip({
       onboardingId: existing.onboardingId,
       taskBefore: { id: existing.id, status: existing.status, due: existing.due ?? "" },
@@ -1010,6 +1102,265 @@ export async function updateTask(id: IdLike, data: UpdateTaskInput, { actor }: {
   return mapTask(updated);
 }
 
+// ---------------------------------------------------------------------------
+// Task dependencies (GAPS-PLAN feature 2). A task waits on board tasks and/or
+// text blockers. TaskDependency is the source of truth; Task.blockedByTaskId is
+// kept equal to the first task blocker (oldest row) until a later migration
+// retires it, so anything still reading the column stays right.
+// ---------------------------------------------------------------------------
+
+/** A dependency write the caller got wrong (400), as opposed to a server fault. */
+export class DependencyError extends Error {
+  status: number;
+  constructor(message: string, status = 400) {
+    super(message);
+    this.name = "DependencyError";
+    this.status = status;
+  }
+}
+
+/** Set Task.blockedByTaskId to the task's first task blocker (or null). */
+async function syncLegacyBlockedBy(client: DbClient, taskId: number) {
+  const first = await client.taskDependency.findFirst({
+    where: { taskId, blockedByTaskId: { not: null } },
+    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    select: { blockedByTaskId: true },
+  });
+  await client.task.update({
+    where: { id: taskId },
+    data: { blockedByTaskId: first?.blockedByTaskId ?? null },
+  });
+}
+
+/**
+ * Insert dependencies for a task, skipping ones it already has. Task blockers
+ * must be other tasks on the same onboarding (DependencyError otherwise).
+ * Does not sync the legacy column; callers do.
+ */
+async function insertDependencies(client: DbClient, taskId: number, onboardingId: number, items: DependsOnItem[]) {
+  if (items.length === 0) return;
+  const taskIds = items.filter((i): i is { taskId: number } => "taskId" in i).map((i) => i.taskId);
+  if (taskIds.includes(taskId)) throw new DependencyError("A task cannot depend on itself");
+  if (taskIds.length > 0) {
+    const found = await client.task.findMany({
+      where: { id: { in: taskIds }, onboardingId },
+      select: { id: true },
+    });
+    if (found.length !== new Set(taskIds).size) {
+      throw new DependencyError("Blocker task not found on this onboarding");
+    }
+  }
+  for (const blockerId of new Set(taskIds)) {
+    const loop = await findDependencyLoop(client, taskId, blockerId);
+    if (loop) {
+      const codes = await taskCodes(client, [taskId, ...loop]);
+      const [self, ...path] = [taskId, ...loop].map((id) => codes.get(id) ?? `#${id}`);
+      const chain = [...path, self];
+      throw new DependencyError(
+        `${path[0]} can't block ${self}: ${chain[0]} already waits on ${chain.slice(1).join(", which waits on ")}, so this would make a loop`
+      );
+    }
+  }
+  const existing = await client.taskDependency.findMany({
+    where: { taskId },
+    select: { blockedByTaskId: true, label: true },
+  });
+  const haveTasks = new Set(existing.map((e) => e.blockedByTaskId).filter((x): x is number => x != null));
+  const haveLabels = new Set(existing.map((e) => e.label?.toLowerCase()).filter(Boolean));
+  for (const item of items) {
+    if ("taskId" in item) {
+      if (haveTasks.has(item.taskId)) continue;
+      haveTasks.add(item.taskId);
+      await client.taskDependency.create({ data: { taskId, blockedByTaskId: item.taskId } });
+    } else {
+      const label = cleanDependencyLabel(item.text);
+      if (!label || haveLabels.has(label.toLowerCase())) continue;
+      haveLabels.add(label.toLowerCase());
+      await client.taskDependency.create({ data: { taskId, label } });
+    }
+  }
+}
+
+/**
+ * Would "taskId waits on blockerId" close a loop? Follows what blockerId
+ * already waits on (task blockers only, any status) and returns the chain
+ * [blockerId, ..., a task that waits on taskId] if it reaches taskId, else
+ * null. Visits each task once, so loops already in the data (old rows) cannot
+ * hang it.
+ */
+async function findDependencyLoop(client: DbClient, taskId: number, blockerId: number): Promise<number[] | null> {
+  const parent = new Map<number, number | null>([[blockerId, null]]);
+  let frontier = [blockerId];
+  while (frontier.length > 0) {
+    const edges = await client.taskDependency.findMany({
+      where: { taskId: { in: frontier }, blockedByTaskId: { not: null } },
+      select: { taskId: true, blockedByTaskId: true },
+    });
+    const next: number[] = [];
+    for (const e of edges) {
+      const to = e.blockedByTaskId as number;
+      if (to === taskId) {
+        const chain = [e.taskId];
+        let p = parent.get(e.taskId) ?? null;
+        while (p != null) { chain.unshift(p); p = parent.get(p) ?? null; }
+        return chain;
+      }
+      if (!parent.has(to)) { parent.set(to, e.taskId); next.push(to); }
+    }
+    frontier = next;
+  }
+  return null;
+}
+
+/** "RAY-7" codes for task ids. */
+async function taskCodes(client: DbClient, ids: number[]): Promise<Map<number, string>> {
+  const rows = await client.task.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, number: true, onboarding: { select: { company: { select: { prefix: true } } } } },
+  });
+  return new Map(rows.map((r) => [r.id, `${r.onboarding.company.prefix}-${r.number}`]));
+}
+
+/** Legacy `blockedByTaskId` write: swap the first task blocker for `next` (null = drop it). */
+async function replaceLegacyBlocker(taskId: number, onboardingId: number, next: IdLike | null) {
+  const nextId = next != null && next !== "" ? Number(next) : null;
+  if (nextId != null && Number.isNaN(nextId)) throw new DependencyError("Invalid blocker task id");
+  await prisma.$transaction(async (tx) => {
+    const current = await tx.task.findUnique({ where: { id: taskId }, select: { blockedByTaskId: true } });
+    if (current?.blockedByTaskId != null && current.blockedByTaskId !== nextId) {
+      await tx.taskDependency.deleteMany({ where: { taskId, blockedByTaskId: current.blockedByTaskId } });
+    }
+    if (nextId != null) await insertDependencies(tx, taskId, onboardingId, [{ taskId: nextId }]);
+    await syncLegacyBlockedBy(tx, taskId);
+  });
+}
+
+/** One task in the board shape (same as getTasksForOnboarding's rows). Null if missing. */
+export async function getTaskForBoard(id: IdLike) {
+  const taskId = Number(id);
+  if (Number.isNaN(taskId)) return null;
+  const t = await prisma.task.findUnique({
+    where: { id: taskId },
+    include: {
+      blockedByTask: { select: BLOCKED_BY_TASK_SELECT },
+      dependencies: DEPENDENCIES_INCLUDE,
+      assigneeContact: { select: { id: true, name: true } },
+      files: { orderBy: { createdAt: "desc" } },
+      onboarding: { select: { company: { select: { prefix: true } } } },
+    },
+  });
+  if (!t) return null;
+  return mapTask({
+    id: t.id,
+    phaseId: t.phaseId,
+    title: t.title,
+    status: t.status,
+    due: t.due,
+    description: t.description || "",
+    members: t.members || [],
+    owner: t.owner,
+    ownerId: t.ownerId,
+    notes: t.notes,
+    sortOrder: t.sortOrder,
+    priority: t.priority || null,
+    commentCount: t.commentCount ?? 0,
+    previousStatus: t.previousStatus || null,
+    blockedByTaskId: t.blockedByTaskId,
+    blockedByTask: t.blockedByTask || null,
+    dependencies: t.dependencies,
+    assigneeContactId: t.assigneeContactId,
+    assigneeContact: t.assigneeContact || null,
+    files: t.files || [],
+    number: t.number ?? null,
+    onboarding: t.onboarding ?? null,
+  });
+}
+
+/**
+ * Sort proposed blocker task ids for an onboarding: `open` (on this onboarding,
+ * not Done) can be linked; `closed` are Done; `missing` no longer exist;
+ * `foreign` belong to another onboarding (a tampered or mis-scoped draft).
+ */
+export async function classifyBlockerTasks(onboardingId: IdLike, taskIds: number[]) {
+  const obId = Number(onboardingId);
+  const ids = [...new Set(taskIds.filter((n) => Number.isInteger(n)))];
+  const result = { open: [] as number[], closed: [] as number[], missing: [] as number[], foreign: [] as number[] };
+  if (Number.isNaN(obId) || ids.length === 0) return result;
+  const rows = await prisma.task.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, onboardingId: true, status: true },
+  });
+  const byId = new Map(rows.map((r) => [r.id, r]));
+  for (const id of ids) {
+    const r = byId.get(id);
+    if (!r) result.missing.push(id);
+    else if (r.onboardingId !== obId) result.foreign.push(id);
+    else if (r.status === "Done") result.closed.push(id);
+    else result.open.push(id);
+  }
+  return result;
+}
+
+/** A task's dependencies, oldest first. [] for a bad id or a missing task. */
+export async function listTaskDependencies(taskId: IdLike): Promise<TaskDependencyView[]> {
+  const id = Number(taskId);
+  if (Number.isNaN(id)) return [];
+  const rows = await prisma.taskDependency.findMany({ where: { taskId: id }, ...DEPENDENCIES_INCLUDE });
+  return rows.map(mapDependency);
+}
+
+/**
+ * Add dependencies to a task (board tasks and/or text). Already-present ones
+ * are skipped. Returns the task in the board shape, or null when the task is
+ * missing. Throws DependencyError for a blocker on another onboarding or the
+ * task itself.
+ */
+export async function addTaskDependencies(taskId: IdLike, items: DependsOnItem[]) {
+  const id = Number(taskId);
+  if (Number.isNaN(id)) return null;
+  const task = await prisma.task.findUnique({ where: { id }, select: { onboardingId: true } });
+  if (!task) return null;
+  const clean = normaliseDependsOn(items);
+  if (clean.length === 0) throw new DependencyError("Nothing to add: give a task or some text");
+  await prisma.$transaction(async (tx) => {
+    await insertDependencies(tx, id, task.onboardingId, clean);
+    await syncLegacyBlockedBy(tx, id);
+  });
+  return getTaskForBoard(id);
+}
+
+/** Remove one dependency from a task. Null when the task or dependency is missing. */
+export async function removeTaskDependency(taskId: IdLike, dependencyId: IdLike) {
+  const id = Number(taskId);
+  const depId = Number(dependencyId);
+  if (Number.isNaN(id) || Number.isNaN(depId)) return null;
+  const removed = await prisma.$transaction(async (tx) => {
+    const r = await tx.taskDependency.deleteMany({ where: { id: depId, taskId: id } });
+    if (r.count === 0) return false;
+    await syncLegacyBlockedBy(tx, id);
+    return true;
+  });
+  return removed ? getTaskForBoard(id) : null;
+}
+
+/**
+ * Tick a text blocker off (or un-tick it). Task blockers are resolved by their
+ * task being Done, so this is a DependencyError for them. Null when missing.
+ */
+export async function setTaskDependencyResolved(taskId: IdLike, dependencyId: IdLike, resolved: boolean) {
+  const id = Number(taskId);
+  const depId = Number(dependencyId);
+  if (Number.isNaN(id) || Number.isNaN(depId)) return null;
+  const dep = await prisma.taskDependency.findFirst({ where: { id: depId, taskId: id }, select: { label: true } });
+  if (!dep) return null;
+  if (dep.label == null) throw new DependencyError("A task blocker is resolved by completing that task");
+  await prisma.taskDependency.update({
+    where: { id: depId },
+    data: { resolvedAt: resolved ? new Date() : null },
+  });
+  return getTaskForBoard(id);
+}
+
 /** Delete a task. */
 export async function deleteTask(id: IdLike) {
   const taskId = Number(id);
@@ -1017,6 +1368,12 @@ export async function deleteTask(id: IdLike) {
 
   const exists = await prisma.task.findUnique({ where: { id: taskId }, select: { id: true } });
   if (!exists) return null;
+  // Tasks waiting on this one lose that dependency (FK cascade); re-derive
+  // their legacy column afterwards so it never points at a later blocker's gap.
+  const dependents = await prisma.taskDependency.findMany({
+    where: { blockedByTaskId: taskId },
+    select: { taskId: true },
+  });
 
   // Re-fetch with the prefix include so the returned shape has taskId
   // computed; Prisma's `delete()` does support `include`, but we need both
@@ -1028,6 +1385,7 @@ export async function deleteTask(id: IdLike) {
       onboarding: { select: { company: { select: { prefix: true } } } },
     },
   });
+  for (const d of dependents) await syncLegacyBlockedBy(prisma, d.taskId);
   return mapTask(deleted);
 }
 
@@ -1081,6 +1439,7 @@ export async function reorderTask(taskId: IdLike, targetPhaseId: IdLike, newSort
     where: { id },
     include: {
       blockedByTask: { select: BLOCKED_BY_TASK_SELECT },
+      dependencies: DEPENDENCIES_INCLUDE,
       onboarding: { select: { company: { select: { prefix: true } } } },
     },
   });
@@ -1762,7 +2121,7 @@ export async function getPortalOnboarding(onboardingId: IdLike) {
           tasks: { select: { id: true, status: true } },
         },
       },
-      tasks: true,
+      tasks: { include: { dependencies: OPEN_TEXT_BLOCKERS_SELECT } },
     },
   });
   if (!onboarding) return null;

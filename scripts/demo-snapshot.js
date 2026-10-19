@@ -19,7 +19,8 @@
  *
  *   --restore-state
  *               Put the seeded rows back the way the snapshot has them:
- *               task status/due/owner/assignee/priority/phase/order, phase
+ *               task status/due/owner/assignee/priority/phase/order and
+ *               dependencies (task and text blockers), phase
  *               names and order, onboarding status/owner/go-live, contact
  *               fields; delete the tasks, comments, files, magic links,
  *               activity and notifications a visitor added that the snapshot
@@ -137,6 +138,12 @@ async function fetchCompanies() {
             include: {
               phase: { select: { name: true } },
               blockedByTask: { select: { number: true } },
+              // GAPS-PLAN feature 2: TaskDependency rows. Needs migration
+              // 20261013120000_add_task_dependency on the database first.
+              dependencies: {
+                orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+                include: { blockedByTask: { select: { number: true } } },
+              },
               ownerUser: { select: { email: true } },
               assigneeContact: { select: { email: true } },
               comments: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
@@ -202,6 +209,8 @@ async function readLive() {
             previousStatus: t.previousStatus ?? null,
             // Dependency by task number, not id: ids churn when a task is restored.
             blockedByNumber: t.blockedByTask?.number ?? null,
+            // Every dependency, oldest first: task blockers by number, text blockers by label.
+            dependencies: captureDependencies(t.dependencies),
           })),
           comments: K.comments.map(([key, cm, number]) => ({
             key, taskNumber: number, author: cm.author, body: cm.body, createdAt: iso(cm.createdAt),
@@ -244,6 +253,32 @@ async function readLive() {
     })),
     events: events.map((e) => ({ sourceId: e.sourceId, ambiguous: e.matchAmbiguous, drafts: e._count.pendingChanges })),
   };
+}
+
+/** TaskDependency rows → the snapshot's portable form. */
+export function captureDependencies(rows) {
+  return (rows ?? []).map((d) =>
+    d.blockedByTask
+      ? { blockedByNumber: d.blockedByTask.number }
+      : { label: d.label, resolvedAt: iso(d.resolvedAt) }
+  );
+}
+
+/**
+ * The dependencies a snapshot task should have. A snapshot captured before
+ * TaskDependency existed only knows the single blocker, which was the whole
+ * truth then, so it means "exactly that one task blocker, nothing else".
+ */
+export function expectedDependencies(st) {
+  if (Object.prototype.hasOwnProperty.call(st, "dependencies")) return st.dependencies ?? [];
+  return st.blockedByNumber == null ? [] : [{ blockedByNumber: st.blockedByNumber }];
+}
+
+/** A comparable string for a dependency list (order matters: the first task blocker is the legacy column). */
+export function dependencySignature(deps) {
+  return JSON.stringify((deps ?? []).map((d) =>
+    d.blockedByNumber != null ? `#${d.blockedByNumber}` : `${d.label}${d.resolvedAt ? ` (resolved ${d.resolvedAt})` : ""}`
+  ));
 }
 
 function loadSnapshot() {
@@ -309,6 +344,7 @@ function diff(expected, actual) {
       if (e.priority !== a.priority) c.push(`priority ${e.priority} → ${a.priority}`);
       if (e.owner !== a.owner) c.push(`owner ${e.owner ?? "none"} → ${a.owner ?? "none"}`);
       if (e.blockedByNumber !== a.blockedByNumber) c.push(`dependency ${e.blockedByNumber ?? "none"} → ${a.blockedByNumber ?? "none"}`);
+      else if (dependencySignature(expectedDependencies(e)) !== dependencySignature(expectedDependencies(a))) c.push("dependencies edited");
       return c;
     });
   sweep("contact", E.contacts, A.contacts, (v) => `${v.name} <${v.email}>`);
@@ -546,8 +582,26 @@ export function planRestoreState(snapshot, companies, { only = null, vendorByEma
           const want = st.assigneeEmail == null ? null : contactIdByEmail.get(st.assigneeEmail) ?? lt.assigneeContactId;
           if (!same(lt.assigneeContactId, want)) { data.assigneeContactId = want; changes.push("assignee"); }
         }
-        const wantBlocker = st.blockedByNumber == null ? null : liveTaskByNumber.get(st.blockedByNumber)?.id ?? null;
+        // Dependencies: put back exactly the snapshot's list (task blockers by
+        // number, text blockers with their resolved state); the legacy column
+        // follows the first task blocker, as lib/db keeps it.
+        const wantDeps = expectedDependencies(st).filter((d) => d.blockedByNumber == null || liveTaskByNumber.has(d.blockedByNumber));
+        const liveDeps = captureDependencies(lt.dependencies);
+        const firstTaskDep = wantDeps.find((d) => d.blockedByNumber != null);
+        const wantBlocker = firstTaskDep ? liveTaskByNumber.get(firstTaskDep.blockedByNumber).id : null;
         if (!same(lt.blockedByTaskId, wantBlocker)) { data.blockedByTaskId = wantBlocker; changes.push("blockedBy"); }
+        if (lt.dependencies && dependencySignature(liveDeps) !== dependencySignature(wantDeps)) {
+          add("TaskDependency", "reset", `${st.key} dependencies ${dependencySignature(liveDeps)} → ${dependencySignature(wantDeps)}`, async (tx) => {
+            await tx.taskDependency.deleteMany({ where: { taskId: lt.id } });
+            for (const d of wantDeps) {
+              await tx.taskDependency.create({
+                data: d.blockedByNumber != null
+                  ? { taskId: lt.id, blockedByTaskId: liveTaskByNumber.get(d.blockedByNumber).id }
+                  : { taskId: lt.id, label: d.label, resolvedAt: d.resolvedAt ? new Date(d.resolvedAt) : null },
+              });
+            }
+          });
+        }
 
         if (changes.length) {
           const label = changes.includes("status")

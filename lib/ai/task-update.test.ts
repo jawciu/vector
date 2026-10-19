@@ -10,6 +10,7 @@ import {
   staleOwnerMessage,
   applyTaskUpdateOverrides,
   hasChanges,
+  invalidChangeFields,
   isIsoDate,
   normaliseTaskUpdate,
   prepareStoredTaskUpdate,
@@ -260,5 +261,51 @@ describe("stale person messages", () => {
     expect(staleOwnerMessage(null)).toBe("The proposed owner is no longer in the workspace: pick a new owner or leave unassigned");
     expect(staleContactMessage("Pat")).toBe("Pat is no longer on this onboarding: pick a new assignee or leave unassigned");
     expect(staleOwnerMessage("x") + staleContactMessage("y")).not.toMatch(/\u2014/);
+  });
+});
+
+describe("dependsOn on an existing-task update (GAPS-PLAN feature 2)", () => {
+  it("sanitises dependsOn and folds a legacy blockedByTaskId in", () => {
+    expect(sanitiseChanges({ dependsOn: [{ text: " security review " }, { taskId: "7" }] })).toEqual({
+      dependsOn: [{ text: "security review" }, { taskId: 7 }],
+    });
+    expect(sanitiseChanges({ blockedByTaskId: 4 })).toEqual({ dependsOn: [{ taskId: 4 }] });
+    expect(sanitiseChanges({ dependsOn: [] })).toEqual({});
+  });
+
+  it("a dependency-only update is action add_dependency; with notes it is update", () => {
+    expect(normaliseTaskUpdate({ changes: { dependsOn: [{ text: "x" }] } }).action).toBe("add_dependency");
+    expect(normaliseTaskUpdate({ changes: { dependsOn: [{ text: "x" }], appendNotes: "y" } }).action).toBe("update");
+    expect(hasChanges({ dependsOn: [{ text: "x" }] })).toBe(true);
+  });
+
+  it("flags malformed dependsOn, accepts an empty list", () => {
+    expect(invalidChangeFields({ dependsOn: [{ taskId: "abc" }] })).toEqual(["dependsOn"]);
+    expect(invalidChangeFields({ dependsOn: [] })).toEqual([]);
+    expect(invalidChangeFields({ blockedByTaskId: 5 })).toEqual([]);
+    expect(invalidChangeFields({ blockedByTaskId: "x" })).toEqual(["blockedByTaskId"]);
+  });
+
+  it("the draft writer drops task blockers the model was not shown, and the task itself", () => {
+    const valid = { vendorUserIds: new Set([6]), contactIds: new Set<number>(), openTaskIds: new Set([3, 4]) };
+    const r = prepareStoredTaskUpdate(
+      { taskId: 3, changes: { dependsOn: [{ taskId: 3 }, { taskId: 4 }, { taskId: 99 }, { text: "legal ok" }] } },
+      valid
+    );
+    expect(r.dropped).toEqual(["dependsOn.taskId=3", "dependsOn.taskId=99"]);
+    expect(r.payload).toMatchObject({ action: "add_dependency", changes: { dependsOn: [{ taskId: 4 }, { text: "legal ok" }] } });
+  });
+
+  it("an update whose only blockers are all invalid is skipped", () => {
+    const valid = { vendorUserIds: new Set<number>(), contactIds: new Set<number>(), openTaskIds: new Set([4]) };
+    expect(prepareStoredTaskUpdate({ taskId: 3, changes: { dependsOn: [{ taskId: 99 }] } }, valid).payload).toBeNull();
+  });
+
+  it("editor overrides with a changes object replace the stored dependsOn", () => {
+    const out = applyTaskUpdateOverrides(
+      { taskId: 3, changes: { dependsOn: [{ text: "a" }, { text: "b" }] } },
+      { changes: { dependsOn: [{ text: "b" }] } }
+    );
+    expect(out.changes).toEqual({ dependsOn: [{ text: "b" }] });
   });
 });

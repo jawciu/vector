@@ -154,6 +154,11 @@ model Task {
   blockedByTaskId Int?
   blockedByTask      Task?    @relation("TaskBlocks", fields: [blockedByTaskId], references: [id], onDelete: SetNull)
   blockedTasks       Task[]   @relation("TaskBlocks")
+  // GAPS-PLAN feature 2. Being replaced by TaskDependency (add-then-tighten):
+  // reads use `dependencies`; writes keep blockedByTaskId = the first open
+  // task blocker so older readers stay right. Retired in a later migration.
+  dependencies       TaskDependency[] @relation("TaskDependencyTask")
+  dependentOf        TaskDependency[] @relation("TaskDependencyBlocker")
   assigneeContactId  Int?
   assigneeContact    Contact? @relation(fields: [assigneeContactId], references: [id], onDelete: SetNull)
   comments           Comment[]
@@ -169,6 +174,32 @@ model Task {
   // These cannot be expressed in Prisma — see migration
   // 20260526164238_tighten_task_id_constraints.
   @@unique([companyId, number])
+}
+
+/// What a task waits on: another task on the board, or something that is not
+/// a task at all (a sign-off, another team, an external event) as a text label.
+/// A task can have several. Exactly one of blockedByTaskId / label is set
+/// (CHECK constraint, see migration 20261013120000_add_task_dependency).
+model TaskDependency {
+  id              Int       @id @default(autoincrement())
+  taskId          Int
+  task            Task      @relation("TaskDependencyTask", fields: [taskId], references: [id], onDelete: Cascade)
+  /// Deleting the blocker task deletes the dependency (as the old column's
+  /// SET NULL meant "no blocker"); a label row is never orphaned.
+  blockedByTaskId Int?
+  blockedByTask   Task?     @relation("TaskDependencyBlocker", fields: [blockedByTaskId], references: [id], onDelete: Cascade)
+  label           String?
+  /// Ticked off. Only text blockers are resolved by hand; a task blocker is
+  /// resolved by its task being Done.
+  resolvedAt      DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@index([taskId])
+  @@index([blockedByTaskId])
+  // Not expressible in Prisma (so `migrate diff` reports them as drift, like
+  // the Task CHECKs): CHECK exactly one of blockedByTaskId / label, label 1-200
+  // chars, no self-dependency, resolvedAt only on label rows, and a partial
+  // UNIQUE (taskId, blockedByTaskId) WHERE blockedByTaskId IS NOT NULL.
 }
 
 model Comment {

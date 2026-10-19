@@ -9,6 +9,8 @@
  * once the lib layer's view types settle.
  */
 
+import type { TaskDependencyView } from "@/lib/task-dependencies";
+
 /** A file attached to a task (subset of the Prisma File row). */
 export type TaskFile = {
   id: number;
@@ -38,6 +40,10 @@ export type ClientTask = {
   previousStatus?: string | null;
   blockedByTaskId?: number | null;
   blockedByTask?: { id: number; title: string; status: string; taskId?: string | null } | null;
+  /** What the task waits on: board tasks and text blockers, oldest first
+   *  (GAPS-PLAN feature 2). The source of truth; blockedByTask mirrors the
+   *  first task blocker for older readers. */
+  dependencies?: TaskDependencyView[];
   assigneeContactId?: number | null;
   assigneeContact?: { id: number; name: string } | null;
   files?: TaskFile[];
