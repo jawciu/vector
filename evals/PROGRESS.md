@@ -20,7 +20,7 @@ A running record of how Vector's meeting AI is evaluated and improved: what was 
 | 2026-10-12 | **Baseline eval run** on a throwaway local database: 30 meetings, $1.26. Results below. |
 | 2026-10-12 | Judgement rules added to the AI's instructions (phrased generally, no test-set names); after run, $1.46. |
 | 2026-10-12 | Rules v2 (quote rule, concreteness test for parked items); original vs v2 each run 3 times (~$8.40 total). Results below. |
-| 2026-10-12 | Feature 1 (richer updates to existing tasks) built and under review. |
+| 2026-10-12/13 | Feature 1 (richer updates to existing tasks) built, reviewed in three evaluator rounds, eval run 3 times (~$4.70). Results below. |
 | _next_ | Remaining capability-gap features (see `GAPS-PLAN.md`), each measured by the eval. |
 
 ---
@@ -163,6 +163,33 @@ The first "after" run raised two clear problems: quotes stitched across two spea
 **What to watch:** recall should rise the most (parked items, "right after the call" promises, vendor reminders), notes captured should rise, and precision should not fall (the rules must not make the AI invent tasks from thinking out loud).
 
 ---
+
+### Feature 1: richer updates to existing tasks (3 runs each, 2026-10-12/13)
+
+Feature 1 lets the AI change several fields of an existing task in one draft and append notes to it (see `GAPS-PLAN.md` §1). It also gives the AI each open task's owner and priority, which it could not see before. Compared with rules v2 (same instructions otherwise):
+
+| Metric | Rules v2 (3 runs) | Feature 1 (3 runs) |
+|---|---|---|
+| Total recall | avg 84% (83–86%) | **avg 91% (90–93%)** |
+| Parked "for later" items | avg 47% | **avg 80%** (3–5 of 5) |
+| Clear commitments | avg 87% | avg 91% |
+| Reminders for our own team | avg 83% | avg 67% (1–2 of 2) |
+| Precision | avg 82% (79–84%) | avg 79% (79–80%) |
+| Owner side right | avg 86% | avg 82% |
+| Due date right | avg 95% | avg 93% |
+| Notes captured | avg 78% | avg 76% |
+| Quotes found verbatim | avg 99.6% | avg 99.6% |
+| Gap expectations met | 1–2 of 18 | **4–5 of 18** |
+| ...notes on existing tasks | 0 of 4 | **1–2 of 4** |
+| ...blockers that aren't tasks | 1–2 of 3 | **3 of 3** |
+| Cost per run | ~$1.50 | ~$1.57 |
+
+**Reading it:**
+- **The feature closes the gap it was built for:** notes on existing tasks moved off zero for the first time, and every non-task blocker is now captured.
+- **Recall jumped about 7 points**, with parked items the biggest mover. Seeing each task's current owner and priority seems to help the AI connect what was said to the board.
+- **The cost of that:** it now proposes about 93 drafts per run against about 84, so precision slipped about 3 points (ranges barely overlap) and owner side another 4. Many of the extra owner misses are the recorder problem the eval surfaced (speaker "You", feature 4), which grows as the AI captures more of what the recorder promised.
+- Team reminders dipped (2 cases only, so one miss is 50 points); worth watching, not yet a trend.
+- One run had to be repeated: the laptop slept mid-run and six cases timed out. The interrupted run was discarded, not averaged.
 
 ## Material for the case study
 

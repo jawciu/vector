@@ -322,3 +322,35 @@ describe("shift SQL clamps with the caller's clock, not the database's", () => {
     expect(sql).toMatch(/\{\{now\}\}::timestamptz/);
   });
 });
+
+describe("draft payload dates", () => {
+  // Existing-task update drafts keep their date in payload.changes.dueDate
+  // (lib/ai/task-update.ts). Shifting only the top-level keys left those
+  // drafts proposing a date that drifted further into the past every night.
+  const stmt = statements().find((s) => s.table === "PendingAIChange");
+
+  it("still shifts the top-level dueDate / newDueDate", () => {
+    expect(stmt.sql).toMatch(/WHEN e\.k IN \('dueDate','newDueDate'\)/);
+  });
+
+  it("shifts changes.dueDate inside the changes object", () => {
+    expect(stmt.what).toMatch(/payload\.changes\.dueDate/);
+    expect(stmt.sql).toMatch(/WHEN e\.k = 'changes'/);
+    expect(stmt.sql).toMatch(/jsonb_set\(e\.v, '\{dueDate\}',\s*to_jsonb\(to_char\(\(e\.v #>> '\{dueDate\}'\)::date \+ \{\{delta\}\}::int, 'YYYY-MM-DD'\)\)\)/);
+  });
+
+  it("only touches changes.dueDate when it is a plain YYYY-MM-DD", () => {
+    expect(stmt.sql).toMatch(/jsonb_typeof\(e\.v\) = 'object'\s+AND \(e\.v #>> '\{dueDate\}'\) ~ '\^\\d\{4\}-\\d\{2\}-\\d\{2\}\$'/);
+  });
+
+  it("shifts noteSource.date, the meeting day an appended note is stamped with", () => {
+    expect(stmt.what).toMatch(/payload\.noteSource\.date/);
+    expect(stmt.sql).toMatch(/WHEN e\.k = 'noteSource'/);
+    expect(stmt.sql).toMatch(/jsonb_set\(e\.v, '\{date\}',\s*to_jsonb\(to_char\(\(e\.v #>> '\{date\}'\)::date \+ \{\{delta\}\}::int, 'YYYY-MM-DD'\)\)\)/);
+  });
+
+  it("compiles with the same parameters as before", () => {
+    const { params } = compile(stmt.sql, { delta: 7, anchor: "A", obIds: [1], now: "N" });
+    expect(params).toEqual([7, "N", [1], "A"]);
+  });
+});

@@ -2017,6 +2017,15 @@ export async function getTaskOnboardingId(id: IdLike | null | undefined) {
   return t ? t.onboardingId : null;
 }
 
+/** A task's current notes, for appending to them (approve route, match_existing
+ *  drafts). Null if the task doesn't exist. */
+export async function getTaskNotes(id: IdLike | null | undefined) {
+  const tId = Number(id);
+  if (Number.isNaN(tId)) return null;
+  const t = await prisma.task.findUnique({ where: { id: tId }, select: { notes: true } });
+  return t ? t.notes ?? "" : null;
+}
+
 export async function getTaskForFollowup(id: IdLike) {
   const tId = Number(id);
   if (Number.isNaN(tId)) return null;

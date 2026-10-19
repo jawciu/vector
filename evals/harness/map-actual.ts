@@ -122,12 +122,17 @@ export function mapPhase(golden: GoldenCase, maps: RawMaps, raw: RawPhase): Phas
         blockedByRef: ref(p.blockedByTaskId),
       };
     }
+    // match_existing: current drafts carry every change in `changes`
+    // (lib/ai/task-update.ts); legacy rows carry one `action` with
+    // newDueDate / newPriority. Read both, legacy first, so a stored legacy
+    // run rescores identically.
     return {
       ...base,
       taskRef: ref(p.taskId),
       updateKind: str(p.action),
       newStatus: str(p.newStatus),
       newDueDate: str(p.newDueDate) ?? str(changes.dueDate),
+      ...(changes.dueDate === null && { clearsDueDate: true }),
       newPriority: str(p.newPriority) ?? str(changes.priority),
       newOwnerName: vendor(changes.ownerId) ?? contact(changes.assigneeContactId),
       notes: str(p.notes),

@@ -9,7 +9,7 @@
  */
 /** Inline SVG action icon, 14×14, no background, `var(--icon-tertiary)`.
  *  For `match_existing`, branches on `payload.action` so the icon matches
- *  the sub-action. For `create_task`, uses the same "not done" circle+check
+ *  the sub-action (a multi-field "update" gets the generic grid). For `create_task`, uses the same "not done" circle+check
  *  shape as the Kanban CheckboxButton so the card reads as an unfinished
  *  task. */
 export function ActionIcon({
@@ -28,7 +28,7 @@ export function ActionIcon({
     if (sub === "update_due_date") icon = <ActionCalendarIcon />;
     else if (sub === "reassign") icon = <ActionPersonIcon />;
     else if (sub === "reprioritise") icon = <ActionFlagIcon />;
-    else if (sub === "comment_only") icon = <ActionCommentIcon />;
+    else if (sub === "comment_only" || sub === "add_notes") icon = <ActionCommentIcon />;
     else icon = <ActionGridIcon />;
   } else if (action === "update_status") {
     icon = <ActionCycleIcon />;

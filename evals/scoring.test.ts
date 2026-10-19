@@ -15,7 +15,9 @@ import {
   summarise,
   titleSimilarity,
 } from "./scoring";
-import type { CaseActual, ExpectedToolCall, PhaseActual, Proposal } from "./harness/types";
+import type { CaseActual, ExpectedToolCall, GoldenCase, PhaseActual, Proposal } from "./harness/types";
+import { mapPhase } from "./harness/map-actual";
+import type { RawMaps } from "./harness/map-actual";
 
 const TRANSCRIPT = [
   "I'll draft the incremental model config and have it in a PR by Thursday the 18th.",
@@ -403,5 +405,111 @@ describe("review fixes (2026-10-12)", () => {
   it("a cited id on a Done board task is not valid", () => {
     const s = scorePhase([], phase([], { rawCalls: [{ tool: "update_task_status_draft", taskId: 13, taskRef: "t3" }] }), sources);
     expect(s.totals.citedIdsValid).toEqual(count(0, 1));
+  });
+});
+
+describe("existing-task updates with a `changes` object (GAPS-PLAN feature 1)", () => {
+  // Raw draft rows as the runner stores them, mapped by the real harness code.
+  const golden = {
+    payload: { event: "meeting.saved", meeting: { id: "m1", title: "Sync", date: "2026-06-18" } },
+    board: {
+      companyPrefix: "ACM",
+      companyName: "Acme",
+      contacts: [],
+      vendorUsers: [],
+      tasks: [
+        { ref: "t1", title: "Configure Okta SAML SSO", status: "Not started", owner: "vendor", ownerName: "Dmitri Volkov", dueDate: null, priority: null, notes: "", blockedBy: null },
+        { ref: "t2", title: "Connect Snowflake warehouse to Quarry", status: "In progress", owner: "customer", ownerName: "Jonas Beck", dueDate: null, priority: null, notes: "", blockedBy: null },
+        { ref: "t3", title: "Kickoff call", status: "Done", owner: "vendor", ownerName: "Maya Lindqvist", dueDate: null, priority: null, notes: "", blockedBy: null },
+      ],
+    },
+    expected: { match: { companyPrefix: "ACM" }, toolCalls: [] },
+  } as unknown as GoldenCase;
+  const maps: RawMaps = {
+    companyPrefixByOnboardingId: { "1": "ACM" },
+    onboardingIdByPrefix: { ACM: 1 },
+    vendorNameById: { "6": "Priya Raman", "8": "Dmitri Volkov" },
+    contactNameById: { "21": "Jonas Beck" },
+    refByTaskId: { "101": "t1", "102": "t2", "103": "t3" },
+  };
+  const draft = (id: number, payload: Record<string, unknown>) => ({
+    id,
+    action: "match_existing",
+    payload,
+    sourceQuote: null,
+    confidence: "high",
+  });
+  const mapped = (...drafts: ReturnType<typeof draft>[]) =>
+    mapPhase(golden, maps, { drafts, orchestratorOutput: null, orchestratorExtraction: null });
+
+  it("maps `changes` onto the proposal fields the checks read", () => {
+    const [p] = mapped(
+      draft(1, { taskId: 101, action: "update", changes: { ownerId: 6, dueDate: "2026-06-26", priority: "high", appendNotes: "Audience: finance leads." } })
+    ).proposals;
+    expect(p).toMatchObject({
+      taskRef: "t1",
+      updateKind: "update",
+      newOwnerName: "Priya Raman",
+      newDueDate: "2026-06-26",
+      newPriority: "high",
+      appendNotes: "Audience: finance leads.",
+    });
+  });
+
+  it("due date, priority and assignee checks read from `changes`", () => {
+    const expected: ExpectedToolCall[] = [
+      { action: "match_existing", existingTaskRef: "t1", newDueDate: "2026-06-26", newPriority: "high", assignee: "Priya Raman" },
+    ];
+    const actual = mapped(draft(1, { taskId: 101, action: "update", changes: { ownerId: 6, dueDate: "2026-06-26", priority: "high" } }));
+    const s = scorePhase(expected, actual, sources);
+    expect(s.calls[0].checks.dueDate?.pass).toBe(true);
+    expect(s.calls[0].checks.priority?.pass).toBe(true);
+    expect(s.calls[0].checks.assignee).toMatchObject({ pass: true });
+    expect(s.totals.assignee).toEqual(count(1, 1));
+  });
+
+  it("existing_task_notes is met only when changes.appendNotes has every phrase", () => {
+    const expected: ExpectedToolCall[] = [
+      { action: "match_existing", existingTaskRef: "t2", notesContains: ["read-only", "finance leads"], gap: "existing_task_notes" },
+    ];
+    const full = mapped(draft(1, { taskId: 102, action: "add_notes", changes: { appendNotes: "Read-only access; audience is the finance leads." } }));
+    expect(scorePhase(expected, full, sources).totals.gapsByCode.existing_task_notes).toEqual(count(1, 1));
+    const partial = mapped(draft(1, { taskId: 102, action: "add_notes", changes: { appendNotes: "Read-only access." } }));
+    expect(scorePhase(expected, partial, sources).totals.gapsByCode.existing_task_notes).toEqual(count(0, 1));
+  });
+
+  it("multi_field_existing_update is met when every expected field is in ONE draft", () => {
+    const expected: ExpectedToolCall[] = [
+      { action: "match_existing", existingTaskRef: "t1", newDueDate: "2026-06-26", assignee: "Priya Raman", gap: "multi_field_existing_update" },
+    ];
+    const one = mapped(draft(1, { taskId: 101, action: "update", changes: { ownerId: 6, dueDate: "2026-06-26" } }));
+    expect(scorePhase(expected, one, sources).totals.gapsByCode.multi_field_existing_update).toEqual(count(1, 1));
+    // Split across two drafts: whichever pairs carries only half of it.
+    const split = mapped(
+      draft(1, { taskId: 101, action: "update_due_date", changes: { dueDate: "2026-06-26" } }),
+      draft(2, { taskId: 101, action: "reassign", changes: { ownerId: 6 } })
+    );
+    expect(scorePhase(expected, split, sources).totals.gapsByCode.multi_field_existing_update).toEqual(count(0, 1));
+    // Right date, wrong person.
+    const wrongOwner = mapped(draft(1, { taskId: 101, action: "update", changes: { ownerId: 8, dueDate: "2026-06-26" } }));
+    expect(scorePhase(expected, wrongOwner, sources).totals.gapsByCode.multi_field_existing_update).toEqual(count(0, 1));
+  });
+
+  it("an expected removed due date (newDueDate: null) is met only by a draft that clears it", () => {
+    const expected: ExpectedToolCall[] = [{ action: "match_existing", existingTaskRef: "t1", newDueDate: null }];
+    const cleared = mapped(draft(1, { taskId: 101, action: "update_due_date", changes: { dueDate: null } }));
+    expect(cleared.proposals[0].clearsDueDate).toBe(true);
+    expect(scorePhase(expected, cleared, sources).calls[0].checks.dueDate).toMatchObject({ pass: true, actual: null });
+    // Leaving the date alone is not the same as removing it.
+    const untouched = mapped(draft(1, { taskId: 101, action: "reprioritise", changes: { priority: "low" } }));
+    expect(scorePhase(expected, untouched, sources).calls[0].checks.dueDate?.pass).toBe(false);
+    // And a cleared date fails an expected new date.
+    const want = [{ ...expected[0], newDueDate: "2026-06-26" }];
+    expect(scorePhase(want, cleared, sources).calls[0].checks.dueDate?.pass).toBe(false);
+  });
+
+  it("legacy single-action rows map exactly as before", () => {
+    const [p] = mapped(draft(1, { taskId: 101, action: "update_due_date", newDueDate: "2026-06-26" })).proposals;
+    expect(p).toMatchObject({ taskRef: "t1", updateKind: "update_due_date", newDueDate: "2026-06-26", newOwnerName: null, appendNotes: null });
   });
 });

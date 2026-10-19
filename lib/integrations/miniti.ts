@@ -19,6 +19,7 @@
 import {
   getCompanies,
   getContactsForOnboarding,
+  getOnboarding,
   getOnboardings,
   getOnboardingsByCompanyId,
   getExternalEvent,
@@ -31,6 +32,7 @@ import {
 } from "@/lib/db";
 import { runMinitiExtraction, runMinitiOrchestrator, toolCallToAction } from "@/lib/ai/orchestrator";
 import type { MinitiExtraction, OrchestratorAction } from "@/lib/ai/orchestrator";
+import { noteSourceFor, prepareStoredTaskUpdate } from "@/lib/ai/task-update";
 import type { Prisma } from "@/lib/generated/prisma/client";
 
 // ---------------------------------------------------------------------------
@@ -97,6 +99,8 @@ type ContextTask = {
   status: string;
   phaseId: number;
   due?: string | null;
+  ownerId?: number | null;
+  priority?: string | null;
   assigneeContactId?: number | null;
   description?: string | null;
   notes?: string | null;
@@ -373,12 +377,16 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
   const meeting = (event.payload as { meeting?: MinitiMeeting } | null)?.meeting;
   if (!meeting) throw new Error(`event ${eventId} has no meeting payload`);
 
-  const [tasks, contacts, phases, allVendorUsers] = await Promise.all([
+  const [tasks, contacts, phases, allVendorUsers, onboarding] = await Promise.all([
     getTasksForOnboarding(onboardingId),
     getContactsForOnboarding(onboardingId),
     getPhasesForOnboarding(onboardingId),
     listVendorUsers(),
+    getOnboarding(onboardingId),
   ]);
+  // Stamp for notes an update draft appends: the meeting's own day + "call
+  // with <Company>" (lib/ai/task-update.ts). Stored on the draft at creation.
+  const noteSource = noteSourceFor(meeting, onboarding?.companyName ?? null);
 
   // Vector picks `ownerId` for create_task drafts from this list. Filter out
   // viewers/disabled roles — they shouldn't be assigned work.
@@ -487,6 +495,39 @@ export async function processMinitiEvent(eventId: number, onboardingId: number) 
       }
     }
 
+    if (action === "match_existing") {
+      // Store the normalised shape (every change in `changes`, `action` set to
+      // the sub-action older readers branch on) with ids outside the context
+      // dropped, like create_task above. See lib/ai/task-update.ts.
+      const prepared = prepareStoredTaskUpdate(call.input, {
+        vendorUserIds: validVendorUserIds,
+        contactIds: validContactIds,
+      });
+      for (const d of prepared.dropped) {
+        console.warn(`[miniti] dropping invalid ${d} on match_existing draft (event ${eventId})`);
+      }
+      if (!prepared.payload) {
+        console.warn(`[miniti] skipping match_existing draft with no valid changes (taskId=${payload.taskId}, event ${eventId})`);
+        continue;
+      }
+      for (const k of Object.keys(payload)) delete payload[k];
+      Object.assign(payload, prepared.payload);
+      if (noteSource) payload.noteSource = noteSource;
+    }
+
+    // Snapshot the proposed people's names, so if one leaves the workspace
+    // (or the onboarding) before approval, the card can still say who.
+    if (action === "create_task" || action === "match_existing") {
+      const people = (action === "create_task" ? payload : payload.changes ?? {}) as {
+        ownerId?: unknown;
+        assigneeContactId?: unknown;
+      };
+      const ownerName = vendorUsers.find((u) => u.id === people.ownerId)?.name;
+      const contactName = context.customerContacts.find((c) => c.id === people.assigneeContactId)?.name;
+      if (ownerName) payload.ownerName = ownerName;
+      if (contactName) payload.assigneeContactName = contactName;
+    }
+
     const draft = await createPendingAIChange({
       source: "miniti",
       sourceEventId: eventId,
@@ -552,6 +593,10 @@ export function buildOrchestratorContext({
       status: t.status,
       phaseId: t.phaseId,
       due: t.due || null,
+      // Owner + priority so the model can compare the board against what
+      // was agreed and only propose fields that differ (rule G).
+      ownerId: t.ownerId ?? null,
+      priority: t.priority ?? null,
       assigneeContactId: t.assigneeContactId ?? null,
       // Richer task grounding so Claude can match against full content
       // (description) and pick a coherent blockedByTaskId for a new draft.

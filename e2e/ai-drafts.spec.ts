@@ -5,8 +5,9 @@ import { loadTarget } from "./target";
  * AI draft inbox — edit-before-approve + bulk select/reject.
  *
  * Runs against tagged fixtures seeded by prisma/seed-ai-test-fixtures.js onto
- * the onboarding it resolved (see e2e/target.js). All fixtures are create_task
- * drafts, so they render as CreateTaskCards in the "Actions" column.
+ * the onboarding it resolved (see e2e/target.js). Most fixtures are
+ * create_task drafts (CreateTaskCards in the "Actions" column); one is a
+ * multi-field match_existing update of a fixture task (DraftCard).
  */
 const { onboardingId: ONBOARDING_ID, prefix: PREFIX } = loadTarget();
 const ACTIONS_URL = `/onboardings/${ONBOARDING_ID}?tab=actions`;
@@ -20,6 +21,14 @@ const T = {
     "Bulk reject candidate C",
   ],
   control: "Control draft (never touched)",
+  updateTarget: "Update target task",
+};
+
+/** Mirrors UPDATE_FIXTURE in prisma/seed-ai-test-fixtures.js. */
+const UPDATE = {
+  originalNotes: "Original note written on the board.",
+  appendNotes: "Scope agreed on the call: billing reports only.",
+  stamp: "2026-06-18, call with fixture",
 };
 
 /** Locate a draft card by a substring of its task title. */
@@ -85,5 +94,42 @@ test.describe("AI draft inbox", () => {
 
     // The unselected control fixture is unaffected — still pending.
     await expect(draftCard(page, T.control)).toBeVisible();
+  });
+
+  test("approving a multi-field update applies every change in one go and appends the note", async ({ page }) => {
+    await page.goto(ACTIONS_URL);
+
+    const card = draftCard(page, T.updateTarget);
+    await expect(card).toBeVisible();
+
+    // The card shows the update as a before → after list, one row per field,
+    // plus the note it would add.
+    const changes = card.getByRole("list", { name: "Proposed changes" });
+    await expect(changes.getByRole("listitem")).toHaveCount(2);
+    await expect(changes).toContainText("Due date");
+    await expect(changes).toContainText("Priority");
+    await expect(changes).toContainText("High");
+    await expect(card).toContainText("Adds note");
+    await expect(card).toContainText(UPDATE.appendNotes);
+
+    const approved = page.waitForResponse(
+      (r) => r.url().includes("/api/ai-drafts/") && r.url().endsWith("/approve")
+    );
+    await card.getByRole("button", { name: "Approve" }).click();
+    const res = await approved;
+    expect(res.status()).toBe(200);
+
+    // The draft leaves the pending list.
+    await expect(draftCard(page, T.updateTarget)).toHaveCount(0);
+
+    // On the board, the task's notes kept what was there and gained the
+    // agreed note on its own stamped line (appended, never overwritten).
+    await page.goto(`/onboardings/${ONBOARDING_ID}?tab=tasks`);
+    const taskCard = page.locator("[data-task-card]", { hasText: T.updateTarget });
+    await expect(taskCard).toBeVisible();
+    await taskCard.locator("span", { hasText: T.updateTarget }).first().click();
+    const notes = page.getByPlaceholder("Write your notes here");
+    // Stamped with the meeting's day and source, not the approval date.
+    await expect(notes).toHaveValue(`${UPDATE.originalNotes}\n[${UPDATE.stamp}] ${UPDATE.appendNotes}`);
   });
 });

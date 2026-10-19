@@ -324,4 +324,13 @@ describe("buildOrchestratorContext", () => {
     const ctx = buildOrchestratorContext(base);
     expect(ctx.today).toBe("2026-07-08");
   });
+
+  it("gives each open task its owner and priority, so the model can compare them with the call", () => {
+    const ctx = buildOrchestratorContext({
+      ...base,
+      tasks: [{ id: 1, taskId: "AC-1", title: "Open task", status: "In progress", phaseId: 5, ownerId: 3, priority: "high" }],
+    });
+    expect(ctx.openTasks[0]).toMatchObject({ ownerId: 3, priority: "high" });
+    expect(buildOrchestratorContext(base).openTasks[0]).toMatchObject({ ownerId: null, priority: null });
+  });
 });
