@@ -24,7 +24,9 @@ A running record of how Vector's meeting AI is evaluated and improved: what was 
 | 2026-10-13 | Feature 2 (free-text dependencies, new `TaskDependency` table) built, reviewed in two evaluator rounds, eval run 3 times (~$4.50). Results below. |
 | 2026-10-14 | Feature 3 (dependencies between new drafts from the same meeting) built; restore-orphan fix; eval run 3 times (~$4.59). Results below. |
 | 2026-10-14 | Feature 4 (recorder identity) built; eval run 3 times (~$4.83). Results below. |
-| _next_ | Remaining open product questions from the review, then Linear and Attio. |
+| 2026-10-18 | Product UI review completed. Investigated the dependency quality regression with overlapping five-case gates and three broader checks. Final local candidate: 78/81 recall (96%), 78/92 precision (85%), 18/24 strict note phrases (75%), 7/11 draft links. Full evidence and rejected attempts: `quality-investigation/README.md`. |
+| 2026-10-18 | Round 2 assessment after holding the merge: same80-action key after Caroline combined implementation/PR in16. Final run79/80 recall,79/79 action types,79/95 precision,21/28 strict note phrases,10/11 direct draft links (remaining relation is transitive). All commitments/parked requests/reminders captured. Real residual parked ownership/speculation, deadline and priority errors remain; raw precision is explained through a manual audit of unkeyed updates. See `quality-investigation/RESULTS.md`. Paid tests stopped. |
+| _next_ | Integration validation against current main and migration coordination before merging; Linear and Attio later. |
 
 ---
 

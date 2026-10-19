@@ -1,0 +1,1578 @@
+{
+  "version": 3,
+  "label": "dependency-quality-owned-review-smoke",
+  "createdAt": "2026-10-18T18:57:48.447Z",
+  "git": {
+    "sha": "90bde62",
+    "dirty": true
+  },
+  "mockLlm": false,
+  "clockShift": true,
+  "model": "claude-sonnet-4-6",
+  "caseCount": 1,
+  "selectedCaseCount": 1,
+  "complete": true,
+  "totalCostUsd": 0.057373,
+  "summary": {
+    "cases": 1,
+    "errors": 0,
+    "match": {
+      "count": 1,
+      "total": 1
+    },
+    "heldBeforeAssign": {
+      "count": 0,
+      "total": 0
+    },
+    "dedup": {
+      "count": 0,
+      "total": 0
+    },
+    "totals": {
+      "recall": {
+        "count": 4,
+        "total": 4
+      },
+      "precision": {
+        "count": 4,
+        "total": 4
+      },
+      "action": {
+        "count": 4,
+        "total": 4
+      },
+      "ownerSide": {
+        "count": 4,
+        "total": 4
+      },
+      "assignee": {
+        "count": 4,
+        "total": 4
+      },
+      "dueDate": {
+        "count": 4,
+        "total": 4
+      },
+      "priority": {
+        "count": 0,
+        "total": 0
+      },
+      "status": {
+        "count": 0,
+        "total": 0
+      },
+      "notesPhrases": {
+        "count": 2,
+        "total": 2
+      },
+      "dependencies": {
+        "count": 0,
+        "total": 0
+      },
+      "kindRecall": {
+        "commitment": {
+          "count": 4,
+          "total": 4
+        },
+        "parked_for_later": {
+          "count": 0,
+          "total": 0
+        },
+        "vendor_reminder": {
+          "count": 0,
+          "total": 0
+        }
+      },
+      "groundedQuotes": {
+        "count": 4,
+        "total": 4
+      },
+      "citedIdsValid": {
+        "count": 0,
+        "total": 0
+      },
+      "duplicates": {
+        "count": 0,
+        "total": 4
+      },
+      "gaps": {
+        "count": 1,
+        "total": 2
+      },
+      "gapsByCode": {
+        "depends_on_new_draft": {
+          "count": 1,
+          "total": 2
+        }
+      }
+    }
+  },
+  "cases": [
+    {
+      "case": "03",
+      "file": "03-ashby-embedded-sync.json",
+      "durationMs": 29511,
+      "costUsd": 0.057373,
+      "aiCalls": 2,
+      "error": null,
+      "score": {
+        "match": {
+          "pass": true,
+          "expected": "ASH",
+          "actual": "ASH",
+          "matchedBy": "domain"
+        },
+        "initial": {
+          "calls": [
+            {
+              "index": 0,
+              "action": "create_task",
+              "title": "Set up embed sandbox",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 1,
+                "action": "create_task",
+                "title": "Set up embed sandbox with signed JWT auth and share credentials",
+                "score": 1.045,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Theo Okonkwo",
+                  "actual": "Theo Okonkwo",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-06-24",
+                  "actual": "2026-06-24",
+                  "pass": true
+                }
+              },
+              "notes": {
+                "found": [
+                  "signed JWT",
+                  "share credentials"
+                ],
+                "missing": []
+              },
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 1,
+              "action": "create_task",
+              "title": "Expose customer_id claim in session token on staging",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 3,
+                "action": "create_task",
+                "title": "Expose customer_id claim in Ashby session token on staging",
+                "score": 1.433,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "customer",
+                  "actual": "customer",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Ruben De Smet",
+                  "actual": "Ruben De Smet",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-06-26",
+                  "actual": "2026-06-26",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 2,
+              "action": "create_task",
+              "title": "Write up row-level filtering approach for multi-tenant embeds",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 2,
+                "action": "create_task",
+                "title": "Write up row-level filtering approach for multi-tenant embeds",
+                "score": 1.5,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Maya Lindqvist",
+                  "actual": "Maya Lindqvist",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-06-25",
+                  "actual": "2026-06-25",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 3,
+              "action": "create_task",
+              "title": "Get security approval",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 4,
+                "action": "create_task",
+                "title": "Ashby security team review of row-level filtering write-up",
+                "score": 1.115,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "customer",
+                  "actual": "customer",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Elise Vandamme",
+                  "actual": "Elise Vandamme",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": null,
+                  "actual": null,
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "depends_on_new_draft"
+                  ],
+                  "what": "depends on new draft \"Write up row-level filtering approach for multi-tenant embeds\"",
+                  "met": true
+                },
+                {
+                  "codes": [
+                    "depends_on_new_draft"
+                  ],
+                  "what": "depends on new draft \"Set up embed sandbox\"",
+                  "met": false
+                }
+              ]
+            }
+          ],
+          "unmatchedProposals": [],
+          "proposalsCount": 4,
+          "duplicates": [],
+          "groundedness": {
+            "quotes": {
+              "count": 4,
+              "total": 4
+            },
+            "quoteViolations": [],
+            "quotesFromActionItemsOnly": 0,
+            "citedIds": {
+              "count": 0,
+              "total": 0
+            },
+            "citedIdViolations": []
+          },
+          "totals": {
+            "recall": {
+              "count": 4,
+              "total": 4
+            },
+            "precision": {
+              "count": 4,
+              "total": 4
+            },
+            "action": {
+              "count": 4,
+              "total": 4
+            },
+            "ownerSide": {
+              "count": 4,
+              "total": 4
+            },
+            "assignee": {
+              "count": 4,
+              "total": 4
+            },
+            "dueDate": {
+              "count": 4,
+              "total": 4
+            },
+            "priority": {
+              "count": 0,
+              "total": 0
+            },
+            "status": {
+              "count": 0,
+              "total": 0
+            },
+            "notesPhrases": {
+              "count": 2,
+              "total": 2
+            },
+            "dependencies": {
+              "count": 0,
+              "total": 0
+            },
+            "kindRecall": {
+              "commitment": {
+                "count": 4,
+                "total": 4
+              },
+              "parked_for_later": {
+                "count": 0,
+                "total": 0
+              },
+              "vendor_reminder": {
+                "count": 0,
+                "total": 0
+              }
+            },
+            "groundedQuotes": {
+              "count": 4,
+              "total": 4
+            },
+            "citedIdsValid": {
+              "count": 0,
+              "total": 0
+            },
+            "duplicates": {
+              "count": 0,
+              "total": 4
+            },
+            "gaps": {
+              "count": 1,
+              "total": 2
+            },
+            "gapsByCode": {
+              "depends_on_new_draft": {
+                "count": 1,
+                "total": 2
+              }
+            }
+          }
+        },
+        "heldBeforeAssign": null,
+        "afterAssign": null,
+        "dedup": null,
+        "totals": {
+          "recall": {
+            "count": 4,
+            "total": 4
+          },
+          "precision": {
+            "count": 4,
+            "total": 4
+          },
+          "action": {
+            "count": 4,
+            "total": 4
+          },
+          "ownerSide": {
+            "count": 4,
+            "total": 4
+          },
+          "assignee": {
+            "count": 4,
+            "total": 4
+          },
+          "dueDate": {
+            "count": 4,
+            "total": 4
+          },
+          "priority": {
+            "count": 0,
+            "total": 0
+          },
+          "status": {
+            "count": 0,
+            "total": 0
+          },
+          "notesPhrases": {
+            "count": 2,
+            "total": 2
+          },
+          "dependencies": {
+            "count": 0,
+            "total": 0
+          },
+          "kindRecall": {
+            "commitment": {
+              "count": 4,
+              "total": 4
+            },
+            "parked_for_later": {
+              "count": 0,
+              "total": 0
+            },
+            "vendor_reminder": {
+              "count": 0,
+              "total": 0
+            }
+          },
+          "groundedQuotes": {
+            "count": 4,
+            "total": 4
+          },
+          "citedIdsValid": {
+            "count": 0,
+            "total": 0
+          },
+          "duplicates": {
+            "count": 0,
+            "total": 4
+          },
+          "gaps": {
+            "count": 1,
+            "total": 2
+          },
+          "gapsByCode": {
+            "depends_on_new_draft": {
+              "count": 1,
+              "total": 2
+            }
+          }
+        }
+      },
+      "actual": {
+        "match": {
+          "companyPrefix": "ASH",
+          "ambiguous": false,
+          "matchedBy": "domain"
+        },
+        "transcript": "Hi both — today is all embedded analytics. Elise, want to restate the goal so we're aligned?\nSure. We want each of our recruiting customers to see their own dashboards inside our product — their pipeline, their time-to-hire, nobody else's. Tenant isolation is non-negotiable.\nUnderstood. The right pattern here is signed JWTs: your backend mints a short-lived token per user, the token carries the tenant identity, and the embed respects it.\nThat works for us — we already issue session tokens, we'd just extend the claims.\nGood. Let's make it concrete. Theo, can you stand up a sandbox they can develop against?\nYes — I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.\nThen the ball is with me. I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.\nOne question — how does the customer_id claim actually filter the data? Is that per dashboard or global?\nGlobal, enforced at the semantic layer, so a dashboard can't accidentally leak across tenants. I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.\nGreat, I'd like our security folks to read that before we go further.\nSensible. The write-up plus the sandbox should give them everything they need to poke at it.\nIt might be worth load-testing the embeds eventually, but let's see it working first.\nAgreed — load testing is a later conversation. So: sandbox Wednesday, write-up Thursday, staging claim Friday. Reconvene next Monday?\nWorks for us. Thanks both.",
+        "actionItemsText": "Theo to set up embed sandbox with signed JWT auth and share credentials by June 24\nRuben to expose customer_id claim in session token on staging by June 26\nMaya to send row-level filtering write-up for multi-tenant embeds by June 25",
+        "initial": {
+          "proposals": [
+            {
+              "action": "create_task",
+              "draftId": 1,
+              "sourceQuote": "I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.",
+              "confidence": "high",
+              "draftRef": "d1",
+              "title": "Set up embed sandbox with signed JWT auth and share credentials",
+              "description": null,
+              "notes": "Stand up an embed sandbox configured with signed JWT auth for Ashby to develop against. Share credentials with the Ashby team once ready. Signed JWTs are minted by Ashby's backend, carrying tenant identity; the embed respects the token for isolation.",
+              "ownerName": "Theo Okonkwo",
+              "assigneeContactName": null,
+              "ownerSide": "vendor",
+              "dueDate": "2026-06-24",
+              "priority": "high",
+              "blockedByRef": null
+            },
+            {
+              "action": "create_task",
+              "draftId": 2,
+              "sourceQuote": "I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.",
+              "confidence": "high",
+              "draftRef": "d2",
+              "title": "Write up row-level filtering approach for multi-tenant embeds",
+              "description": null,
+              "notes": "Document the row-level filtering approach for multi-tenant embeds. Key points: filtering is global, enforced at the semantic layer, so no dashboard can accidentally leak data across tenants. Send the write-up to the Ashby team by Thursday the 25th. Elise's security team will review it before the project proceeds further.",
+              "ownerName": "Maya Lindqvist",
+              "assigneeContactName": null,
+              "ownerSide": "vendor",
+              "dueDate": "2026-06-25",
+              "priority": "high",
+              "blockedByRef": null
+            },
+            {
+              "action": "create_task",
+              "draftId": 3,
+              "sourceQuote": "I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.",
+              "confidence": "high",
+              "dependsOn": [
+                {
+                  "title": "Set up embed sandbox with signed JWT auth and share credentials",
+                  "draftId": 1,
+                  "draftRef": "d1"
+                }
+              ],
+              "draftRef": "d3",
+              "title": "Expose customer_id claim in Ashby session token on staging",
+              "description": null,
+              "notes": "Ruben to extend Ashby's existing session tokens with a customer_id claim and deploy to staging. This is the tenant identity carrier consumed by the embed's signed JWT auth flow.",
+              "ownerName": null,
+              "assigneeContactName": "Ruben De Smet",
+              "ownerSide": "customer",
+              "dueDate": "2026-06-26",
+              "priority": "high",
+              "blockedByRef": null
+            },
+            {
+              "action": "create_task",
+              "draftId": 4,
+              "sourceQuote": "I'd like our security folks to read that before we go further.",
+              "confidence": "low",
+              "dependsOn": [
+                {
+                  "title": "Write up row-level filtering approach for multi-tenant embeds",
+                  "draftId": 2,
+                  "draftRef": "d2"
+                }
+              ],
+              "draftRef": "d4",
+              "title": "Ashby security team review of row-level filtering write-up",
+              "description": null,
+              "notes": "Elise's security team to review the row-level filtering write-up (and may also test against the sandbox). This review is a prerequisite before the project proceeds further. No deadline committed; depends on the write-up being delivered first.",
+              "ownerName": null,
+              "assigneeContactName": "Elise Vandamme",
+              "ownerSide": "customer",
+              "dueDate": null,
+              "priority": "medium",
+              "blockedByRef": null
+            }
+          ],
+          "rawCalls": [
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'd like our security folks to read that before we go further."
+            }
+          ],
+          "boardRefs": [
+            "t1",
+            "t2",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "openRefs": [
+            "t1",
+            "t2",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "boardTasks": [
+            {
+              "ref": "t1",
+              "title": "Connect dbt repo to Quarry",
+              "status": "In progress",
+              "ownerName": "Ruben De Smet"
+            },
+            {
+              "ref": "t2",
+              "title": "Define first 10 metrics in dbt .yml",
+              "status": "In progress",
+              "ownerName": "Ruben De Smet"
+            },
+            {
+              "ref": "t3",
+              "title": "Configure SSO for Ashby workspace",
+              "status": "Not started",
+              "ownerName": "Elise Vandamme"
+            },
+            {
+              "ref": "t4",
+              "title": "Build hiring pipeline dashboard for embed",
+              "status": "Not started",
+              "ownerName": "Theo Okonkwo"
+            },
+            {
+              "ref": "t5",
+              "title": "Embedded analytics go-live review",
+              "status": "Not started",
+              "ownerName": "Maya Lindqvist"
+            }
+          ]
+        },
+        "error": null
+      },
+      "raw": {
+        "maps": {
+          "companyPrefixByOnboardingId": {
+            "1": "RAY",
+            "2": "BEE",
+            "3": "MDL",
+            "4": "LOOP",
+            "5": "HUEL",
+            "6": "FN",
+            "7": "FLK",
+            "8": "SYL",
+            "9": "CHOW",
+            "10": "ASH",
+            "11": "PEER",
+            "12": "PAT"
+          },
+          "onboardingIdByPrefix": {
+            "RAY": 1,
+            "BEE": 2,
+            "MDL": 3,
+            "LOOP": 4,
+            "HUEL": 5,
+            "FN": 6,
+            "FLK": 7,
+            "SYL": 8,
+            "CHOW": 9,
+            "ASH": 10,
+            "PEER": 11,
+            "PAT": 12
+          },
+          "vendorNameById": {
+            "1": "Maya Lindqvist",
+            "2": "Theo Okonkwo",
+            "3": "Ines Ferreira",
+            "4": "Sam Whitfield",
+            "5": "Caroline Jaworsky"
+          },
+          "contactNameById": {
+            "1": "Elise Vandamme",
+            "2": "Ruben De Smet"
+          },
+          "refByTaskId": {
+            "1": "t1",
+            "2": "t2",
+            "3": "t3",
+            "4": "t4",
+            "5": "t5"
+          }
+        },
+        "match": {
+          "onboardingId": 10,
+          "ambiguous": false,
+          "matchedBy": "domain",
+          "candidates": [
+            {
+              "onboardingId": 10,
+              "signal": "domain",
+              "evidence": "attendee domain ashbyhq.com → Ashby"
+            }
+          ]
+        },
+        "initial": {
+          "drafts": [
+            {
+              "id": 1,
+              "action": "create_task",
+              "payload": {
+                "notes": "Stand up an embed sandbox configured with signed JWT auth for Ashby to develop against. Share credentials with the Ashby team once ready. Signed JWTs are minted by Ashby's backend, carrying tenant identity; the embed respects the token for isolation.",
+                "title": "Set up embed sandbox with signed JWT auth and share credentials",
+                "dueDate": "2026-06-24",
+                "ownerId": 2,
+                "phaseId": 47,
+                "draftRef": "d1",
+                "priority": "high",
+                "ownerName": "Theo Okonkwo",
+                "confidence": "high",
+                "sourceQuote": "I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th."
+              },
+              "sourceQuote": "I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.",
+              "confidence": "high"
+            },
+            {
+              "id": 2,
+              "action": "create_task",
+              "payload": {
+                "notes": "Document the row-level filtering approach for multi-tenant embeds. Key points: filtering is global, enforced at the semantic layer, so no dashboard can accidentally leak data across tenants. Send the write-up to the Ashby team by Thursday the 25th. Elise's security team will review it before the project proceeds further.",
+                "title": "Write up row-level filtering approach for multi-tenant embeds",
+                "dueDate": "2026-06-25",
+                "ownerId": 1,
+                "phaseId": 47,
+                "draftRef": "d2",
+                "priority": "high",
+                "ownerName": "Maya Lindqvist",
+                "confidence": "high",
+                "sourceQuote": "I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th."
+              },
+              "sourceQuote": "I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.",
+              "confidence": "high"
+            },
+            {
+              "id": 3,
+              "action": "create_task",
+              "payload": {
+                "notes": "Ruben to extend Ashby's existing session tokens with a customer_id claim and deploy to staging. This is the tenant identity carrier consumed by the embed's signed JWT auth flow.",
+                "title": "Expose customer_id claim in Ashby session token on staging",
+                "dueDate": "2026-06-26",
+                "phaseId": 47,
+                "draftRef": "d3",
+                "priority": "high",
+                "dependsOn": [
+                  {
+                    "title": "Set up embed sandbox with signed JWT auth and share credentials",
+                    "draftId": 1,
+                    "draftRef": "d1"
+                  }
+                ],
+                "confidence": "high",
+                "sourceQuote": "I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.",
+                "assigneeContactId": 2,
+                "assigneeContactName": "Ruben De Smet"
+              },
+              "sourceQuote": "I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.",
+              "confidence": "high"
+            },
+            {
+              "id": 4,
+              "action": "create_task",
+              "payload": {
+                "notes": "Elise's security team to review the row-level filtering write-up (and may also test against the sandbox). This review is a prerequisite before the project proceeds further. No deadline committed; depends on the write-up being delivered first.",
+                "title": "Ashby security team review of row-level filtering write-up",
+                "phaseId": 47,
+                "draftRef": "d4",
+                "priority": "medium",
+                "dependsOn": [
+                  {
+                    "title": "Write up row-level filtering approach for multi-tenant embeds",
+                    "draftId": 2,
+                    "draftRef": "d2"
+                  }
+                ],
+                "confidence": "low",
+                "sourceQuote": "I'd like our security folks to read that before we go further.",
+                "assigneeContactId": 1,
+                "assigneeContactName": "Elise Vandamme"
+              },
+              "sourceQuote": "I'd like our security folks to read that before we go further.",
+              "confidence": "low"
+            }
+          ],
+          "orchestratorOutput": [
+            {
+              "id": "toolu_017ueyHRpwm6bvrtoQuKewmc_0",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Stand up an embed sandbox configured with signed JWT auth for Ashby to develop against. Share credentials with the Ashby team once ready. Signed JWTs are minted by Ashby's backend, carrying tenant identity; the embed respects the token for isolation.",
+                "title": "Set up embed sandbox with signed JWT auth and share credentials",
+                "dueDate": "2026-06-24",
+                "ownerId": 2,
+                "phaseId": 47,
+                "draftRef": "d1",
+                "priority": "high",
+                "confidence": "high",
+                "sourceQuote": "I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th."
+              }
+            },
+            {
+              "id": "toolu_017ueyHRpwm6bvrtoQuKewmc_1",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Document the row-level filtering approach for multi-tenant embeds. Key points: filtering is global, enforced at the semantic layer, so no dashboard can accidentally leak data across tenants. Send the write-up to the Ashby team by Thursday the 25th. Elise's security team will review it before the project proceeds further.",
+                "title": "Write up row-level filtering approach for multi-tenant embeds",
+                "dueDate": "2026-06-25",
+                "ownerId": 1,
+                "phaseId": 47,
+                "draftRef": "d2",
+                "priority": "high",
+                "confidence": "high",
+                "sourceQuote": "I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th."
+              }
+            },
+            {
+              "id": "toolu_017ueyHRpwm6bvrtoQuKewmc_2",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Ruben to extend Ashby's existing session tokens with a customer_id claim and deploy to staging. This is the tenant identity carrier consumed by the embed's signed JWT auth flow.",
+                "title": "Expose customer_id claim in Ashby session token on staging",
+                "dueDate": "2026-06-26",
+                "phaseId": 47,
+                "draftRef": "d3",
+                "priority": "high",
+                "dependsOn": [
+                  {
+                    "draftRef": "d1"
+                  }
+                ],
+                "confidence": "high",
+                "sourceQuote": "I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.",
+                "assigneeContactId": 2
+              }
+            },
+            {
+              "id": "toolu_017ueyHRpwm6bvrtoQuKewmc_3",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Elise's security team to review the row-level filtering write-up (and may also test against the sandbox). This review is a prerequisite before the project proceeds further. No deadline committed; depends on the write-up being delivered first.",
+                "title": "Ashby security team review of row-level filtering write-up",
+                "phaseId": 47,
+                "draftRef": "d4",
+                "priority": "medium",
+                "dependsOn": [
+                  {
+                    "draftRef": "d2"
+                  }
+                ],
+                "confidence": "low",
+                "sourceQuote": "I'd like our security folks to read that before we go further.",
+                "assigneeContactId": 1
+              }
+            }
+          ],
+          "orchestratorExtraction": {
+            "actionItems": [
+              {
+                "claim": "Set up embed sandbox with signed JWT auth and share credentials by June 24",
+                "details": [
+                  "Signed JWT auth",
+                  "Share credentials with Ashby team",
+                  "Sandbox for Ashby to develop against"
+                ],
+                "speaker": "Theo Okonkwo",
+                "firmness": "firm",
+                "sourceQuote": "I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.",
+                "notesSnippet": "Maya Lindqvist: Good. Let's make it concrete. Theo, can you stand up a sandbox they can develop against?\nTheo Okonkwo: Yes — I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.",
+                "mentionedOwner": "Theo",
+                "mentionedDueDate": "Wednesday, June 24th",
+                "mentionedDependency": ""
+              },
+              {
+                "claim": "Expose customer_id claim in session token deployed to staging by June 26",
+                "details": [
+                  "Extend existing session tokens with customer_id claim",
+                  "Deploy to staging environment",
+                  "Deadline: Friday, June 26th"
+                ],
+                "speaker": "Ruben De Smet",
+                "firmness": "firm",
+                "sourceQuote": "I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.",
+                "notesSnippet": "Ruben De Smet: Then the ball is with me. I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.\nElise Vandamme: One question — how does the customer_id claim actually filter the data?",
+                "mentionedOwner": "Ruben",
+                "mentionedDueDate": "Friday, June 26th",
+                "mentionedDependency": ""
+              },
+              {
+                "claim": "Write up row-level filtering approach for multi-tenant embeds and send it over by June 25",
+                "details": [
+                  "Row-level filtering approach for multi-tenant embeds",
+                  "Filtering is global, enforced at the semantic layer",
+                  "A dashboard cannot accidentally leak data across tenants",
+                  "Send to Ashby team by Thursday the 25th",
+                  "Elise's security team will review it before proceeding further"
+                ],
+                "speaker": "Maya Lindqvist",
+                "firmness": "firm",
+                "sourceQuote": "I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.",
+                "notesSnippet": "Maya Lindqvist: Global, enforced at the semantic layer, so a dashboard can't accidentally leak across tenants. I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.\nElise Vandamme: Great, I'd like our security folks to read that before we go further.",
+                "mentionedOwner": "Maya",
+                "mentionedDueDate": "Thursday the 25th",
+                "mentionedDependency": ""
+              },
+              {
+                "claim": "Have Ashby security team review the row-level filtering write-up before proceeding",
+                "details": [
+                  "Elise's security team to review the row-level filtering write-up",
+                  "Also noted that the sandbox will be available for security team to test",
+                  "Review is a prerequisite before the project proceeds further"
+                ],
+                "speaker": "Elise Vandamme",
+                "firmness": "tentative",
+                "sourceQuote": "I'd like our security folks to read that before we go further.",
+                "notesSnippet": "Maya Lindqvist: Global, enforced at the semantic layer, so a dashboard can't accidentally leak across tenants. I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.\nElise Vandamme: Great, I'd like our security folks to read that before we go further.\nTheo Okonkwo: Sensible. The write-up plus the sandbox should give them everything they need to poke at it.",
+                "mentionedOwner": "Elise Vandamme",
+                "mentionedDueDate": "",
+                "mentionedDependency": "waiting for the row-level filtering write-up"
+              },
+              {
+                "claim": "Reconvene next Monday",
+                "details": [
+                  "Follow-up sync scheduled for next Monday (2026-06-29)",
+                  "Milestones expected before then: sandbox by Wednesday, write-up by Thursday, staging claim by Friday"
+                ],
+                "speaker": "Maya Lindqvist",
+                "firmness": "firm",
+                "sourceQuote": "Reconvene next Monday?",
+                "notesSnippet": "Maya Lindqvist: Agreed — load testing is a later conversation. So: sandbox Wednesday, write-up Thursday, staging claim Friday. Reconvene next Monday?\nElise Vandamme: Works for us. Thanks both.",
+                "mentionedOwner": "",
+                "mentionedDueDate": "next Monday",
+                "mentionedDependency": ""
+              },
+              {
+                "claim": "Consider load-testing the embeds at a later stage",
+                "details": [
+                  "Load testing of embeds deferred until embeds are confirmed working",
+                  "Explicitly agreed to be a later conversation"
+                ],
+                "speaker": "Ruben De Smet",
+                "firmness": "vague",
+                "sourceQuote": "It might be worth load-testing the embeds eventually, but let's see it working first.",
+                "notesSnippet": "Ruben De Smet: It might be worth load-testing the embeds eventually, but let's see it working first.\nMaya Lindqvist: Agreed — load testing is a later conversation.",
+                "mentionedOwner": "",
+                "mentionedDueDate": "",
+                "mentionedDependency": "once the embeds are working"
+              }
+            ],
+            "meetingTone": "status update",
+            "externalBlockers": [],
+            "reportedCompletions": []
+          }
+        },
+        "error": null
+      },
+      "logs": [
+        "log [miniti] extraction (pass 1): input ~1141 prompt tokens, 5 open tasks",
+        "log [miniti] extraction (pass 1): 6 action items, 0 completions, tone=status update, 17042ms",
+        "log [miniti] orchestrator (pass 2): input ~2306 prompt tokens, 5 open tasks, 6 extracted items",
+        "log [miniti] orchestrator (pass 2): 1 content blocks, 4 draft proposals"
+      ],
+      "llmTrace": [
+        {
+          "request": {
+            "model": "claude-sonnet-4-6",
+            "max_tokens": 6000,
+            "temperature": 0.2,
+            "system": [
+              {
+                "type": "text",
+                "text": "You are Vector. Your job is FACT EXTRACTION from a B2B onboarding meeting (transcribed by Miniti). You do NOT decide what to do with the facts; another step takes care of that. Just find them faithfully.\n\nYou will receive a JSON context with:\n- meeting.title, meeting.date, meeting.summary, meeting.notes\n- meeting.transcript: the FULL meeting transcript, one turn per line as \"<speaker>: <words>\". The label before the first colon says who is talking; it is not part of what they said, so never copy it into a quote.\n- meeting.actionItems: Miniti's pre-extracted action items (strings)\n- openTasks, customerContacts, vendorUsers, phases (for reference only — DO NOT resolve to ids in this pass)\n- recorder: { id, name } of the person who recorded the meeting, or null when nobody has said who that is (see the rule on the recorder below)\n- today: today's ISO date\n\nThe recorder: the transcript labels whoever recorded the meeting as \"You\" (Miniti's own microphone, never a customer). They are on the vendor side, one of our own team. Treat \"You\" like any other named speaker: what they promise is an action item, with speaker \"You\" and mentionedOwner \"You\" when they said they'd do it.\n\nProduce a single JSON object with these arrays:\n\nactionItems[]: every concrete commitment surfaced anywhere in the transcript or in meeting.actionItems. For each one capture:\n  - claim: a short imperative summary of what was committed to (\"Send security questionnaire\").\n  - sourceQuote: ONE continuous passage copied word for word from a single speaker's turn in the transcript. Never join separate turns or speakers, never paraphrase, and never quote the meeting's summary, notes or key decisions. Only if the commitment appears nowhere in the transcript, use the exact wording of the matching meeting.actionItems entry instead.\n  - speaker: who said it (use the name from the transcript verbatim, e.g. \"Ian Ahuja\", \"Marco\", \"unknown\" if not attributable).\n  - mentionedOwner: the name of the person who said they'd do it, VERBATIM from the transcript (\"Marco\", \"Ian\", \"the customer's IT team\", or \"\" if not mentioned). DO NOT resolve to an id.\n  - mentionedDueDate: VERBATIM date phrasing (\"by Friday\", \"next week\", \"end of Q3\") or \"\" if no deadline mentioned. DO NOT convert to ISO.\n  - mentionedDependency: VERBATIM phrasing of any blocker mentioned (\"blocked on the SSO setup\", \"waiting for legal sign-off\") or \"\" if no dependency mentioned. This includes things that are not tasks (a sign-off, another team, an approval) and other action items from this same meeting (\"once the export is done\"). DO NOT match to a task id.\n  - firmness: \"firm\" (clear commitment with timing or owner), \"tentative\" (commitment but vague timing/owner, including a parked item that someone has taken on; see below), \"vague\" (someone mused about it but didn't commit and nobody took it on).\n  - notesSnippet: ~200 char verbatim transcript window around the commitment so the next pass has surrounding context. When the specifics that were agreed (scope, names of the things involved, audience, constraints, who to send it to) sit near the commitment, pick the window that contains them.\n  - details: short VERBATIM facts needed to carry out or verify this work: named files/metrics, comparison/reference systems, scope, audience, constraints and delivery instructions. Gather relevant facts from other turns too; the ~200 char notesSnippet is not a limit on these details. Preserve exclusions and negations. Use [] if no execution details were agreed. Progress percentages alone are not execution instructions.\n\nreportedCompletions[]: every claim that an existing piece of work is now done. (\"Data migration is complete\", \"we've signed the DPA\"). Each item has:\n  - claim, sourceQuote, speaker.\n\nexternalBlockers[]: external blockers mentioned that aren't tasks (\"customer's IT team is non-responsive\", \"legal review delays\"). Just short strings.\n\nmeetingTone: a single short label — one of \"kickoff\", \"status update\", \"casual catchup\", \"escalation\", \"planning\", \"review\", \"other\".\n\nRules:\n1. Be FAITHFUL. Every actionItem must point to a sourceQuote that is literally present, character for character, in one transcript turn (or, failing that, one meeting.actionItems entry). If you can't quote it that way, don't surface it.\n2. Capture EVERYTHING. Err on the side of including marginal items — Pass 2 decides whether they make it through.\n3. Keep mentioned-* fields as VERBATIM TEXT. Do NOT resolve names to ids, do NOT convert dates to ISO. That's Pass 2's job.\n4. If meeting.actionItems already lists an item that you find in the transcript too, surface it once with the most informative sourceQuote.\n5. If the meeting has zero commitments of any kind (no firm ones, no parked items someone took on, no promised check-ins; e.g. a casual catch-up), return actionItems: [] and let meetingTone tell the story.\n\nWhat counts as an action item (judgement rules; these refine rule 2, they do not loosen rule 1):\nA. Promises to do something \"right after this call\", \"straight after we hang up\", \"later today\" are action items like any other. People get distracted after calls. Mark them firm, with the timing phrase as mentionedDueDate.\nB. Parked work needs BOTH a concrete deliverable and someone taking responsibility for doing, tracking or revisiting it. Capture that as \"tentative\", undated unless timing was given, owned by the person who took it on. Merely naming a possible feature, asking \"maybe eventually?\", or saying \"not in this plan\" is not a commitment. Do not invent ownership by assigning it to whoever first mentioned the idea. Acknowledging that an idea exists is not agreeing to carry it forward.\n   \"Noted for later\" or \"noted as a nice-to-have\" in response to a specific requested deliverable DOES count as tracking it, even if nobody promises delivery now. Keep the requester as owner when it is their future work; use the teammate when they take on remembering it. This is different from speculative talk about a possible future product with no specific request or deliverable.\n   Example (different domain): \"Later on we'll need the delivery report split by region, not this quarter though.\" \"I'll keep that on my list.\" → tentative item \"Delivery report split by region\", owner = the person keeping it on their list.\n   NOT action items: vague musing with no concrete deliverable (\"it'd be great to be more data-driven someday\"), hypotheticals, opinions, descriptions of how things work today, and ideas that were raised and then explicitly rejected (\"actually, let's not\").\nC. When the customer says they are overwhelmed, stretched, or asks for space or time before taking on more, do NOT surface new work for the customer from that exchange. If the vendor side agrees to check back in (or it is clearly the vendor's job to pick it up again later), surface that as one vendor-owned action item (\"Check back in with <contact> about <topic>\"), with any timing that was discussed as mentionedDueDate.\nD. Updates to work that already exists count too: if someone restates, re-times, or hands over a piece of work that looks like it is already on openTasks, surface it as an action item with the new owner or timing as said, so the next pass can compare it against the board.\nE. Keep separate commitments even when one starts only after another. \"Once X is ready, I will do Y\" includes Y as its own action, with X in mentionedDependency. A dependency does not swallow the downstream deliverable.\n   If somebody is also responsible for obtaining/providing X, extract that work separately as well. An owned approval/sign-off action is still work; only an external condition with no committed action stays solely a blocker.\n   A concrete request for the speaker's own team to review an artifact before proceeding is such work, even when phrased as \"I'd like our team to review it\" rather than \"I'll obtain approval\". Capture the requested review, with that speaker coordinating it, and the required artifacts as dependencies. Do not reduce this to a blocker label on the artifact-producing task.\nF. Routine meeting recaps, calendar housekeeping, sign-offs and invitations to ask for help do not become onboarding work by themselves. Preserve substantive deliverables promised immediately after a call, such as sending an agreed artifact. Do not turn conversational closing remarks into a follow-up task.\n\nGLOBAL RULES — apply to all output:\n- Never use em dashes (—) or en dashes (–). Use commas, periods, parentheses, or \"and\" instead.\n\nToday is 2026-06-22 (Monday). This is normally the meeting date; if meeting.date differs, dates said in the meeting are relative to meeting.date.",
+                "cache_control": {
+                  "type": "ephemeral"
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "user",
+                "content": "{\"today\":\"2026-06-22\",\"meeting\":{\"id\":\"D03B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A03\",\"title\":\"Ashby embedded analytics — weekly sync\",\"date\":\"2026-06-22T13:00:00Z\",\"summary\":\"Weekly sync on the Ashby embedded analytics rollout. Agreed sandbox setup with signed JWT auth, the customer_id claim work on Ashby's side, and a write-up of the row-level filtering approach.\",\"actionItems\":[\"Theo to set up embed sandbox with signed JWT auth and share credentials by June 24\",\"Ruben to expose customer_id claim in session token on staging by June 26\",\"Maya to send row-level filtering write-up for multi-tenant embeds by June 25\"],\"keyDecisions\":[\"Embeds authenticate via signed JWTs minted by Ashby's backend, not shared links\"],\"notes\":\"Ashby wants hiring dashboards inside their recruiting product for their own customers — tenant isolation is the make-or-break requirement.\",\"transcript\":\"Maya Lindqvist: Hi both — today is all embedded analytics. Elise, want to restate the goal so we're aligned?\\nElise Vandamme: Sure. We want each of our recruiting customers to see their own dashboards inside our product — their pipeline, their time-to-hire, nobody else's. Tenant isolation is non-negotiable.\\nTheo Okonkwo: Understood. The right pattern here is signed JWTs: your backend mints a short-lived token per user, the token carries the tenant identity, and the embed respects it.\\nRuben De Smet: That works for us — we already issue session tokens, we'd just extend the claims.\\nMaya Lindqvist: Good. Let's make it concrete. Theo, can you stand up a sandbox they can develop against?\\nTheo Okonkwo: Yes — I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.\\nRuben De Smet: Then the ball is with me. I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.\\nElise Vandamme: One question — how does the customer_id claim actually filter the data? Is that per dashboard or global?\\nMaya Lindqvist: Global, enforced at the semantic layer, so a dashboard can't accidentally leak across tenants. I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.\\nElise Vandamme: Great, I'd like our security folks to read that before we go further.\\nTheo Okonkwo: Sensible. The write-up plus the sandbox should give them everything they need to poke at it.\\nRuben De Smet: It might be worth load-testing the embeds eventually, but let's see it working first.\\nMaya Lindqvist: Agreed — load testing is a later conversation. So: sandbox Wednesday, write-up Thursday, staging claim Friday. Reconvene next Monday?\\nElise Vandamme: Works for us. Thanks both.\"},\"openTasks\":[{\"id\":1,\"taskId\":\"ASH-1\",\"title\":\"Connect dbt repo to Quarry\",\"status\":\"In progress\",\"phaseId\":48,\"due\":\"2026-06-24\",\"ownerId\":null,\"priority\":null,\"assigneeContactId\":2,\"description\":null,\"notes\":null,\"dependsOn\":[]},{\"id\":2,\"taskId\":\"ASH-2\",\"title\":\"Define first 10 metrics in dbt .yml\",\"status\":\"In progress\",\"phaseId\":48,\"due\":\"2026-06-26\",\"ownerId\":null,\"priority\":null,\"assigneeContactId\":2,\"description\":null,\"notes\":null,\"dependsOn\":[]},{\"id\":3,\"taskId\":\"ASH-3\",\"title\":\"Configure SSO for Ashby workspace\",\"status\":\"Not started\",\"phaseId\":47,\"due\":null,\"ownerId\":null,\"priority\":null,\"assigneeContactId\":1,\"description\":null,\"notes\":null,\"dependsOn\":[]},{\"id\":4,\"taskId\":\"ASH-4\",\"title\":\"Build hiring pipeline dashboard for embed\",\"status\":\"Not started\",\"phaseId\":48,\"due\":\"2026-07-10\",\"ownerId\":2,\"priority\":null,\"assigneeContactId\":null,\"description\":null,\"notes\":null,\"dependsOn\":[]},{\"id\":5,\"taskId\":\"ASH-5\",\"title\":\"Embedded analytics go-live review\",\"status\":\"Not started\",\"phaseId\":50,\"due\":\"2026-07-20\",\"ownerId\":1,\"priority\":null,\"assigneeContactId\":null,\"description\":null,\"notes\":null,\"dependsOn\":[]}],\"phases\":[{\"id\":46,\"name\":\"Kickoff\",\"isComplete\":false},{\"id\":47,\"name\":\"Configuration\",\"isComplete\":false},{\"id\":48,\"name\":\"Data Migration\",\"isComplete\":false},{\"id\":49,\"name\":\"Training\",\"isComplete\":false},{\"id\":50,\"name\":\"Go-Live\",\"isComplete\":false}],\"customerContacts\":[{\"id\":1,\"name\":\"Elise Vandamme\",\"email\":\"elise@ashbyhq.com\"},{\"id\":2,\"name\":\"Ruben De Smet\",\"email\":\"ruben@ashbyhq.com\"}],\"vendorUsers\":[{\"id\":1,\"name\":\"Maya Lindqvist\",\"email\":\"maya@vector.test\"},{\"id\":2,\"name\":\"Theo Okonkwo\",\"email\":\"theo@vector.test\"},{\"id\":3,\"name\":\"Ines Ferreira\",\"email\":\"ines@vector.test\"},{\"id\":4,\"name\":\"Sam Whitfield\",\"email\":\"sam@vector.test\"},{\"id\":5,\"name\":\"Caroline Jaworsky\",\"email\":\"caroline@vector.test\"}],\"recorder\":{\"id\":1,\"name\":\"Maya Lindqvist\"}}"
+              }
+            ],
+            "output_config": {
+              "format": {
+                "type": "json_schema",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "actionItems": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "claim": {
+                            "type": "string"
+                          },
+                          "sourceQuote": {
+                            "type": "string"
+                          },
+                          "speaker": {
+                            "type": "string"
+                          },
+                          "mentionedOwner": {
+                            "type": "string"
+                          },
+                          "mentionedDueDate": {
+                            "type": "string"
+                          },
+                          "mentionedDependency": {
+                            "type": "string"
+                          },
+                          "firmness": {
+                            "type": "string",
+                            "enum": [
+                              "firm",
+                              "tentative",
+                              "vague"
+                            ]
+                          },
+                          "notesSnippet": {
+                            "type": "string"
+                          },
+                          "details": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "required": [
+                          "claim",
+                          "sourceQuote",
+                          "firmness",
+                          "details"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "reportedCompletions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "claim": {
+                            "type": "string"
+                          },
+                          "sourceQuote": {
+                            "type": "string"
+                          },
+                          "speaker": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "claim",
+                          "sourceQuote"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "externalBlockers": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "meetingTone": {
+                      "type": "string",
+                      "enum": [
+                        "kickoff",
+                        "status update",
+                        "casual catchup",
+                        "escalation",
+                        "planning",
+                        "review",
+                        "other"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "actionItems",
+                    "reportedCompletions",
+                    "externalBlockers",
+                    "meetingTone"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "response": {
+            "model": "claude-sonnet-4-6",
+            "id": "msg_011CgADMuXTDR94GHN2Dgw7L",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"actionItems\":[{\"claim\":\"Set up embed sandbox with signed JWT auth and share credentials by June 24\",\"sourceQuote\":\"I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.\",\"speaker\":\"Theo Okonkwo\",\"mentionedOwner\":\"Theo\",\"mentionedDueDate\":\"Wednesday, June 24th\",\"mentionedDependency\":\"\",\"firmness\":\"firm\",\"notesSnippet\":\"Maya Lindqvist: Good. Let's make it concrete. Theo, can you stand up a sandbox they can develop against?\\nTheo Okonkwo: Yes — I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.\",\"details\":[\"Signed JWT auth\",\"Share credentials with Ashby team\",\"Sandbox for Ashby to develop against\"]},{\"claim\":\"Expose customer_id claim in session token deployed to staging by June 26\",\"sourceQuote\":\"I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.\",\"speaker\":\"Ruben De Smet\",\"mentionedOwner\":\"Ruben\",\"mentionedDueDate\":\"Friday, June 26th\",\"mentionedDependency\":\"\",\"firmness\":\"firm\",\"notesSnippet\":\"Ruben De Smet: Then the ball is with me. I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.\\nElise Vandamme: One question — how does the customer_id claim actually filter the data?\",\"details\":[\"Extend existing session tokens with customer_id claim\",\"Deploy to staging environment\",\"Deadline: Friday, June 26th\"]},{\"claim\":\"Write up row-level filtering approach for multi-tenant embeds and send it over by June 25\",\"sourceQuote\":\"I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.\",\"speaker\":\"Maya Lindqvist\",\"mentionedOwner\":\"Maya\",\"mentionedDueDate\":\"Thursday the 25th\",\"mentionedDependency\":\"\",\"firmness\":\"firm\",\"notesSnippet\":\"Maya Lindqvist: Global, enforced at the semantic layer, so a dashboard can't accidentally leak across tenants. I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.\\nElise Vandamme: Great, I'd like our security folks to read that before we go further.\",\"details\":[\"Row-level filtering approach for multi-tenant embeds\",\"Filtering is global, enforced at the semantic layer\",\"A dashboard cannot accidentally leak data across tenants\",\"Send to Ashby team by Thursday the 25th\",\"Elise's security team will review it before proceeding further\"]},{\"claim\":\"Have Ashby security team review the row-level filtering write-up before proceeding\",\"sourceQuote\":\"I'd like our security folks to read that before we go further.\",\"speaker\":\"Elise Vandamme\",\"mentionedOwner\":\"Elise Vandamme\",\"mentionedDueDate\":\"\",\"mentionedDependency\":\"waiting for the row-level filtering write-up\",\"firmness\":\"tentative\",\"notesSnippet\":\"Maya Lindqvist: Global, enforced at the semantic layer, so a dashboard can't accidentally leak across tenants. I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.\\nElise Vandamme: Great, I'd like our security folks to read that before we go further.\\nTheo Okonkwo: Sensible. The write-up plus the sandbox should give them everything they need to poke at it.\",\"details\":[\"Elise's security team to review the row-level filtering write-up\",\"Also noted that the sandbox will be available for security team to test\",\"Review is a prerequisite before the project proceeds further\"]},{\"claim\":\"Reconvene next Monday\",\"sourceQuote\":\"Reconvene next Monday?\",\"speaker\":\"Maya Lindqvist\",\"mentionedOwner\":\"\",\"mentionedDueDate\":\"next Monday\",\"mentionedDependency\":\"\",\"firmness\":\"firm\",\"notesSnippet\":\"Maya Lindqvist: Agreed — load testing is a later conversation. So: sandbox Wednesday, write-up Thursday, staging claim Friday. Reconvene next Monday?\\nElise Vandamme: Works for us. Thanks both.\",\"details\":[\"Follow-up sync scheduled for next Monday (2026-06-29)\",\"Milestones expected before then: sandbox by Wednesday, write-up by Thursday, staging claim by Friday\"]},{\"claim\":\"Consider load-testing the embeds at a later stage\",\"sourceQuote\":\"It might be worth load-testing the embeds eventually, but let's see it working first.\",\"speaker\":\"Ruben De Smet\",\"mentionedOwner\":\"\",\"mentionedDueDate\":\"\",\"mentionedDependency\":\"once the embeds are working\",\"firmness\":\"vague\",\"notesSnippet\":\"Ruben De Smet: It might be worth load-testing the embeds eventually, but let's see it working first.\\nMaya Lindqvist: Agreed — load testing is a later conversation.\",\"details\":[\"Load testing of embeds deferred until embeds are confirmed working\",\"Explicitly agreed to be a later conversation\"]}],\"reportedCompletions\":[],\"externalBlockers\":[],\"meetingTone\":\"status update\"}"
+              }
+            ],
+            "container": null,
+            "stop_reason": "end_turn",
+            "stop_sequence": null,
+            "stop_details": null,
+            "usage": {
+              "input_tokens": 1390,
+              "cache_creation_input_tokens": 2799,
+              "cache_read_input_tokens": 0,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 2799,
+                "ephemeral_1h_input_tokens": 0
+              },
+              "output_tokens": 1250,
+              "service_tier": "standard",
+              "inference_geo": "global",
+              "speed": "standard"
+            },
+            "diagnostics": null
+          }
+        },
+        {
+          "request": {
+            "model": "claude-sonnet-4-6",
+            "max_tokens": 8000,
+            "temperature": 0.2,
+            "system": [
+              {
+                "type": "text",
+                "text": "You are Vector. You take pre-extracted facts from a B2B onboarding meeting (Pass 1) and decide what to do with them — match to existing tasks, create new ones, mark completions, or flag none. Another reviewer will approve every tool call before anything writes to the database.\n\nYou will receive a JSON context with:\n- meeting.title, meeting.date, meeting.summary, meeting.transcript (you can re-read if needed)\n- extraction: Pass 1's structured findings:\n    - actionItems[]: { claim, sourceQuote, speaker, mentionedOwner, mentionedDueDate, mentionedDependency, firmness, notesSnippet, details[] }\n    - reportedCompletions[]: { claim, sourceQuote, speaker }\n    - externalBlockers[]: string[]\n    - meetingTone: short label\n- openTasks: existing OPEN tasks for this onboarding, each with id, taskId (human-readable e.g. \"AC-12\"), title, status, phaseId, due, ownerId (a vendorUsers id), priority, assigneeContactId (a customerContacts id), description, notes, dependsOn (what it already waits on: [{ taskId } | { text }], taskId being another openTasks id). When referring to a task in sourceQuote or notes, you may use its taskId (e.g. \"blocked on AC-7\") for readability.\n- customerContacts: [{ id, name, email }] — for assigneeContactId\n- vendorUsers: [{ id, name, email }] — Caroline's team; for ownerId\n- recorder: { id, name } of the person who recorded the meeting, or null when nobody has said who that is\n- phases: [{ id, name, isComplete }]\n- today: today's ISO date\n\nmeeting.transcript has one turn per line as \"<speaker>: <words>\"; the label is not part of the quote. The speaker \"You\" is the person who recorded the meeting: someone on our (vendor) side, never a customer contact.\n\nCOMPLETE BATCH, NOT TASK EXECUTION:\nCall propose_meeting_drafts once. Its calls array holds the create_task_draft, match_to_existing_task_draft, update_task_status_draft or flag_no_action_items entries described below.\nYour response is the entire review batch. These tools only PROPOSE drafts; they do not execute work, return task ids, or require tool results. Emit every warranted create, update and completion together in this ONE response. Do not stop after the first tasks or wait for a prerequisite's tool result. Assign draftRefs yourself so even a later tool call in this response can be referenced.\nA dependency is a relationship between pieces of work, not a reason to omit or postpone drafting either piece. \"After A, I will do B\" requires B's own draft as well as A's draft when A is new work; put the relationship on B. Do not hide B in A's notes. A task that is already on the board can still need an update even while it waits.\nBefore finishing, account for every firm/tentative extraction item and reported completion: either its own tool call, or a merged update for the SAME deliverable. Check that dependent actions and existing-task updates have not disappeared from the batch. Only omit an item under the explicit skip rules below, or when an existing task already captures all its agreed fields, details and dependencies unchanged.\n\nFor each extraction.actionItems entry, decide:\n- If it maps to an existing open task by topic, call match_to_existing_task_draft (don't duplicate). Every change to that task goes in the one draft's `changes` object.\n- Otherwise call create_task_draft. This includes commitments where the actor is vendor-side (Caroline's team) — internal vendor work IS roadmap work and belongs as a draft on this onboarding too. Don't filter by who owns it.\n- If it's a \"vague\" item with no clear owner AND no clear commitment, skip it. Tentative items with a credible owner still get a create_task_draft (mark confidence \"low\"). Parked items that someone owns remembering are tentative items with an owner: draft them undated (see JUDGEMENT RULES).\n\nFor each extraction.reportedCompletions entry, call update_task_status_draft against the matching task (newStatus = \"Done\").\n\nflag_no_action_items is the LAST RESORT. Use it alone when no eligible new or changed work remains after checking the extraction against the board. An extracted restatement may already be fully captured by an existing task. Do not create a no-op update just to account for it. Never use this flag to avoid drafting real work merely because its prerequisite is not ready.\n\nRules, non-negotiable:\n\n1. RESOLVE the verbatim mentions to ids:\n   - mentionedOwner: match against vendorUsers (by name) → ownerId. If the speaker is a customer-side person, match against customerContacts → assigneeContactId. If neither matches confidently, leave the relevant id null.\n   - The recorder (\"You\"): when the person who said they'd do it is \"You\" (mentionedOwner \"You\", or speaker \"You\" saying \"I'll ...\"), resolve them like any named vendor speaker: ownerId = recorder.id. If recorder is null, nobody has said who recorded the meeting: leave ownerId empty and set ownerFromRecorder: true on the create_task_draft, so the reviewer is asked to pick the owner. Never guess the recorder from vendorUsers, and never give their work to a customer contact.\n   - mentionedDueDate: convert to ISO YYYY-MM-DD relative to the meeting date (today, unless meeting.date says otherwise; e.g. \"by Friday\" → next Friday's date). Vague and anchored phrases count as dates too; see JUDGEMENT RULES (dates). Only leave dueDate empty when no timing was said at all, or the phrase has no reasonable reading.\n   - mentionedDependency: match against openTasks (use task title + description + notes for the match) → dependsOn [{ taskId: <openTasks id> }]. If it is another new task you are proposing from this same meeting → dependsOn [{ draftRef: \"<that draft's draftRef>\" }]. If it is not a task at all (mentioned in extraction.externalBlockers or describes a non-task blocker) → dependsOn [{ text: \"<the blocker in a few words>\" }]. See JUDGEMENT RULES E.\n\n2. NEVER guess. If you can't resolve a mention with reasonable confidence, leave the field null/omitted. The vendor reviews every draft.\n\n3. Match before you create. If extraction.claim plausibly maps to an existing open task (compare title + description + notes), use match_to_existing_task_draft. Don't duplicate work. Several action items about the same existing task become ONE match_to_existing_task_draft with all their changes (see JUDGEMENT RULES G and H).\n\n4. phaseId is REQUIRED on create_task_draft and MUST be from the phases array. Pick the phase that semantically fits (Discovery / Setup / Migration / Go-Live etc.). If unclear, pick the first non-complete phase.\n\n5. Every tool call MUST include sourceQuote. Use the same sourceQuote that Pass 1 surfaced — don't invent a new one. When several action items merge into one draft (e.g. one update carrying several changes to the same task), use the quote of the most important change; never join quotes together.\n\n6. Never invent task ids, contact ids, vendor user ids, or phase ids. Use only ids that appear in the context.\n\n7. Confidence on the tool call:\n   - high   = mentioned owner explicitly named + clear deadline + firm extraction\n   - medium = clear commitment, one of (owner, deadline) inferred or vague\n   - low    = implied or ambiguous; flag for the vendor to verify\n\n8. Concrete commitments produce a draft unless an existing task already captures the agreed work without changes. Parked deliverables need someone who actually took responsibility for doing, tracking or revisiting them; merely mentioning a possible feature is not ownership. Routine recaps, calendar housekeeping, sign-offs and offers to help are not task deliverables. An actual commitment to send an agreed artifact after the call still counts.\n\n9. Notes: write the create_task_draft notes in your own words, concisely, from notesSnippet and the transcript. They hold the crucial specifics agreed on the call (see JUDGEMENT RULES), then any \"Due date: ...\" reasoning. Do not paste a raw transcript window. Blockers do not go in notes; they go in dependsOn (rule E), including relevant ones from extraction.externalBlockers.\n\nJUDGEMENT RULES (how an experienced onboarding manager listens; apply them when deciding and filling drafts):\n\nA. Parked work becomes an undated task when a specific deliverable has someone who took responsibility for doing, tracking or revisiting it. Do not rely on an extraction owner inferred solely from who mentioned an idea. When those conditions hold, create it with NO dueDate (unless timing was actually given), owned by that person: the vendor user via ownerId, or the customer contact via assigneeContactId. Priority \"low\", confidence \"low\" or \"medium\". Title it as the deliverable itself, and say in notes that it was parked and why (\"Parked: not in scope until after launch\").\n   Explicitly noting a specific requested deliverable for later counts as tracking it, not rejection. \"Not committing now\" can defer delivery without cancelling the requested work. Do not require the literal words \"I promise\" or a deadline to preserve that undated item.\n   Do NOT create a task for: vague musing with no concrete deliverable, hypotheticals, opinions, descriptions of how things work today, ideas explicitly rejected, or general goodwill (\"we should catch up sometime\"). The line is concreteness: a nameable deliverable someone wants later is a task; a general wish is not.\n\nB. Dates. Turn vague and anchored timing into a concrete date, counting from the meeting date and its weekday (given below):\n   - \"by <weekday>\" / \"on <weekday>\" = the next occurrence of that weekday after the meeting.\n   - \"early next week\" = the Tuesday of next week; \"end of next week\" = the Friday of next week; \"end of the week\" = this week's Friday; \"tomorrow\" = the next day; \"mid-<month>\" = the 15th; \"end of the month\" = the last day of the month.\n   - \"right after this call\", \"today\", \"later today\" = the meeting date itself.\n   - Anchored to another event (\"before the review on <date>\", \"ahead of the launch on <date>\") = the working day before that event. \"By\" or \"at\" an event = the event's date.\n   - Explicit dates win over inference.\n   Whenever you inferred a date rather than read it directly, add one short line to notes: \"Due date: <phrase> from <meeting weekday + date> = <result>.\" Example: \"Due date: 'ahead of the stocktake on Wed 9 Apr' = Tue 8 Apr.\"\n\nC. \"Right after this call\" promises are tasks like any other. Draft them with the meeting date as dueDate. Do not skip them because they sound immediate or trivial.\n\nD. Notes carry the execution details. Include the agreed scope (what is in and what is out), exact names of files/systems/metrics, comparison or reference system, acceptance criteria, audience, constraints, and where or to whom the result must be delivered. Use the action's extraction.details as a checklist: preserve each relevant fact in notes/appendNotes, including exclusions and delivery instructions. Older extractions may have no details; re-read the transcript when needed. A progress summary is not a substitute for the instructions needed to finish the work. Be concise in your own words, but use as many short sentences as needed to preserve the specifics; never a raw transcript dump. Prefer the exact names and short technical phrases people used so a reader can search for them. Storing a dependency in dependsOn removes only the dependency sentence from notes, not the work's scope or delivery instructions. If nothing specific was agreed, keep notes short.\n\nE. Dependencies. When the item can only happen after something else, list every blocker in dependsOn (a task can wait on several things):\n   - the blocker is an existing open task → { \"taskId\": <its openTasks id> }.\n   - the blocker is not a task on the board (a sign-off, an approval, another team, an external event) → { \"text\": \"<the blocker, short, in the words used on the call>\" }, e.g. { \"text\": \"legal sign-off on the contract\" }.\n   - the blocker is another new task you are proposing from this same meeting → { \"draftRef\": \"<that create_task_draft's draftRef>\" }. Every create_task_draft you emit carries its own short draftRef (\"d1\", \"d2\", ... in the order you propose them, unique within this response), so other drafts can point at it. Never point a draft at itself, and never make two drafts wait on each other.\n   This applies to new tasks (create_task_draft.dependsOn) and to existing ones: when the call says an existing open task now waits on something its dependsOn does not already list, put it in match_to_existing_task_draft changes.dependsOn. Do not repeat a blocker the task already has. Do not write \"Blocked by\" lines in notes.\n\nF. Overwhelmed customer. When the customer says they are overwhelmed, stretched thin, or asks for space before taking on more, put NOTHING new on their plate from that exchange: no customer-owned tasks, no assigneeContactId for them on new work. Instead create one reminder for our own owner (ownerId = the vendor user who owns the relationship or took it on) to circle back, titled like \"Check back in with <contact> about <topic>\", with dueDate set to the check-in time if one was discussed (rule B), otherwise empty. Put the reason in notes (\"Customer asked for space until ...\").\n\nG. Cross-check existing tasks. When the call touches an existing open task (it maps via match_to_existing_task_draft, or someone talks about that work), compare its owner, assignee, due date and priority against what was agreed on the call. Propose ONE match_to_existing_task_draft per existing task, carrying every change in its `changes` object: ownerId / assigneeContactId when the work changed hands, dueDate when the timing moved (rule B applies; null when the call says the date no longer applies), priority when it was re-ranked. Do not split one task's changes across several drafts. Only include a field when the call disagrees with the board; do not restate what the board already says.\n\nH. Add what was agreed to existing tasks. When the call adds information to an existing task (scope, names of the specific things involved, audience, constraints, who to send it to), put it in changes.appendNotes, following rule D. A new blocker goes in changes.dependsOn (rule E), not in notes. It is appended to the task's notes as a new dated line, never replacing what is there, so write only what is new, not a restatement of the existing notes. Add any \"Due date: ...\" reasoning line (rule B) there too. A call that adds information but changes nothing else is still worth one update with appendNotes only.\n   Repeating the task title, unchanged status/owner/date, or the fact that the task is still relevant is not new information. Leave that task alone. Do not emit both a no-action flag and an update for the same restatement.\n\nGLOBAL RULES — apply to all output:\n- Never use em dashes (—) or en dashes (–). Use commas, periods, parentheses, or \"and\" instead.\n\nToday is 2026-06-22 (Monday). This is normally the meeting date; if meeting.date differs, count dates from meeting.date.",
+                "cache_control": {
+                  "type": "ephemeral"
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "user",
+                "content": "{\"today\":\"2026-06-22\",\"meeting\":{\"id\":\"D03B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A03\",\"title\":\"Ashby embedded analytics — weekly sync\",\"date\":\"2026-06-22T13:00:00Z\",\"summary\":\"Weekly sync on the Ashby embedded analytics rollout. Agreed sandbox setup with signed JWT auth, the customer_id claim work on Ashby's side, and a write-up of the row-level filtering approach.\",\"actionItems\":[\"Theo to set up embed sandbox with signed JWT auth and share credentials by June 24\",\"Ruben to expose customer_id claim in session token on staging by June 26\",\"Maya to send row-level filtering write-up for multi-tenant embeds by June 25\"],\"keyDecisions\":[\"Embeds authenticate via signed JWTs minted by Ashby's backend, not shared links\"],\"notes\":\"Ashby wants hiring dashboards inside their recruiting product for their own customers — tenant isolation is the make-or-break requirement.\",\"transcript\":\"Maya Lindqvist: Hi both — today is all embedded analytics. Elise, want to restate the goal so we're aligned?\\nElise Vandamme: Sure. We want each of our recruiting customers to see their own dashboards inside our product — their pipeline, their time-to-hire, nobody else's. Tenant isolation is non-negotiable.\\nTheo Okonkwo: Understood. The right pattern here is signed JWTs: your backend mints a short-lived token per user, the token carries the tenant identity, and the embed respects it.\\nRuben De Smet: That works for us — we already issue session tokens, we'd just extend the claims.\\nMaya Lindqvist: Good. Let's make it concrete. Theo, can you stand up a sandbox they can develop against?\\nTheo Okonkwo: Yes — I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.\\nRuben De Smet: Then the ball is with me. I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.\\nElise Vandamme: One question — how does the customer_id claim actually filter the data? Is that per dashboard or global?\\nMaya Lindqvist: Global, enforced at the semantic layer, so a dashboard can't accidentally leak across tenants. I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.\\nElise Vandamme: Great, I'd like our security folks to read that before we go further.\\nTheo Okonkwo: Sensible. The write-up plus the sandbox should give them everything they need to poke at it.\\nRuben De Smet: It might be worth load-testing the embeds eventually, but let's see it working first.\\nMaya Lindqvist: Agreed — load testing is a later conversation. So: sandbox Wednesday, write-up Thursday, staging claim Friday. Reconvene next Monday?\\nElise Vandamme: Works for us. Thanks both.\"},\"openTasks\":[{\"id\":1,\"taskId\":\"ASH-1\",\"title\":\"Connect dbt repo to Quarry\",\"status\":\"In progress\",\"phaseId\":48,\"due\":\"2026-06-24\",\"ownerId\":null,\"priority\":null,\"assigneeContactId\":2,\"description\":null,\"notes\":null,\"dependsOn\":[]},{\"id\":2,\"taskId\":\"ASH-2\",\"title\":\"Define first 10 metrics in dbt .yml\",\"status\":\"In progress\",\"phaseId\":48,\"due\":\"2026-06-26\",\"ownerId\":null,\"priority\":null,\"assigneeContactId\":2,\"description\":null,\"notes\":null,\"dependsOn\":[]},{\"id\":3,\"taskId\":\"ASH-3\",\"title\":\"Configure SSO for Ashby workspace\",\"status\":\"Not started\",\"phaseId\":47,\"due\":null,\"ownerId\":null,\"priority\":null,\"assigneeContactId\":1,\"description\":null,\"notes\":null,\"dependsOn\":[]},{\"id\":4,\"taskId\":\"ASH-4\",\"title\":\"Build hiring pipeline dashboard for embed\",\"status\":\"Not started\",\"phaseId\":48,\"due\":\"2026-07-10\",\"ownerId\":2,\"priority\":null,\"assigneeContactId\":null,\"description\":null,\"notes\":null,\"dependsOn\":[]},{\"id\":5,\"taskId\":\"ASH-5\",\"title\":\"Embedded analytics go-live review\",\"status\":\"Not started\",\"phaseId\":50,\"due\":\"2026-07-20\",\"ownerId\":1,\"priority\":null,\"assigneeContactId\":null,\"description\":null,\"notes\":null,\"dependsOn\":[]}],\"phases\":[{\"id\":46,\"name\":\"Kickoff\",\"isComplete\":false},{\"id\":47,\"name\":\"Configuration\",\"isComplete\":false},{\"id\":48,\"name\":\"Data Migration\",\"isComplete\":false},{\"id\":49,\"name\":\"Training\",\"isComplete\":false},{\"id\":50,\"name\":\"Go-Live\",\"isComplete\":false}],\"customerContacts\":[{\"id\":1,\"name\":\"Elise Vandamme\",\"email\":\"elise@ashbyhq.com\"},{\"id\":2,\"name\":\"Ruben De Smet\",\"email\":\"ruben@ashbyhq.com\"}],\"vendorUsers\":[{\"id\":1,\"name\":\"Maya Lindqvist\",\"email\":\"maya@vector.test\"},{\"id\":2,\"name\":\"Theo Okonkwo\",\"email\":\"theo@vector.test\"},{\"id\":3,\"name\":\"Ines Ferreira\",\"email\":\"ines@vector.test\"},{\"id\":4,\"name\":\"Sam Whitfield\",\"email\":\"sam@vector.test\"},{\"id\":5,\"name\":\"Caroline Jaworsky\",\"email\":\"caroline@vector.test\"}],\"recorder\":{\"id\":1,\"name\":\"Maya Lindqvist\"},\"extraction\":{\"actionItems\":[{\"claim\":\"Set up embed sandbox with signed JWT auth and share credentials by June 24\",\"sourceQuote\":\"I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.\",\"speaker\":\"Theo Okonkwo\",\"mentionedOwner\":\"Theo\",\"mentionedDueDate\":\"Wednesday, June 24th\",\"mentionedDependency\":\"\",\"firmness\":\"firm\",\"notesSnippet\":\"Maya Lindqvist: Good. Let's make it concrete. Theo, can you stand up a sandbox they can develop against?\\nTheo Okonkwo: Yes — I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.\",\"details\":[\"Signed JWT auth\",\"Share credentials with Ashby team\",\"Sandbox for Ashby to develop against\"]},{\"claim\":\"Expose customer_id claim in session token deployed to staging by June 26\",\"sourceQuote\":\"I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.\",\"speaker\":\"Ruben De Smet\",\"mentionedOwner\":\"Ruben\",\"mentionedDueDate\":\"Friday, June 26th\",\"mentionedDependency\":\"\",\"firmness\":\"firm\",\"notesSnippet\":\"Ruben De Smet: Then the ball is with me. I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.\\nElise Vandamme: One question — how does the customer_id claim actually filter the data?\",\"details\":[\"Extend existing session tokens with customer_id claim\",\"Deploy to staging environment\",\"Deadline: Friday, June 26th\"]},{\"claim\":\"Write up row-level filtering approach for multi-tenant embeds and send it over by June 25\",\"sourceQuote\":\"I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.\",\"speaker\":\"Maya Lindqvist\",\"mentionedOwner\":\"Maya\",\"mentionedDueDate\":\"Thursday the 25th\",\"mentionedDependency\":\"\",\"firmness\":\"firm\",\"notesSnippet\":\"Maya Lindqvist: Global, enforced at the semantic layer, so a dashboard can't accidentally leak across tenants. I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.\\nElise Vandamme: Great, I'd like our security folks to read that before we go further.\",\"details\":[\"Row-level filtering approach for multi-tenant embeds\",\"Filtering is global, enforced at the semantic layer\",\"A dashboard cannot accidentally leak data across tenants\",\"Send to Ashby team by Thursday the 25th\",\"Elise's security team will review it before proceeding further\"]},{\"claim\":\"Have Ashby security team review the row-level filtering write-up before proceeding\",\"sourceQuote\":\"I'd like our security folks to read that before we go further.\",\"speaker\":\"Elise Vandamme\",\"mentionedOwner\":\"Elise Vandamme\",\"mentionedDueDate\":\"\",\"mentionedDependency\":\"waiting for the row-level filtering write-up\",\"firmness\":\"tentative\",\"notesSnippet\":\"Maya Lindqvist: Global, enforced at the semantic layer, so a dashboard can't accidentally leak across tenants. I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.\\nElise Vandamme: Great, I'd like our security folks to read that before we go further.\\nTheo Okonkwo: Sensible. The write-up plus the sandbox should give them everything they need to poke at it.\",\"details\":[\"Elise's security team to review the row-level filtering write-up\",\"Also noted that the sandbox will be available for security team to test\",\"Review is a prerequisite before the project proceeds further\"]},{\"claim\":\"Reconvene next Monday\",\"sourceQuote\":\"Reconvene next Monday?\",\"speaker\":\"Maya Lindqvist\",\"mentionedOwner\":\"\",\"mentionedDueDate\":\"next Monday\",\"mentionedDependency\":\"\",\"firmness\":\"firm\",\"notesSnippet\":\"Maya Lindqvist: Agreed — load testing is a later conversation. So: sandbox Wednesday, write-up Thursday, staging claim Friday. Reconvene next Monday?\\nElise Vandamme: Works for us. Thanks both.\",\"details\":[\"Follow-up sync scheduled for next Monday (2026-06-29)\",\"Milestones expected before then: sandbox by Wednesday, write-up by Thursday, staging claim by Friday\"]},{\"claim\":\"Consider load-testing the embeds at a later stage\",\"sourceQuote\":\"It might be worth load-testing the embeds eventually, but let's see it working first.\",\"speaker\":\"Ruben De Smet\",\"mentionedOwner\":\"\",\"mentionedDueDate\":\"\",\"mentionedDependency\":\"once the embeds are working\",\"firmness\":\"vague\",\"notesSnippet\":\"Ruben De Smet: It might be worth load-testing the embeds eventually, but let's see it working first.\\nMaya Lindqvist: Agreed — load testing is a later conversation.\",\"details\":[\"Load testing of embeds deferred until embeds are confirmed working\",\"Explicitly agreed to be a later conversation\"]}],\"reportedCompletions\":[],\"externalBlockers\":[],\"meetingTone\":\"status update\"}}"
+              }
+            ],
+            "tools": [
+              {
+                "name": "propose_meeting_drafts",
+                "description": "Submit the COMPLETE meeting review batch once. Each calls entry is a draft proposal, not an executed task. Include prerequisites, dependent tasks, existing-task updates and completions together; draftRefs can point forward within this batch. No tool results are needed. Use flag_no_action_items alone only when no draft is warranted.",
+                "input_schema": {
+                  "type": "object",
+                  "properties": {
+                    "calls": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "description": "Propose creating a new task. Use when an action item is a fresh commitment not covered by any existing open task. Fill in as many fields as the extraction supports; leave the rest null/omitted.",
+                            "properties": {
+                              "tool": {
+                                "type": "string",
+                                "const": "create_task_draft"
+                              },
+                              "input": {
+                                "type": "object",
+                                "properties": {
+                                  "draftRef": {
+                                    "type": "string",
+                                    "description": "REQUIRED. A short id for this draft, unique within this response: \"d1\", \"d2\", ... in the order you propose new tasks. Other drafts name it in dependsOn ({ draftRef }) when they wait on this one."
+                                  },
+                                  "title": {
+                                    "type": "string",
+                                    "description": "Short imperative task title, max 80 chars."
+                                  },
+                                  "description": {
+                                    "type": "string",
+                                    "description": "Optional longer description of what the task entails."
+                                  },
+                                  "ownerId": {
+                                    "type": "integer",
+                                    "description": "Vendor team-mate who owns this work. MUST be an id from vendorUsers. When the recorder (\"You\") made the commitment, recorder.id. Omit if not determinable."
+                                  },
+                                  "ownerFromRecorder": {
+                                    "type": "boolean",
+                                    "description": "true ONLY when the person who recorded the meeting (\"You\") made this commitment and recorder is null, so ownerId is left empty. Omit otherwise."
+                                  },
+                                  "assigneeContactId": {
+                                    "type": "integer",
+                                    "description": "Customer-side person responsible. MUST be an id from customerContacts. Omit if not determinable."
+                                  },
+                                  "dueDate": {
+                                    "type": "string",
+                                    "description": "ISO date YYYY-MM-DD if a deadline was committed. Empty string or omit if not."
+                                  },
+                                  "phaseId": {
+                                    "type": "integer",
+                                    "description": "REQUIRED. Must match a phase id from the phases array."
+                                  },
+                                  "priority": {
+                                    "type": "string",
+                                    "enum": [
+                                      "low",
+                                      "medium",
+                                      "high"
+                                    ]
+                                  },
+                                  "dependsOn": {
+                                    "type": "array",
+                                    "description": "What this task waits on (see JUDGEMENT RULES E). Each item is exactly ONE of: { taskId } for an open task on the board, { draftRef } for another new task you are proposing in this same response (its create_task_draft's draftRef), or { text } for a blocker that is not a task (a sign-off, another team, an external event). Omit when nothing blocks it.",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "taskId": {
+                                          "type": "integer",
+                                          "description": "An id from openTasks."
+                                        },
+                                        "draftRef": {
+                                          "type": "string",
+                                          "description": "The draftRef of another create_task_draft in this response."
+                                        },
+                                        "text": {
+                                          "type": "string",
+                                          "description": "The blocker in a few words."
+                                        }
+                                      },
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "notes": {
+                                    "type": "string",
+                                    "description": "Concise, in your own words: the crucial specifics agreed on the call (scope, names, audience, constraints, recipient), then any \"Due date: ...\" line explaining an inferred date. Blockers go in dependsOn, not here. Not a raw transcript dump."
+                                  },
+                                  "sourceQuote": {
+                                    "type": "string",
+                                    "description": "REQUIRED. Verbatim — use extraction.sourceQuote."
+                                  },
+                                  "confidence": {
+                                    "type": "string",
+                                    "enum": [
+                                      "low",
+                                      "medium",
+                                      "high"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "draftRef",
+                                  "title",
+                                  "phaseId",
+                                  "priority",
+                                  "sourceQuote",
+                                  "confidence"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "tool",
+                              "input"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "description": "Propose updating an existing open task instead of creating a duplicate. Use when an action item maps to a task already in the openTasks list. One draft per task: put EVERY change agreed on the call for that task in `changes` (new owner or assignee, new due date, new priority, notes to append, new blockers). Only include fields that differ from the board.",
+                            "properties": {
+                              "tool": {
+                                "type": "string",
+                                "const": "match_to_existing_task_draft"
+                              },
+                              "input": {
+                                "type": "object",
+                                "properties": {
+                                  "taskId": {
+                                    "type": "integer",
+                                    "description": "Must be an id from openTasks"
+                                  },
+                                  "changes": {
+                                    "type": "object",
+                                    "description": "The changes to apply to the task, all at once. At least one field.",
+                                    "properties": {
+                                      "ownerId": {
+                                        "type": "integer",
+                                        "description": "New vendor owner. MUST be an id from vendorUsers. Only when the work moved to a different vendor team-mate."
+                                      },
+                                      "assigneeContactId": {
+                                        "type": "integer",
+                                        "description": "New customer-side assignee. MUST be an id from customerContacts. Only when the work moved to a different customer contact."
+                                      },
+                                      "priority": {
+                                        "type": "string",
+                                        "enum": [
+                                          "low",
+                                          "medium",
+                                          "high"
+                                        ],
+                                        "description": "New priority."
+                                      },
+                                      "dueDate": {
+                                        "type": [
+                                          "string",
+                                          "null"
+                                        ],
+                                        "description": "New due date, ISO YYYY-MM-DD (see JUDGEMENT RULES, dates). null removes the task's due date: only when the call says there is no date for it any more."
+                                      },
+                                      "appendNotes": {
+                                        "type": "string",
+                                        "description": "Concise, in your own words: what the call added to this task (scope, names, audience, constraints, recipient), then any \"Due date: ...\" line explaining an inferred date. Appended to the task's notes as a new dated line; never repeat what the notes already say. Blockers go in dependsOn."
+                                      },
+                                      "dependsOn": {
+                                        "type": "array",
+                                        "description": "Blockers to ADD to this task (see JUDGEMENT RULES E). Only ones its dependsOn does not already list.",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "taskId": {
+                                              "type": "integer",
+                                              "description": "An id from openTasks."
+                                            },
+                                            "draftRef": {
+                                              "type": "string",
+                                              "description": "The draftRef of another create_task_draft in this response."
+                                            },
+                                            "text": {
+                                              "type": "string",
+                                              "description": "The blocker in a few words."
+                                            }
+                                          },
+                                          "additionalProperties": false
+                                        }
+                                      }
+                                    },
+                                    "minProperties": 1,
+                                    "additionalProperties": false
+                                  },
+                                  "sourceQuote": {
+                                    "type": "string"
+                                  },
+                                  "confidence": {
+                                    "type": "string",
+                                    "enum": [
+                                      "low",
+                                      "medium",
+                                      "high"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "taskId",
+                                  "changes",
+                                  "sourceQuote",
+                                  "confidence"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "tool",
+                              "input"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "description": "Propose marking an existing task as Done (or another status) when the transcript reports completion.",
+                            "properties": {
+                              "tool": {
+                                "type": "string",
+                                "const": "update_task_status_draft"
+                              },
+                              "input": {
+                                "type": "object",
+                                "properties": {
+                                  "taskId": {
+                                    "type": "integer",
+                                    "description": "Must be an id from openTasks"
+                                  },
+                                  "newStatus": {
+                                    "type": "string",
+                                    "enum": [
+                                      "Not started",
+                                      "In progress",
+                                      "Under investigation",
+                                      "Blocked",
+                                      "Done"
+                                    ]
+                                  },
+                                  "sourceQuote": {
+                                    "type": "string"
+                                  },
+                                  "confidence": {
+                                    "type": "string",
+                                    "enum": [
+                                      "low",
+                                      "medium",
+                                      "high"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "taskId",
+                                  "newStatus",
+                                  "sourceQuote",
+                                  "confidence"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "tool",
+                              "input"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "description": "Call exactly once if the meeting has no concrete action items worth surfacing.",
+                            "properties": {
+                              "tool": {
+                                "type": "string",
+                                "const": "flag_no_action_items"
+                              },
+                              "input": {
+                                "type": "object",
+                                "properties": {
+                                  "reason": {
+                                    "type": "string",
+                                    "description": "Brief explanation (e.g. 'casual catch-up', 'all items already covered by existing tasks')"
+                                  }
+                                },
+                                "required": [
+                                  "reason"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "tool",
+                              "input"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "calls"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            ],
+            "tool_choice": {
+              "type": "tool",
+              "name": "propose_meeting_drafts"
+            }
+          },
+          "response": {
+            "model": "claude-sonnet-4-6",
+            "id": "msg_011CgADPAF1F38guH3Dk3BXv",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "tool_use",
+                "id": "toolu_017ueyHRpwm6bvrtoQuKewmc",
+                "name": "propose_meeting_drafts",
+                "input": {
+                  "calls": [
+                    {
+                      "tool": "create_task_draft",
+                      "input": {
+                        "draftRef": "d1",
+                        "title": "Set up embed sandbox with signed JWT auth and share credentials",
+                        "phaseId": 47,
+                        "priority": "high",
+                        "ownerId": 2,
+                        "dueDate": "2026-06-24",
+                        "sourceQuote": "I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.",
+                        "confidence": "high",
+                        "notes": "Stand up an embed sandbox configured with signed JWT auth for Ashby to develop against. Share credentials with the Ashby team once ready. Signed JWTs are minted by Ashby's backend, carrying tenant identity; the embed respects the token for isolation."
+                      }
+                    },
+                    {
+                      "tool": "create_task_draft",
+                      "input": {
+                        "draftRef": "d2",
+                        "title": "Write up row-level filtering approach for multi-tenant embeds",
+                        "phaseId": 47,
+                        "priority": "high",
+                        "ownerId": 1,
+                        "dueDate": "2026-06-25",
+                        "sourceQuote": "I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.",
+                        "confidence": "high",
+                        "notes": "Document the row-level filtering approach for multi-tenant embeds. Key points: filtering is global, enforced at the semantic layer, so no dashboard can accidentally leak data across tenants. Send the write-up to the Ashby team by Thursday the 25th. Elise's security team will review it before the project proceeds further."
+                      }
+                    },
+                    {
+                      "tool": "create_task_draft",
+                      "input": {
+                        "draftRef": "d3",
+                        "title": "Expose customer_id claim in Ashby session token on staging",
+                        "phaseId": 47,
+                        "priority": "high",
+                        "assigneeContactId": 2,
+                        "dueDate": "2026-06-26",
+                        "sourceQuote": "I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.",
+                        "confidence": "high",
+                        "notes": "Ruben to extend Ashby's existing session tokens with a customer_id claim and deploy to staging. This is the tenant identity carrier consumed by the embed's signed JWT auth flow.",
+                        "dependsOn": [
+                          {
+                            "draftRef": "d1"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "tool": "create_task_draft",
+                      "input": {
+                        "draftRef": "d4",
+                        "title": "Ashby security team review of row-level filtering write-up",
+                        "phaseId": 47,
+                        "priority": "medium",
+                        "assigneeContactId": 1,
+                        "sourceQuote": "I'd like our security folks to read that before we go further.",
+                        "confidence": "low",
+                        "notes": "Elise's security team to review the row-level filtering write-up (and may also test against the sandbox). This review is a prerequisite before the project proceeds further. No deadline committed; depends on the write-up being delivered first.",
+                        "dependsOn": [
+                          {
+                            "draftRef": "d2"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "caller": {
+                  "type": "direct"
+                }
+              }
+            ],
+            "container": null,
+            "stop_reason": "tool_use",
+            "stop_sequence": null,
+            "stop_details": null,
+            "usage": {
+              "input_tokens": 3057,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 5886,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 0
+              },
+              "output_tokens": 868,
+              "service_tier": "standard",
+              "inference_geo": "global",
+              "speed": "standard"
+            },
+            "diagnostics": null
+          }
+        }
+      ]
+    }
+  ]
+}

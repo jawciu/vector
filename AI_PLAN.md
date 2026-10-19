@@ -497,11 +497,22 @@ model AICall {
 - **Anthropic Console** for top-level cost/usage visibility.
 - **LangSmith deferred** — wire up later when prompt tuning starts in earnest (Caroline already has an account).
 
-### The 10-second Vercel Hobby ceiling
+### Miniti processing duration
 
-- Webhook handlers run on Node runtime → 10s function lifetime cap.
-- We use Next 16's `after()` to run the orchestrator after the 200 ack — extends the function lifetime up to the cap, but doesn't bypass it.
-- Long Sonnet calls can exceed 10s. Stuck events surface in `/admin/ai` with a Reprocess button; second runs are usually faster because of prompt caching.
+Miniti webhook, assign and retry routes acknowledge immediately and run the two
+model passes through Next.js after(). Their local configuration now allows 300s,
+which requires Vercel Fluid compute. The previous explicit 60s cap is too short
+for some reasoning-enabled decisions; one development case took ~82s. No model
+request was added. This is a local code proposal, not a deployed settings change.
+
+Before deployment verify Fluid compute is enabled for the actual target project.
+[Vercel documents 300s on every Fluid plan, including Hobby](https://vercel.com/docs/functions/configuring-functions/duration).
+Live project settings were not verified: the CLI had no credentials and its
+login attempt was cancelled. No project setting, plan, deployment or billing was
+changed. Increasing maxDuration is headroom, not a guarantee of job completion.
+Large bulk-retry batches can still exceed it; completed events stay idempotent
+and unfinished events remain retryable. Durable background jobs remain separate
+work if whole-batch completion is needed.
 
 ---
 
@@ -613,3 +624,62 @@ Same payload schema; switch on `event` in the handler. We process both — `meet
 - **Idempotency**: enforced by `@@unique([source, sourceId])` on `ExternalEvent`. Duplicate `meeting.id` deliveries are silently absorbed.
 - **No retries from Miniti**: app downtime loses events. Mitigation: `meeting.updated` events fire on regenerate, giving a natural backstop. For critical missed events, manually re-save from Miniti history.
 - **Fire fast**: ack within ~50ms (write `ExternalEvent`, return 200). Orchestrator runs async after the response via `after()`.
+
+
+## Meeting draft quality correction (local, 2026-10-18)
+
+The two-pass Miniti pipeline now makes one complete Pass-2 proposal batch via
+`propose_meeting_drafts`. Its array uses the existing per-draft tool schemas and
+is decoded before the existing validation/dependency/persistence path. Separate
+first-response tool calls had omitted drafts the model had already planned;
+the pipeline does not have a tool-result conversation to continue them.
+Malformed or token-limited batches fail visibly, with usage logged, rather than
+persisting a partial response. No extra model pass is introduced.
+
+Pass 1 carries `details[]` for execution facts beyond its short `notesSnippet`.
+Pass 2 uses those facts as a notes checklist. Parked work needs an actual owner
+commitment; routine meeting administration and unchanged-task restatements do
+not create drafts. An action waiting on another action still gets its own draft.
+Older cached extractions without details remain supported through the transcript.
+
+Evaluation stages, rejected attempts, exact requests, costs and limitations are
+in `evals/quality-investigation/README.md`. This correction is local work pending
+review; it has not been merged or deployed.
+
+
+### Round 2 decision and runtime safeguards (local)
+
+Pass 1 uses Sonnet 4.6, temperature 0.2, max 6000 output tokens, with execution
+facts and an activity label. Pass 2 uses the same model, max 10000, requested
+thinking budget 1024 and automatic tool choice. It must still return one complete
+proposal batch. The requested thinking budget is not a guaranteed measured cap;
+traces retain actual usage. There is no additional verification/model pass.
+
+Match the finished deliverable, not its topic: producing an input and doing the
+work that waits for it are different tasks. Preserve a waiting task's existing
+date/owner when adding a prerequisite. Capture short recipient hand-offs and
+cross-turn dependencies. One implementation/PR task retains technical scope and
+optional cheap measurements in notes; the review remains separate. A promised
+vendor response to an undecided customer choice stays a separate undated reminder.
+
+Code supplies UTC calendar facts and narrow relative-date hints. Corrections
+apply only to a date already proposed on the matching quotation; they cannot
+invent a deadline or reverse explicit null removal. Activity labels alone never
+delete tasks: only an explicit recap in both quote and proposed title, unanimously
+classified as administration and unreferenced by dependent drafts, can be excluded.
+When both ownership fields are supplied, a narrow guard clears the customer
+assignment only if the vendor owner is the known recorder and all matching
+extraction facts explicitly identify that recorder as the actor. It does not
+guess unresolved ownership or change existing-task updates.
+
+The 300-second route budget and live Fluid verification requirement are documented
+above. New outputs remain local; existing saved review fixtures were not refreshed.
+Round 2 results and policy-key comparability are in
+`evals/quality-investigation/round2.md` and its manifest.
+
+
+Final local assessment: `evals/quality-investigation/RESULTS.md`. All 50 keyed
+commitments are found, with correct matched action types and clearer dependency
+chains. Parked ownership/speculative suggestions and one inferred deadline remain
+model errors. Do not treat the tuned30-case set as a production guarantee. Exact
+final source hashes/configuration are in the manifest; paid tests are stopped.

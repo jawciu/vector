@@ -1157,7 +1157,10 @@ const TaskDrawer = forwardRef<HTMLDivElement, TaskDrawerProps>(function TaskDraw
               allTasks={allTasks}
               open={depsOpen}
               onToggle={() => toggleDropdown(depsOpen, setDepsOpen)}
-              onClose={() => setDepsOpen(false)}
+              onClose={() => {
+                keepDepsOpenRef.current = null;
+                setDepsOpen(false);
+              }}
               onTaskUpdated={(updated) => {
                 keepDepsOpenRef.current = depsOpen ? updated.id : null;
                 setLocalTask(updated);

@@ -1,0 +1,1240 @@
+[
+  {
+    "case": "01",
+    "extractionAudit": {
+      "matched": 4,
+      "total": 4,
+      "possiblyMissing": [],
+      "pairs": [
+        {
+          "expectedIndex": 0,
+          "proposalIndex": 0,
+          "score": 1.3,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 1,
+          "proposalIndex": 2,
+          "score": 1.236842105263158,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 2,
+          "proposalIndex": 3,
+          "score": 1.3,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 3,
+          "proposalIndex": 4,
+          "score": 1.2692307692307692,
+          "by": "title"
+        }
+      ]
+    },
+    "providers": {
+      "claude": {
+        "proposals": [
+          {
+            "action": "create_task",
+            "title": "Draft incremental model config for usage events table and open PR by Thursday June 18",
+            "sourceQuote": "I'll draft the incremental model config for the usage events table and have it in a PR by Thursday the 18th.",
+            "draftId": 1,
+            "draftRef": "a1",
+            "ownerSide": "vendor",
+            "ownerName": "Theo Okonkwo",
+            "assigneeContactName": null,
+            "dependsOn": []
+          },
+          {
+            "action": "create_task",
+            "title": "Review incremental model config PR on the same day it is opened",
+            "sourceQuote": "Perfect, I'll review it same day.",
+            "draftId": 2,
+            "draftRef": "a2",
+            "ownerSide": "customer",
+            "ownerName": null,
+            "assigneeContactName": "Jonas Beck",
+            "dependsOn": [
+              {
+                "draftRef": "a1"
+              }
+            ]
+          },
+          {
+            "action": "match_existing",
+            "title": "Add Quarry static IPs to warehouse network policy by end of day Wednesday June 17",
+            "sourceQuote": "I'll add the Quarry static IPs to our warehouse network policy — I can get that done by end of day Wednesday, June 17th.",
+            "draftId": 3,
+            "draftRef": null,
+            "taskRef": "t1",
+            "ownerSide": "customer",
+            "ownerName": null,
+            "assigneeContactName": "Jonas Beck",
+            "dependsOn": []
+          },
+          {
+            "action": "create_task",
+            "title": "Circulate pilot dashboard list to analytics guild and get sign-off by Friday June 19",
+            "sourceQuote": "I'll circulate the pilot dashboard list to the analytics guild and get sign-off by Friday the 19th.",
+            "draftId": 4,
+            "draftRef": "a4",
+            "ownerSide": "customer",
+            "ownerName": null,
+            "assigneeContactName": "Priya Raman",
+            "dependsOn": []
+          }
+        ],
+        "unresolved": [],
+        "score": {
+          "calls": [
+            {
+              "index": 0,
+              "action": "create_task",
+              "title": "Draft incremental model config for usage events table (PR)",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 1,
+                "action": "create_task",
+                "title": "Draft incremental model config for usage events table and open PR by Thursday June 18",
+                "score": 1.3,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Theo Okonkwo",
+                  "actual": "Theo Okonkwo",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 1,
+              "action": "create_task",
+              "title": "Add Quarry static IPs to warehouse network policy",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 3,
+                "action": "match_existing",
+                "title": "Add Quarry static IPs to warehouse network policy by end of day Wednesday June 17",
+                "score": 1.237,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "match_existing",
+                  "pass": false
+                },
+                "owner": {
+                  "expected": "customer",
+                  "actual": null,
+                  "pass": false
+                },
+                "assignee": {
+                  "expected": "Jonas Beck",
+                  "actual": "Jonas Beck",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 2,
+              "action": "create_task",
+              "title": "Circulate pilot dashboard list to analytics guild for sign-off",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 4,
+                "action": "create_task",
+                "title": "Circulate pilot dashboard list to analytics guild and get sign-off by Friday June 19",
+                "score": 1.3,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "customer",
+                  "actual": "customer",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Priya Raman",
+                  "actual": "Priya Raman",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 3,
+              "action": "create_task",
+              "title": "Row-level security for the sales team",
+              "kind": null,
+              "paired": false,
+              "pairedWith": null,
+              "checks": {},
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "free_text_dependency"
+                  ],
+                  "what": "depends on \"after the pilot\"",
+                  "met": false
+                }
+              ]
+            }
+          ],
+          "unmatchedProposals": [
+            {
+              "draftId": 2,
+              "action": "create_task",
+              "title": "Review incremental model config PR on the same day it is opened",
+              "sourceQuote": "Perfect, I'll review it same day."
+            }
+          ],
+          "proposalsCount": 4,
+          "duplicates": [],
+          "groundedness": {
+            "quotes": {
+              "count": 4,
+              "total": 4
+            },
+            "quoteViolations": [],
+            "quotesFromActionItemsOnly": 0,
+            "citedIds": {
+              "count": 0,
+              "total": 0
+            },
+            "citedIdViolations": []
+          },
+          "totals": {
+            "recall": {
+              "count": 3,
+              "total": 4
+            },
+            "precision": {
+              "count": 3,
+              "total": 4
+            },
+            "action": {
+              "count": 2,
+              "total": 3
+            },
+            "ownerSide": {
+              "count": 2,
+              "total": 3
+            },
+            "assignee": {
+              "count": 3,
+              "total": 3
+            },
+            "dueDate": {
+              "count": 0,
+              "total": 0
+            },
+            "priority": {
+              "count": 0,
+              "total": 0
+            },
+            "status": {
+              "count": 0,
+              "total": 0
+            },
+            "notesPhrases": {
+              "count": 0,
+              "total": 0
+            },
+            "dependencies": {
+              "count": 0,
+              "total": 0
+            },
+            "kindRecall": {
+              "commitment": {
+                "count": 0,
+                "total": 0
+              },
+              "parked_for_later": {
+                "count": 0,
+                "total": 0
+              },
+              "vendor_reminder": {
+                "count": 0,
+                "total": 0
+              }
+            },
+            "groundedQuotes": {
+              "count": 4,
+              "total": 4
+            },
+            "citedIdsValid": {
+              "count": 0,
+              "total": 0
+            },
+            "duplicates": {
+              "count": 0,
+              "total": 3
+            },
+            "gaps": {
+              "count": 0,
+              "total": 1
+            },
+            "gapsByCode": {
+              "free_text_dependency": {
+                "count": 0,
+                "total": 1
+              }
+            }
+          }
+        },
+        "metrics": {
+          "correctAction": {
+            "count": 2,
+            "total": 4
+          },
+          "correctOwner": {
+            "count": 3,
+            "total": 4
+          },
+          "correctDependencies": {
+            "count": 0,
+            "total": 1
+          },
+          "dependencyPrecision": {
+            "count": 0,
+            "total": 1
+          },
+          "unwantedDependencies": [
+            {
+              "candidate": "a2",
+              "dependency": {
+                "draftRef": "a1"
+              }
+            }
+          ]
+        },
+        "model": "claude-sonnet-4-6",
+        "durationMs": 9132.931625000001,
+        "estimatedCostUsd": 0.08934
+      },
+      "jev": null
+    }
+  },
+  {
+    "case": "02",
+    "extractionAudit": {
+      "matched": 4,
+      "total": 4,
+      "possiblyMissing": [],
+      "pairs": [
+        {
+          "expectedIndex": 0,
+          "proposalIndex": 0,
+          "score": 1,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 2,
+          "proposalIndex": 1,
+          "score": 1.2692307692307692,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 1,
+          "proposalIndex": 2,
+          "score": 0.9615384615384616,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 3,
+          "proposalIndex": 3,
+          "score": 1.1,
+          "by": "title"
+        }
+      ]
+    },
+    "providers": {
+      "claude": {
+        "proposals": [
+          {
+            "action": "create_task",
+            "title": "Send completed SIG Lite questionnaire to Freya by June 5th",
+            "sourceQuote": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th.",
+            "draftId": 1,
+            "draftRef": "a1",
+            "ownerSide": "vendor",
+            "ownerName": "Ines Ferreira",
+            "assigneeContactName": null,
+            "dependsOn": []
+          },
+          {
+            "action": "create_task",
+            "title": "Upload pen test summary to the portal by Monday June 8th",
+            "sourceQuote": "I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.",
+            "draftId": 2,
+            "draftRef": "a2",
+            "ownerSide": "customer",
+            "ownerName": null,
+            "assigneeContactName": "Freya Dunn",
+            "dependsOn": [
+              {
+                "draftRef": "a3"
+              }
+            ]
+          },
+          {
+            "action": "create_task",
+            "title": "Email pen test report to Freya right after this call",
+            "sourceQuote": "I'll email it to you right after this call, it's ready to go.",
+            "draftId": 3,
+            "draftRef": "a3",
+            "ownerSide": "vendor",
+            "ownerName": "Sam Whitfield",
+            "assigneeContactName": null,
+            "dependsOn": []
+          },
+          {
+            "action": "create_task",
+            "title": "Provision read-only Snowflake service account scoped to ANALYTICS schema with key-pair auth by June 10th",
+            "sourceQuote": "I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th.",
+            "draftId": 4,
+            "draftRef": "a4",
+            "ownerSide": "customer",
+            "ownerName": null,
+            "assigneeContactName": "Oliver Hartley",
+            "dependsOn": [
+              {
+                "taskRef": "t1"
+              },
+              {
+                "text": "Warehouse team will not create the service account until security signs off due to PHI in the schema"
+              }
+            ]
+          },
+          {
+            "action": "create_task",
+            "title": "Recap agreed dates and chain in the portal after the call",
+            "sourceQuote": "I'll recap in the portal after this.",
+            "draftId": 5,
+            "draftRef": "a5",
+            "ownerSide": "vendor",
+            "ownerName": "Ines Ferreira",
+            "assigneeContactName": null,
+            "dependsOn": []
+          }
+        ],
+        "unresolved": [],
+        "score": {
+          "calls": [
+            {
+              "index": 0,
+              "action": "create_task",
+              "title": "Return completed SIG Lite questionnaire to Function Health security",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 1,
+                "action": "create_task",
+                "title": "Send completed SIG Lite questionnaire to Freya by June 5th",
+                "score": 1,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Ines Ferreira",
+                  "actual": "Ines Ferreira",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 1,
+              "action": "create_task",
+              "title": "Share pen test summary with Freya",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 3,
+                "action": "create_task",
+                "title": "Email pen test report to Freya right after this call",
+                "score": 0.962,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Sam Whitfield",
+                  "actual": "Sam Whitfield",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 2,
+              "action": "create_task",
+              "title": "Upload pen test summary to portal",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 2,
+                "action": "create_task",
+                "title": "Upload pen test summary to the portal by Monday June 8th",
+                "score": 1.269,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "customer",
+                  "actual": "customer",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Freya Dunn",
+                  "actual": "Freya Dunn",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "depends_on_new_draft"
+                  ],
+                  "what": "depends on new draft \"Share pen test summary with Freya\"",
+                  "met": true
+                }
+              ]
+            },
+            {
+              "index": 3,
+              "action": "create_task",
+              "title": "Provision read-only Snowflake service account",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 4,
+                "action": "create_task",
+                "title": "Provision read-only Snowflake service account scoped to ANALYTICS schema with key-pair auth by June 10th",
+                "score": 1.1,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "customer",
+                  "actual": "customer",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Oliver Hartley",
+                  "actual": "Oliver Hartley",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "free_text_dependency"
+                  ],
+                  "what": "depends on \"security sign-off\"",
+                  "met": true
+                }
+              ]
+            }
+          ],
+          "unmatchedProposals": [
+            {
+              "draftId": 5,
+              "action": "create_task",
+              "title": "Recap agreed dates and chain in the portal after the call",
+              "sourceQuote": "I'll recap in the portal after this."
+            }
+          ],
+          "proposalsCount": 5,
+          "duplicates": [],
+          "groundedness": {
+            "quotes": {
+              "count": 5,
+              "total": 5
+            },
+            "quoteViolations": [],
+            "quotesFromActionItemsOnly": 0,
+            "citedIds": {
+              "count": 0,
+              "total": 0
+            },
+            "citedIdViolations": []
+          },
+          "totals": {
+            "recall": {
+              "count": 4,
+              "total": 4
+            },
+            "precision": {
+              "count": 4,
+              "total": 5
+            },
+            "action": {
+              "count": 4,
+              "total": 4
+            },
+            "ownerSide": {
+              "count": 4,
+              "total": 4
+            },
+            "assignee": {
+              "count": 4,
+              "total": 4
+            },
+            "dueDate": {
+              "count": 0,
+              "total": 0
+            },
+            "priority": {
+              "count": 0,
+              "total": 0
+            },
+            "status": {
+              "count": 0,
+              "total": 0
+            },
+            "notesPhrases": {
+              "count": 0,
+              "total": 0
+            },
+            "dependencies": {
+              "count": 0,
+              "total": 0
+            },
+            "kindRecall": {
+              "commitment": {
+                "count": 0,
+                "total": 0
+              },
+              "parked_for_later": {
+                "count": 0,
+                "total": 0
+              },
+              "vendor_reminder": {
+                "count": 0,
+                "total": 0
+              }
+            },
+            "groundedQuotes": {
+              "count": 5,
+              "total": 5
+            },
+            "citedIdsValid": {
+              "count": 0,
+              "total": 0
+            },
+            "duplicates": {
+              "count": 0,
+              "total": 5
+            },
+            "gaps": {
+              "count": 2,
+              "total": 2
+            },
+            "gapsByCode": {
+              "depends_on_new_draft": {
+                "count": 1,
+                "total": 1
+              },
+              "free_text_dependency": {
+                "count": 1,
+                "total": 1
+              }
+            }
+          }
+        },
+        "metrics": {
+          "correctAction": {
+            "count": 4,
+            "total": 4
+          },
+          "correctOwner": {
+            "count": 4,
+            "total": 4
+          },
+          "correctDependencies": {
+            "count": 2,
+            "total": 2
+          },
+          "dependencyPrecision": {
+            "count": 2,
+            "total": 3
+          },
+          "unwantedDependencies": [
+            {
+              "candidate": "a4",
+              "dependency": {
+                "taskRef": "t1"
+              }
+            }
+          ]
+        },
+        "model": "claude-sonnet-4-6",
+        "durationMs": 7946.0154999999995,
+        "estimatedCostUsd": 0.089574
+      },
+      "jev": null
+    }
+  },
+  {
+    "case": "03",
+    "extractionAudit": {
+      "matched": 3,
+      "total": 4,
+      "possiblyMissing": [
+        {
+          "action": "create_task",
+          "titleLike": "Get security approval",
+          "titleAlternatives": [
+            "Security team reviews the embed write-up"
+          ],
+          "owner": "customer",
+          "assignee": "Elise Vandamme",
+          "sourceQuoteContains": "I'd like our security folks to read that before we go further",
+          "dependsOn": [
+            {
+              "newTaskTitleLike": "Write up row-level filtering approach for multi-tenant embeds",
+              "gap": "depends_on_new_draft"
+            },
+            {
+              "newTaskTitleLike": "Set up embed sandbox",
+              "gap": "depends_on_new_draft"
+            }
+          ]
+        }
+      ],
+      "pairs": [
+        {
+          "expectedIndex": 0,
+          "proposalIndex": 0,
+          "score": 0.9615384615384616,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 1,
+          "proposalIndex": 1,
+          "score": 1.3235294117647058,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 2,
+          "proposalIndex": 2,
+          "score": 1.3,
+          "by": "title"
+        }
+      ]
+    },
+    "providers": {
+      "claude": {
+        "proposals": [
+          {
+            "action": "create_task",
+            "title": "Set up embed sandbox with signed JWT auth and share credentials by June 24",
+            "sourceQuote": "I'll set up the embed sandbox with signed JWT auth and share credentials by Wednesday, June 24th.",
+            "draftId": 1,
+            "draftRef": "a1",
+            "ownerSide": "vendor",
+            "ownerName": "Theo Okonkwo",
+            "assigneeContactName": null,
+            "dependsOn": []
+          },
+          {
+            "action": "create_task",
+            "title": "Expose customer_id claim in session token deployed to staging by June 26",
+            "sourceQuote": "I'll expose the customer_id claim in our session token — deployed to staging by Friday, June 26th.",
+            "draftId": 2,
+            "draftRef": "a2",
+            "ownerSide": "customer",
+            "ownerName": null,
+            "assigneeContactName": "Ruben De Smet",
+            "dependsOn": []
+          },
+          {
+            "action": "create_task",
+            "title": "Write up row-level filtering approach for multi-tenant embeds and send it over by June 25",
+            "sourceQuote": "I'll write up the row-level filtering approach for multi-tenant embeds and send it over by Thursday the 25th.",
+            "draftId": 3,
+            "draftRef": "a3",
+            "ownerSide": "vendor",
+            "ownerName": "Maya Lindqvist",
+            "assigneeContactName": null,
+            "dependsOn": []
+          }
+        ],
+        "unresolved": [],
+        "score": {
+          "calls": [
+            {
+              "index": 0,
+              "action": "create_task",
+              "title": "Set up embed sandbox",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 1,
+                "action": "create_task",
+                "title": "Set up embed sandbox with signed JWT auth and share credentials by June 24",
+                "score": 0.962,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Theo Okonkwo",
+                  "actual": "Theo Okonkwo",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 1,
+              "action": "create_task",
+              "title": "Expose customer_id claim in session token on staging",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 2,
+                "action": "create_task",
+                "title": "Expose customer_id claim in session token deployed to staging by June 26",
+                "score": 1.324,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "customer",
+                  "actual": "customer",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Ruben De Smet",
+                  "actual": "Ruben De Smet",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 2,
+              "action": "create_task",
+              "title": "Write up row-level filtering approach for multi-tenant embeds",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 3,
+                "action": "create_task",
+                "title": "Write up row-level filtering approach for multi-tenant embeds and send it over by June 25",
+                "score": 1.3,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Maya Lindqvist",
+                  "actual": "Maya Lindqvist",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 3,
+              "action": "create_task",
+              "title": "Get security approval",
+              "kind": null,
+              "paired": false,
+              "pairedWith": null,
+              "checks": {},
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "depends_on_new_draft"
+                  ],
+                  "what": "depends on new draft \"Write up row-level filtering approach for multi-tenant embeds\"",
+                  "met": false
+                },
+                {
+                  "codes": [
+                    "depends_on_new_draft"
+                  ],
+                  "what": "depends on new draft \"Set up embed sandbox\"",
+                  "met": false
+                }
+              ]
+            }
+          ],
+          "unmatchedProposals": [],
+          "proposalsCount": 3,
+          "duplicates": [],
+          "groundedness": {
+            "quotes": {
+              "count": 3,
+              "total": 3
+            },
+            "quoteViolations": [],
+            "quotesFromActionItemsOnly": 0,
+            "citedIds": {
+              "count": 0,
+              "total": 0
+            },
+            "citedIdViolations": []
+          },
+          "totals": {
+            "recall": {
+              "count": 3,
+              "total": 4
+            },
+            "precision": {
+              "count": 3,
+              "total": 3
+            },
+            "action": {
+              "count": 3,
+              "total": 3
+            },
+            "ownerSide": {
+              "count": 3,
+              "total": 3
+            },
+            "assignee": {
+              "count": 3,
+              "total": 3
+            },
+            "dueDate": {
+              "count": 0,
+              "total": 0
+            },
+            "priority": {
+              "count": 0,
+              "total": 0
+            },
+            "status": {
+              "count": 0,
+              "total": 0
+            },
+            "notesPhrases": {
+              "count": 0,
+              "total": 0
+            },
+            "dependencies": {
+              "count": 0,
+              "total": 0
+            },
+            "kindRecall": {
+              "commitment": {
+                "count": 0,
+                "total": 0
+              },
+              "parked_for_later": {
+                "count": 0,
+                "total": 0
+              },
+              "vendor_reminder": {
+                "count": 0,
+                "total": 0
+              }
+            },
+            "groundedQuotes": {
+              "count": 3,
+              "total": 3
+            },
+            "citedIdsValid": {
+              "count": 0,
+              "total": 0
+            },
+            "duplicates": {
+              "count": 0,
+              "total": 3
+            },
+            "gaps": {
+              "count": 0,
+              "total": 2
+            },
+            "gapsByCode": {
+              "depends_on_new_draft": {
+                "count": 0,
+                "total": 2
+              }
+            }
+          }
+        },
+        "metrics": {
+          "correctAction": {
+            "count": 3,
+            "total": 4
+          },
+          "correctOwner": {
+            "count": 3,
+            "total": 4
+          },
+          "correctDependencies": {
+            "count": 0,
+            "total": 2
+          },
+          "dependencyPrecision": {
+            "count": 0,
+            "total": 0
+          },
+          "unwantedDependencies": []
+        },
+        "model": "claude-sonnet-4-6",
+        "durationMs": 7784.650291999998,
+        "estimatedCostUsd": 0.089475
+      },
+      "jev": null
+    }
+  },
+  {
+    "case": "13",
+    "extractionAudit": {
+      "matched": 2,
+      "total": 2,
+      "possiblyMissing": [],
+      "pairs": [
+        {
+          "expectedIndex": 0,
+          "proposalIndex": 0,
+          "score": 1.1666666666666665,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 1,
+          "proposalIndex": 1,
+          "score": 1.131578947368421,
+          "by": "title"
+        }
+      ]
+    },
+    "providers": {
+      "claude": null,
+      "jev": null
+    }
+  },
+  {
+    "case": "15",
+    "extractionAudit": {
+      "matched": 2,
+      "total": 2,
+      "possiblyMissing": [],
+      "pairs": [
+        {
+          "expectedIndex": 1,
+          "proposalIndex": 0,
+          "score": 1.3888888888888888,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 0,
+          "proposalIndex": 1,
+          "score": 1.2272727272727273,
+          "by": "title"
+        }
+      ]
+    },
+    "providers": {
+      "claude": null,
+      "jev": null
+    }
+  },
+  {
+    "case": "17",
+    "extractionAudit": {
+      "matched": 2,
+      "total": 3,
+      "possiblyMissing": [
+        {
+          "action": "create_task",
+          "titleLike": "Forward the SSO troubleshooting guide to IT",
+          "owner": "customer",
+          "assignee": "Speaker 1",
+          "sourceQuoteContains": "I'll forward it to IT",
+          "dependsOn": {
+            "newTaskTitleLike": "Send the SSO troubleshooting guide",
+            "gap": "depends_on_new_draft"
+          }
+        }
+      ],
+      "pairs": [
+        {
+          "expectedIndex": 0,
+          "proposalIndex": 0,
+          "score": 1.3888888888888888,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 2,
+          "proposalIndex": 2,
+          "score": 0.6666666666666666,
+          "by": "title"
+        }
+      ]
+    },
+    "providers": {
+      "claude": null,
+      "jev": null
+    }
+  },
+  {
+    "case": "20",
+    "extractionAudit": {
+      "matched": 1,
+      "total": 1,
+      "possiblyMissing": [],
+      "pairs": [
+        {
+          "expectedIndex": 0,
+          "proposalIndex": 3,
+          "score": 0.4,
+          "by": "title"
+        }
+      ]
+    },
+    "providers": {
+      "claude": null,
+      "jev": null
+    }
+  },
+  {
+    "case": "26",
+    "extractionAudit": {
+      "matched": 5,
+      "total": 5,
+      "possiblyMissing": [],
+      "pairs": [
+        {
+          "expectedIndex": 1,
+          "proposalIndex": 0,
+          "score": 1.1666666666666665,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 2,
+          "proposalIndex": 1,
+          "score": 1.0454545454545454,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 3,
+          "proposalIndex": 2,
+          "score": 1,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 4,
+          "proposalIndex": 3,
+          "score": 0.5882352941176471,
+          "by": "title"
+        },
+        {
+          "expectedIndex": 0,
+          "proposalIndex": 4,
+          "score": 1,
+          "by": "title"
+        }
+      ]
+    },
+    "providers": {
+      "claude": null,
+      "jev": null
+    }
+  }
+]

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import InlineEventDrafts from "./InlineEventDrafts";
 import { MetaDot, ChevronRight, FollowupSparkleIcon as MinitiSparkleIcon } from "./AIDraftInbox";
 import { MenuList, MenuOption } from "./Menu";
@@ -31,6 +31,8 @@ type UnmatchedEventsProps = {
   onboardings: PickerOnboarding[];
 };
 
+const subscribeToHydration = () => () => {};
+
 /**
  * "Unmatched meetings" panel — shown above the drafts list when Miniti
  * sends a meeting we couldn't auto-route. Vendor picks the right
@@ -53,6 +55,9 @@ type UnmatchedEventsProps = {
  *   onboardings   — [{ id, companyName }] for the picker
  */
 export default function UnmatchedEvents({ initialEvents, onboardings }: UnmatchedEventsProps) {
+  // Match the server's UTC text during hydration, then retain the browser's
+  // existing local-time display. No meeting data or layout changes.
+  const hydrated = useSyncExternalStore(subscribeToHydration, () => true, () => false);
   const [events, setEvents] = useState(initialEvents);
   const [selections, setSelections] = useState<Record<number, string>>({}); // eventId → onboardingId
   const [busyIds, setBusyIds] = useState(new Set<number>());
@@ -164,7 +169,7 @@ export default function UnmatchedEvents({ initialEvents, onboardings }: Unmatche
                     From miniti
                   </span>
                   <MetaDot />
-                  <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{formatDate(meeting.date)}</span>
+                  <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{formatDate(meeting.date, hydrated)}</span>
                   <MetaDot />
                   <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
                     {actionItems.length} action item{actionItems.length === 1 ? "" : "s"}
@@ -406,7 +411,7 @@ function PickerChevron({ open }: { open: boolean }) {
   );
 }
 
-function formatDate(iso: string | undefined) {
+function formatDate(iso: string | undefined, hydrated: boolean) {
   if (!iso) return "—";
   try {
     return new Date(iso).toLocaleString("en-GB", {
@@ -414,6 +419,7 @@ function formatDate(iso: string | undefined) {
       month: "short",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: hydrated ? undefined : "UTC",
     });
   } catch {
     return iso;

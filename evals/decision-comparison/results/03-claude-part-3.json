@@ -1,0 +1,104 @@
+{
+  "model": "claude-sonnet-4-6",
+  "answers": {
+    "a4_needs_task_t3": {
+      "choice": "no"
+    },
+    "a4_needs_task_t4": {
+      "choice": "no"
+    },
+    "a4_needs_task_t5": {
+      "choice": "no"
+    },
+    "a4_needs_external_0": {
+      "choice": "no"
+    },
+    "a5_action": {
+      "choice": "ignore"
+    },
+    "a5_task": {
+      "choice": "none"
+    },
+    "a5_owner": {
+      "choice": "unknown"
+    },
+    "a5_needs_a1": {
+      "choice": "no"
+    },
+    "a5_needs_a2": {
+      "choice": "no"
+    },
+    "a5_needs_a3": {
+      "choice": "no"
+    },
+    "a5_needs_a4": {
+      "choice": "no"
+    },
+    "a5_needs_task_t1": {
+      "choice": "no"
+    },
+    "a5_needs_task_t2": {
+      "choice": "no"
+    },
+    "a5_needs_task_t3": {
+      "choice": "no"
+    },
+    "a5_needs_task_t4": {
+      "choice": "no"
+    },
+    "a5_needs_task_t5": {
+      "choice": "no"
+    },
+    "a5_needs_external_0": {
+      "choice": "no"
+    }
+  },
+  "raw": {
+    "model": "claude-sonnet-4-6",
+    "id": "msg_011Cg9ujMSvAQYpQgY16yZRE",
+    "type": "message",
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"a4_needs_task_t3\":\"no\",\"a4_needs_task_t4\":\"no\",\"a4_needs_task_t5\":\"no\",\"a4_needs_external_0\":\"no\",\"a5_action\":\"ignore\",\"a5_task\":\"none\",\"a5_owner\":\"unknown\",\"a5_needs_a1\":\"no\",\"a5_needs_a2\":\"no\",\"a5_needs_a3\":\"no\",\"a5_needs_a4\":\"no\",\"a5_needs_task_t1\":\"no\",\"a5_needs_task_t2\":\"no\",\"a5_needs_task_t3\":\"no\",\"a5_needs_task_t4\":\"no\",\"a5_needs_task_t5\":\"no\",\"a5_needs_external_0\":\"no\"}"
+      }
+    ],
+    "container": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "stop_details": null,
+    "usage": {
+      "input_tokens": 9018,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 183,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "diagnostics": null
+  },
+  "durationMs": 3334.665084,
+  "usage": {
+    "input_tokens": 9018,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 183,
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "estimatedCostUsd": 0.029799,
+  "hash": "712387b10030bc736fa8ee07d9e528b6b2be3474c80d65cb9a76cb2bf654386e",
+  "version": "decision-comparison-v3",
+  "modelRequested": "claude-sonnet-4-6"
+}

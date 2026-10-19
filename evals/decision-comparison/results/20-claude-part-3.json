@@ -1,0 +1,65 @@
+{
+  "model": "claude-sonnet-4-6",
+  "answers": {
+    "a4_needs_task_t4": {
+      "choice": "no"
+    },
+    "a4_needs_task_t5": {
+      "choice": "no"
+    },
+    "a4_needs_external_0": {
+      "choice": "yes"
+    },
+    "a4_needs_external_1": {
+      "choice": "no"
+    }
+  },
+  "raw": {
+    "model": "claude-sonnet-4-6",
+    "id": "msg_011Cg9unfL2dmxUjwAJybaxT",
+    "type": "message",
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"a4_needs_task_t4\":\"no\",\"a4_needs_task_t5\":\"no\",\"a4_needs_external_0\":\"yes\",\"a4_needs_external_1\":\"no\"}"
+      }
+    ],
+    "container": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "stop_details": null,
+    "usage": {
+      "input_tokens": 3811,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 50,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "diagnostics": null
+  },
+  "durationMs": 1962.4596249999886,
+  "usage": {
+    "input_tokens": 3811,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 50,
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "estimatedCostUsd": 0.012183,
+  "hash": "5e364cfeaff9efb9f818853d6b26522c4c91786d787f0698653a428d7f894c0a",
+  "version": "decision-comparison-v3",
+  "modelRequested": "claude-sonnet-4-6"
+}

@@ -757,6 +757,13 @@ textarea.input {
   color: var(--text-secondary);
 }
 
+/* Shared before → after rows: emphasise the current value when reviewing
+   a card by pointer or keyboard; proposed values keep their bold emphasis. */
+.draft-card:hover .draft-diff-before,
+.draft-card:focus-within .draft-diff-before {
+  color: var(--text);
+}
+
 .task-completing {
   animation: taskComplete 0.8s ease forwards;
 }
@@ -868,6 +875,11 @@ textarea.input {
   color: inherit;
   font: inherit;
   text-align: left;
+}
+
+/* A draft dependency field holds wrapping tags and sibling controls. */
+.draft-dependencies-field .field-main {
+  min-width: 0;
 }
 /* Only the trigger form is pressable; the container form is a plain div. */
 button.field-main {

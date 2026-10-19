@@ -41,6 +41,7 @@ import { assertSafeEvalDbUrl, isLoopbackServerAddr, redactDbUrl } from "./harnes
 import { applyMigrations, EVAL_MARKER_TABLE, startLocalDb, type LocalDb } from "./harness/local-db";
 import { seedCase } from "./harness/seed-case";
 import { installMockLlm } from "./harness/mock-llm";
+import { traceLlm } from "./harness/trace-llm";
 import { resetClock, setClock } from "./harness/clock";
 import { buildActual, mapsToRaw, type DraftRow, type OutputCall, type RawCase, type RawPhase } from "./harness/map-actual";
 import type { CaseActual, GoldenCase } from "./harness/types";
@@ -49,7 +50,7 @@ import { formatCount, scoreCase, summarise, summaryLines, type CaseScore, type R
 const REPO_ROOT = path.resolve(__dirname, "..");
 const GOLDEN_DIR = path.join(__dirname, "golden");
 /** Bump when the run-file shape changes. */
-const RUN_FILE_VERSION = 2;
+const RUN_FILE_VERSION = 3;
 
 type Args = {
   cases: string[] | null;
@@ -136,6 +137,8 @@ type CaseRecord = {
   /** Everything the pipeline produced, unmapped. `--rescore` rebuilds `actual` from this. */
   raw: RawCase | null;
   logs?: string[];
+  /** Synthetic request bodies + full responses; never SDK options/headers. */
+  llmTrace?: ReturnType<ReturnType<typeof traceLlm>>;
 };
 
 type RunFile = {
@@ -148,6 +151,9 @@ type RunFile = {
   model: string;
   caseCount: number;
   totalCostUsd: number;
+  /** Checkpoints are saved after each case; false means an interrupted run. */
+  complete?: boolean;
+  selectedCaseCount?: number;
   summary: RunSummary;
   cases: CaseRecord[];
   rescoredFrom?: string;
@@ -245,6 +251,7 @@ async function main() {
     const miniti = await import("@/lib/integrations/miniti");
     const aiClient = await import("@/lib/ai/client");
     if (args.mockLlm) installMockLlm(aiClient.anthropic);
+    const takeTrace = traceLlm(aiClient.anthropic);
 
     const files = readdirSync(GOLDEN_DIR)
       .filter((f) => /^\d\d-.*\.json$/.test(f))
@@ -253,7 +260,24 @@ async function main() {
     if (files.length === 0) throw new Error("no golden cases selected");
     console.log(`Running ${files.length} case(s)${args.mockLlm ? " with the MOCK LLM (scores are meaningless, plumbing only)" : ""}\n`);
 
+    const today = new Date().toISOString().slice(0, 10);
+    const label = (args.label ?? (args.mockLlm ? "mock" : "run")).replace(/[^A-Za-z0-9._-]+/g, "-");
+    const out = args.out ? path.resolve(args.out) : path.join(__dirname, "runs", `${today}-${label}.json`);
+    if (existsSync(out)) throw new Error(`Run file already exists: ${out}. Choose a new --label or --out; saved calls must not be overwritten.`);
+    mkdirSync(path.dirname(out), { recursive: true });
+    const git = gitInfo();
     const records: CaseRecord[] = [];
+    const saveRun = () => {
+      const report: RunFile = {
+        version: RUN_FILE_VERSION, label, createdAt: new Date().toISOString(), git,
+        mockLlm: args.mockLlm, clockShift: args.clockShift, model: "claude-sonnet-4-6",
+        caseCount: records.length, selectedCaseCount: files.length,
+        complete: records.length === files.length,
+        totalCostUsd: Number(records.reduce((sum, r) => sum + r.costUsd, 0).toFixed(6)),
+        summary: summarise(records.map((r) => r.score)), cases: records,
+      };
+      writeFileSync(out, JSON.stringify(report, null, 2) + "\n");
+    };
     for (const file of files) {
       const { golden } = loadGolden(file);
       const started = Date.now();
@@ -283,8 +307,10 @@ async function main() {
         actual,
         raw,
         logs: cap.buf,
+        llmTrace: takeTrace(),
       };
       records.push(rec);
+      saveRun();
       console.log(caseLine(rec.case, score, error, rec.costUsd, rec.durationMs));
     }
 
@@ -294,24 +320,7 @@ async function main() {
     console.log("\n" + summaryLines(summary).join("\n"));
     console.log(`Cost:                      $${totalCost.toFixed(4)} (${records.reduce((s, r) => s + r.aiCalls, 0)} Claude calls)`);
 
-    const today = new Date().toISOString().slice(0, 10);
-    const label = (args.label ?? (args.mockLlm ? "mock" : "run")).replace(/[^A-Za-z0-9._-]+/g, "-");
-    const out = args.out ? path.resolve(args.out) : path.join(__dirname, "runs", `${today}-${label}.json`);
-    mkdirSync(path.dirname(out), { recursive: true });
-    const report: RunFile = {
-      version: RUN_FILE_VERSION,
-      label,
-      createdAt: new Date().toISOString(),
-      git: gitInfo(),
-      mockLlm: args.mockLlm,
-      clockShift: args.clockShift,
-      model: "claude-sonnet-4-6",
-      caseCount: records.length,
-      totalCostUsd: Number(totalCost.toFixed(6)),
-      summary,
-      cases: records,
-    };
-    writeFileSync(out, JSON.stringify(report, null, 2) + "\n");
+    saveRun();
     console.log(`\nRun file: ${path.relative(process.cwd(), out)}`);
     process.exitCode = records.some((r) => r.error) ? 1 : 0;
   } finally {

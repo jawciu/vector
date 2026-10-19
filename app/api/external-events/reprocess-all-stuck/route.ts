@@ -4,8 +4,8 @@
  * no error, older than the stuck cutoff).
  *
  * Each reprocess runs idempotently via processMinitiEvent — if Vercel
- * killed the original orchestrator mid-run, prompt caching usually means
- * the retry finishes within the 10s window.
+ * killed the original orchestrator mid-run, completed events remain skipped.
+ * A large batch can outlive the function budget; remaining events stay retryable.
  *
  * Returns {scheduled: N} immediately; orchestrators run in the background
  * via after().
@@ -15,6 +15,9 @@ import { NextResponse, after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { listStuckEvents, markExternalEventProcessed } from "@/lib/db";
 import { processMinitiEvent } from "@/lib/integrations/miniti";
+
+// Same Fluid compute budget as the webhook; no extra model requests.
+export const maxDuration = 300;
 
 export async function POST() {
   try {
@@ -29,7 +32,7 @@ export async function POST() {
 
     after(async () => {
       // Sequential — running 50 Claude calls in parallel would blow our
-      // rate limit and the 10s ceiling. One at a time keeps it sane.
+      // rate limit. Large batches can still outlive the function budget.
       for (const event of stuck) {
         try {
           // listStuckEvents filters to onboardingId != null.

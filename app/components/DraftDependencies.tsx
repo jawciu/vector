@@ -1,11 +1,13 @@
 /**
  * A draft's proposed dependencies in the AI inbox (GAPS-PLAN feature 2):
- * board tasks by id chip and title, things that are not tasks as a plain text
- * chip, and (GAPS-PLAN feature 3) another new task proposed from the same
- * meeting as "Depends on: <title> (also in this meeting)" with what approval
- * will do or did with it (`describeLink`). With `onRemove`, each one has a
- * remove button (the edit forms).
- * Long titles and labels wrap rather than truncate: readable over tidy.
+ * All entries use plain 14px names without a border, whether they refer to a
+ * board task, typed dependency or another draft. Board tasks retain their id
+ * prefix. The parent provides the Dependencies icon/field label once; omit
+ * workflow explanations and link-state text from the entries themselves.
+ * With `onRemove`, each entry has a remove button. `presentation="tags"`
+ * adds a quiet tag fill for entries held inside DraftDependenciesField.
+ * Each dependency stays on one line: long names truncate with an ellipsis,
+ * with the full name available in the title attribute.
  * After a removal, focus moves to the next remove button (or the previous
  * one); when the last one goes, `onEmptied` lets the form put focus somewhere
  * sensible instead of dropping it on the page.
@@ -22,13 +24,6 @@ type TaskLite = { id: number; title: string; taskId?: string | null };
 /** How a sibling-draft link reads on the card (lib/draft-links.ts draftLinkStatus). */
 export type DraftLinkDescription = { title: string; label: string; tone: "pending" | "ok" | "warn" | "muted" };
 
-const TONE_CLASS: Record<DraftLinkDescription["tone"], string> = {
-  pending: "text-text-muted",
-  ok: "text-success",
-  warn: "text-alert",
-  muted: "text-text-muted",
-};
-
 export default function DraftDependencies({
   items,
   tasks,
@@ -36,14 +31,16 @@ export default function DraftDependencies({
   onEmptied,
   disabled = false,
   align = "start",
+  presentation = "plain",
   describeLink,
 }: {
-  /** Names a sibling-draft link and its state; without it, the snapshot title is shown. */
+  /** Supplies the current task name. Link-state metadata is not displayed. */
   describeLink?: (link: DraftLinkItem) => DraftLinkDescription;
   /** Called after the last item is removed, to move focus elsewhere. */
   onEmptied?: () => void;
-  /** "end" right-aligns the chips (the compact card's right-hand column). */
+  /** "end" right-aligns entries (the compact card's right-hand column). */
   align?: "start" | "end";
+  presentation?: "plain" | "tags";
   items: DraftDependsOnItem[];
   tasks: TaskLite[];
   onRemove?: (index: number) => void;
@@ -62,11 +59,12 @@ export default function DraftDependencies({
   }, [items.length, onEmptied]);
 
   if (items.length === 0) return null;
+  const itemClass = `inline-flex max-w-full min-w-0 items-center gap-1 text-sm leading-6${presentation === "tags" ? " rounded-md bg-surface-hover px-2 py-0.5" : ""}`;
   return (
     <ul
       ref={listRef}
       aria-label="Blocked by"
-      className={`flex min-w-0 flex-1 flex-wrap items-center gap-2 text-sm text-text-secondary${align === "end" ? " justify-end" : ""}`}
+      className={`flex min-w-0 flex-wrap items-center gap-2 text-sm text-text-secondary${align === "end" ? " justify-end" : presentation === "plain" ? " flex-1" : ""}`}
     >
       {items.map((d, i) => {
         if (isDraftLink(d)) {
@@ -74,13 +72,10 @@ export default function DraftDependencies({
           return (
             <li
               key={`d${d.draftId ?? d.draftRef}`}
-              className="inline-flex max-w-full min-w-0 items-start gap-1 rounded-md border border-border px-1 text-xs leading-5"
+              className={itemClass}
             >
-              <span className="min-w-0 break-words">
-                <span className="text-text-muted">Depends on: </span>
+              <span className="min-w-0 truncate" title={info.title}>
                 {info.title}
-                <span className="text-text-muted"> (also in this meeting)</span>
-                {info.label && <span className={TONE_CLASS[info.tone]}>{` · ${info.label}`}</span>}
               </span>
               {onRemove && (
                 <IconButton aria-label={`Remove blocker: ${info.title}`} onClick={() => { focusIndex.current = i; onRemove(i); }} disabled={disabled} className="shrink-0">
@@ -95,13 +90,9 @@ export default function DraftDependencies({
         return (
           <li
             key={"taskId" in d ? `t${d.taskId}` : `x${d.text}`}
-            className={
-              "taskId" in d
-                ? "inline-flex max-w-full min-w-0 items-start gap-1"
-                : "inline-flex max-w-full min-w-0 items-start gap-1 rounded-md border border-border px-1 text-xs leading-5"
-            }
+            className={itemClass}
           >
-            <span className="min-w-0 break-words">
+            <span className="min-w-0 truncate" title={name}>
               {"taskId" in d ? (
                 <>
                   <TaskIdChip task={task} />

@@ -15,8 +15,8 @@
  *   6. After response, run the orchestrator (Claude tool-use → drafts) via `after()`
  *
  * Node runtime (Prisma needs it). Webhook acks Miniti within ~200ms (well under
- * their 10s timeout). The orchestrator runs in `after()` with `maxDuration = 60`,
- * giving it ~58s to chew through the full transcript. If it gets killed mid-flight
+ * their 10s timeout). The orchestrator runs in `after()` with `maxDuration = 300`
+ * on Fluid compute, allowing the two model passes to finish after the fast ack. If it gets killed mid-flight
  * (deploy, crash) the ExternalEvent stays with `processedAt = null` and can be
  * reprocessed manually from /admin/ai.
  */
@@ -30,7 +30,7 @@ import {
 } from "@/lib/integrations/miniti";
 import { createExternalEvent, markExternalEventProcessed } from "@/lib/db";
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 export async function POST(request: Request) {
   // 1. Auth — token query param.

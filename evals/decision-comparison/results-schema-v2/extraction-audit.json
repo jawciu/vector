@@ -1,0 +1,237 @@
+[
+  {
+    "case": "01",
+    "matched": 4,
+    "total": 4,
+    "possiblyMissing": [],
+    "pairs": [
+      {
+        "expectedIndex": 0,
+        "proposalIndex": 0,
+        "score": 1.3,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 1,
+        "proposalIndex": 2,
+        "score": 1.236842105263158,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 2,
+        "proposalIndex": 3,
+        "score": 1.3,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 3,
+        "proposalIndex": 4,
+        "score": 1.2692307692307692,
+        "by": "title"
+      }
+    ]
+  },
+  {
+    "case": "02",
+    "matched": 4,
+    "total": 4,
+    "possiblyMissing": [],
+    "pairs": [
+      {
+        "expectedIndex": 0,
+        "proposalIndex": 0,
+        "score": 1,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 2,
+        "proposalIndex": 1,
+        "score": 1.2692307692307692,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 1,
+        "proposalIndex": 2,
+        "score": 0.9615384615384616,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 3,
+        "proposalIndex": 3,
+        "score": 1.1,
+        "by": "title"
+      }
+    ]
+  },
+  {
+    "case": "03",
+    "matched": 3,
+    "total": 4,
+    "possiblyMissing": [
+      {
+        "action": "create_task",
+        "titleLike": "Get security approval",
+        "titleAlternatives": [
+          "Security team reviews the embed write-up"
+        ],
+        "owner": "customer",
+        "assignee": "Elise Vandamme",
+        "sourceQuoteContains": "I'd like our security folks to read that before we go further",
+        "dependsOn": [
+          {
+            "newTaskTitleLike": "Write up row-level filtering approach for multi-tenant embeds",
+            "gap": "depends_on_new_draft"
+          },
+          {
+            "newTaskTitleLike": "Set up embed sandbox",
+            "gap": "depends_on_new_draft"
+          }
+        ]
+      }
+    ],
+    "pairs": [
+      {
+        "expectedIndex": 0,
+        "proposalIndex": 0,
+        "score": 0.9615384615384616,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 1,
+        "proposalIndex": 1,
+        "score": 1.3235294117647058,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 2,
+        "proposalIndex": 2,
+        "score": 1.3,
+        "by": "title"
+      }
+    ]
+  },
+  {
+    "case": "13",
+    "matched": 2,
+    "total": 2,
+    "possiblyMissing": [],
+    "pairs": [
+      {
+        "expectedIndex": 0,
+        "proposalIndex": 0,
+        "score": 1.1666666666666665,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 1,
+        "proposalIndex": 1,
+        "score": 1.131578947368421,
+        "by": "title"
+      }
+    ]
+  },
+  {
+    "case": "15",
+    "matched": 2,
+    "total": 2,
+    "possiblyMissing": [],
+    "pairs": [
+      {
+        "expectedIndex": 1,
+        "proposalIndex": 0,
+        "score": 1.3888888888888888,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 0,
+        "proposalIndex": 1,
+        "score": 1.2272727272727273,
+        "by": "title"
+      }
+    ]
+  },
+  {
+    "case": "17",
+    "matched": 2,
+    "total": 3,
+    "possiblyMissing": [
+      {
+        "action": "create_task",
+        "titleLike": "Forward the SSO troubleshooting guide to IT",
+        "owner": "customer",
+        "assignee": "Speaker 1",
+        "sourceQuoteContains": "I'll forward it to IT",
+        "dependsOn": {
+          "newTaskTitleLike": "Send the SSO troubleshooting guide",
+          "gap": "depends_on_new_draft"
+        }
+      }
+    ],
+    "pairs": [
+      {
+        "expectedIndex": 0,
+        "proposalIndex": 0,
+        "score": 1.3888888888888888,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 2,
+        "proposalIndex": 2,
+        "score": 0.6666666666666666,
+        "by": "title"
+      }
+    ]
+  },
+  {
+    "case": "20",
+    "matched": 1,
+    "total": 1,
+    "possiblyMissing": [],
+    "pairs": [
+      {
+        "expectedIndex": 0,
+        "proposalIndex": 3,
+        "score": 0.4,
+        "by": "title"
+      }
+    ]
+  },
+  {
+    "case": "26",
+    "matched": 5,
+    "total": 5,
+    "possiblyMissing": [],
+    "pairs": [
+      {
+        "expectedIndex": 1,
+        "proposalIndex": 0,
+        "score": 1.1666666666666665,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 2,
+        "proposalIndex": 1,
+        "score": 1.0454545454545454,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 3,
+        "proposalIndex": 2,
+        "score": 1,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 4,
+        "proposalIndex": 3,
+        "score": 0.5882352941176471,
+        "by": "title"
+      },
+      {
+        "expectedIndex": 0,
+        "proposalIndex": 4,
+        "score": 1,
+        "by": "title"
+      }
+    ]
+  }
+]

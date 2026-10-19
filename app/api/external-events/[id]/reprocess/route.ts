@@ -11,6 +11,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getExternalEvent, markExternalEventProcessed } from "@/lib/db";
 import { processMinitiEvent } from "@/lib/integrations/miniti";
 
+// Same Fluid compute budget as the webhook; no extra model requests.
+export const maxDuration = 300;
+
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: rawId } = await params;
