@@ -178,7 +178,7 @@ for (const file of files) {
     if (/vector\.test$/.test(a.email) && a.domain !== "vector.test") err(file, `vendor attendee ${a.email} lost its vector.test domain`);
   }
 
-  if (!expected?.review?.verdict || expected.review.reviewedAt !== "2026-10-11") err(file, "missing expected.review stamp");
+  if (!expected?.review?.verdict || !ISO.test(expected.review.reviewedAt ?? "")) err(file, "missing expected.review stamp");
   if (!expected?.notes) err(file, "missing expected.notes");
 
   if (board) {

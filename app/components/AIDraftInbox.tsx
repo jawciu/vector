@@ -38,6 +38,7 @@ import {
 import DraftDependencies, { type DraftLinkDescription } from "./DraftDependencies";
 import DraftDependenciesField from "./DraftDependenciesField";
 import Button from "@/app/ui/Button";
+import Checkbox from "@/app/ui/Checkbox";
 import Textarea from "@/app/ui/Textarea";
 import IconButton from "@/app/ui/IconButton";
 import type { ToastAction } from "@/app/ui/Toast";
@@ -817,7 +818,7 @@ export function DraftCard({
         <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {isPending && (
-              <SelectCheckbox selected={selected} onToggle={onToggleSelect} disabled={busy} />
+              <Checkbox checked={selected} onChange={onToggleSelect} disabled={busy} aria-label={selected ? "Unselect this draft" : "Select this draft"} className="shrink-0" />
             )}
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <ActionIcon action={action} payload={payload} />
@@ -2496,7 +2497,7 @@ function CreateTaskCompact({
       <div style={{ flex: "1 1 240px", minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {isPending && onToggleSelect && (
-            <SelectCheckbox selected={!!selected} onToggle={onToggleSelect} disabled={busy} />
+            <Checkbox checked={!!selected} onChange={onToggleSelect} disabled={busy} aria-label={selected ? "Unselect this draft" : "Select this draft"} className="shrink-0" />
           )}
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <TasksBreadcrumbIcon />
@@ -3100,71 +3101,6 @@ function CheckCircleIcon() {
       <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.1" />
       <path d="M4.5 7L6.25 8.75L9.5 5.25" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-/** Bulk-selection toggle, mirroring the Kanban board's CheckboxButton
- *  (TaskCardView): empty circle + ghost check when unselected whose
- *  outline animates to colour on hover, and a filled circle-check when
- *  selected. Uses --action (not --success) since this is a selection
- *  affordance in the inbox, not a "done" state. */
-function SelectCheckbox({
-  selected,
-  onToggle,
-  disabled,
-}: {
-  selected: boolean;
-  onToggle: () => void;
-  disabled: boolean;
-}) {
-  const [hovered, setHovered] = useState(false);
-  const strokeColor = hovered && !disabled ? "var(--action)" : "var(--icon-tertiary)";
-  return (
-    // eslint-disable-next-line no-restricted-syntax -- circle + ghost check, not the square DS Checkbox; a retrofit would change the shape
-    <button
-      type="button"
-      role="checkbox"
-      aria-checked={selected}
-      aria-label={selected ? "Unselect this draft" : "Select this draft"}
-      onClick={onToggle}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      disabled={disabled}
-      className="flex-shrink-0"
-      style={{
-        background: "none",
-        border: "none",
-        padding: "4px",
-        margin: "-4px",
-        cursor: disabled ? "default" : "pointer",
-        display: "flex",
-      }}
-    >
-      {selected ? (
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M7 0C10.866 0 14 3.13401 14 7C14 10.866 10.866 14 7 14C3.13401 14 0 10.866 0 7C0 3.13401 3.13401 0 7 0ZM10.8125 4.10938C10.5969 3.93687 10.2819 3.97187 10.1094 4.1875L6.42773 8.78906L3.82031 6.61621C3.60827 6.43951 3.29304 6.46781 3.11621 6.67969C2.93951 6.89173 2.96781 7.20696 3.17969 7.38379L6.17969 9.88379L6.57129 10.2109L6.89062 9.8125L10.8906 4.8125C11.0631 4.59687 11.0281 4.28188 10.8125 4.10938Z"
-            fill="var(--action)"
-          />
-        </svg>
-      ) : (
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden xmlns="http://www.w3.org/2000/svg">
-          <circle
-            cx="7"
-            cy="7"
-            r="6.5"
-            stroke={strokeColor}
-            style={{ transition: "stroke 0.15s ease" }}
-          />
-          <path
-            d="M3.5 7L6.5 9.5L10.5 4.5"
-            stroke={strokeColor}
-            strokeLinecap="round"
-            style={{ transition: "stroke 0.15s ease" }}
-          />
-        </svg>
-      )}
-    </button>
   );
 }
 

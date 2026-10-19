@@ -10,7 +10,7 @@ waiting for are in `GAPS-PLAN.md`.
 ```bash
 npm run eval -- --mock-llm                 # whole harness, zero spend, ~5 seconds
 npm run eval -- --cases 11,13 --label smoke  # real Claude calls on two cases (~$0.11)
-npm run eval                               # real run, all 30 cases (~$1.60, ~15 min)
+npm run eval                               # paid, all 30; use narrow cases first
 npm run eval:validate                      # static checks on the answer key (no DB, no API)
 npm run eval -- --rescore evals/runs/<run>.json   # re-score a stored run: no DB, no AI, $0
 ```
@@ -23,6 +23,27 @@ Every run writes `evals/runs/<YYYY-MM-DD>-<label>.json` and prints a summary. Pe
 the **raw** pipeline output (draft rows with full payloads, Pass 2's full tool calls, Pass 1's
 extraction, the match result and candidates) plus the id → board-ref and id → name maps from
 seeding, then the mapped view, every check, the pipeline's logs and the cost.
+
+Version 3 also records `llmTrace`: exact synthetic request bodies and full model
+responses, including text blocks and stop reasons. SDK options/headers are never
+recorded. The run file is checkpointed after each case; `complete: false` marks
+an interrupted run. A live run refuses an existing output path before making
+model calls. For an interrupted run, select only the remaining case numbers and
+use a new label; preserve the original checkpoints and costs.
+
+Pass 2 now submits one `propose_meeting_drafts` batch containing the existing
+per-draft tool shapes. Vector unpacks the batch before its existing validation
+and persistence path. Mock mode exercises this same batch boundary.
+Extraction also carries `details[]` per action: execution facts from across the
+transcript, so the short context snippet does not limit the final task notes.
+Older cached extractions without this field remain supported.
+
+The current local candidate reasons in Pass 2 before its batch and can be slower
+and more expensive than the historical runs below. Current evidence/configuration
+and costs are in `quality-investigation/RESULTS.md`, `round2.md`, `manifest.json` and `costs.json`.
+Caroline's case 16 implementation/PR grouping now makes 80 expected actions; use the
+recorded offline policy-baseline rescores for comparison with earlier outputs.
+The scorer and other cases are unchanged. This is development data, not held out.
 
 **Rescoring.** `--rescore <runfile>` rebuilds every case from that raw output with the *current*
 answer key and scorer, with no database and no API calls, and writes
@@ -152,9 +173,12 @@ them, rescore the latest real run to see the effect for free.
 
 ## Cost
 
-Each matched meeting is two Sonnet 4.6 calls, about $0.05. An ambiguous meeting runs Pass 1 on
-arrival and only Pass 2 after assignment. A full run is about **$1.60**; the 2-case smoke run on
-2026-10-11 cost $0.106. The run file records the exact cost per case from the local AICall rows.
+Each matched meeting uses two Sonnet 4.6 calls. Ambiguous meetings run Pass 1 on
+arrival and Pass 2 after assignment. Historical non-thinking runs cost around
+$1.60 for 30; the current decision-thinking candidate costs more. The run file
+records estimates from response usage/local AICall rows, not an exact bill.
+`quality-investigation/costs.json` counts attempts once and documents the one
+interrupted request whose charge is unknown. Offline rescoring costs zero.
 
 ## What the harness cannot express yet
 

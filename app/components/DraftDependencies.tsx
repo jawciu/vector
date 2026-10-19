@@ -6,7 +6,8 @@
  * workflow explanations and link-state text from the entries themselves.
  * With `onRemove`, each entry has a remove button. `presentation="tags"`
  * adds a quiet tag fill for entries held inside DraftDependenciesField.
- * Long titles and labels wrap rather than truncate: readable over tidy.
+ * Each dependency stays on one line: long names truncate with an ellipsis,
+ * with the full name available in the title attribute.
  * After a removal, focus moves to the next remove button (or the previous
  * one); when the last one goes, `onEmptied` lets the form put focus somewhere
  * sensible instead of dropping it on the page.
@@ -73,7 +74,7 @@ export default function DraftDependencies({
               key={`d${d.draftId ?? d.draftRef}`}
               className={itemClass}
             >
-              <span className="min-w-0 break-words">
+              <span className="min-w-0 truncate" title={info.title}>
                 {info.title}
               </span>
               {onRemove && (
@@ -91,7 +92,7 @@ export default function DraftDependencies({
             key={"taskId" in d ? `t${d.taskId}` : `x${d.text}`}
             className={itemClass}
           >
-            <span className="min-w-0 break-words">
+            <span className="min-w-0 truncate" title={name}>
               {"taskId" in d ? (
                 <>
                   <TaskIdChip task={task} />

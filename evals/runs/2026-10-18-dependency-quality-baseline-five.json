@@ -1,0 +1,3452 @@
+{
+  "version": 2,
+  "label": "dependency-quality-baseline-five",
+  "createdAt": "2026-10-18T18:30:54.889Z",
+  "git": {
+    "sha": "90bde62",
+    "dirty": true
+  },
+  "mockLlm": false,
+  "clockShift": true,
+  "model": "claude-sonnet-4-6",
+  "caseCount": 5,
+  "totalCostUsd": 0.34025,
+  "summary": {
+    "cases": 5,
+    "errors": 0,
+    "match": {
+      "count": 5,
+      "total": 5
+    },
+    "heldBeforeAssign": {
+      "count": 0,
+      "total": 0
+    },
+    "dedup": {
+      "count": 0,
+      "total": 0
+    },
+    "totals": {
+      "recall": {
+        "count": 11,
+        "total": 20
+      },
+      "precision": {
+        "count": 11,
+        "total": 14
+      },
+      "action": {
+        "count": 10,
+        "total": 11
+      },
+      "ownerSide": {
+        "count": 7,
+        "total": 8
+      },
+      "assignee": {
+        "count": 5,
+        "total": 6
+      },
+      "dueDate": {
+        "count": 8,
+        "total": 9
+      },
+      "priority": {
+        "count": 0,
+        "total": 0
+      },
+      "status": {
+        "count": 2,
+        "total": 2
+      },
+      "notesPhrases": {
+        "count": 1,
+        "total": 1
+      },
+      "dependencies": {
+        "count": 0,
+        "total": 0
+      },
+      "kindRecall": {
+        "commitment": {
+          "count": 6,
+          "total": 12
+        },
+        "parked_for_later": {
+          "count": 0,
+          "total": 1
+        },
+        "vendor_reminder": {
+          "count": 0,
+          "total": 0
+        }
+      },
+      "groundedQuotes": {
+        "count": 14,
+        "total": 14
+      },
+      "citedIdsValid": {
+        "count": 5,
+        "total": 5
+      },
+      "duplicates": {
+        "count": 0,
+        "total": 9
+      },
+      "gaps": {
+        "count": 1,
+        "total": 7
+      },
+      "gapsByCode": {
+        "depends_on_new_draft": {
+          "count": 0,
+          "total": 4
+        },
+        "free_text_dependency": {
+          "count": 0,
+          "total": 1
+        },
+        "existing_task_notes": {
+          "count": 1,
+          "total": 2
+        },
+        "existing_task_dependency": {
+          "count": 0,
+          "total": 1
+        }
+      }
+    }
+  },
+  "cases": [
+    {
+      "case": "02",
+      "file": "02-functionhealth-security-working-session.json",
+      "durationMs": 37655,
+      "costUsd": 0.070825,
+      "aiCalls": 2,
+      "error": null,
+      "score": {
+        "match": {
+          "pass": true,
+          "expected": "FN",
+          "actual": "FN",
+          "matchedBy": "domain"
+        },
+        "initial": {
+          "calls": [
+            {
+              "index": 0,
+              "action": "create_task",
+              "title": "Return completed SIG Lite questionnaire to Function Health security",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 1,
+                "action": "match_existing",
+                "title": "Complete Function Health security review",
+                "score": 1.115,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "match_existing",
+                  "pass": false
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": null,
+                  "pass": false
+                },
+                "assignee": {
+                  "expected": "Ines Ferreira",
+                  "actual": "Freya Dunn",
+                  "pass": false
+                },
+                "dueDate": {
+                  "expected": "2026-06-05",
+                  "actual": "2026-06-10",
+                  "pass": false
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 1,
+              "action": "create_task",
+              "title": "Share pen test summary with Freya",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 2,
+                "action": "create_task",
+                "title": "Email Q1 pen test report to Freya Dunn",
+                "score": 1,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Sam Whitfield",
+                  "actual": "Sam Whitfield",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-06-03",
+                  "actual": "2026-06-03",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 2,
+              "action": "create_task",
+              "title": "Upload pen test summary to portal",
+              "kind": "commitment",
+              "paired": false,
+              "pairedWith": null,
+              "checks": {},
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "depends_on_new_draft"
+                  ],
+                  "what": "depends on new draft \"Share pen test summary with Freya\"",
+                  "met": false
+                }
+              ]
+            },
+            {
+              "index": 3,
+              "action": "create_task",
+              "title": "Provision read-only Snowflake service account",
+              "kind": "commitment",
+              "paired": false,
+              "pairedWith": null,
+              "checks": {},
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "free_text_dependency"
+                  ],
+                  "what": "depends on \"security sign-off\"",
+                  "met": false
+                }
+              ]
+            }
+          ],
+          "unmatchedProposals": [
+            {
+              "draftId": 3,
+              "action": "create_task",
+              "title": "Post security review recap (dates and chain) to the portal",
+              "sourceQuote": "I'll recap in the portal after this."
+            }
+          ],
+          "proposalsCount": 3,
+          "duplicates": [],
+          "groundedness": {
+            "quotes": {
+              "count": 3,
+              "total": 3
+            },
+            "quoteViolations": [],
+            "quotesFromActionItemsOnly": 0,
+            "citedIds": {
+              "count": 1,
+              "total": 1
+            },
+            "citedIdViolations": []
+          },
+          "totals": {
+            "recall": {
+              "count": 2,
+              "total": 4
+            },
+            "precision": {
+              "count": 2,
+              "total": 3
+            },
+            "action": {
+              "count": 1,
+              "total": 2
+            },
+            "ownerSide": {
+              "count": 1,
+              "total": 2
+            },
+            "assignee": {
+              "count": 1,
+              "total": 2
+            },
+            "dueDate": {
+              "count": 1,
+              "total": 2
+            },
+            "priority": {
+              "count": 0,
+              "total": 0
+            },
+            "status": {
+              "count": 0,
+              "total": 0
+            },
+            "notesPhrases": {
+              "count": 0,
+              "total": 0
+            },
+            "dependencies": {
+              "count": 0,
+              "total": 0
+            },
+            "kindRecall": {
+              "commitment": {
+                "count": 2,
+                "total": 4
+              },
+              "parked_for_later": {
+                "count": 0,
+                "total": 0
+              },
+              "vendor_reminder": {
+                "count": 0,
+                "total": 0
+              }
+            },
+            "groundedQuotes": {
+              "count": 3,
+              "total": 3
+            },
+            "citedIdsValid": {
+              "count": 1,
+              "total": 1
+            },
+            "duplicates": {
+              "count": 0,
+              "total": 2
+            },
+            "gaps": {
+              "count": 0,
+              "total": 2
+            },
+            "gapsByCode": {
+              "depends_on_new_draft": {
+                "count": 0,
+                "total": 1
+              },
+              "free_text_dependency": {
+                "count": 0,
+                "total": 1
+              }
+            }
+          }
+        },
+        "heldBeforeAssign": null,
+        "afterAssign": null,
+        "dedup": null,
+        "totals": {
+          "recall": {
+            "count": 2,
+            "total": 4
+          },
+          "precision": {
+            "count": 2,
+            "total": 3
+          },
+          "action": {
+            "count": 1,
+            "total": 2
+          },
+          "ownerSide": {
+            "count": 1,
+            "total": 2
+          },
+          "assignee": {
+            "count": 1,
+            "total": 2
+          },
+          "dueDate": {
+            "count": 1,
+            "total": 2
+          },
+          "priority": {
+            "count": 0,
+            "total": 0
+          },
+          "status": {
+            "count": 0,
+            "total": 0
+          },
+          "notesPhrases": {
+            "count": 0,
+            "total": 0
+          },
+          "dependencies": {
+            "count": 0,
+            "total": 0
+          },
+          "kindRecall": {
+            "commitment": {
+              "count": 2,
+              "total": 4
+            },
+            "parked_for_later": {
+              "count": 0,
+              "total": 0
+            },
+            "vendor_reminder": {
+              "count": 0,
+              "total": 0
+            }
+          },
+          "groundedQuotes": {
+            "count": 3,
+            "total": 3
+          },
+          "citedIdsValid": {
+            "count": 1,
+            "total": 1
+          },
+          "duplicates": {
+            "count": 0,
+            "total": 2
+          },
+          "gaps": {
+            "count": 0,
+            "total": 2
+          },
+          "gapsByCode": {
+            "depends_on_new_draft": {
+              "count": 0,
+              "total": 1
+            },
+            "free_text_dependency": {
+              "count": 0,
+              "total": 1
+            }
+          }
+        }
+      },
+      "actual": {
+        "match": {
+          "companyPrefix": "FN",
+          "ambiguous": false,
+          "matchedBy": "domain"
+        },
+        "transcript": "Thanks for making time, both. The goal today is to get the security review moving again — it's been the blocker for three weeks.\nHonest answer from our side: the review is stuck because we're missing two inputs — your completed SIG Lite questionnaire and evidence from a recent penetration test. Handling patient lab results, our infosec team can't wave either through.\nThe questionnaire is ninety percent done, our security lead has the last section. I'll send the completed SIG Lite questionnaire back to Freya by June 5th.\nFriday works. If I have it Friday, I can start the internal review the following week.\nAnd the pen test — we have the Q1 report from our external testers. Do you need the full report or a summary?\nA summary with scope and findings severity is enough. Actually, easier if it lives with the rest of the evidence — I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.\nI'll email it to you right after this call, it's ready to go.\nThen the last link in the chain is me. The warehouse team won't create the service account until security signs off — and with PHI in the schema they're strict about it.\nCan we pre-agree the shape so it's a same-day job once you get the green light?\nYes — read-only, scoped to the ANALYTICS schema, key-pair auth. I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th.\nThat's realistic if the questionnaire lands Friday.\nDo we need your change advisory board for the account creation? That added two weeks last time at another customer.\nNo — we agreed internally last month that read-only analytics accounts skip the change board. It goes straight through.\nExcellent. So: questionnaire Friday the 5th, pen test summary Monday the 8th, service account Wednesday the 10th. That's the chain unblocked.\nAgreed. Nice to have dates on it at last.\nThanks all — I'll recap in the portal after this.",
+        "actionItemsText": "Ines to return completed SIG Lite questionnaire by June 5\nFreya to upload pen test summary to the portal by June 8\nOliver to provision read-only Snowflake service account by June 10",
+        "initial": {
+          "proposals": [
+            {
+              "action": "match_existing",
+              "draftId": 1,
+              "sourceQuote": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th.",
+              "confidence": "high",
+              "draftRef": null,
+              "taskRef": "t1",
+              "updateKind": "update",
+              "newStatus": null,
+              "newDueDate": "2026-06-10",
+              "newPriority": "high",
+              "newOwnerName": null,
+              "notes": null,
+              "appendNotes": "Call on 2026-06-03 set concrete dates on each blocking input. Ines to return completed SIG Lite questionnaire by 2026-06-05 (questionnaire is 90% done, security lead has the last section). Freya to upload pen test summary (scope and findings severity) to the portal by 2026-06-08, once Sam emails her the Q1 report. Service account provisioning (Oliver) targets 2026-06-10 as soon as security signs off. No change advisory board review required for read-only analytics accounts. Due date: overall chain resolves by Wed 2026-06-10."
+            },
+            {
+              "action": "create_task",
+              "draftId": 2,
+              "sourceQuote": "I'll email it to you right after this call, it's ready to go.",
+              "confidence": "high",
+              "draftRef": "d1",
+              "title": "Email Q1 pen test report to Freya Dunn",
+              "description": null,
+              "notes": "Sam committed to emailing the Q1 external pen test report to Freya immediately after the call. Report is ready to go. Freya needs it to prepare the portal upload by 2026-06-08. Due date: \"right after this call\" from Wed 2026-06-03 = 2026-06-03.",
+              "ownerName": "Sam Whitfield",
+              "assigneeContactName": null,
+              "ownerSide": "vendor",
+              "dueDate": "2026-06-03",
+              "priority": "high",
+              "blockedByRef": null
+            },
+            {
+              "action": "create_task",
+              "draftId": 3,
+              "sourceQuote": "I'll recap in the portal after this.",
+              "confidence": "high",
+              "draftRef": "d4",
+              "title": "Post security review recap (dates and chain) to the portal",
+              "description": null,
+              "notes": "Ines committed to posting a recap of the agreed dates and unblocking chain to the portal immediately after the call: questionnaire by 2026-06-05, pen test summary by 2026-06-08, service account by 2026-06-10. Due date: \"after this call\" from Wed 2026-06-03 = 2026-06-03.",
+              "ownerName": "Ines Ferreira",
+              "assigneeContactName": null,
+              "ownerSide": "vendor",
+              "dueDate": "2026-06-03",
+              "priority": "medium",
+              "blockedByRef": null
+            }
+          ],
+          "rawCalls": [
+            {
+              "tool": "match_to_existing_task_draft",
+              "taskId": 1,
+              "taskRef": "t1",
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll email it to you right after this call, it's ready to go."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll recap in the portal after this."
+            }
+          ],
+          "boardRefs": [
+            "t1",
+            "t2",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "openRefs": [
+            "t1",
+            "t2",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "boardTasks": [
+            {
+              "ref": "t1",
+              "title": "Complete Function Health security review",
+              "status": "Blocked",
+              "ownerName": "Freya Dunn"
+            },
+            {
+              "ref": "t2",
+              "title": "Connect dbt repo and warehouse to Quarry",
+              "status": "Blocked",
+              "ownerName": "Sam Whitfield"
+            },
+            {
+              "ref": "t3",
+              "title": "Model lab-results marts",
+              "status": "Not started",
+              "ownerName": "Sam Whitfield"
+            },
+            {
+              "ref": "t4",
+              "title": "Build member health dashboard",
+              "status": "Not started",
+              "ownerName": "Ines Ferreira"
+            },
+            {
+              "ref": "t5",
+              "title": "Run analyst training",
+              "status": "Not started",
+              "ownerName": "Ines Ferreira"
+            }
+          ]
+        },
+        "error": null
+      },
+      "raw": {
+        "maps": {
+          "companyPrefixByOnboardingId": {
+            "1": "RAY",
+            "2": "BEE",
+            "3": "MDL",
+            "4": "LOOP",
+            "5": "HUEL",
+            "6": "FN",
+            "7": "FLK",
+            "8": "SYL",
+            "9": "CHOW",
+            "10": "ASH",
+            "11": "PEER",
+            "12": "PAT"
+          },
+          "onboardingIdByPrefix": {
+            "RAY": 1,
+            "BEE": 2,
+            "MDL": 3,
+            "LOOP": 4,
+            "HUEL": 5,
+            "FN": 6,
+            "FLK": 7,
+            "SYL": 8,
+            "CHOW": 9,
+            "ASH": 10,
+            "PEER": 11,
+            "PAT": 12
+          },
+          "vendorNameById": {
+            "1": "Maya Lindqvist",
+            "2": "Theo Okonkwo",
+            "3": "Ines Ferreira",
+            "4": "Sam Whitfield",
+            "5": "Caroline Jaworsky"
+          },
+          "contactNameById": {
+            "1": "Oliver Hartley",
+            "2": "Freya Dunn"
+          },
+          "refByTaskId": {
+            "1": "t1",
+            "2": "t2",
+            "3": "t3",
+            "4": "t4",
+            "5": "t5"
+          }
+        },
+        "match": {
+          "onboardingId": 6,
+          "ambiguous": false,
+          "matchedBy": "domain",
+          "candidates": [
+            {
+              "onboardingId": 6,
+              "signal": "domain",
+              "evidence": "attendee domain functionhealth.com → Function Health"
+            }
+          ]
+        },
+        "initial": {
+          "drafts": [
+            {
+              "id": 1,
+              "action": "match_existing",
+              "payload": {
+                "action": "update",
+                "taskId": 1,
+                "changes": {
+                  "dueDate": "2026-06-10",
+                  "priority": "high",
+                  "appendNotes": "Call on 2026-06-03 set concrete dates on each blocking input. Ines to return completed SIG Lite questionnaire by 2026-06-05 (questionnaire is 90% done, security lead has the last section). Freya to upload pen test summary (scope and findings severity) to the portal by 2026-06-08, once Sam emails her the Q1 report. Service account provisioning (Oliver) targets 2026-06-10 as soon as security signs off. No change advisory board review required for read-only analytics accounts. Due date: overall chain resolves by Wed 2026-06-10."
+                },
+                "confidence": "high",
+                "noteSource": {
+                  "date": "2026-06-03",
+                  "label": "call with Function Health"
+                },
+                "sourceQuote": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th."
+              },
+              "sourceQuote": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th.",
+              "confidence": "high"
+            },
+            {
+              "id": 2,
+              "action": "create_task",
+              "payload": {
+                "notes": "Sam committed to emailing the Q1 external pen test report to Freya immediately after the call. Report is ready to go. Freya needs it to prepare the portal upload by 2026-06-08. Due date: \"right after this call\" from Wed 2026-06-03 = 2026-06-03.",
+                "title": "Email Q1 pen test report to Freya Dunn",
+                "dueDate": "2026-06-03",
+                "ownerId": 4,
+                "phaseId": 27,
+                "draftRef": "d1",
+                "priority": "high",
+                "ownerName": "Sam Whitfield",
+                "confidence": "high",
+                "sourceQuote": "I'll email it to you right after this call, it's ready to go."
+              },
+              "sourceQuote": "I'll email it to you right after this call, it's ready to go.",
+              "confidence": "high"
+            },
+            {
+              "id": 3,
+              "action": "create_task",
+              "payload": {
+                "notes": "Ines committed to posting a recap of the agreed dates and unblocking chain to the portal immediately after the call: questionnaire by 2026-06-05, pen test summary by 2026-06-08, service account by 2026-06-10. Due date: \"after this call\" from Wed 2026-06-03 = 2026-06-03.",
+                "title": "Post security review recap (dates and chain) to the portal",
+                "dueDate": "2026-06-03",
+                "ownerId": 3,
+                "phaseId": 27,
+                "draftRef": "d4",
+                "priority": "medium",
+                "ownerName": "Ines Ferreira",
+                "confidence": "high",
+                "sourceQuote": "I'll recap in the portal after this."
+              },
+              "sourceQuote": "I'll recap in the portal after this.",
+              "confidence": "high"
+            }
+          ],
+          "orchestratorOutput": [
+            {
+              "id": "toolu_01Amv4mpvhSNX7nKsVoyXXKJ",
+              "tool": "match_to_existing_task_draft",
+              "input": {
+                "taskId": 1,
+                "changes": {
+                  "dueDate": "2026-06-10",
+                  "priority": "high",
+                  "appendNotes": "Call on 2026-06-03 set concrete dates on each blocking input. Ines to return completed SIG Lite questionnaire by 2026-06-05 (questionnaire is 90% done, security lead has the last section). Freya to upload pen test summary (scope and findings severity) to the portal by 2026-06-08, once Sam emails her the Q1 report. Service account provisioning (Oliver) targets 2026-06-10 as soon as security signs off. No change advisory board review required for read-only analytics accounts. Due date: overall chain resolves by Wed 2026-06-10."
+                },
+                "confidence": "high",
+                "sourceQuote": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th."
+              }
+            },
+            {
+              "id": "toolu_01Wy7DFuvq8T3c7Ttcm1Kb4t",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Sam committed to emailing the Q1 external pen test report to Freya immediately after the call. Report is ready to go. Freya needs it to prepare the portal upload by 2026-06-08. Due date: \"right after this call\" from Wed 2026-06-03 = 2026-06-03.",
+                "title": "Email Q1 pen test report to Freya Dunn",
+                "dueDate": "2026-06-03",
+                "ownerId": 4,
+                "phaseId": 27,
+                "draftRef": "d1",
+                "priority": "high",
+                "confidence": "high",
+                "sourceQuote": "I'll email it to you right after this call, it's ready to go."
+              }
+            },
+            {
+              "id": "toolu_01912ksiLM7c3r72Fawpe1bq",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Ines committed to posting a recap of the agreed dates and unblocking chain to the portal immediately after the call: questionnaire by 2026-06-05, pen test summary by 2026-06-08, service account by 2026-06-10. Due date: \"after this call\" from Wed 2026-06-03 = 2026-06-03.",
+                "title": "Post security review recap (dates and chain) to the portal",
+                "dueDate": "2026-06-03",
+                "ownerId": 3,
+                "phaseId": 27,
+                "draftRef": "d4",
+                "priority": "medium",
+                "confidence": "high",
+                "sourceQuote": "I'll recap in the portal after this."
+              }
+            }
+          ],
+          "orchestratorExtraction": {
+            "actionItems": [
+              {
+                "claim": "Send completed SIG Lite questionnaire to Freya by June 5th",
+                "speaker": "Ines Ferreira",
+                "firmness": "firm",
+                "sourceQuote": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th.",
+                "notesSnippet": "The questionnaire is ninety percent done, our security lead has the last section. I'll send the completed SIG Lite questionnaire back to Freya by June 5th. Friday works. If I have it Friday, I can start the internal review the following week.",
+                "mentionedOwner": "Ines",
+                "mentionedDueDate": "June 5th",
+                "mentionedDependency": ""
+              },
+              {
+                "claim": "Upload pen test summary to the portal by Monday June 8th",
+                "speaker": "Freya Dunn",
+                "firmness": "firm",
+                "sourceQuote": "I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.",
+                "notesSnippet": "A summary with scope and findings severity is enough. Actually, easier if it lives with the rest of the evidence — I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.",
+                "mentionedOwner": "Freya",
+                "mentionedDueDate": "Monday, June 8th",
+                "mentionedDependency": "once Sam shares it"
+              },
+              {
+                "claim": "Email pen test report to Freya right after the call",
+                "speaker": "Sam Whitfield",
+                "firmness": "firm",
+                "sourceQuote": "I'll email it to you right after this call, it's ready to go.",
+                "notesSnippet": "Do you need the full report or a summary? A summary with scope and findings severity is enough. Actually, easier if it lives with the rest of the evidence — I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it. I'll email it to you right after this call, it's ready to go.",
+                "mentionedOwner": "Sam",
+                "mentionedDueDate": "right after this call",
+                "mentionedDependency": ""
+              },
+              {
+                "claim": "Provision read-only Snowflake service account scoped to ANALYTICS schema with key-pair auth by June 10th",
+                "speaker": "Oliver Hartley",
+                "firmness": "firm",
+                "sourceQuote": "I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th.",
+                "notesSnippet": "Yes — read-only, scoped to the ANALYTICS schema, key-pair auth. I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th. That's realistic if the questionnaire lands Friday.",
+                "mentionedOwner": "Oliver Hartley",
+                "mentionedDueDate": "Wednesday, June 10th",
+                "mentionedDependency": "as soon as security signs off"
+              },
+              {
+                "claim": "Recap agreed dates and chain in the portal after the call",
+                "speaker": "Ines Ferreira",
+                "firmness": "firm",
+                "sourceQuote": "I'll recap in the portal after this.",
+                "notesSnippet": "Excellent. So: questionnaire Friday the 5th, pen test summary Monday the 8th, service account Wednesday the 10th. That's the chain unblocked. Agreed. Nice to have dates on it at last. Thanks all — I'll recap in the portal after this.",
+                "mentionedOwner": "Ines",
+                "mentionedDueDate": "after this",
+                "mentionedDependency": ""
+              }
+            ],
+            "meetingTone": "status update",
+            "externalBlockers": [],
+            "reportedCompletions": []
+          }
+        },
+        "error": null
+      },
+      "logs": [
+        "log [miniti] extraction (pass 1): input ~1250 prompt tokens, 5 open tasks",
+        "log [miniti] extraction (pass 1): 5 action items, 0 completions, tone=status update, 17697ms",
+        "log [miniti] orchestrator (pass 2): input ~1998 prompt tokens, 5 open tasks, 5 extracted items",
+        "log [miniti] orchestrator (pass 2): 4 content blocks, 3 tool calls"
+      ]
+    },
+    {
+      "case": "06",
+      "file": "06-beehiiv-post-kickoff-sync.json",
+      "durationMs": 24291,
+      "costUsd": 0.063805,
+      "aiCalls": 2,
+      "error": null,
+      "score": {
+        "match": {
+          "pass": true,
+          "expected": "BEE",
+          "actual": "BEE",
+          "matchedBy": "domain"
+        },
+        "initial": {
+          "calls": [
+            {
+              "index": 0,
+              "action": "create_task",
+              "title": "Grant dbt repo access via quarry-integration GitHub team",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 1,
+                "action": "create_task",
+                "title": "Grant dbt repo access via quarry-integration GitHub team",
+                "score": 1.5,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "customer",
+                  "actual": "customer",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Nina Alvarez",
+                  "actual": "Nina Alvarez",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-07-03",
+                  "actual": "2026-07-03",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 1,
+              "action": "create_task",
+              "title": "Send the static IP ranges",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 2,
+                "action": "create_task",
+                "title": "Send Quarry static IP ranges to Marcus Webb",
+                "score": 1.227,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Maya Lindqvist",
+                  "actual": "Maya Lindqvist",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-07-02",
+                  "actual": "2026-07-02",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 2,
+              "action": "create_task",
+              "title": "Whitelist Quarry IPs on Redshift cluster",
+              "kind": "commitment",
+              "paired": false,
+              "pairedWith": null,
+              "checks": {},
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 3,
+              "action": "create_task",
+              "title": "Connect warehouse and get dbt project compiling in Quarry",
+              "kind": "commitment",
+              "paired": false,
+              "pairedWith": null,
+              "checks": {},
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "depends_on_new_draft"
+                  ],
+                  "what": "depends on new draft \"Whitelist Quarry IPs on Redshift cluster\"",
+                  "met": false
+                }
+              ]
+            },
+            {
+              "index": 4,
+              "action": "create_task",
+              "title": "Scope the retention dashboard at next Thursday's sync",
+              "kind": "commitment",
+              "paired": false,
+              "pairedWith": null,
+              "checks": {},
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            }
+          ],
+          "unmatchedProposals": [],
+          "proposalsCount": 2,
+          "duplicates": [],
+          "groundedness": {
+            "quotes": {
+              "count": 2,
+              "total": 2
+            },
+            "quoteViolations": [],
+            "quotesFromActionItemsOnly": 0,
+            "citedIds": {
+              "count": 0,
+              "total": 0
+            },
+            "citedIdViolations": []
+          },
+          "totals": {
+            "recall": {
+              "count": 2,
+              "total": 5
+            },
+            "precision": {
+              "count": 2,
+              "total": 2
+            },
+            "action": {
+              "count": 2,
+              "total": 2
+            },
+            "ownerSide": {
+              "count": 2,
+              "total": 2
+            },
+            "assignee": {
+              "count": 2,
+              "total": 2
+            },
+            "dueDate": {
+              "count": 2,
+              "total": 2
+            },
+            "priority": {
+              "count": 0,
+              "total": 0
+            },
+            "status": {
+              "count": 0,
+              "total": 0
+            },
+            "notesPhrases": {
+              "count": 0,
+              "total": 0
+            },
+            "dependencies": {
+              "count": 0,
+              "total": 0
+            },
+            "kindRecall": {
+              "commitment": {
+                "count": 2,
+                "total": 5
+              },
+              "parked_for_later": {
+                "count": 0,
+                "total": 0
+              },
+              "vendor_reminder": {
+                "count": 0,
+                "total": 0
+              }
+            },
+            "groundedQuotes": {
+              "count": 2,
+              "total": 2
+            },
+            "citedIdsValid": {
+              "count": 0,
+              "total": 0
+            },
+            "duplicates": {
+              "count": 0,
+              "total": 2
+            },
+            "gaps": {
+              "count": 0,
+              "total": 1
+            },
+            "gapsByCode": {
+              "depends_on_new_draft": {
+                "count": 0,
+                "total": 1
+              }
+            }
+          }
+        },
+        "heldBeforeAssign": null,
+        "afterAssign": null,
+        "dedup": null,
+        "totals": {
+          "recall": {
+            "count": 2,
+            "total": 5
+          },
+          "precision": {
+            "count": 2,
+            "total": 2
+          },
+          "action": {
+            "count": 2,
+            "total": 2
+          },
+          "ownerSide": {
+            "count": 2,
+            "total": 2
+          },
+          "assignee": {
+            "count": 2,
+            "total": 2
+          },
+          "dueDate": {
+            "count": 2,
+            "total": 2
+          },
+          "priority": {
+            "count": 0,
+            "total": 0
+          },
+          "status": {
+            "count": 0,
+            "total": 0
+          },
+          "notesPhrases": {
+            "count": 0,
+            "total": 0
+          },
+          "dependencies": {
+            "count": 0,
+            "total": 0
+          },
+          "kindRecall": {
+            "commitment": {
+              "count": 2,
+              "total": 5
+            },
+            "parked_for_later": {
+              "count": 0,
+              "total": 0
+            },
+            "vendor_reminder": {
+              "count": 0,
+              "total": 0
+            }
+          },
+          "groundedQuotes": {
+            "count": 2,
+            "total": 2
+          },
+          "citedIdsValid": {
+            "count": 0,
+            "total": 0
+          },
+          "duplicates": {
+            "count": 0,
+            "total": 2
+          },
+          "gaps": {
+            "count": 0,
+            "total": 1
+          },
+          "gapsByCode": {
+            "depends_on_new_draft": {
+              "count": 0,
+              "total": 1
+            }
+          }
+        }
+      },
+      "actual": {
+        "match": {
+          "companyPrefix": "BEE",
+          "ambiguous": false,
+          "matchedBy": "domain"
+        },
+        "transcript": "Great kickoff last week. This week is about getting the plumbing in so we can compile your project. First up: repo access.\nEasy one. I'll get you the dbt repo access — invite to the quarry-integration GitHub team by tomorrow, July 3rd.\nPerfect. Once I'm in, do we work off main or do you want us on a fork?\nOff main, against the existing production target. A fork would just drift.\nAgreed. Then on our side — I'll connect the warehouse and get the dbt project compiling in Quarry by Tuesday, July 7th.\nThat depends on network access though — our Redshift cluster only accepts whitelisted IPs.\nRight, I'll send you our static IP ranges after this call. Can you get them whitelisted before Tuesday?\nYes — I'll whitelist Quarry's IPs on the Redshift cluster by Monday the 6th.\nFor context on urgency: our board meeting is end of July and I'd love the subscriber retention dashboard live for it.\nThat's a realistic target if the compile lands next week. We'll scope the retention dashboard properly at next Thursday's sync rather than promise it today.\nFair. Plumbing first.\nSo: repo invite tomorrow, IPs Monday, compile Tuesday. Speak Thursday.\nSounds good, thanks Maya.",
+        "actionItemsText": "Nina to grant dbt repo access via the quarry-integration GitHub team by July 3\nMaya to connect the warehouse and get the dbt project compiling by July 7\nMarcus to whitelist Quarry's IPs on the Redshift cluster by July 6",
+        "initial": {
+          "proposals": [
+            {
+              "action": "create_task",
+              "draftId": 1,
+              "sourceQuote": "I'll get you the dbt repo access — invite to the quarry-integration GitHub team by tomorrow, July 3rd.",
+              "confidence": "high",
+              "draftRef": "d1",
+              "title": "Grant dbt repo access via quarry-integration GitHub team",
+              "description": null,
+              "notes": "Nina to invite Maya (Quarry) to the quarry-integration GitHub team, giving access to the dbt repo. Agreed to work off main against the existing production target, not a fork.",
+              "ownerName": null,
+              "assigneeContactName": "Nina Alvarez",
+              "ownerSide": "customer",
+              "dueDate": "2026-07-03",
+              "priority": "high",
+              "blockedByRef": null
+            },
+            {
+              "action": "create_task",
+              "draftId": 2,
+              "sourceQuote": "I'll send you our static IP ranges after this call.",
+              "confidence": "high",
+              "draftRef": "d3",
+              "title": "Send Quarry static IP ranges to Marcus Webb",
+              "description": null,
+              "notes": "Maya to send Quarry's static IP ranges to Marcus so he can whitelist them on the Redshift cluster. Committed to doing this immediately after the call. Due date: \"after this call\" from meeting date 2026-07-02 = 2026-07-02.",
+              "ownerName": "Maya Lindqvist",
+              "assigneeContactName": null,
+              "ownerSide": "vendor",
+              "dueDate": "2026-07-02",
+              "priority": "high",
+              "blockedByRef": null
+            }
+          ],
+          "rawCalls": [
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll get you the dbt repo access — invite to the quarry-integration GitHub team by tomorrow, July 3rd."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll send you our static IP ranges after this call."
+            }
+          ],
+          "boardRefs": [
+            "t1",
+            "t2",
+            "t3",
+            "t4"
+          ],
+          "openRefs": [
+            "t2",
+            "t3",
+            "t4"
+          ],
+          "boardTasks": [
+            {
+              "ref": "t1",
+              "title": "Kickoff: confirm onboarding plan",
+              "status": "Done",
+              "ownerName": "Maya Lindqvist"
+            },
+            {
+              "ref": "t2",
+              "title": "Model subscriber growth marts",
+              "status": "Not started",
+              "ownerName": "Maya Lindqvist"
+            },
+            {
+              "ref": "t3",
+              "title": "Configure SSO for beehiiv workspace",
+              "status": "Not started",
+              "ownerName": "Nina Alvarez"
+            },
+            {
+              "ref": "t4",
+              "title": "Run analyst training on Quarry",
+              "status": "Not started",
+              "ownerName": "Maya Lindqvist"
+            }
+          ]
+        },
+        "error": null
+      },
+      "raw": {
+        "maps": {
+          "companyPrefixByOnboardingId": {
+            "1": "RAY",
+            "2": "BEE",
+            "3": "MDL",
+            "4": "LOOP",
+            "5": "HUEL",
+            "6": "FN",
+            "7": "FLK",
+            "8": "SYL",
+            "9": "CHOW",
+            "10": "ASH",
+            "11": "PEER",
+            "12": "PAT"
+          },
+          "onboardingIdByPrefix": {
+            "RAY": 1,
+            "BEE": 2,
+            "MDL": 3,
+            "LOOP": 4,
+            "HUEL": 5,
+            "FN": 6,
+            "FLK": 7,
+            "SYL": 8,
+            "CHOW": 9,
+            "ASH": 10,
+            "PEER": 11,
+            "PAT": 12
+          },
+          "vendorNameById": {
+            "1": "Maya Lindqvist",
+            "2": "Theo Okonkwo",
+            "3": "Ines Ferreira",
+            "4": "Sam Whitfield",
+            "5": "Caroline Jaworsky"
+          },
+          "contactNameById": {
+            "1": "Nina Alvarez",
+            "2": "Marcus Webb"
+          },
+          "refByTaskId": {
+            "1": "t1",
+            "2": "t2",
+            "3": "t3",
+            "4": "t4"
+          }
+        },
+        "match": {
+          "onboardingId": 2,
+          "ambiguous": false,
+          "matchedBy": "domain",
+          "candidates": [
+            {
+              "onboardingId": 2,
+              "signal": "domain",
+              "evidence": "attendee domain beehiiv.com → beehiiv"
+            }
+          ]
+        },
+        "initial": {
+          "drafts": [
+            {
+              "id": 1,
+              "action": "create_task",
+              "payload": {
+                "notes": "Nina to invite Maya (Quarry) to the quarry-integration GitHub team, giving access to the dbt repo. Agreed to work off main against the existing production target, not a fork.",
+                "title": "Grant dbt repo access via quarry-integration GitHub team",
+                "dueDate": "2026-07-03",
+                "phaseId": 7,
+                "draftRef": "d1",
+                "priority": "high",
+                "confidence": "high",
+                "sourceQuote": "I'll get you the dbt repo access — invite to the quarry-integration GitHub team by tomorrow, July 3rd.",
+                "assigneeContactId": 1,
+                "assigneeContactName": "Nina Alvarez"
+              },
+              "sourceQuote": "I'll get you the dbt repo access — invite to the quarry-integration GitHub team by tomorrow, July 3rd.",
+              "confidence": "high"
+            },
+            {
+              "id": 2,
+              "action": "create_task",
+              "payload": {
+                "notes": "Maya to send Quarry's static IP ranges to Marcus so he can whitelist them on the Redshift cluster. Committed to doing this immediately after the call. Due date: \"after this call\" from meeting date 2026-07-02 = 2026-07-02.",
+                "title": "Send Quarry static IP ranges to Marcus Webb",
+                "dueDate": "2026-07-02",
+                "ownerId": 1,
+                "phaseId": 7,
+                "draftRef": "d3",
+                "priority": "high",
+                "ownerName": "Maya Lindqvist",
+                "confidence": "high",
+                "sourceQuote": "I'll send you our static IP ranges after this call."
+              },
+              "sourceQuote": "I'll send you our static IP ranges after this call.",
+              "confidence": "high"
+            }
+          ],
+          "orchestratorOutput": [
+            {
+              "id": "toolu_01HYXbe2Zpx4evpnR7T3HBmv",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Nina to invite Maya (Quarry) to the quarry-integration GitHub team, giving access to the dbt repo. Agreed to work off main against the existing production target, not a fork.",
+                "title": "Grant dbt repo access via quarry-integration GitHub team",
+                "dueDate": "2026-07-03",
+                "phaseId": 7,
+                "draftRef": "d1",
+                "priority": "high",
+                "confidence": "high",
+                "sourceQuote": "I'll get you the dbt repo access — invite to the quarry-integration GitHub team by tomorrow, July 3rd.",
+                "assigneeContactId": 1
+              }
+            },
+            {
+              "id": "toolu_01LhgVSv5civYsLYVFoAGYdj",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Maya to send Quarry's static IP ranges to Marcus so he can whitelist them on the Redshift cluster. Committed to doing this immediately after the call. Due date: \"after this call\" from meeting date 2026-07-02 = 2026-07-02.",
+                "title": "Send Quarry static IP ranges to Marcus Webb",
+                "dueDate": "2026-07-02",
+                "ownerId": 1,
+                "phaseId": 7,
+                "draftRef": "d3",
+                "priority": "high",
+                "confidence": "high",
+                "sourceQuote": "I'll send you our static IP ranges after this call."
+              }
+            }
+          ],
+          "orchestratorExtraction": {
+            "actionItems": [
+              {
+                "claim": "Grant dbt repo access via invite to the quarry-integration GitHub team by July 3",
+                "speaker": "Nina Alvarez",
+                "firmness": "firm",
+                "sourceQuote": "I'll get you the dbt repo access — invite to the quarry-integration GitHub team by tomorrow, July 3rd.",
+                "notesSnippet": "Nina Alvarez: Easy one. I'll get you the dbt repo access — invite to the quarry-integration GitHub team by tomorrow, July 3rd.\nMaya Lindqvist: Perfect. Once I'm in, do we work off main or do you want us on a fork?",
+                "mentionedOwner": "Nina Alvarez",
+                "mentionedDueDate": "tomorrow, July 3rd",
+                "mentionedDependency": ""
+              },
+              {
+                "claim": "Connect the warehouse and get the dbt project compiling in Quarry by July 7",
+                "speaker": "Maya Lindqvist",
+                "firmness": "firm",
+                "sourceQuote": "I'll connect the warehouse and get the dbt project compiling in Quarry by Tuesday, July 7th.",
+                "notesSnippet": "Maya Lindqvist: Agreed. Then on our side — I'll connect the warehouse and get the dbt project compiling in Quarry by Tuesday, July 7th.\nMarcus Webb: That depends on network access though — our Redshift cluster only accepts whitelisted IPs.",
+                "mentionedOwner": "Maya Lindqvist",
+                "mentionedDueDate": "Tuesday, July 7th",
+                "mentionedDependency": "blocked on network access — Redshift cluster only accepts whitelisted IPs"
+              },
+              {
+                "claim": "Send Quarry's static IP ranges to Marcus after the call",
+                "speaker": "Maya Lindqvist",
+                "firmness": "firm",
+                "sourceQuote": "I'll send you our static IP ranges after this call.",
+                "notesSnippet": "Maya Lindqvist: Right, I'll send you our static IP ranges after this call. Can you get them whitelisted before Tuesday?\nMarcus Webb: Yes — I'll whitelist Quarry's IPs on the Redshift cluster by Monday the 6th.",
+                "mentionedOwner": "Maya Lindqvist",
+                "mentionedDueDate": "after this call",
+                "mentionedDependency": ""
+              },
+              {
+                "claim": "Whitelist Quarry's IPs on the Redshift cluster by Monday July 6",
+                "speaker": "Marcus Webb",
+                "firmness": "firm",
+                "sourceQuote": "I'll whitelist Quarry's IPs on the Redshift cluster by Monday the 6th.",
+                "notesSnippet": "Maya Lindqvist: Right, I'll send you our static IP ranges after this call. Can you get them whitelisted before Tuesday?\nMarcus Webb: Yes — I'll whitelist Quarry's IPs on the Redshift cluster by Monday the 6th.",
+                "mentionedOwner": "Marcus Webb",
+                "mentionedDueDate": "Monday the 6th",
+                "mentionedDependency": "waiting for Quarry's static IP ranges"
+              },
+              {
+                "claim": "Scope the subscriber retention dashboard at next Thursday's sync",
+                "speaker": "Maya Lindqvist",
+                "firmness": "tentative",
+                "sourceQuote": "We'll scope the retention dashboard properly at next Thursday's sync rather than promise it today.",
+                "notesSnippet": "Maya Lindqvist: That's a realistic target if the compile lands next week. We'll scope the retention dashboard properly at next Thursday's sync rather than promise it today.\nNina Alvarez: Fair. Plumbing first.",
+                "mentionedOwner": "Maya Lindqvist",
+                "mentionedDueDate": "next Thursday's sync",
+                "mentionedDependency": "once the compile lands next week"
+              }
+            ],
+            "meetingTone": "status update",
+            "externalBlockers": [],
+            "reportedCompletions": []
+          }
+        },
+        "error": null
+      },
+      "logs": [
+        "log [miniti] extraction (pass 1): input ~884 prompt tokens, 3 open tasks",
+        "log [miniti] extraction (pass 1): 5 action items, 0 completions, tone=status update, 10604ms",
+        "log [miniti] orchestrator (pass 2): input ~1642 prompt tokens, 3 open tasks, 5 extracted items",
+        "log [miniti] orchestrator (pass 2): 3 content blocks, 2 tool calls"
+      ]
+    },
+    {
+      "case": "13",
+      "file": "13-functionhealth-service-account-trap.json",
+      "durationMs": 31787,
+      "costUsd": 0.067822,
+      "aiCalls": 2,
+      "error": null,
+      "score": {
+        "match": {
+          "pass": true,
+          "expected": "FN",
+          "actual": "FN",
+          "matchedBy": "domain"
+        },
+        "initial": {
+          "calls": [
+            {
+              "index": 0,
+              "action": "create_task",
+              "title": "Close the security review",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 1,
+                "action": "create_task",
+                "title": "Close out security review (platform lead sign-off)",
+                "score": 1.1,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "customer",
+                  "actual": "customer",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Nadia Kaur",
+                  "actual": "Nadia Kaur",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-06-23",
+                  "actual": "2026-06-23",
+                  "pass": true
+                }
+              },
+              "notes": {
+                "found": [
+                  "platform lead"
+                ],
+                "missing": []
+              },
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 1,
+              "action": "match_existing",
+              "title": "Provision read-only Snowflake service account",
+              "kind": null,
+              "paired": false,
+              "pairedWith": null,
+              "checks": {},
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "existing_task_notes"
+                  ],
+                  "what": "notes on existing task: read-only, ANALYTICS schema, no raw layer",
+                  "met": false
+                },
+                {
+                  "codes": [
+                    "existing_task_dependency",
+                    "depends_on_new_draft"
+                  ],
+                  "what": "depends on new draft \"Close the security review\"",
+                  "met": false
+                }
+              ]
+            }
+          ],
+          "unmatchedProposals": [
+            {
+              "draftId": 2,
+              "action": "match_existing",
+              "title": "Connect dbt repo to Quarry",
+              "sourceQuote": "Once the service account exists we can connect the dbt repo the same day, so the chain unblocks quickly."
+            }
+          ],
+          "proposalsCount": 2,
+          "duplicates": [],
+          "groundedness": {
+            "quotes": {
+              "count": 2,
+              "total": 2
+            },
+            "quoteViolations": [],
+            "quotesFromActionItemsOnly": 0,
+            "citedIds": {
+              "count": 1,
+              "total": 1
+            },
+            "citedIdViolations": []
+          },
+          "totals": {
+            "recall": {
+              "count": 1,
+              "total": 2
+            },
+            "precision": {
+              "count": 1,
+              "total": 2
+            },
+            "action": {
+              "count": 1,
+              "total": 1
+            },
+            "ownerSide": {
+              "count": 1,
+              "total": 1
+            },
+            "assignee": {
+              "count": 1,
+              "total": 1
+            },
+            "dueDate": {
+              "count": 1,
+              "total": 1
+            },
+            "priority": {
+              "count": 0,
+              "total": 0
+            },
+            "status": {
+              "count": 0,
+              "total": 0
+            },
+            "notesPhrases": {
+              "count": 1,
+              "total": 1
+            },
+            "dependencies": {
+              "count": 0,
+              "total": 0
+            },
+            "kindRecall": {
+              "commitment": {
+                "count": 1,
+                "total": 1
+              },
+              "parked_for_later": {
+                "count": 0,
+                "total": 0
+              },
+              "vendor_reminder": {
+                "count": 0,
+                "total": 0
+              }
+            },
+            "groundedQuotes": {
+              "count": 2,
+              "total": 2
+            },
+            "citedIdsValid": {
+              "count": 1,
+              "total": 1
+            },
+            "duplicates": {
+              "count": 0,
+              "total": 1
+            },
+            "gaps": {
+              "count": 0,
+              "total": 2
+            },
+            "gapsByCode": {
+              "existing_task_notes": {
+                "count": 0,
+                "total": 1
+              },
+              "existing_task_dependency": {
+                "count": 0,
+                "total": 1
+              },
+              "depends_on_new_draft": {
+                "count": 0,
+                "total": 1
+              }
+            }
+          }
+        },
+        "heldBeforeAssign": null,
+        "afterAssign": null,
+        "dedup": null,
+        "totals": {
+          "recall": {
+            "count": 1,
+            "total": 2
+          },
+          "precision": {
+            "count": 1,
+            "total": 2
+          },
+          "action": {
+            "count": 1,
+            "total": 1
+          },
+          "ownerSide": {
+            "count": 1,
+            "total": 1
+          },
+          "assignee": {
+            "count": 1,
+            "total": 1
+          },
+          "dueDate": {
+            "count": 1,
+            "total": 1
+          },
+          "priority": {
+            "count": 0,
+            "total": 0
+          },
+          "status": {
+            "count": 0,
+            "total": 0
+          },
+          "notesPhrases": {
+            "count": 1,
+            "total": 1
+          },
+          "dependencies": {
+            "count": 0,
+            "total": 0
+          },
+          "kindRecall": {
+            "commitment": {
+              "count": 1,
+              "total": 1
+            },
+            "parked_for_later": {
+              "count": 0,
+              "total": 0
+            },
+            "vendor_reminder": {
+              "count": 0,
+              "total": 0
+            }
+          },
+          "groundedQuotes": {
+            "count": 2,
+            "total": 2
+          },
+          "citedIdsValid": {
+            "count": 1,
+            "total": 1
+          },
+          "duplicates": {
+            "count": 0,
+            "total": 1
+          },
+          "gaps": {
+            "count": 0,
+            "total": 2
+          },
+          "gapsByCode": {
+            "existing_task_notes": {
+              "count": 0,
+              "total": 1
+            },
+            "existing_task_dependency": {
+              "count": 0,
+              "total": 1
+            },
+            "depends_on_new_draft": {
+              "count": 0,
+              "total": 1
+            }
+          }
+        }
+      },
+      "actual": {
+        "match": {
+          "companyPrefix": "FN",
+          "ambiguous": false,
+          "matchedBy": "domain"
+        },
+        "transcript": "Thanks for making time. I know this project has been stuck behind the security review, so I mostly want to understand where that stands.\nFair. It's taken longer than any of us wanted — the questionnaire touched teams that don't usually review vendors together, and anything touching patient data gets extra scrutiny.\nUnderstood. Is there anything outstanding on our side? More documentation, a call with your reviewers?\nNo, your responses were complete, including the HIPAA and data-handling sections. The remaining answers are drafted internally and I'm waiting on one approval from our platform lead. I expect to close the review out early next week.\nThat's genuinely good news. Oliver, once that lands, what's the path to getting us connected?\nThe moment Nadia signs off, I'll provision the Snowflake service account — read-only on the ANALYTICS schema, exactly as specced. It's a same-day job once the review closes, so I won't put a separate date on it.\nAnd just to confirm scope while we're all here: read-only, ANALYTICS schema only, no raw layer?\nCorrect. Our data governance policy won't allow raw-layer access for external tools — that's where the identifiable lab results live — and honestly you don't need it.\nAgreed, we don't. Once the service account exists we can connect the dbt repo the same day, so the chain unblocks quickly.\nThat's what I'm hoping. We've lost about three weeks; if the connection happens next week we can claw most of that back.\nFrom my side, no further reviews needed after this one. The tool itself was approved — it was the data-sharing terms for the health data that took time.\nGood to know. I won't pile more actions on — the sign-off and the service account are the whole critical path. Anything you need from me?\nNothing right now. If provisioning throws anything weird I'll ping you on Slack.\nPerfect. Let's speak once the account is live. Thanks both.",
+        "actionItemsText": "Nadia to close out the security review early next week (waiting on platform lead approval)\nOliver to provision the Snowflake service account (read-only, ANALYTICS schema) the same day security signs off",
+        "initial": {
+          "proposals": [
+            {
+              "action": "create_task",
+              "draftId": 1,
+              "sourceQuote": "The remaining answers are drafted internally and I'm waiting on one approval from our platform lead. I expect to close the review out early next week.",
+              "confidence": "high",
+              "dependsOn": [
+                {
+                  "text": "Platform lead approval at Function Health"
+                }
+              ],
+              "draftRef": "d1",
+              "title": "Close out security review (platform lead sign-off)",
+              "description": null,
+              "notes": "Nadia has all answers drafted internally, including HIPAA and data-handling sections (vendor responses confirmed complete). Waiting on one internal approval from Function Health's platform lead. Expects to close the review out early next week. No further reviews needed after this one; the tool itself is already approved, only the data-sharing terms for health data caused the delay. Due date: \"early next week\" from Thursday 2026-06-18 = Tuesday 2026-06-22, but platform lead approval is an external dependency so using Tuesday 2026-06-23 as a conservative early-next-week target. (Adjusted to Wednesday to allow for the approval arriving Monday and Nadia closing Tuesday/Wednesday.)",
+              "ownerName": null,
+              "assigneeContactName": "Nadia Kaur",
+              "ownerSide": "customer",
+              "dueDate": "2026-06-23",
+              "priority": "high",
+              "blockedByRef": null
+            },
+            {
+              "action": "match_existing",
+              "draftId": 2,
+              "sourceQuote": "Once the service account exists we can connect the dbt repo the same day, so the chain unblocks quickly.",
+              "confidence": "high",
+              "draftRef": null,
+              "taskRef": "t3",
+              "updateKind": "update",
+              "newStatus": null,
+              "newDueDate": null,
+              "newPriority": "high",
+              "newOwnerName": null,
+              "notes": null,
+              "appendNotes": "Call confirmed Sam will connect the dbt repo the same day the service account is provisioned, so the chain unblocks quickly. No new date beyond the same-day dependency on FN-1."
+            }
+          ],
+          "rawCalls": [
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "The remaining answers are drafted internally and I'm waiting on one approval from our platform lead. I expect to close the review out early next week."
+            },
+            {
+              "tool": "match_to_existing_task_draft",
+              "taskId": 3,
+              "taskRef": "t3",
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "Once the service account exists we can connect the dbt repo the same day, so the chain unblocks quickly."
+            }
+          ],
+          "boardRefs": [
+            "t1",
+            "t2",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "openRefs": [
+            "t1",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "boardTasks": [
+            {
+              "ref": "t1",
+              "title": "Provision read-only Snowflake service account",
+              "status": "Blocked",
+              "ownerName": "Oliver Hartley"
+            },
+            {
+              "ref": "t2",
+              "title": "Return completed security questionnaire",
+              "status": "Done",
+              "ownerName": "Sam Whitfield"
+            },
+            {
+              "ref": "t3",
+              "title": "Connect dbt repo to Quarry",
+              "status": "Blocked",
+              "ownerName": "Sam Whitfield"
+            },
+            {
+              "ref": "t4",
+              "title": "Model lab-results marts",
+              "status": "Not started",
+              "ownerName": "Sam Whitfield"
+            },
+            {
+              "ref": "t5",
+              "title": "Run analyst training",
+              "status": "Not started",
+              "ownerName": "Sam Whitfield"
+            }
+          ]
+        },
+        "error": null
+      },
+      "raw": {
+        "maps": {
+          "companyPrefixByOnboardingId": {
+            "1": "RAY",
+            "2": "BEE",
+            "3": "MDL",
+            "4": "LOOP",
+            "5": "HUEL",
+            "6": "FN",
+            "7": "FLK",
+            "8": "SYL",
+            "9": "CHOW",
+            "10": "ASH",
+            "11": "PEER",
+            "12": "PAT"
+          },
+          "onboardingIdByPrefix": {
+            "RAY": 1,
+            "BEE": 2,
+            "MDL": 3,
+            "LOOP": 4,
+            "HUEL": 5,
+            "FN": 6,
+            "FLK": 7,
+            "SYL": 8,
+            "CHOW": 9,
+            "ASH": 10,
+            "PEER": 11,
+            "PAT": 12
+          },
+          "vendorNameById": {
+            "1": "Maya Lindqvist",
+            "2": "Theo Okonkwo",
+            "3": "Ines Ferreira",
+            "4": "Sam Whitfield",
+            "5": "Caroline Jaworsky"
+          },
+          "contactNameById": {
+            "1": "Oliver Hartley",
+            "2": "Nadia Kaur"
+          },
+          "refByTaskId": {
+            "1": "t1",
+            "2": "t2",
+            "3": "t3",
+            "4": "t4",
+            "5": "t5"
+          }
+        },
+        "match": {
+          "onboardingId": 6,
+          "ambiguous": false,
+          "matchedBy": "domain",
+          "candidates": [
+            {
+              "onboardingId": 6,
+              "signal": "domain",
+              "evidence": "attendee domain functionhealth.com → Function Health"
+            }
+          ]
+        },
+        "initial": {
+          "drafts": [
+            {
+              "id": 1,
+              "action": "create_task",
+              "payload": {
+                "notes": "Nadia has all answers drafted internally, including HIPAA and data-handling sections (vendor responses confirmed complete). Waiting on one internal approval from Function Health's platform lead. Expects to close the review out early next week. No further reviews needed after this one; the tool itself is already approved, only the data-sharing terms for health data caused the delay. Due date: \"early next week\" from Thursday 2026-06-18 = Tuesday 2026-06-22, but platform lead approval is an external dependency so using Tuesday 2026-06-23 as a conservative early-next-week target. (Adjusted to Wednesday to allow for the approval arriving Monday and Nadia closing Tuesday/Wednesday.)",
+                "title": "Close out security review (platform lead sign-off)",
+                "dueDate": "2026-06-23",
+                "phaseId": 27,
+                "draftRef": "d1",
+                "priority": "high",
+                "dependsOn": [
+                  {
+                    "text": "Platform lead approval at Function Health"
+                  }
+                ],
+                "confidence": "high",
+                "sourceQuote": "The remaining answers are drafted internally and I'm waiting on one approval from our platform lead. I expect to close the review out early next week.",
+                "assigneeContactId": 2,
+                "assigneeContactName": "Nadia Kaur"
+              },
+              "sourceQuote": "The remaining answers are drafted internally and I'm waiting on one approval from our platform lead. I expect to close the review out early next week.",
+              "confidence": "high"
+            },
+            {
+              "id": 2,
+              "action": "match_existing",
+              "payload": {
+                "action": "update",
+                "taskId": 3,
+                "changes": {
+                  "priority": "high",
+                  "appendNotes": "Call confirmed Sam will connect the dbt repo the same day the service account is provisioned, so the chain unblocks quickly. No new date beyond the same-day dependency on FN-1."
+                },
+                "confidence": "high",
+                "noteSource": {
+                  "date": "2026-06-18",
+                  "label": "call with Function Health"
+                },
+                "sourceQuote": "Once the service account exists we can connect the dbt repo the same day, so the chain unblocks quickly."
+              },
+              "sourceQuote": "Once the service account exists we can connect the dbt repo the same day, so the chain unblocks quickly.",
+              "confidence": "high"
+            }
+          ],
+          "orchestratorOutput": [
+            {
+              "id": "toolu_01XBhLFTbwG7U6WGGnEzPX9P",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Nadia has all answers drafted internally, including HIPAA and data-handling sections (vendor responses confirmed complete). Waiting on one internal approval from Function Health's platform lead. Expects to close the review out early next week. No further reviews needed after this one; the tool itself is already approved, only the data-sharing terms for health data caused the delay. Due date: \"early next week\" from Thursday 2026-06-18 = Tuesday 2026-06-22, but platform lead approval is an external dependency so using Tuesday 2026-06-23 as a conservative early-next-week target. (Adjusted to Wednesday to allow for the approval arriving Monday and Nadia closing Tuesday/Wednesday.)",
+                "title": "Close out security review (platform lead sign-off)",
+                "dueDate": "2026-06-23",
+                "phaseId": 27,
+                "draftRef": "d1",
+                "priority": "high",
+                "dependsOn": [
+                  {
+                    "text": "Platform lead approval at Function Health"
+                  }
+                ],
+                "confidence": "high",
+                "sourceQuote": "The remaining answers are drafted internally and I'm waiting on one approval from our platform lead. I expect to close the review out early next week.",
+                "assigneeContactId": 2
+              }
+            },
+            {
+              "id": "toolu_01YCQpPtQZvFqq2utVdD5Jqf",
+              "tool": "match_to_existing_task_draft",
+              "input": {
+                "taskId": 3,
+                "changes": {
+                  "priority": "high",
+                  "appendNotes": "Call confirmed Sam will connect the dbt repo the same day the service account is provisioned, so the chain unblocks quickly. No new date beyond the same-day dependency on FN-1."
+                },
+                "confidence": "high",
+                "sourceQuote": "Once the service account exists we can connect the dbt repo the same day, so the chain unblocks quickly."
+              }
+            }
+          ],
+          "orchestratorExtraction": {
+            "actionItems": [
+              {
+                "claim": "Close out the security review early next week",
+                "speaker": "Nadia Kaur",
+                "firmness": "firm",
+                "sourceQuote": "The remaining answers are drafted internally and I'm waiting on one approval from our platform lead. I expect to close the review out early next week.",
+                "notesSnippet": "No, your responses were complete, including the HIPAA and data-handling sections. The remaining answers are drafted internally and I'm waiting on one approval from our platform lead. I expect to close the review out early next week.",
+                "mentionedOwner": "Nadia",
+                "mentionedDueDate": "early next week",
+                "mentionedDependency": "waiting on one approval from our platform lead"
+              },
+              {
+                "claim": "Provision the Snowflake service account (read-only on ANALYTICS schema) the same day security signs off",
+                "speaker": "Oliver Hartley",
+                "firmness": "firm",
+                "sourceQuote": "The moment Nadia signs off, I'll provision the Snowflake service account — read-only on the ANALYTICS schema, exactly as specced. It's a same-day job once the review closes, so I won't put a separate date on it.",
+                "notesSnippet": "The moment Nadia signs off, I'll provision the Snowflake service account — read-only on the ANALYTICS schema, exactly as specced. It's a same-day job once the review closes, so I won't put a separate date on it.",
+                "mentionedOwner": "Oliver",
+                "mentionedDueDate": "same day once the review closes",
+                "mentionedDependency": "The moment Nadia signs off"
+              },
+              {
+                "claim": "Connect the dbt repo the same day the service account is provisioned",
+                "speaker": "Sam Whitfield",
+                "firmness": "firm",
+                "sourceQuote": "Once the service account exists we can connect the dbt repo the same day, so the chain unblocks quickly.",
+                "notesSnippet": "Once the service account exists we can connect the dbt repo the same day, so the chain unblocks quickly.",
+                "mentionedOwner": "Sam Whitfield",
+                "mentionedDueDate": "same day",
+                "mentionedDependency": "once the service account exists"
+              },
+              {
+                "claim": "Ping Sam on Slack if provisioning throws anything unexpected",
+                "speaker": "Oliver Hartley",
+                "firmness": "tentative",
+                "sourceQuote": "If provisioning throws anything weird I'll ping you on Slack.",
+                "notesSnippet": "Nothing right now. If provisioning throws anything weird I'll ping you on Slack.",
+                "mentionedOwner": "Oliver",
+                "mentionedDueDate": "",
+                "mentionedDependency": "if provisioning throws anything weird"
+              },
+              {
+                "claim": "Speak once the service account is live",
+                "speaker": "Sam Whitfield",
+                "firmness": "tentative",
+                "sourceQuote": "Let's speak once the account is live. Thanks both.",
+                "notesSnippet": "Perfect. Let's speak once the account is live. Thanks both.",
+                "mentionedOwner": "",
+                "mentionedDueDate": "once the account is live",
+                "mentionedDependency": "once the account is live"
+              }
+            ],
+            "meetingTone": "status update",
+            "externalBlockers": [
+              "Platform lead approval at Function Health still pending, blocking security review sign-off"
+            ],
+            "reportedCompletions": [
+              {
+                "claim": "Function Health's security questionnaire responses (including HIPAA and data-handling sections) are complete on the vendor side",
+                "speaker": "Nadia Kaur",
+                "sourceQuote": "No, your responses were complete, including the HIPAA and data-handling sections."
+              },
+              {
+                "claim": "The tool itself was approved; only the data-sharing terms for health data caused delay",
+                "speaker": "Nadia Kaur",
+                "sourceQuote": "From my side, no further reviews needed after this one. The tool itself was approved — it was the data-sharing terms for the health data that took time."
+              }
+            ]
+          }
+        },
+        "error": null
+      },
+      "logs": [
+        "log [miniti] extraction (pass 1): input ~1232 prompt tokens, 4 open tasks",
+        "log [miniti] extraction (pass 1): 5 action items, 2 completions, tone=status update, 11945ms",
+        "log [miniti] orchestrator (pass 2): input ~2083 prompt tokens, 4 open tasks, 5 extracted items",
+        "log [miniti] orchestrator (pass 2): 3 content blocks, 2 tool calls"
+      ]
+    },
+    {
+      "case": "26",
+      "file": "26-functionhealth-weekly-security-unblocked.json",
+      "durationMs": 31202,
+      "costUsd": 0.066436,
+      "aiCalls": 2,
+      "error": null,
+      "score": {
+        "match": {
+          "pass": true,
+          "expected": "FN",
+          "actual": "FN",
+          "matchedBy": "domain"
+        },
+        "initial": {
+          "calls": [
+            {
+              "index": 0,
+              "action": "update_status",
+              "title": "Complete infosec questionnaire review",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 1,
+                "action": "update_status",
+                "title": "Complete infosec questionnaire review",
+                "score": 1,
+                "by": "ref"
+              },
+              "checks": {
+                "action": {
+                  "expected": "update_status",
+                  "actual": "update_status",
+                  "pass": true
+                },
+                "newStatus": {
+                  "expected": "Done",
+                  "actual": "Done",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 1,
+              "action": "create_task",
+              "title": "Send Quarry static IP list for network policy",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 3,
+                "action": "create_task",
+                "title": "Send Quarry static IP list to Function Health for network policy allowlist",
+                "score": 1.324,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Sam Whitfield",
+                  "actual": "Sam Whitfield",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-06-24",
+                  "actual": "2026-06-24",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 2,
+              "action": "match_existing",
+              "title": "Provision read-only Snowflake service account",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 2,
+                "action": "match_existing",
+                "title": "Provision read-only Snowflake service account",
+                "score": 1,
+                "by": "ref"
+              },
+              "checks": {
+                "action": {
+                  "expected": "match_existing",
+                  "actual": "match_existing",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Oliver Hartley",
+                  "actual": "Oliver Hartley",
+                  "pass": true,
+                  "scored": false
+                },
+                "dueDate": {
+                  "expected": "2026-06-26",
+                  "actual": "2026-06-26",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "existing_task_notes"
+                  ],
+                  "what": "notes on existing task: read-only, analytics schema, de-identified marts, not the raw PHI",
+                  "met": true
+                }
+              ]
+            },
+            {
+              "index": 3,
+              "action": "create_task",
+              "title": "Connect the warehouse and the repo",
+              "kind": "commitment",
+              "paired": false,
+              "pairedWith": null,
+              "checks": {},
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "depends_on_new_draft"
+                  ],
+                  "what": "depends on new draft \"Send Quarry static IP list for network policy\"",
+                  "met": false
+                }
+              ]
+            },
+            {
+              "index": 4,
+              "action": "create_task",
+              "title": "Access reviews before HIPAA audit season in August",
+              "kind": "parked_for_later",
+              "paired": false,
+              "pairedWith": null,
+              "checks": {},
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            }
+          ],
+          "unmatchedProposals": [],
+          "proposalsCount": 3,
+          "duplicates": [],
+          "groundedness": {
+            "quotes": {
+              "count": 3,
+              "total": 3
+            },
+            "quoteViolations": [],
+            "quotesFromActionItemsOnly": 0,
+            "citedIds": {
+              "count": 2,
+              "total": 2
+            },
+            "citedIdViolations": []
+          },
+          "totals": {
+            "recall": {
+              "count": 3,
+              "total": 5
+            },
+            "precision": {
+              "count": 3,
+              "total": 3
+            },
+            "action": {
+              "count": 3,
+              "total": 3
+            },
+            "ownerSide": {
+              "count": 1,
+              "total": 1
+            },
+            "assignee": {
+              "count": 1,
+              "total": 1
+            },
+            "dueDate": {
+              "count": 2,
+              "total": 2
+            },
+            "priority": {
+              "count": 0,
+              "total": 0
+            },
+            "status": {
+              "count": 1,
+              "total": 1
+            },
+            "notesPhrases": {
+              "count": 0,
+              "total": 0
+            },
+            "dependencies": {
+              "count": 0,
+              "total": 0
+            },
+            "kindRecall": {
+              "commitment": {
+                "count": 1,
+                "total": 2
+              },
+              "parked_for_later": {
+                "count": 0,
+                "total": 1
+              },
+              "vendor_reminder": {
+                "count": 0,
+                "total": 0
+              }
+            },
+            "groundedQuotes": {
+              "count": 3,
+              "total": 3
+            },
+            "citedIdsValid": {
+              "count": 2,
+              "total": 2
+            },
+            "duplicates": {
+              "count": 0,
+              "total": 1
+            },
+            "gaps": {
+              "count": 1,
+              "total": 2
+            },
+            "gapsByCode": {
+              "existing_task_notes": {
+                "count": 1,
+                "total": 1
+              },
+              "depends_on_new_draft": {
+                "count": 0,
+                "total": 1
+              }
+            }
+          }
+        },
+        "heldBeforeAssign": null,
+        "afterAssign": null,
+        "dedup": null,
+        "totals": {
+          "recall": {
+            "count": 3,
+            "total": 5
+          },
+          "precision": {
+            "count": 3,
+            "total": 3
+          },
+          "action": {
+            "count": 3,
+            "total": 3
+          },
+          "ownerSide": {
+            "count": 1,
+            "total": 1
+          },
+          "assignee": {
+            "count": 1,
+            "total": 1
+          },
+          "dueDate": {
+            "count": 2,
+            "total": 2
+          },
+          "priority": {
+            "count": 0,
+            "total": 0
+          },
+          "status": {
+            "count": 1,
+            "total": 1
+          },
+          "notesPhrases": {
+            "count": 0,
+            "total": 0
+          },
+          "dependencies": {
+            "count": 0,
+            "total": 0
+          },
+          "kindRecall": {
+            "commitment": {
+              "count": 1,
+              "total": 2
+            },
+            "parked_for_later": {
+              "count": 0,
+              "total": 1
+            },
+            "vendor_reminder": {
+              "count": 0,
+              "total": 0
+            }
+          },
+          "groundedQuotes": {
+            "count": 3,
+            "total": 3
+          },
+          "citedIdsValid": {
+            "count": 2,
+            "total": 2
+          },
+          "duplicates": {
+            "count": 0,
+            "total": 1
+          },
+          "gaps": {
+            "count": 1,
+            "total": 2
+          },
+          "gapsByCode": {
+            "existing_task_notes": {
+              "count": 1,
+              "total": 1
+            },
+            "depends_on_new_draft": {
+              "count": 0,
+              "total": 1
+            }
+          }
+        }
+      },
+      "actual": {
+        "match": {
+          "companyPrefix": "FN",
+          "ambiguous": false,
+          "matchedBy": "domain"
+        },
+        "transcript": "Morning both. Nadia, I'm hoping you have news on the security review.\nI do — good news finally. We signed off the infosec questionnaire yesterday afternoon. That review is done from our side.\nFantastic. That's been the long pole for three weeks, so everything downstream can move now.\nWhich means the service account is on me next. What exactly do you need?\nA read-only Snowflake service account scoped to the analytics schema — the de-identified marts, not the raw PHI — and our static IPs added to your network policy.\nThe IP allowlist goes through my team — send us the list and we'll process it with the sign-off paperwork.\nWill do — I'll send over the Quarry static IP list by tomorrow so your team can add it to the network policy.\nAnd I'll get the Snowflake service account created by Friday. Platform team has capacity this week.\nPerfect. Once both land, we connect the warehouse and the repo the same day.\nOne thing to flag — our HIPAA audit season starts in August, so we may want to think about access reviews before then.\nNoted, let's scope that once we're connected rather than now.\nFine by me. It was mostly a heads-up.\nGreat. So: questionnaire is done, IP list from me tomorrow, service account from Oliver by Friday. Real progress.\nFeels good to be moving again. Thanks Sam.",
+        "actionItemsText": "Sam to send the Quarry static IP list by tomorrow\nOliver to create the Snowflake service account by Friday",
+        "initial": {
+          "proposals": [
+            {
+              "action": "update_status",
+              "draftId": 1,
+              "sourceQuote": "We signed off the infosec questionnaire yesterday afternoon. That review is done from our side.",
+              "confidence": "high",
+              "draftRef": null,
+              "taskRef": "t2",
+              "updateKind": null,
+              "newStatus": "Done",
+              "newDueDate": null,
+              "newPriority": null,
+              "newOwnerName": null,
+              "notes": null,
+              "appendNotes": null
+            },
+            {
+              "action": "match_existing",
+              "draftId": 2,
+              "sourceQuote": "And I'll get the Snowflake service account created by Friday. Platform team has capacity this week.",
+              "confidence": "high",
+              "draftRef": null,
+              "taskRef": "t1",
+              "updateKind": "update",
+              "newStatus": null,
+              "newDueDate": "2026-06-26",
+              "newPriority": null,
+              "newOwnerName": null,
+              "notes": null,
+              "appendNotes": "Scope confirmed on call: read-only Snowflake service account scoped to the analytics schema (de-identified marts only, not raw PHI). Static IPs also need to be added to Function Health's network policy. Oliver confirmed platform team has capacity this week. Due date: 'by Friday' from Tuesday 2026-06-23 = 2026-06-26."
+            },
+            {
+              "action": "create_task",
+              "draftId": 3,
+              "sourceQuote": "I'll send over the Quarry static IP list by tomorrow so your team can add it to the network policy.",
+              "confidence": "high",
+              "draftRef": "d1",
+              "title": "Send Quarry static IP list to Function Health for network policy allowlist",
+              "description": null,
+              "notes": "Sam to send the Quarry static IP list to Nadia Rahman's team so they can add it to the network policy alongside the infosec sign-off paperwork. Due date: 'by tomorrow' from Tuesday 2026-06-23 = 2026-06-24.",
+              "ownerName": "Sam Whitfield",
+              "assigneeContactName": null,
+              "ownerSide": "vendor",
+              "dueDate": "2026-06-24",
+              "priority": "high",
+              "blockedByRef": null
+            }
+          ],
+          "rawCalls": [
+            {
+              "tool": "update_task_status_draft",
+              "taskId": 2,
+              "taskRef": "t2",
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "We signed off the infosec questionnaire yesterday afternoon. That review is done from our side."
+            },
+            {
+              "tool": "match_to_existing_task_draft",
+              "taskId": 1,
+              "taskRef": "t1",
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "And I'll get the Snowflake service account created by Friday. Platform team has capacity this week."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll send over the Quarry static IP list by tomorrow so your team can add it to the network policy."
+            }
+          ],
+          "boardRefs": [
+            "t1",
+            "t2",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "openRefs": [
+            "t1",
+            "t2",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "boardTasks": [
+            {
+              "ref": "t1",
+              "title": "Provision read-only Snowflake service account",
+              "status": "Blocked",
+              "ownerName": "Oliver Hartley"
+            },
+            {
+              "ref": "t2",
+              "title": "Complete infosec questionnaire review",
+              "status": "Blocked",
+              "ownerName": "Nadia Rahman"
+            },
+            {
+              "ref": "t3",
+              "title": "Model lab-results marts",
+              "status": "Not started",
+              "ownerName": "Sam Whitfield"
+            },
+            {
+              "ref": "t4",
+              "title": "Build member health dashboard",
+              "status": "Not started",
+              "ownerName": "Sam Whitfield"
+            },
+            {
+              "ref": "t5",
+              "title": "Run analyst training",
+              "status": "Not started",
+              "ownerName": "Sam Whitfield"
+            }
+          ]
+        },
+        "error": null
+      },
+      "raw": {
+        "maps": {
+          "companyPrefixByOnboardingId": {
+            "1": "RAY",
+            "2": "BEE",
+            "3": "MDL",
+            "4": "LOOP",
+            "5": "HUEL",
+            "6": "FN",
+            "7": "FLK",
+            "8": "SYL",
+            "9": "CHOW",
+            "10": "ASH",
+            "11": "PEER",
+            "12": "PAT"
+          },
+          "onboardingIdByPrefix": {
+            "RAY": 1,
+            "BEE": 2,
+            "MDL": 3,
+            "LOOP": 4,
+            "HUEL": 5,
+            "FN": 6,
+            "FLK": 7,
+            "SYL": 8,
+            "CHOW": 9,
+            "ASH": 10,
+            "PEER": 11,
+            "PAT": 12
+          },
+          "vendorNameById": {
+            "1": "Maya Lindqvist",
+            "2": "Theo Okonkwo",
+            "3": "Ines Ferreira",
+            "4": "Sam Whitfield",
+            "5": "Caroline Jaworsky"
+          },
+          "contactNameById": {
+            "1": "Oliver Hartley",
+            "2": "Nadia Rahman"
+          },
+          "refByTaskId": {
+            "1": "t1",
+            "2": "t2",
+            "3": "t3",
+            "4": "t4",
+            "5": "t5"
+          }
+        },
+        "match": {
+          "onboardingId": 6,
+          "ambiguous": false,
+          "matchedBy": "domain",
+          "candidates": [
+            {
+              "onboardingId": 6,
+              "signal": "domain",
+              "evidence": "attendee domain functionhealth.com → Function Health"
+            }
+          ]
+        },
+        "initial": {
+          "drafts": [
+            {
+              "id": 1,
+              "action": "update_status",
+              "payload": {
+                "taskId": 2,
+                "newStatus": "Done",
+                "confidence": "high",
+                "sourceQuote": "We signed off the infosec questionnaire yesterday afternoon. That review is done from our side."
+              },
+              "sourceQuote": "We signed off the infosec questionnaire yesterday afternoon. That review is done from our side.",
+              "confidence": "high"
+            },
+            {
+              "id": 2,
+              "action": "match_existing",
+              "payload": {
+                "action": "update",
+                "taskId": 1,
+                "changes": {
+                  "dueDate": "2026-06-26",
+                  "appendNotes": "Scope confirmed on call: read-only Snowflake service account scoped to the analytics schema (de-identified marts only, not raw PHI). Static IPs also need to be added to Function Health's network policy. Oliver confirmed platform team has capacity this week. Due date: 'by Friday' from Tuesday 2026-06-23 = 2026-06-26."
+                },
+                "confidence": "high",
+                "noteSource": {
+                  "date": "2026-06-23",
+                  "label": "call with Function Health"
+                },
+                "sourceQuote": "And I'll get the Snowflake service account created by Friday. Platform team has capacity this week."
+              },
+              "sourceQuote": "And I'll get the Snowflake service account created by Friday. Platform team has capacity this week.",
+              "confidence": "high"
+            },
+            {
+              "id": 3,
+              "action": "create_task",
+              "payload": {
+                "notes": "Sam to send the Quarry static IP list to Nadia Rahman's team so they can add it to the network policy alongside the infosec sign-off paperwork. Due date: 'by tomorrow' from Tuesday 2026-06-23 = 2026-06-24.",
+                "title": "Send Quarry static IP list to Function Health for network policy allowlist",
+                "dueDate": "2026-06-24",
+                "ownerId": 4,
+                "phaseId": 27,
+                "draftRef": "d1",
+                "priority": "high",
+                "ownerName": "Sam Whitfield",
+                "confidence": "high",
+                "sourceQuote": "I'll send over the Quarry static IP list by tomorrow so your team can add it to the network policy."
+              },
+              "sourceQuote": "I'll send over the Quarry static IP list by tomorrow so your team can add it to the network policy.",
+              "confidence": "high"
+            }
+          ],
+          "orchestratorOutput": [
+            {
+              "id": "toolu_01FFj1W5Qs7MZ6yP1CaLsyZh",
+              "tool": "update_task_status_draft",
+              "input": {
+                "taskId": 2,
+                "newStatus": "Done",
+                "confidence": "high",
+                "sourceQuote": "We signed off the infosec questionnaire yesterday afternoon. That review is done from our side."
+              }
+            },
+            {
+              "id": "toolu_01DsTypP7dmQxRbkGnFW49D4",
+              "tool": "match_to_existing_task_draft",
+              "input": {
+                "taskId": 1,
+                "changes": {
+                  "dueDate": "2026-06-26",
+                  "appendNotes": "Scope confirmed on call: read-only Snowflake service account scoped to the analytics schema (de-identified marts only, not raw PHI). Static IPs also need to be added to Function Health's network policy. Oliver confirmed platform team has capacity this week. Due date: 'by Friday' from Tuesday 2026-06-23 = 2026-06-26."
+                },
+                "confidence": "high",
+                "sourceQuote": "And I'll get the Snowflake service account created by Friday. Platform team has capacity this week."
+              }
+            },
+            {
+              "id": "toolu_01Ni3GhFkL9x3fADd1d6q525",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Sam to send the Quarry static IP list to Nadia Rahman's team so they can add it to the network policy alongside the infosec sign-off paperwork. Due date: 'by tomorrow' from Tuesday 2026-06-23 = 2026-06-24.",
+                "title": "Send Quarry static IP list to Function Health for network policy allowlist",
+                "dueDate": "2026-06-24",
+                "ownerId": 4,
+                "phaseId": 27,
+                "draftRef": "d1",
+                "priority": "high",
+                "confidence": "high",
+                "sourceQuote": "I'll send over the Quarry static IP list by tomorrow so your team can add it to the network policy."
+              }
+            }
+          ],
+          "orchestratorExtraction": {
+            "actionItems": [
+              {
+                "claim": "Send the Quarry static IP list to Function Health by tomorrow",
+                "speaker": "Sam Whitfield",
+                "firmness": "firm",
+                "sourceQuote": "I'll send over the Quarry static IP list by tomorrow so your team can add it to the network policy.",
+                "notesSnippet": "Nadia Rahman: The IP allowlist goes through my team — send us the list and we'll process it with the sign-off paperwork.\nSam Whitfield: Will do — I'll send over the Quarry static IP list by tomorrow so your team can add it to the network policy.",
+                "mentionedOwner": "Sam Whitfield",
+                "mentionedDueDate": "by tomorrow",
+                "mentionedDependency": ""
+              },
+              {
+                "claim": "Create the Snowflake service account by Friday",
+                "speaker": "Oliver Hartley",
+                "firmness": "firm",
+                "sourceQuote": "And I'll get the Snowflake service account created by Friday. Platform team has capacity this week.",
+                "notesSnippet": "Sam Whitfield: Will do — I'll send over the Quarry static IP list by tomorrow so your team can add it to the network policy.\nOliver Hartley: And I'll get the Snowflake service account created by Friday. Platform team has capacity this week.",
+                "mentionedOwner": "Oliver Hartley",
+                "mentionedDueDate": "by Friday",
+                "mentionedDependency": ""
+              },
+              {
+                "claim": "Connect the warehouse and the repo once the IP list and service account are in place",
+                "speaker": "Sam Whitfield",
+                "firmness": "tentative",
+                "sourceQuote": "Once both land, we connect the warehouse and the repo the same day.",
+                "notesSnippet": "Oliver Hartley: And I'll get the Snowflake service account created by Friday. Platform team has capacity this week.\nSam Whitfield: Perfect. Once both land, we connect the warehouse and the repo the same day.",
+                "mentionedOwner": "",
+                "mentionedDueDate": "",
+                "mentionedDependency": "once both land"
+              },
+              {
+                "claim": "Scope access reviews ahead of HIPAA audit season in August",
+                "speaker": "Sam Whitfield",
+                "firmness": "tentative",
+                "sourceQuote": "Noted, let's scope that once we're connected rather than now.",
+                "notesSnippet": "Oliver Hartley: One thing to flag — our HIPAA audit season starts in August, so we may want to think about access reviews before then.\nSam Whitfield: Noted, let's scope that once we're connected rather than now.",
+                "mentionedOwner": "Sam Whitfield",
+                "mentionedDueDate": "",
+                "mentionedDependency": "once we're connected"
+              }
+            ],
+            "meetingTone": "status update",
+            "externalBlockers": [],
+            "reportedCompletions": [
+              {
+                "claim": "Infosec questionnaire review is complete",
+                "speaker": "Nadia Rahman",
+                "sourceQuote": "We signed off the infosec questionnaire yesterday afternoon. That review is done from our side."
+              }
+            ]
+          }
+        },
+        "error": null
+      },
+      "logs": [
+        "log [miniti] extraction (pass 1): input ~1016 prompt tokens, 5 open tasks",
+        "log [miniti] extraction (pass 1): 4 action items, 1 completions, tone=status update, 9066ms",
+        "log [miniti] orchestrator (pass 2): input ~1646 prompt tokens, 5 open tasks, 4 extracted items",
+        "log [miniti] orchestrator (pass 2): 4 content blocks, 3 tool calls"
+      ]
+    },
+    {
+      "case": "29",
+      "file": "29-flockfreight-weekly-champion-back.json",
+      "durationMs": 34533,
+      "costUsd": 0.071362,
+      "aiCalls": 2,
+      "error": null,
+      "score": {
+        "match": {
+          "pass": true,
+          "expected": "FLK",
+          "actual": "FLK",
+          "matchedBy": "domain"
+        },
+        "initial": {
+          "calls": [
+            {
+              "index": 0,
+              "action": "update_status",
+              "title": "Configure Okta SAML SSO",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 1,
+                "action": "update_status",
+                "title": "Configure Okta SAML SSO",
+                "score": 1,
+                "by": "ref"
+              },
+              "checks": {
+                "action": {
+                  "expected": "update_status",
+                  "actual": "update_status",
+                  "pass": true
+                },
+                "newStatus": {
+                  "expected": "Done",
+                  "actual": "Done",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 1,
+              "action": "match_existing",
+              "title": "Define first 10 metrics in dbt .yml",
+              "kind": null,
+              "paired": false,
+              "pairedWith": null,
+              "checks": {},
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 2,
+              "action": "create_task",
+              "title": "Re-baseline implementation timeline",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 2,
+                "action": "create_task",
+                "title": "Re-baseline implementation timeline and send updated plan to Owen",
+                "score": 1.167,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-07-09",
+                  "actual": "2026-07-09",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 3,
+              "action": "create_task",
+              "title": "Deliver shipment data dictionary",
+              "kind": null,
+              "paired": true,
+              "pairedWith": {
+                "draftId": 3,
+                "action": "create_task",
+                "title": "Deliver shipment data dictionary (cleaned up for sharing)",
+                "score": 1.3,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "customer",
+                  "actual": "customer",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-07-17",
+                  "actual": "2026-07-17",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            }
+          ],
+          "unmatchedProposals": [
+            {
+              "draftId": 4,
+              "action": "create_task",
+              "title": "Scope carrier-scorecard dashboards for Flock Freight roadmap",
+              "sourceQuote": "There's vague talk of a carrier-scorecard module on our roadmap that might want dashboards, but it's a quarter away at least."
+            }
+          ],
+          "proposalsCount": 4,
+          "duplicates": [],
+          "groundedness": {
+            "quotes": {
+              "count": 4,
+              "total": 4
+            },
+            "quoteViolations": [],
+            "quotesFromActionItemsOnly": 0,
+            "citedIds": {
+              "count": 1,
+              "total": 1
+            },
+            "citedIdViolations": []
+          },
+          "totals": {
+            "recall": {
+              "count": 3,
+              "total": 4
+            },
+            "precision": {
+              "count": 3,
+              "total": 4
+            },
+            "action": {
+              "count": 3,
+              "total": 3
+            },
+            "ownerSide": {
+              "count": 2,
+              "total": 2
+            },
+            "assignee": {
+              "count": 0,
+              "total": 0
+            },
+            "dueDate": {
+              "count": 2,
+              "total": 2
+            },
+            "priority": {
+              "count": 0,
+              "total": 0
+            },
+            "status": {
+              "count": 1,
+              "total": 1
+            },
+            "notesPhrases": {
+              "count": 0,
+              "total": 0
+            },
+            "dependencies": {
+              "count": 0,
+              "total": 0
+            },
+            "kindRecall": {
+              "commitment": {
+                "count": 0,
+                "total": 0
+              },
+              "parked_for_later": {
+                "count": 0,
+                "total": 0
+              },
+              "vendor_reminder": {
+                "count": 0,
+                "total": 0
+              }
+            },
+            "groundedQuotes": {
+              "count": 4,
+              "total": 4
+            },
+            "citedIdsValid": {
+              "count": 1,
+              "total": 1
+            },
+            "duplicates": {
+              "count": 0,
+              "total": 3
+            },
+            "gaps": {
+              "count": 0,
+              "total": 0
+            },
+            "gapsByCode": {}
+          }
+        },
+        "heldBeforeAssign": null,
+        "afterAssign": null,
+        "dedup": null,
+        "totals": {
+          "recall": {
+            "count": 3,
+            "total": 4
+          },
+          "precision": {
+            "count": 3,
+            "total": 4
+          },
+          "action": {
+            "count": 3,
+            "total": 3
+          },
+          "ownerSide": {
+            "count": 2,
+            "total": 2
+          },
+          "assignee": {
+            "count": 0,
+            "total": 0
+          },
+          "dueDate": {
+            "count": 2,
+            "total": 2
+          },
+          "priority": {
+            "count": 0,
+            "total": 0
+          },
+          "status": {
+            "count": 1,
+            "total": 1
+          },
+          "notesPhrases": {
+            "count": 0,
+            "total": 0
+          },
+          "dependencies": {
+            "count": 0,
+            "total": 0
+          },
+          "kindRecall": {
+            "commitment": {
+              "count": 0,
+              "total": 0
+            },
+            "parked_for_later": {
+              "count": 0,
+              "total": 0
+            },
+            "vendor_reminder": {
+              "count": 0,
+              "total": 0
+            }
+          },
+          "groundedQuotes": {
+            "count": 4,
+            "total": 4
+          },
+          "citedIdsValid": {
+            "count": 1,
+            "total": 1
+          },
+          "duplicates": {
+            "count": 0,
+            "total": 3
+          },
+          "gaps": {
+            "count": 0,
+            "total": 0
+          },
+          "gapsByCode": {}
+        }
+      },
+      "actual": {
+        "match": {
+          "companyPrefix": "FLK",
+          "ambiguous": false,
+          "matchedBy": "domain"
+        },
+        "transcript": "Owen! Good to have you back — congratulations again.\nThanks Maya. Sorry the project went dark for three weeks, that was me, not the team losing interest.\nNo apology needed. Let's rebuild the picture — where do things actually stand?\nBetter than you'd think. IT finished the Okta SAML SSO configuration while I was out — it's done, tested, people log in through Okta now.\nExcellent, I'll stop chasing that one. The other open item on my board is the metric definitions.\nYeah, that one's still on me and still not started. We still owe you the metric definitions — I'll get the first ten drafted in the yml now that I'm back.\nGood. Given the gap, I don't want to pretend the old dates still hold.\nAgreed, chasing the original timeline would just stress everyone out.\nThen I'll re-baseline the implementation timeline and send you the updated plan by Thursday.\nPerfect. One more thing from our side — your team asked what fields we track per shipment.\nYes, we need that to model the shipment marts properly.\nI'll deliver the shipment data dictionary by end of next week — it exists, it just needs cleaning up before I share it.\nThat unblocks the modeling work nicely. Anything else in flight I should know about?\nThere's vague talk of a carrier-scorecard module on our roadmap that might want dashboards, but it's a quarter away at least.\nNoted for later, not for the plan. Great to have you back, Owen.\nGood to be back. Talk Thursday when the plan lands.",
+        "actionItemsText": "Maya to re-baseline the implementation timeline by Thursday\nOwen to draft the first ten metric definitions\nOwen to deliver the shipment data dictionary by end of next week",
+        "initial": {
+          "proposals": [
+            {
+              "action": "update_status",
+              "draftId": 1,
+              "sourceQuote": "IT finished the Okta SAML SSO configuration while I was out — it's done, tested, people log in through Okta now.",
+              "confidence": "high",
+              "draftRef": null,
+              "taskRef": "t1",
+              "updateKind": null,
+              "newStatus": "Done",
+              "newDueDate": null,
+              "newPriority": null,
+              "newOwnerName": null,
+              "notes": null,
+              "appendNotes": null
+            },
+            {
+              "action": "create_task",
+              "draftId": 2,
+              "sourceQuote": "I'll re-baseline the implementation timeline and send you the updated plan by Thursday.",
+              "confidence": "high",
+              "draftRef": "d1",
+              "title": "Re-baseline implementation timeline and send updated plan to Owen",
+              "description": null,
+              "notes": "Original dates are no longer valid after the three-week pause. Maya to re-baseline the full implementation timeline and send Owen the updated plan. Due date: \"by Thursday\" from Tuesday 2026-07-07 = 2026-07-09.",
+              "ownerName": "Maya Lindqvist",
+              "assigneeContactName": null,
+              "ownerSide": "vendor",
+              "dueDate": "2026-07-09",
+              "priority": "high",
+              "blockedByRef": null
+            },
+            {
+              "action": "create_task",
+              "draftId": 3,
+              "sourceQuote": "I'll deliver the shipment data dictionary by end of next week — it exists, it just needs cleaning up before I share it.",
+              "confidence": "high",
+              "draftRef": "d2",
+              "title": "Deliver shipment data dictionary (cleaned up for sharing)",
+              "description": null,
+              "notes": "Owen confirmed the shipment data dictionary exists but needs cleanup before sharing. Required by Maya's team to model the shipment marts. Due date: \"end of next week\" from Tuesday 2026-07-07 = Friday 2026-07-17.",
+              "ownerName": null,
+              "assigneeContactName": "Owen Brennan",
+              "ownerSide": "customer",
+              "dueDate": "2026-07-17",
+              "priority": "high",
+              "blockedByRef": null
+            },
+            {
+              "action": "create_task",
+              "draftId": 4,
+              "sourceQuote": "There's vague talk of a carrier-scorecard module on our roadmap that might want dashboards, but it's a quarter away at least.",
+              "confidence": "low",
+              "draftRef": "d3",
+              "title": "Scope carrier-scorecard dashboards for Flock Freight roadmap",
+              "description": null,
+              "notes": "Parked: Owen mentioned vague talk of a carrier-scorecard module on Flock Freight's roadmap that may need dashboards, estimated at least a quarter away. Maya acknowledged it but explicitly set it aside from the current plan. Revisit after go-live.",
+              "ownerName": "Maya Lindqvist",
+              "assigneeContactName": null,
+              "ownerSide": "vendor",
+              "dueDate": null,
+              "priority": "low",
+              "blockedByRef": null
+            }
+          ],
+          "rawCalls": [
+            {
+              "tool": "update_task_status_draft",
+              "taskId": 1,
+              "taskRef": "t1",
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "IT finished the Okta SAML SSO configuration while I was out — it's done, tested, people log in through Okta now."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll re-baseline the implementation timeline and send you the updated plan by Thursday."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll deliver the shipment data dictionary by end of next week — it exists, it just needs cleaning up before I share it."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "There's vague talk of a carrier-scorecard module on our roadmap that might want dashboards, but it's a quarter away at least."
+            }
+          ],
+          "boardRefs": [
+            "t1",
+            "t2",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "openRefs": [
+            "t1",
+            "t2",
+            "t4",
+            "t5"
+          ],
+          "boardTasks": [
+            {
+              "ref": "t1",
+              "title": "Configure Okta SAML SSO",
+              "status": "In progress",
+              "ownerName": "Owen Brennan"
+            },
+            {
+              "ref": "t2",
+              "title": "Define first 10 metrics in dbt .yml",
+              "status": "Not started",
+              "ownerName": "Owen Brennan"
+            },
+            {
+              "ref": "t3",
+              "title": "Build shipment reporting dashboard",
+              "status": "Done",
+              "ownerName": "Maya Lindqvist"
+            },
+            {
+              "ref": "t4",
+              "title": "Model shipment marts",
+              "status": "Not started",
+              "ownerName": "Maya Lindqvist"
+            },
+            {
+              "ref": "t5",
+              "title": "Go-live",
+              "status": "Not started",
+              "ownerName": "Maya Lindqvist"
+            }
+          ]
+        },
+        "error": null
+      },
+      "raw": {
+        "maps": {
+          "companyPrefixByOnboardingId": {
+            "1": "RAY",
+            "2": "BEE",
+            "3": "MDL",
+            "4": "LOOP",
+            "5": "HUEL",
+            "6": "FN",
+            "7": "FLK",
+            "8": "SYL",
+            "9": "CHOW",
+            "10": "ASH",
+            "11": "PEER",
+            "12": "PAT"
+          },
+          "onboardingIdByPrefix": {
+            "RAY": 1,
+            "BEE": 2,
+            "MDL": 3,
+            "LOOP": 4,
+            "HUEL": 5,
+            "FN": 6,
+            "FLK": 7,
+            "SYL": 8,
+            "CHOW": 9,
+            "ASH": 10,
+            "PEER": 11,
+            "PAT": 12
+          },
+          "vendorNameById": {
+            "1": "Maya Lindqvist",
+            "2": "Theo Okonkwo",
+            "3": "Ines Ferreira",
+            "4": "Sam Whitfield",
+            "5": "Caroline Jaworsky"
+          },
+          "contactNameById": {
+            "1": "Owen Brennan"
+          },
+          "refByTaskId": {
+            "1": "t1",
+            "2": "t2",
+            "3": "t3",
+            "4": "t4",
+            "5": "t5"
+          }
+        },
+        "match": {
+          "onboardingId": 7,
+          "ambiguous": false,
+          "matchedBy": "domain",
+          "candidates": [
+            {
+              "onboardingId": 7,
+              "signal": "domain",
+              "evidence": "attendee domain flockfreight.com → Flock Freight"
+            }
+          ]
+        },
+        "initial": {
+          "drafts": [
+            {
+              "id": 1,
+              "action": "update_status",
+              "payload": {
+                "taskId": 1,
+                "newStatus": "Done",
+                "confidence": "high",
+                "sourceQuote": "IT finished the Okta SAML SSO configuration while I was out — it's done, tested, people log in through Okta now."
+              },
+              "sourceQuote": "IT finished the Okta SAML SSO configuration while I was out — it's done, tested, people log in through Okta now.",
+              "confidence": "high"
+            },
+            {
+              "id": 2,
+              "action": "create_task",
+              "payload": {
+                "notes": "Original dates are no longer valid after the three-week pause. Maya to re-baseline the full implementation timeline and send Owen the updated plan. Due date: \"by Thursday\" from Tuesday 2026-07-07 = 2026-07-09.",
+                "title": "Re-baseline implementation timeline and send updated plan to Owen",
+                "dueDate": "2026-07-09",
+                "ownerId": 1,
+                "phaseId": 31,
+                "draftRef": "d1",
+                "priority": "high",
+                "ownerName": "Maya Lindqvist",
+                "confidence": "high",
+                "sourceQuote": "I'll re-baseline the implementation timeline and send you the updated plan by Thursday."
+              },
+              "sourceQuote": "I'll re-baseline the implementation timeline and send you the updated plan by Thursday.",
+              "confidence": "high"
+            },
+            {
+              "id": 3,
+              "action": "create_task",
+              "payload": {
+                "notes": "Owen confirmed the shipment data dictionary exists but needs cleanup before sharing. Required by Maya's team to model the shipment marts. Due date: \"end of next week\" from Tuesday 2026-07-07 = Friday 2026-07-17.",
+                "title": "Deliver shipment data dictionary (cleaned up for sharing)",
+                "dueDate": "2026-07-17",
+                "phaseId": 33,
+                "draftRef": "d2",
+                "priority": "high",
+                "confidence": "high",
+                "sourceQuote": "I'll deliver the shipment data dictionary by end of next week — it exists, it just needs cleaning up before I share it.",
+                "assigneeContactId": 1,
+                "assigneeContactName": "Owen Brennan"
+              },
+              "sourceQuote": "I'll deliver the shipment data dictionary by end of next week — it exists, it just needs cleaning up before I share it.",
+              "confidence": "high"
+            },
+            {
+              "id": 4,
+              "action": "create_task",
+              "payload": {
+                "notes": "Parked: Owen mentioned vague talk of a carrier-scorecard module on Flock Freight's roadmap that may need dashboards, estimated at least a quarter away. Maya acknowledged it but explicitly set it aside from the current plan. Revisit after go-live.",
+                "title": "Scope carrier-scorecard dashboards for Flock Freight roadmap",
+                "ownerId": 1,
+                "phaseId": 35,
+                "draftRef": "d3",
+                "priority": "low",
+                "ownerName": "Maya Lindqvist",
+                "confidence": "low",
+                "sourceQuote": "There's vague talk of a carrier-scorecard module on our roadmap that might want dashboards, but it's a quarter away at least."
+              },
+              "sourceQuote": "There's vague talk of a carrier-scorecard module on our roadmap that might want dashboards, but it's a quarter away at least.",
+              "confidence": "low"
+            }
+          ],
+          "orchestratorOutput": [
+            {
+              "id": "toolu_016QmHkdb2pECAUpBD5y2q9A",
+              "tool": "update_task_status_draft",
+              "input": {
+                "taskId": 1,
+                "newStatus": "Done",
+                "confidence": "high",
+                "sourceQuote": "IT finished the Okta SAML SSO configuration while I was out — it's done, tested, people log in through Okta now."
+              }
+            },
+            {
+              "id": "toolu_013jGM8Gp4iKvMe8dJSnAUqK",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Original dates are no longer valid after the three-week pause. Maya to re-baseline the full implementation timeline and send Owen the updated plan. Due date: \"by Thursday\" from Tuesday 2026-07-07 = 2026-07-09.",
+                "title": "Re-baseline implementation timeline and send updated plan to Owen",
+                "dueDate": "2026-07-09",
+                "ownerId": 1,
+                "phaseId": 31,
+                "draftRef": "d1",
+                "priority": "high",
+                "confidence": "high",
+                "sourceQuote": "I'll re-baseline the implementation timeline and send you the updated plan by Thursday."
+              }
+            },
+            {
+              "id": "toolu_01VHS8va28UgFfc7wpxfKaMf",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Owen confirmed the shipment data dictionary exists but needs cleanup before sharing. Required by Maya's team to model the shipment marts. Due date: \"end of next week\" from Tuesday 2026-07-07 = Friday 2026-07-17.",
+                "title": "Deliver shipment data dictionary (cleaned up for sharing)",
+                "dueDate": "2026-07-17",
+                "phaseId": 33,
+                "draftRef": "d2",
+                "priority": "high",
+                "confidence": "high",
+                "sourceQuote": "I'll deliver the shipment data dictionary by end of next week — it exists, it just needs cleaning up before I share it.",
+                "assigneeContactId": 1
+              }
+            },
+            {
+              "id": "toolu_01HWShB8JnVUgy4jCPcpKUfk",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Parked: Owen mentioned vague talk of a carrier-scorecard module on Flock Freight's roadmap that may need dashboards, estimated at least a quarter away. Maya acknowledged it but explicitly set it aside from the current plan. Revisit after go-live.",
+                "title": "Scope carrier-scorecard dashboards for Flock Freight roadmap",
+                "ownerId": 1,
+                "phaseId": 35,
+                "draftRef": "d3",
+                "priority": "low",
+                "confidence": "low",
+                "sourceQuote": "There's vague talk of a carrier-scorecard module on our roadmap that might want dashboards, but it's a quarter away at least."
+              }
+            }
+          ],
+          "orchestratorExtraction": {
+            "actionItems": [
+              {
+                "claim": "Re-baseline the implementation timeline and send updated plan",
+                "speaker": "Maya Lindqvist",
+                "firmness": "firm",
+                "sourceQuote": "I'll re-baseline the implementation timeline and send you the updated plan by Thursday.",
+                "notesSnippet": "Maya Lindqvist: Then I'll re-baseline the implementation timeline and send you the updated plan by Thursday.\nOwen Brennan: Perfect. One more thing from our side — your team asked what fields we track per shipment.",
+                "mentionedOwner": "Maya Lindqvist",
+                "mentionedDueDate": "by Thursday",
+                "mentionedDependency": ""
+              },
+              {
+                "claim": "Draft the first ten metric definitions in the yml",
+                "speaker": "Owen Brennan",
+                "firmness": "tentative",
+                "sourceQuote": "We still owe you the metric definitions — I'll get the first ten drafted in the yml now that I'm back.",
+                "notesSnippet": "Owen Brennan: Yeah, that one's still on me and still not started. We still owe you the metric definitions — I'll get the first ten drafted in the yml now that I'm back.\nMaya Lindqvist: Good. Given the gap, I don't want to pretend the old dates still hold.",
+                "mentionedOwner": "Owen Brennan",
+                "mentionedDueDate": "",
+                "mentionedDependency": ""
+              },
+              {
+                "claim": "Deliver the shipment data dictionary",
+                "speaker": "Owen Brennan",
+                "firmness": "firm",
+                "sourceQuote": "I'll deliver the shipment data dictionary by end of next week — it exists, it just needs cleaning up before I share it.",
+                "notesSnippet": "Owen Brennan: I'll deliver the shipment data dictionary by end of next week — it exists, it just needs cleaning up before I share it.\nMaya Lindqvist: That unblocks the modeling work nicely. Anything else in flight I should know about?",
+                "mentionedOwner": "Owen Brennan",
+                "mentionedDueDate": "by end of next week",
+                "mentionedDependency": ""
+              },
+              {
+                "claim": "Note carrier-scorecard dashboard need for later planning",
+                "speaker": "Owen Brennan",
+                "firmness": "tentative",
+                "sourceQuote": "There's vague talk of a carrier-scorecard module on our roadmap that might want dashboards, but it's a quarter away at least.",
+                "notesSnippet": "Owen Brennan: There's vague talk of a carrier-scorecard module on our roadmap that might want dashboards, but it's a quarter away at least.\nMaya Lindqvist: Noted for later, not for the plan. Great to have you back, Owen.",
+                "mentionedOwner": "Maya Lindqvist",
+                "mentionedDueDate": "",
+                "mentionedDependency": ""
+              }
+            ],
+            "meetingTone": "status update",
+            "externalBlockers": [],
+            "reportedCompletions": [
+              {
+                "claim": "Okta SAML SSO configuration is complete and tested",
+                "speaker": "Owen Brennan",
+                "sourceQuote": "IT finished the Okta SAML SSO configuration while I was out — it's done, tested, people log in through Okta now."
+              }
+            ]
+          }
+        },
+        "error": null
+      },
+      "logs": [
+        "log [miniti] extraction (pass 1): input ~1016 prompt tokens, 4 open tasks",
+        "log [miniti] extraction (pass 1): 4 action items, 1 completions, tone=status update, 9503ms",
+        "log [miniti] orchestrator (pass 2): input ~1668 prompt tokens, 4 open tasks, 4 extracted items",
+        "log [miniti] orchestrator (pass 2): 5 content blocks, 4 tool calls"
+      ]
+    }
+  ]
+}

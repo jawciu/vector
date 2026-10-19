@@ -336,6 +336,9 @@ For SVG fills the gradient must be inlined as a `<linearGradient>` referencing t
 
 ### AI draft review patterns — `app/components/AIDraftInbox.tsx`
 
+- Bulk selection uses the shared square `Checkbox`: empty at rest, action-coloured
+  outline on hover and filled with a tick when selected. Keep circular task
+  completion controls out of draft selection. Apply to create/update cards alike.
 - `StalePersonWarning` is shared by unavailable owners, assignees and unknown
   meeting recorders. Use an alert-coloured message and warning icon, without an
   enclosing border. Resolution pickers keep their normal neutral styling.
@@ -355,6 +358,8 @@ For SVG fills the gradient must be inlined as a `<linearGradient>` referencing t
 - Within each meeting/date group, show prerequisite task drafts above the
   drafts that depend on them. Preserve unrelated ordering and group boundaries.
 - `DraftDependencies` uses plain 14px names without borders in previews.
+  Each dependency name stays on one line and truncates with an ellipsis;
+  keep the full name in its title attribute. Apply to preview entries and editor tags.
   `DraftDependenciesField` holds removable tags inside a single field in both
   create-task and update-task editors. Multiple tags wrap within the field;
   the + control adds another, and an empty field shows "Dependencies".

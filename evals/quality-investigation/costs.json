@@ -1,0 +1,252 @@
+{
+  "runs": [
+    {
+      "label": "baseline-five",
+      "costUsd": 0.34025,
+      "calls": 10,
+      "cases": 5
+    },
+    {
+      "label": "batch-five",
+      "costUsd": 0.287964,
+      "calls": 10,
+      "cases": 5
+    },
+    {
+      "label": "single-batch-five",
+      "costUsd": 0.300968,
+      "calls": 10,
+      "cases": 5
+    },
+    {
+      "label": "notes-five",
+      "costUsd": 0.311877,
+      "calls": 10,
+      "cases": 5
+    },
+    {
+      "label": "final-five",
+      "costUsd": 0.315533,
+      "calls": 10,
+      "cases": 5
+    },
+    {
+      "label": "date-guard-smoke",
+      "costUsd": 0.072088,
+      "calls": 2,
+      "cases": 1
+    },
+    {
+      "label": "detail-facts-five",
+      "costUsd": 0.291792,
+      "calls": 10,
+      "cases": 5
+    },
+    {
+      "label": "parked-boundary-five",
+      "costUsd": 0.351366,
+      "calls": 10,
+      "cases": 5
+    },
+    {
+      "label": "owned-review-smoke",
+      "costUsd": 0.057373,
+      "calls": 2,
+      "cases": 1
+    },
+    {
+      "label": "confirmation-full",
+      "costUsd": 1.520921,
+      "calls": 59,
+      "cases": 30
+    },
+    {
+      "label": "finalcheck-full",
+      "costUsd": 1.470276,
+      "calls": 59,
+      "cases": 30
+    },
+    {
+      "label": "verified-full",
+      "costUsd": 1.468553,
+      "calls": 59,
+      "cases": 30
+    },
+    {
+      "label": "r2-acceptance-five",
+      "costUsd": 0.396108,
+      "calls": 10,
+      "cases": 5,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-acceptance-five.json"
+    },
+    {
+      "label": "r2-budgeted-five",
+      "costUsd": 0.438854,
+      "calls": 10,
+      "cases": 5,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-budgeted-five.json"
+    },
+    {
+      "label": "r2-concise-five",
+      "costUsd": 0.319834,
+      "calls": 10,
+      "cases": 5,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-concise-five.json"
+    },
+    {
+      "label": "r2-confirmation-full",
+      "costUsd": 1.964457,
+      "calls": 59,
+      "cases": 30,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-confirmation-full.json"
+    },
+    {
+      "label": "r2-controls-five",
+      "costUsd": 0.440577,
+      "calls": 10,
+      "cases": 5,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-controls-five.json"
+    },
+    {
+      "label": "r2-cross-turn-five",
+      "costUsd": 0.311029,
+      "calls": 10,
+      "cases": 5,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-cross-turn-five.json"
+    },
+    {
+      "label": "r2-deliverable-five",
+      "costUsd": 0.346772,
+      "calls": 10,
+      "cases": 5,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-deliverable-five.json"
+    },
+    {
+      "label": "r2-field-guard-five",
+      "costUsd": 0.325267,
+      "calls": 10,
+      "cases": 5,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-field-guard-five.json"
+    },
+    {
+      "label": "r2-granularity-smoke",
+      "costUsd": 0.15219,
+      "calls": 4,
+      "cases": 2,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-granularity-smoke.json"
+    },
+    {
+      "label": "r2-handoff-17-a",
+      "costUsd": 0.064267,
+      "calls": 2,
+      "cases": 1,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-handoff-17-a.json"
+    },
+    {
+      "label": "r2-handoff-17-b",
+      "costUsd": 0.062558,
+      "calls": 2,
+      "cases": 1,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-handoff-17-b.json"
+    },
+    {
+      "label": "r2-link-tool-five",
+      "costUsd": 0.383068,
+      "calls": 10,
+      "cases": 5,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-link-tool-five.json"
+    },
+    {
+      "label": "r2-owner-guard-smoke",
+      "costUsd": 0.116529,
+      "calls": 4,
+      "cases": 2,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-owner-guard-smoke.json"
+    },
+    {
+      "label": "r2-parent-boundary-five",
+      "costUsd": 0.304427,
+      "calls": 10,
+      "cases": 5,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-parent-boundary-five.json"
+    },
+    {
+      "label": "r2-parked-five",
+      "costUsd": 0.372165,
+      "calls": 10,
+      "cases": 5,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-parked-five.json"
+    },
+    {
+      "label": "r2-parked-owner-three",
+      "costUsd": 0.242306,
+      "calls": 6,
+      "cases": 3,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-parked-owner-three.json"
+    },
+    {
+      "label": "r2-policy-smoke",
+      "costUsd": 0.146283,
+      "calls": 4,
+      "cases": 2,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-policy-smoke.json"
+    },
+    {
+      "label": "r2-reasoning-five",
+      "costUsd": 0.269242,
+      "calls": 2,
+      "cases": 1,
+      "complete": false,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-reasoning-five.json",
+      "note": "Includes first token-limited response missed by old logger. One interrupted in-flight case07 extraction has unknown charge and is excluded."
+    },
+    {
+      "label": "r2-verified-full",
+      "costUsd": 2.042026,
+      "calls": 59,
+      "cases": 30,
+      "complete": true,
+      "source": "returned response usage",
+      "runFile": "evals/runs/2026-10-18-dependency-quality-r2-verified-full.json"
+    }
+  ],
+  "totalEstimatedCostUsd": 15.48692,
+  "modelCalls": 493,
+  "note": "Returned-response estimates only, not a bill; one interrupted in-flight request has unknown charge and is excluded. Complete full aggregates counted once; their parts, all offline rescores and mock runs excluded. If no aggregate exists yet, in-progress part checkpoints are counted. Rates match lib/ai/client.ts.",
+  "round2EstimatedCostUsd": 8.697959
+}

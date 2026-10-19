@@ -1,0 +1,915 @@
+{
+  "run": "evals/runs/2026-10-18-dependency-quality-r2-verified-full.json",
+  "unchangedScorer": true,
+  "cases": [
+    {
+      "case": "01",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [
+        {
+          "title": "Circulate pilot dashboard list to analytics guild for sign-off",
+          "found": [],
+          "missing": [
+            "four of the six"
+          ],
+          "proposal": {
+            "action": "create_task",
+            "draftId": 5,
+            "sourceQuote": "I'll circulate the pilot dashboard list to the analytics guild and get sign-off by Friday the 19th.",
+            "confidence": "high",
+            "draftRef": "d4",
+            "title": "Circulate pilot dashboard list to analytics guild for sign-off",
+            "description": null,
+            "notes": "Priya Raman has a shortlist of six dashboards and will circulate it to the analytics guild. The guild is to agree on which four dashboards make the pilot. Sign-off required by Friday June 19th.",
+            "ownerName": null,
+            "assigneeContactName": "Priya Raman",
+            "ownerSide": "customer",
+            "dueDate": "2026-06-19",
+            "priority": "high",
+            "blockedByRef": null
+          }
+        }
+      ],
+      "unmetGaps": [],
+      "extraProposals": [
+        {
+          "action": "create_task",
+          "draftId": 2,
+          "sourceQuote": "Perfect, I'll review it same day.",
+          "confidence": "high",
+          "dependsOn": [
+            {
+              "title": "Open PR with incremental model config for usage events",
+              "draftId": 1,
+              "draftRef": "d1"
+            }
+          ],
+          "draftRef": "d2",
+          "title": "Review incremental model config PR for usage events",
+          "description": null,
+          "notes": "Jonas Beck committed to reviewing the incremental usage events model config PR on the same day it is opened (Thursday June 18th).",
+          "ownerName": null,
+          "assigneeContactName": "Jonas Beck",
+          "ownerSide": "customer",
+          "dueDate": "2026-06-18",
+          "priority": "high",
+          "blockedByRef": null
+        },
+        {
+          "action": "match_existing",
+          "draftId": 4,
+          "sourceQuote": "I'll add the Quarry static IPs to our warehouse network policy \u2014 I can get that done by end of day Wednesday, June 17th.",
+          "confidence": "high",
+          "dependsOn": [
+            {
+              "title": "Add Quarry static IPs to warehouse network policy",
+              "draftId": 3,
+              "draftRef": "d3"
+            }
+          ],
+          "draftRef": null,
+          "taskRef": "t1",
+          "updateKind": "add_dependency",
+          "newStatus": null,
+          "newDueDate": null,
+          "newPriority": null,
+          "newOwnerName": null,
+          "notes": null,
+          "appendNotes": null
+        }
+      ],
+      "quoteViolations": []
+    },
+    {
+      "case": "02",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [
+        {
+          "action": "match_existing",
+          "draftId": 5,
+          "sourceQuote": "Honest answer from our side: the review is stuck because we're missing two inputs \u2014 your completed SIG Lite questionnaire and evidence from a recent penetration test. Handling patient lab results, our infosec team can't wave either through.",
+          "confidence": "high",
+          "dependsOn": [
+            {
+              "title": "Send completed SIG Lite questionnaire to Freya",
+              "draftId": 1,
+              "draftRef": "d1"
+            },
+            {
+              "title": "Upload pen test summary to evidence portal",
+              "draftId": 3,
+              "draftRef": "d3"
+            }
+          ],
+          "draftRef": null,
+          "taskRef": "t1",
+          "updateKind": "update",
+          "newStatus": null,
+          "newDueDate": null,
+          "newPriority": null,
+          "newOwnerName": null,
+          "notes": null,
+          "appendNotes": "June 3 working session set concrete delivery dates for both blocking inputs: SIG Lite questionnaire due June 5 (Ines), pen test summary (Q1, scope and findings severity) uploaded to portal by June 8 (Freya, after Sam emails it). Freya's infosec team will start the internal review the week of June 8 once both inputs are in. Patient lab results (PHI) mean infosec cannot waive either requirement."
+        }
+      ],
+      "quoteViolations": []
+    },
+    {
+      "case": "03",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "04",
+      "missed": [],
+      "fieldFailures": [
+        {
+          "title": "Returns-by-reason breakdown",
+          "failures": {
+            "owner": {
+              "expected": "customer",
+              "actual": "vendor",
+              "pass": false
+            },
+            "assignee": {
+              "expected": "Casey Morgan",
+              "actual": "Theo Okonkwo",
+              "pass": false
+            }
+          }
+        }
+      ],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "05",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [
+        {
+          "title": "Schedule two developer training sessions for ratings team",
+          "found": [],
+          "missing": [
+            "week of July 6"
+          ],
+          "proposal": {
+            "action": "create_task",
+            "draftId": 1,
+            "sourceQuote": "I'll schedule the two developer training sessions for the ratings team \u2014 invites out by Tuesday, June 30th.",
+            "confidence": "high",
+            "draftRef": "d1",
+            "title": "Send developer training session invites for ratings team",
+            "description": null,
+            "notes": "Two sessions for the ratings team, covering the metrics-as-code workflow, 90 minutes each. Sessions to be held during the week of July 6th (when the whole team is back from offsite). Invites must go out by Tuesday June 30th.",
+            "ownerName": "Sam Whitfield",
+            "assigneeContactName": null,
+            "ownerSide": "vendor",
+            "dueDate": "2026-06-30",
+            "priority": "high",
+            "blockedByRef": null
+          }
+        },
+        {
+          "title": "Finish parity checks on carbon ratings dashboard",
+          "found": [
+            "against Looker"
+          ],
+          "missing": [
+            "post results"
+          ],
+          "proposal": {
+            "action": "create_task",
+            "draftId": 2,
+            "sourceQuote": "I'll finish the parity checks on the carbon ratings dashboard against Looker and post results by Thursday, July 2nd.",
+            "confidence": "high",
+            "draftRef": "d2",
+            "title": "Complete parity checks on carbon ratings dashboard vs Looker and post results",
+            "description": null,
+            "notes": "Carbon ratings dashboard checked against the legacy Looker explore. About 60% complete at time of meeting. Two discrepancies found so far, both attributed to timezone handling in the old Looker explore, not the new system's numbers. Results must be posted by Thursday July 2nd. July 2nd results are the decision gate for the July 13th go-live: clean results means go-live holds at July 13th.",
+            "ownerName": null,
+            "assigneeContactName": "Tom Whitmore",
+            "ownerSide": "customer",
+            "dueDate": "2026-07-02",
+            "priority": "high",
+            "blockedByRef": null
+          }
+        }
+      ],
+      "unmetGaps": [],
+      "extraProposals": [
+        {
+          "action": "match_existing",
+          "draftId": 5,
+          "sourceQuote": "Then July 2nd is our decision gate \u2014 clean results and go-live holds at July 13th.",
+          "confidence": "high",
+          "dependsOn": [
+            {
+              "title": "Complete parity checks on carbon ratings dashboard vs Looker and post results",
+              "draftId": 2,
+              "draftRef": "d2"
+            }
+          ],
+          "draftRef": null,
+          "taskRef": "t4",
+          "updateKind": "update",
+          "newStatus": null,
+          "newDueDate": null,
+          "newPriority": null,
+          "newOwnerName": null,
+          "notes": null,
+          "appendNotes": "Parity check results (due July 2nd) are the explicit decision gate: clean results confirm go-live holds at July 13th."
+        }
+      ],
+      "quoteViolations": []
+    },
+    {
+      "case": "06",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "07",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [
+        {
+          "action": "match_existing",
+          "draftId": 4,
+          "sourceQuote": "The thing blocking us is the metric definitions doc \u2014 it's been sitting with you since mid-May. Without your comments we can't lock the semantic layer.",
+          "confidence": "high",
+          "dependsOn": [
+            {
+              "title": "Review metric definitions doc and leave comments",
+              "draftId": 1,
+              "draftRef": "d1"
+            }
+          ],
+          "draftRef": null,
+          "taskRef": "t1",
+          "updateKind": "add_dependency",
+          "newStatus": null,
+          "newDueDate": null,
+          "newPriority": null,
+          "newOwnerName": null,
+          "notes": null,
+          "appendNotes": null
+        }
+      ],
+      "quoteViolations": []
+    },
+    {
+      "case": "08",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "09",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "10",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "11",
+      "missed": [],
+      "fieldFailures": [
+        {
+          "title": "Configure Okta SAML SSO",
+          "failures": {
+            "priority": {
+              "expected": "high",
+              "actual": null,
+              "pass": false
+            }
+          }
+        }
+      ],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "12",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [
+        {
+          "title": "Validate migrated numbers against legacy dashboards (parity sign-off)",
+          "codes": [
+            "existing_task_notes"
+          ],
+          "what": "notes on existing task: six dashboards",
+          "met": false
+        }
+      ],
+      "extraProposals": [
+        {
+          "action": "update_status",
+          "draftId": 2,
+          "sourceQuote": "Yes, that's ready to go, no help needed there.",
+          "confidence": "high",
+          "draftRef": null,
+          "taskRef": "t3",
+          "updateKind": null,
+          "newStatus": "Done",
+          "newDueDate": null,
+          "newPriority": null,
+          "newOwnerName": null,
+          "notes": null,
+          "appendNotes": null
+        }
+      ],
+      "quoteViolations": []
+    },
+    {
+      "case": "13",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [
+        {
+          "title": "Provision read-only Snowflake service account",
+          "codes": [
+            "existing_task_notes"
+          ],
+          "what": "notes on existing task: read-only, ANALYTICS schema, no raw layer",
+          "met": false
+        }
+      ],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "14",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [
+        {
+          "title": "Define first 10 metrics in dbt .yml",
+          "codes": [
+            "existing_task_notes"
+          ],
+          "what": "notes on existing task: embedded first, fct_applications, fct_interviews, snake_case, domain prefix, time to hire, offer acceptance rate",
+          "met": false
+        }
+      ],
+      "extraProposals": [
+        {
+          "action": "create_task",
+          "draftId": 2,
+          "sourceQuote": "Please do. Good session \u2014 same time next week to review them live.",
+          "confidence": "medium",
+          "dependsOn": [
+            {
+              "taskRef": "t1"
+            }
+          ],
+          "draftRef": "d1",
+          "title": "Review metric definitions PR and sanity-check expressions",
+          "description": "Ines to review the PR raised by Bram containing the first ten metric definitions and verify the expressions are correct before the next weekly session.",
+          "notes": "Bram will tag Ines on the PR once the ten metric definitions are submitted. Review scope: sanity-check that each expression (numerator, denominator, type) is correct for the agreed metrics. Session the following week (approx. 2026-06-17) is the expected review point.",
+          "ownerName": "Ines Ferreira",
+          "assigneeContactName": null,
+          "ownerSide": "vendor",
+          "dueDate": null,
+          "priority": "medium",
+          "blockedByRef": "t1"
+        }
+      ],
+      "quoteViolations": []
+    },
+    {
+      "case": "15",
+      "missed": [],
+      "fieldFailures": [
+        {
+          "title": "Share draft of the executive dashboard",
+          "failures": {
+            "dueDate": {
+              "expected": "2026-07-06",
+              "actual": "2026-07-07",
+              "pass": false
+            }
+          }
+        }
+      ],
+      "notePhraseFailures": [
+        {
+          "title": "Share draft of the executive dashboard",
+          "found": [
+            "weekly grain"
+          ],
+          "missing": [
+            "exec audience"
+          ],
+          "proposal": {
+            "action": "create_task",
+            "draftId": 2,
+            "sourceQuote": "I'll share a draft of the executive dashboard before our next call so you have something concrete to circulate.",
+            "confidence": "medium",
+            "draftRef": "d2",
+            "title": "Share executive dashboard draft before next call",
+            "description": null,
+            "notes": "Audience is executive leadership. Dashboard uses weekly grain (not daily); daily grain was considered too noisy in the prior tool. No additional inputs needed from the customer; sufficient discovery information already in hand. Speaker 2 will circulate the draft to leadership once received.\n\nDue date: Inferred from the weekly sync cadence. The next call is assumed to fall on Tuesday 2026-07-07, making that the latest date by which the draft must be shared.",
+            "ownerName": "Maya Lindqvist",
+            "assigneeContactName": null,
+            "ownerSide": "vendor",
+            "dueDate": "2026-07-07",
+            "priority": "medium",
+            "blockedByRef": null
+          }
+        }
+      ],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "16",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [
+        {
+          "title": "Refactor stg_events into three staging models and open PR",
+          "found": [
+            "three source-aligned",
+            "staging models",
+            "thin union",
+            "downstream untouched",
+            "compile-time numbers"
+          ],
+          "missing": [
+            "tag me"
+          ],
+          "proposal": {
+            "action": "create_task",
+            "draftId": 1,
+            "sourceQuote": "I can get the refactor PR open by Tuesday \u2014 it's mostly mechanical once the pattern is set.",
+            "confidence": "high",
+            "draftRef": "d1",
+            "title": "Open stg_events refactor PR",
+            "description": null,
+            "notes": "Split stg_events into three new source-aligned staging models, one per source (webhook feed, app database, and the third source). Keep stg_events as a thin union view on top so that the approximately 12 downstream models that select from it directly are not broken. Leave those downstream refs untouched for now and plan to migrate them one by one afterwards. Do not define any measures on top of the new staging models until the refactor lands. Tag Maya Lindqvist on the PR when it is opened. If it is cheap to capture, include compile-time numbers before and after as a proof point, but do not invest significant time in gathering them.\n\nDue date: 'by Tuesday' from 2026-06-05 = 2026-06-09.",
+            "ownerName": null,
+            "assigneeContactName": "Speaker 1",
+            "ownerSide": "customer",
+            "dueDate": "2026-06-09",
+            "priority": "high",
+            "blockedByRef": null
+          }
+        }
+      ],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "17",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "18",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "19",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "20",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "21",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [
+        {
+          "action": "create_task",
+          "draftId": 4,
+          "sourceQuote": "We should think about row-level security at some point, but honestly it's not a launch blocker. Let's park it.",
+          "confidence": "low",
+          "draftRef": "d4",
+          "title": "Implement row-level security (parked for later phase)",
+          "description": null,
+          "notes": "Row-level security was originally raised in the kickoff and discussed in this sync. Both parties agreed it is not a launch blocker and should be deferred to a later phase. Tracked here so it is not lost.",
+          "ownerName": "Theo Okonkwo",
+          "assigneeContactName": null,
+          "ownerSide": "vendor",
+          "dueDate": null,
+          "priority": "low",
+          "blockedByRef": null
+        },
+        {
+          "action": "match_existing",
+          "draftId": 5,
+          "sourceQuote": "Agreed, we need the dedicated account before we open this beyond you two.",
+          "confidence": "high",
+          "dependsOn": [
+            {
+              "title": "Provision read-only Snowflake service account for semantic layer",
+              "draftId": 2,
+              "draftRef": "d2"
+            },
+            {
+              "title": "Send pilot group list to Theo",
+              "draftId": 3,
+              "draftRef": "d3"
+            }
+          ],
+          "draftRef": null,
+          "taskRef": "t4",
+          "updateKind": "update",
+          "newStatus": null,
+          "newDueDate": null,
+          "newPriority": null,
+          "newOwnerName": null,
+          "notes": null,
+          "appendNotes": "Per the 2026-06-17 sync: the dedicated read-only Snowflake service account (d2) must be provisioned before access is opened to the pilot group, and the pilot group list from Priya Nair (d3) is required to identify who gets access. Pilot group is expected to be the platform team, five to eight people."
+        }
+      ],
+      "quoteViolations": []
+    },
+    {
+      "case": "22",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [
+        {
+          "title": "Build exec rollup dashboard",
+          "found": [],
+          "missing": [
+            "Maya will review"
+          ],
+          "proposal": {
+            "action": "create_task",
+            "draftId": 3,
+            "sourceQuote": "I'll own building the exec rollup dashboard once the ops ones land \u2014 I'll pick it up sometime next sprint, no hard date yet.",
+            "confidence": "low",
+            "dependsOn": [
+              {
+                "title": "Migrate two returns-ops dashboards into Quarry",
+                "draftId": 2,
+                "draftRef": "d2"
+              }
+            ],
+            "draftRef": "d3",
+            "title": "Build exec rollup dashboard for leadership",
+            "description": null,
+            "notes": "Single exec rollup view for leadership. Needs the same three metrics as the ops dashboards (return rate, refund value, processing time) plus additional metrics not yet modeled. Explicitly deferred until after the ops dashboards land; no hard date, Rosa to raise again at next sprint planning.",
+            "ownerName": null,
+            "assigneeContactName": "Rosa Delgado",
+            "ownerSide": "customer",
+            "dueDate": null,
+            "priority": "low",
+            "blockedByRef": null
+          }
+        }
+      ],
+      "unmetGaps": [],
+      "extraProposals": [
+        {
+          "action": "create_task",
+          "draftId": 4,
+          "sourceQuote": "Deal, and I'll review it when you have a draft.",
+          "confidence": "medium",
+          "dependsOn": [
+            {
+              "title": "Build exec rollup dashboard for leadership",
+              "draftId": 3,
+              "draftRef": "d3"
+            }
+          ],
+          "draftRef": "d4",
+          "title": "Review exec rollup dashboard draft",
+          "description": null,
+          "notes": "Maya to review Rosa's exec rollup dashboard draft once Rosa has one ready. No hard date; timing follows Rosa's delivery.",
+          "ownerName": "Maya Lindqvist",
+          "assigneeContactName": null,
+          "ownerSide": "vendor",
+          "dueDate": null,
+          "priority": "low",
+          "blockedByRef": null
+        },
+        {
+          "action": "create_task",
+          "draftId": 5,
+          "sourceQuote": "Nice to have. Maybe we look at exposures down the line, but let's not add scope this week.",
+          "confidence": "low",
+          "draftRef": "d5",
+          "title": "Evaluate dbt exposures for returns-ops dashboards",
+          "description": null,
+          "notes": "Declared dbt exposures for the two returns-ops dashboards. Explicitly out of scope for the current sprint and parked by agreement between Maya and Jonah. No owner or date committed; to be revisited in a later sprint.",
+          "ownerName": null,
+          "assigneeContactName": null,
+          "ownerSide": null,
+          "dueDate": null,
+          "priority": "low",
+          "blockedByRef": null
+        }
+      ],
+      "quoteViolations": []
+    },
+    {
+      "case": "23",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [
+        {
+          "action": "match_existing",
+          "draftId": 4,
+          "sourceQuote": "Recap: parity from Amara by Monday, SSO enforced by Sam tomorrow, training invite from me for next Thursday.",
+          "confidence": "high",
+          "dependsOn": [
+            {
+              "title": "Complete parity checks on all three ratings dashboards and write rounding note",
+              "draftId": 1,
+              "draftRef": "d1"
+            },
+            {
+              "title": "Enable Okta SSO enforcement",
+              "draftId": 2,
+              "draftRef": "d2"
+            },
+            {
+              "title": "Schedule analyst training session and send invite with agenda",
+              "draftId": 3,
+              "draftRef": "d3"
+            }
+          ],
+          "draftRef": null,
+          "taskRef": "t3",
+          "updateKind": "add_dependency",
+          "newStatus": null,
+          "newDueDate": null,
+          "newPriority": null,
+          "newOwnerName": null,
+          "notes": null,
+          "appendNotes": null
+        }
+      ],
+      "quoteViolations": []
+    },
+    {
+      "case": "24",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "25",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [
+        {
+          "title": "Draft returns KPI one-pager",
+          "found": [],
+          "missing": [
+            "review working session"
+          ],
+          "proposal": {
+            "action": "create_task",
+            "draftId": 2,
+            "sourceQuote": "I'll draft the returns KPI one-pager and get it to you by next Wednesday.",
+            "confidence": "high",
+            "draftRef": "d1",
+            "title": "Draft returns KPI one-pager with canonical definitions",
+            "description": null,
+            "notes": "Produce a one-pager containing canonical definitions of return rate KPIs to standardize terminology across all teams before any modeling begins. Recipient: Jonah Fields. The one-pager will anchor the working session immediately following delivery. Finance involvement for refund value was flagged as potentially useful later but explicitly agreed not to block this draft.",
+            "ownerName": "Maya Lindqvist",
+            "assigneeContactName": null,
+            "ownerSide": "vendor",
+            "dueDate": "2026-06-10",
+            "priority": "high",
+            "blockedByRef": null
+          }
+        }
+      ],
+      "unmetGaps": [],
+      "extraProposals": [
+        {
+          "action": "match_existing",
+          "draftId": 3,
+          "sourceQuote": "Best fix is a one-pager with the canonical definitions before we model anything.",
+          "confidence": "high",
+          "dependsOn": [
+            {
+              "title": "Draft returns KPI one-pager with canonical definitions",
+              "draftId": 2,
+              "draftRef": "d1"
+            }
+          ],
+          "draftRef": null,
+          "taskRef": "t2",
+          "updateKind": "update",
+          "newStatus": null,
+          "newDueDate": null,
+          "newPriority": null,
+          "newOwnerName": null,
+          "notes": null,
+          "appendNotes": "KPI one-pager (d1) must land before modeling begins, per explicit agreement on 2026-06-05 call: canonical definitions are required before the metrics block is authored."
+        }
+      ],
+      "quoteViolations": []
+    },
+    {
+      "case": "26",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [
+        {
+          "title": "Connect the warehouse and the repo",
+          "codes": [
+            "depends_on_new_draft"
+          ],
+          "what": "depends on new draft \"Send Quarry static IP list for network policy\"",
+          "met": false
+        }
+      ],
+      "extraProposals": [
+        {
+          "action": "create_task",
+          "draftId": 4,
+          "sourceQuote": "The IP allowlist goes through my team \u2014 send us the list and we'll process it with the sign-off paperwork.",
+          "confidence": "high",
+          "dependsOn": [
+            {
+              "title": "Send Quarry static IP list to Function Health network team",
+              "draftId": 3,
+              "draftRef": "d1"
+            }
+          ],
+          "draftRef": "d2",
+          "title": "Add Quarry static IPs to Function Health network policy",
+          "description": null,
+          "notes": "Nadia Rahman's team to process the received Quarry static IP list and add the addresses to the Function Health network policy. Will be handled alongside the infosec sign-off paperwork.",
+          "ownerName": null,
+          "assigneeContactName": "Nadia Rahman",
+          "ownerSide": "customer",
+          "dueDate": null,
+          "priority": "high",
+          "blockedByRef": null
+        }
+      ],
+      "quoteViolations": []
+    },
+    {
+      "case": "27",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "28",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [],
+      "quoteViolations": []
+    },
+    {
+      "case": "29",
+      "missed": [
+        {
+          "index": 1,
+          "action": "match_existing",
+          "title": "Define first 10 metrics in dbt .yml",
+          "kind": null,
+          "paired": false,
+          "pairedWith": null,
+          "checks": {},
+          "notes": null,
+          "dependencies": [],
+          "gaps": []
+        }
+      ],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [
+        {
+          "action": "match_existing",
+          "draftId": 4,
+          "sourceQuote": "I'll deliver the shipment data dictionary by end of next week \u2014 it exists, it just needs cleaning up before I share it.",
+          "confidence": "high",
+          "dependsOn": [
+            {
+              "title": "Deliver cleaned shipment data dictionary",
+              "draftId": 3,
+              "draftRef": "d2"
+            }
+          ],
+          "draftRef": null,
+          "taskRef": "t4",
+          "updateKind": "update",
+          "newStatus": null,
+          "newDueDate": null,
+          "newPriority": null,
+          "newOwnerName": null,
+          "notes": null,
+          "appendNotes": "Owen confirmed the shipment data dictionary (to be delivered by 2026-07-17) is the direct prerequisite for this modeling work."
+        }
+      ],
+      "quoteViolations": []
+    },
+    {
+      "case": "30",
+      "missed": [],
+      "fieldFailures": [],
+      "notePhraseFailures": [],
+      "unmetGaps": [],
+      "extraProposals": [
+        {
+          "action": "match_existing",
+          "draftId": 4,
+          "sourceQuote": "Mainly your analysts in the workspace early, so they learn the tool while we build rather than after.",
+          "confidence": "medium",
+          "dependsOn": [
+            {
+              "title": "Invite two beehiiv analysts to Quarry workspace",
+              "draftId": 3,
+              "draftRef": "d2"
+            }
+          ],
+          "draftRef": null,
+          "taskRef": "t4",
+          "updateKind": "add_dependency",
+          "newStatus": null,
+          "newDueDate": null,
+          "newPriority": null,
+          "newOwnerName": null,
+          "notes": null,
+          "appendNotes": null
+        }
+      ],
+      "quoteViolations": []
+    }
+  ]
+}

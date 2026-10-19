@@ -1,0 +1,1717 @@
+{
+  "version": 3,
+  "label": "dependency-quality-r2-reasoning-five",
+  "createdAt": "2026-10-18T20:14:36.635Z",
+  "git": {
+    "sha": "90bde62",
+    "dirty": true
+  },
+  "mockLlm": false,
+  "clockShift": true,
+  "model": "claude-sonnet-4-6",
+  "caseCount": 1,
+  "selectedCaseCount": 5,
+  "complete": false,
+  "totalCostUsd": 0.133412,
+  "summary": {
+    "cases": 1,
+    "errors": 0,
+    "match": {
+      "count": 1,
+      "total": 1
+    },
+    "heldBeforeAssign": {
+      "count": 0,
+      "total": 0
+    },
+    "dedup": {
+      "count": 0,
+      "total": 0
+    },
+    "totals": {
+      "recall": {
+        "count": 4,
+        "total": 4
+      },
+      "precision": {
+        "count": 4,
+        "total": 6
+      },
+      "action": {
+        "count": 4,
+        "total": 4
+      },
+      "ownerSide": {
+        "count": 4,
+        "total": 4
+      },
+      "assignee": {
+        "count": 4,
+        "total": 4
+      },
+      "dueDate": {
+        "count": 4,
+        "total": 4
+      },
+      "priority": {
+        "count": 0,
+        "total": 0
+      },
+      "status": {
+        "count": 0,
+        "total": 0
+      },
+      "notesPhrases": {
+        "count": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "count": 0,
+        "total": 0
+      },
+      "kindRecall": {
+        "commitment": {
+          "count": 4,
+          "total": 4
+        },
+        "parked_for_later": {
+          "count": 0,
+          "total": 0
+        },
+        "vendor_reminder": {
+          "count": 0,
+          "total": 0
+        }
+      },
+      "groundedQuotes": {
+        "count": 6,
+        "total": 6
+      },
+      "citedIdsValid": {
+        "count": 3,
+        "total": 3
+      },
+      "duplicates": {
+        "count": 0,
+        "total": 4
+      },
+      "gaps": {
+        "count": 2,
+        "total": 2
+      },
+      "gapsByCode": {
+        "depends_on_new_draft": {
+          "count": 1,
+          "total": 1
+        },
+        "free_text_dependency": {
+          "count": 1,
+          "total": 1
+        }
+      }
+    }
+  },
+  "cases": [
+    {
+      "case": "02",
+      "file": "02-functionhealth-security-working-session.json",
+      "durationMs": 260256,
+      "costUsd": 0.133412,
+      "aiCalls": 1,
+      "error": null,
+      "score": {
+        "match": {
+          "pass": true,
+          "expected": "FN",
+          "actual": "FN",
+          "matchedBy": "domain"
+        },
+        "initial": {
+          "calls": [
+            {
+              "index": 0,
+              "action": "create_task",
+              "title": "Return completed SIG Lite questionnaire to Function Health security",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 1,
+                "action": "create_task",
+                "title": "Submit completed SIG Lite questionnaire to Freya Dunn",
+                "score": 1.033,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Ines Ferreira",
+                  "actual": "Ines Ferreira",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-06-05",
+                  "actual": "2026-06-05",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 1,
+              "action": "create_task",
+              "title": "Share pen test summary with Freya",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 2,
+                "action": "create_task",
+                "title": "Email Q1 pen test summary to Freya Dunn",
+                "score": 1.167,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "vendor",
+                  "actual": "vendor",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Sam Whitfield",
+                  "actual": "Sam Whitfield",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-06-03",
+                  "actual": "2026-06-03",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": []
+            },
+            {
+              "index": 2,
+              "action": "create_task",
+              "title": "Upload pen test summary to portal",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 3,
+                "action": "create_task",
+                "title": "Upload pen test summary to evidence portal",
+                "score": 1.409,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "customer",
+                  "actual": "customer",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Freya Dunn",
+                  "actual": "Freya Dunn",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-06-08",
+                  "actual": "2026-06-08",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "depends_on_new_draft"
+                  ],
+                  "what": "depends on new draft \"Share pen test summary with Freya\"",
+                  "met": true
+                }
+              ]
+            },
+            {
+              "index": 3,
+              "action": "create_task",
+              "title": "Provision read-only Snowflake service account",
+              "kind": "commitment",
+              "paired": true,
+              "pairedWith": {
+                "draftId": 4,
+                "action": "create_task",
+                "title": "Provision read-only Snowflake service account (ANALYTICS schema)",
+                "score": 1.357,
+                "by": "title"
+              },
+              "checks": {
+                "action": {
+                  "expected": "create_task",
+                  "actual": "create_task",
+                  "pass": true
+                },
+                "owner": {
+                  "expected": "customer",
+                  "actual": "customer",
+                  "pass": true
+                },
+                "assignee": {
+                  "expected": "Oliver Hartley",
+                  "actual": "Oliver Hartley",
+                  "pass": true
+                },
+                "dueDate": {
+                  "expected": "2026-06-10",
+                  "actual": "2026-06-10",
+                  "pass": true
+                }
+              },
+              "notes": null,
+              "dependencies": [],
+              "gaps": [
+                {
+                  "codes": [
+                    "free_text_dependency"
+                  ],
+                  "what": "depends on \"security sign-off\"",
+                  "met": true
+                }
+              ]
+            }
+          ],
+          "unmatchedProposals": [
+            {
+              "draftId": 5,
+              "action": "match_existing",
+              "title": "Complete Function Health security review",
+              "sourceQuote": "the review is stuck because we're missing two inputs — your completed SIG Lite questionnaire and evidence from a recent penetration test. Handling patient lab results, our infosec team can't wave either through."
+            },
+            {
+              "draftId": 6,
+              "action": "match_existing",
+              "title": "Connect dbt repo and warehouse to Quarry",
+              "sourceQuote": "Then the last link in the chain is me. The warehouse team won't create the service account until security signs off — and with PHI in the schema they're strict about it."
+            }
+          ],
+          "proposalsCount": 6,
+          "duplicates": [],
+          "groundedness": {
+            "quotes": {
+              "count": 6,
+              "total": 6
+            },
+            "quoteViolations": [],
+            "quotesFromActionItemsOnly": 0,
+            "citedIds": {
+              "count": 3,
+              "total": 3
+            },
+            "citedIdViolations": []
+          },
+          "totals": {
+            "recall": {
+              "count": 4,
+              "total": 4
+            },
+            "precision": {
+              "count": 4,
+              "total": 6
+            },
+            "action": {
+              "count": 4,
+              "total": 4
+            },
+            "ownerSide": {
+              "count": 4,
+              "total": 4
+            },
+            "assignee": {
+              "count": 4,
+              "total": 4
+            },
+            "dueDate": {
+              "count": 4,
+              "total": 4
+            },
+            "priority": {
+              "count": 0,
+              "total": 0
+            },
+            "status": {
+              "count": 0,
+              "total": 0
+            },
+            "notesPhrases": {
+              "count": 0,
+              "total": 0
+            },
+            "dependencies": {
+              "count": 0,
+              "total": 0
+            },
+            "kindRecall": {
+              "commitment": {
+                "count": 4,
+                "total": 4
+              },
+              "parked_for_later": {
+                "count": 0,
+                "total": 0
+              },
+              "vendor_reminder": {
+                "count": 0,
+                "total": 0
+              }
+            },
+            "groundedQuotes": {
+              "count": 6,
+              "total": 6
+            },
+            "citedIdsValid": {
+              "count": 3,
+              "total": 3
+            },
+            "duplicates": {
+              "count": 0,
+              "total": 4
+            },
+            "gaps": {
+              "count": 2,
+              "total": 2
+            },
+            "gapsByCode": {
+              "depends_on_new_draft": {
+                "count": 1,
+                "total": 1
+              },
+              "free_text_dependency": {
+                "count": 1,
+                "total": 1
+              }
+            }
+          }
+        },
+        "heldBeforeAssign": null,
+        "afterAssign": null,
+        "dedup": null,
+        "totals": {
+          "recall": {
+            "count": 4,
+            "total": 4
+          },
+          "precision": {
+            "count": 4,
+            "total": 6
+          },
+          "action": {
+            "count": 4,
+            "total": 4
+          },
+          "ownerSide": {
+            "count": 4,
+            "total": 4
+          },
+          "assignee": {
+            "count": 4,
+            "total": 4
+          },
+          "dueDate": {
+            "count": 4,
+            "total": 4
+          },
+          "priority": {
+            "count": 0,
+            "total": 0
+          },
+          "status": {
+            "count": 0,
+            "total": 0
+          },
+          "notesPhrases": {
+            "count": 0,
+            "total": 0
+          },
+          "dependencies": {
+            "count": 0,
+            "total": 0
+          },
+          "kindRecall": {
+            "commitment": {
+              "count": 4,
+              "total": 4
+            },
+            "parked_for_later": {
+              "count": 0,
+              "total": 0
+            },
+            "vendor_reminder": {
+              "count": 0,
+              "total": 0
+            }
+          },
+          "groundedQuotes": {
+            "count": 6,
+            "total": 6
+          },
+          "citedIdsValid": {
+            "count": 3,
+            "total": 3
+          },
+          "duplicates": {
+            "count": 0,
+            "total": 4
+          },
+          "gaps": {
+            "count": 2,
+            "total": 2
+          },
+          "gapsByCode": {
+            "depends_on_new_draft": {
+              "count": 1,
+              "total": 1
+            },
+            "free_text_dependency": {
+              "count": 1,
+              "total": 1
+            }
+          }
+        }
+      },
+      "actual": {
+        "match": {
+          "companyPrefix": "FN",
+          "ambiguous": false,
+          "matchedBy": "domain"
+        },
+        "transcript": "Thanks for making time, both. The goal today is to get the security review moving again — it's been the blocker for three weeks.\nHonest answer from our side: the review is stuck because we're missing two inputs — your completed SIG Lite questionnaire and evidence from a recent penetration test. Handling patient lab results, our infosec team can't wave either through.\nThe questionnaire is ninety percent done, our security lead has the last section. I'll send the completed SIG Lite questionnaire back to Freya by June 5th.\nFriday works. If I have it Friday, I can start the internal review the following week.\nAnd the pen test — we have the Q1 report from our external testers. Do you need the full report or a summary?\nA summary with scope and findings severity is enough. Actually, easier if it lives with the rest of the evidence — I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.\nI'll email it to you right after this call, it's ready to go.\nThen the last link in the chain is me. The warehouse team won't create the service account until security signs off — and with PHI in the schema they're strict about it.\nCan we pre-agree the shape so it's a same-day job once you get the green light?\nYes — read-only, scoped to the ANALYTICS schema, key-pair auth. I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th.\nThat's realistic if the questionnaire lands Friday.\nDo we need your change advisory board for the account creation? That added two weeks last time at another customer.\nNo — we agreed internally last month that read-only analytics accounts skip the change board. It goes straight through.\nExcellent. So: questionnaire Friday the 5th, pen test summary Monday the 8th, service account Wednesday the 10th. That's the chain unblocked.\nAgreed. Nice to have dates on it at last.\nThanks all — I'll recap in the portal after this.",
+        "actionItemsText": "Ines to return completed SIG Lite questionnaire by June 5\nFreya to upload pen test summary to the portal by June 8\nOliver to provision read-only Snowflake service account by June 10",
+        "initial": {
+          "proposals": [
+            {
+              "action": "create_task",
+              "draftId": 1,
+              "sourceQuote": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th.",
+              "confidence": "high",
+              "draftRef": "d1",
+              "title": "Submit completed SIG Lite questionnaire to Freya Dunn",
+              "description": null,
+              "notes": "Ines Ferreira to deliver the fully completed SIG Lite questionnaire to Freya Dunn. The document is 90% done; the security lead holds the last section. Recipient is Freya Dunn for her internal infosec review. Completion of this task unblocks the Function Health security review.",
+              "ownerName": "Ines Ferreira",
+              "assigneeContactName": null,
+              "ownerSide": "vendor",
+              "dueDate": "2026-06-05",
+              "priority": "high",
+              "blockedByRef": null
+            },
+            {
+              "action": "create_task",
+              "draftId": 2,
+              "sourceQuote": "I'll email it to you right after this call, it's ready to go.",
+              "confidence": "high",
+              "draftRef": "d2",
+              "title": "Email Q1 pen test summary to Freya Dunn",
+              "description": null,
+              "notes": "Sam Whitfield to send the Q1 external penetration test report to Freya Dunn immediately after the June 3 working session. The report is ready. Freya needs it to upload the summary to the evidence portal (see dependent task).",
+              "ownerName": "Sam Whitfield",
+              "assigneeContactName": null,
+              "ownerSide": "vendor",
+              "dueDate": "2026-06-03",
+              "priority": "high",
+              "blockedByRef": null
+            },
+            {
+              "action": "create_task",
+              "draftId": 3,
+              "sourceQuote": "I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.",
+              "confidence": "high",
+              "dependsOn": [
+                {
+                  "title": "Email Q1 pen test summary to Freya Dunn",
+                  "draftId": 2,
+                  "draftRef": "d2"
+                }
+              ],
+              "draftRef": "d3",
+              "title": "Upload pen test summary to evidence portal",
+              "description": null,
+              "notes": "Freya Dunn to upload the penetration test summary to the customer evidence portal once Sam Whitfield provides the Q1 report. Summary must include scope and findings severity; the full report is not required. Uploading to the portal keeps all review evidence in one place for infosec.",
+              "ownerName": null,
+              "assigneeContactName": "Freya Dunn",
+              "ownerSide": "customer",
+              "dueDate": "2026-06-08",
+              "priority": "high",
+              "blockedByRef": null
+            },
+            {
+              "action": "create_task",
+              "draftId": 4,
+              "sourceQuote": "Yes — read-only, scoped to the ANALYTICS schema, key-pair auth. I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th.",
+              "confidence": "high",
+              "dependsOn": [
+                {
+                  "taskRef": "t1"
+                }
+              ],
+              "draftRef": "d4",
+              "title": "Provision read-only Snowflake service account (ANALYTICS schema)",
+              "description": null,
+              "notes": "Oliver Hartley to create the service account immediately after security sign-off, targeting June 10. Specifications agreed: read-only access, scoped to the ANALYTICS schema, key-pair authentication. No change advisory board review required; read-only analytics accounts were agreed internally last month to skip that process. PHI is present in the schema so the warehouse team requires security sign-off before proceeding.",
+              "ownerName": null,
+              "assigneeContactName": "Oliver Hartley",
+              "ownerSide": "customer",
+              "dueDate": "2026-06-10",
+              "priority": "high",
+              "blockedByRef": "t1"
+            },
+            {
+              "action": "match_existing",
+              "draftId": 5,
+              "sourceQuote": "the review is stuck because we're missing two inputs — your completed SIG Lite questionnaire and evidence from a recent penetration test. Handling patient lab results, our infosec team can't wave either through.",
+              "confidence": "high",
+              "dependsOn": [
+                {
+                  "title": "Submit completed SIG Lite questionnaire to Freya Dunn",
+                  "draftId": 1,
+                  "draftRef": "d1"
+                },
+                {
+                  "title": "Upload pen test summary to evidence portal",
+                  "draftId": 3,
+                  "draftRef": "d3"
+                }
+              ],
+              "draftRef": null,
+              "taskRef": "t1",
+              "updateKind": "update",
+              "newStatus": null,
+              "newDueDate": null,
+              "newPriority": null,
+              "newOwnerName": null,
+              "notes": null,
+              "appendNotes": "Working session on June 3 established concrete deadlines for both blocking inputs: SIG Lite questionnaire to be submitted by June 5 (Ines Ferreira), pen test summary to be uploaded to the portal by June 8 (Freya Dunn). Freya will begin internal infosec review the week of June 9 if the questionnaire arrives on time."
+            },
+            {
+              "action": "match_existing",
+              "draftId": 6,
+              "sourceQuote": "Then the last link in the chain is me. The warehouse team won't create the service account until security signs off — and with PHI in the schema they're strict about it.",
+              "confidence": "high",
+              "dependsOn": [
+                {
+                  "title": "Provision read-only Snowflake service account (ANALYTICS schema)",
+                  "draftId": 4,
+                  "draftRef": "d4"
+                }
+              ],
+              "draftRef": null,
+              "taskRef": "t2",
+              "updateKind": "add_dependency",
+              "newStatus": null,
+              "newDueDate": null,
+              "newPriority": null,
+              "newOwnerName": null,
+              "notes": null,
+              "appendNotes": null
+            }
+          ],
+          "rawCalls": [
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll email it to you right after this call, it's ready to go."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it."
+            },
+            {
+              "tool": "create_task_draft",
+              "taskId": null,
+              "taskRef": null,
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "Yes — read-only, scoped to the ANALYTICS schema, key-pair auth. I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th.",
+              "dependsOnTaskIds": [
+                {
+                  "id": 1,
+                  "ref": "t1"
+                }
+              ]
+            },
+            {
+              "tool": "match_to_existing_task_draft",
+              "taskId": 1,
+              "taskRef": "t1",
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "the review is stuck because we're missing two inputs — your completed SIG Lite questionnaire and evidence from a recent penetration test. Handling patient lab results, our infosec team can't wave either through."
+            },
+            {
+              "tool": "match_to_existing_task_draft",
+              "taskId": 2,
+              "taskRef": "t2",
+              "blockedByTaskId": null,
+              "blockedByRef": null,
+              "sourceQuote": "Then the last link in the chain is me. The warehouse team won't create the service account until security signs off — and with PHI in the schema they're strict about it."
+            }
+          ],
+          "boardRefs": [
+            "t1",
+            "t2",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "openRefs": [
+            "t1",
+            "t2",
+            "t3",
+            "t4",
+            "t5"
+          ],
+          "boardTasks": [
+            {
+              "ref": "t1",
+              "title": "Complete Function Health security review",
+              "status": "Blocked",
+              "ownerName": "Freya Dunn"
+            },
+            {
+              "ref": "t2",
+              "title": "Connect dbt repo and warehouse to Quarry",
+              "status": "Blocked",
+              "ownerName": "Sam Whitfield"
+            },
+            {
+              "ref": "t3",
+              "title": "Model lab-results marts",
+              "status": "Not started",
+              "ownerName": "Sam Whitfield"
+            },
+            {
+              "ref": "t4",
+              "title": "Build member health dashboard",
+              "status": "Not started",
+              "ownerName": "Ines Ferreira"
+            },
+            {
+              "ref": "t5",
+              "title": "Run analyst training",
+              "status": "Not started",
+              "ownerName": "Ines Ferreira"
+            }
+          ]
+        },
+        "error": null
+      },
+      "raw": {
+        "maps": {
+          "companyPrefixByOnboardingId": {
+            "1": "RAY",
+            "2": "BEE",
+            "3": "MDL",
+            "4": "LOOP",
+            "5": "HUEL",
+            "6": "FN",
+            "7": "FLK",
+            "8": "SYL",
+            "9": "CHOW",
+            "10": "ASH",
+            "11": "PEER",
+            "12": "PAT"
+          },
+          "onboardingIdByPrefix": {
+            "RAY": 1,
+            "BEE": 2,
+            "MDL": 3,
+            "LOOP": 4,
+            "HUEL": 5,
+            "FN": 6,
+            "FLK": 7,
+            "SYL": 8,
+            "CHOW": 9,
+            "ASH": 10,
+            "PEER": 11,
+            "PAT": 12
+          },
+          "vendorNameById": {
+            "1": "Maya Lindqvist",
+            "2": "Theo Okonkwo",
+            "3": "Ines Ferreira",
+            "4": "Sam Whitfield",
+            "5": "Caroline Jaworsky"
+          },
+          "contactNameById": {
+            "1": "Oliver Hartley",
+            "2": "Freya Dunn"
+          },
+          "refByTaskId": {
+            "1": "t1",
+            "2": "t2",
+            "3": "t3",
+            "4": "t4",
+            "5": "t5"
+          }
+        },
+        "match": {
+          "onboardingId": 6,
+          "ambiguous": false,
+          "matchedBy": "domain",
+          "candidates": [
+            {
+              "onboardingId": 6,
+              "signal": "domain",
+              "evidence": "attendee domain functionhealth.com → Function Health"
+            }
+          ]
+        },
+        "initial": {
+          "drafts": [
+            {
+              "id": 1,
+              "action": "create_task",
+              "payload": {
+                "notes": "Ines Ferreira to deliver the fully completed SIG Lite questionnaire to Freya Dunn. The document is 90% done; the security lead holds the last section. Recipient is Freya Dunn for her internal infosec review. Completion of this task unblocks the Function Health security review.",
+                "title": "Submit completed SIG Lite questionnaire to Freya Dunn",
+                "dueDate": "2026-06-05",
+                "ownerId": 3,
+                "phaseId": 27,
+                "draftRef": "d1",
+                "priority": "high",
+                "ownerName": "Ines Ferreira",
+                "confidence": "high",
+                "sourceQuote": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th."
+              },
+              "sourceQuote": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th.",
+              "confidence": "high"
+            },
+            {
+              "id": 2,
+              "action": "create_task",
+              "payload": {
+                "notes": "Sam Whitfield to send the Q1 external penetration test report to Freya Dunn immediately after the June 3 working session. The report is ready. Freya needs it to upload the summary to the evidence portal (see dependent task).",
+                "title": "Email Q1 pen test summary to Freya Dunn",
+                "dueDate": "2026-06-03",
+                "ownerId": 4,
+                "phaseId": 27,
+                "draftRef": "d2",
+                "priority": "high",
+                "ownerName": "Sam Whitfield",
+                "confidence": "high",
+                "sourceQuote": "I'll email it to you right after this call, it's ready to go."
+              },
+              "sourceQuote": "I'll email it to you right after this call, it's ready to go.",
+              "confidence": "high"
+            },
+            {
+              "id": 3,
+              "action": "create_task",
+              "payload": {
+                "notes": "Freya Dunn to upload the penetration test summary to the customer evidence portal once Sam Whitfield provides the Q1 report. Summary must include scope and findings severity; the full report is not required. Uploading to the portal keeps all review evidence in one place for infosec.",
+                "title": "Upload pen test summary to evidence portal",
+                "dueDate": "2026-06-08",
+                "phaseId": 27,
+                "draftRef": "d3",
+                "priority": "high",
+                "dependsOn": [
+                  {
+                    "title": "Email Q1 pen test summary to Freya Dunn",
+                    "draftId": 2,
+                    "draftRef": "d2"
+                  }
+                ],
+                "confidence": "high",
+                "sourceQuote": "I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.",
+                "assigneeContactId": 2,
+                "assigneeContactName": "Freya Dunn"
+              },
+              "sourceQuote": "I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.",
+              "confidence": "high"
+            },
+            {
+              "id": 4,
+              "action": "create_task",
+              "payload": {
+                "notes": "Oliver Hartley to create the service account immediately after security sign-off, targeting June 10. Specifications agreed: read-only access, scoped to the ANALYTICS schema, key-pair authentication. No change advisory board review required; read-only analytics accounts were agreed internally last month to skip that process. PHI is present in the schema so the warehouse team requires security sign-off before proceeding.",
+                "title": "Provision read-only Snowflake service account (ANALYTICS schema)",
+                "dueDate": "2026-06-10",
+                "phaseId": 27,
+                "draftRef": "d4",
+                "priority": "high",
+                "dependsOn": [
+                  {
+                    "taskId": 1
+                  }
+                ],
+                "confidence": "high",
+                "sourceQuote": "Yes — read-only, scoped to the ANALYTICS schema, key-pair auth. I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th.",
+                "assigneeContactId": 1,
+                "assigneeContactName": "Oliver Hartley"
+              },
+              "sourceQuote": "Yes — read-only, scoped to the ANALYTICS schema, key-pair auth. I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th.",
+              "confidence": "high"
+            },
+            {
+              "id": 5,
+              "action": "match_existing",
+              "payload": {
+                "action": "update",
+                "taskId": 1,
+                "changes": {
+                  "dependsOn": [
+                    {
+                      "title": "Submit completed SIG Lite questionnaire to Freya Dunn",
+                      "draftId": 1,
+                      "draftRef": "d1"
+                    },
+                    {
+                      "title": "Upload pen test summary to evidence portal",
+                      "draftId": 3,
+                      "draftRef": "d3"
+                    }
+                  ],
+                  "appendNotes": "Working session on June 3 established concrete deadlines for both blocking inputs: SIG Lite questionnaire to be submitted by June 5 (Ines Ferreira), pen test summary to be uploaded to the portal by June 8 (Freya Dunn). Freya will begin internal infosec review the week of June 9 if the questionnaire arrives on time."
+                },
+                "confidence": "high",
+                "noteSource": {
+                  "date": "2026-06-03",
+                  "label": "call with Function Health"
+                },
+                "sourceQuote": "the review is stuck because we're missing two inputs — your completed SIG Lite questionnaire and evidence from a recent penetration test. Handling patient lab results, our infosec team can't wave either through."
+              },
+              "sourceQuote": "the review is stuck because we're missing two inputs — your completed SIG Lite questionnaire and evidence from a recent penetration test. Handling patient lab results, our infosec team can't wave either through.",
+              "confidence": "high"
+            },
+            {
+              "id": 6,
+              "action": "match_existing",
+              "payload": {
+                "action": "add_dependency",
+                "taskId": 2,
+                "changes": {
+                  "dependsOn": [
+                    {
+                      "title": "Provision read-only Snowflake service account (ANALYTICS schema)",
+                      "draftId": 4,
+                      "draftRef": "d4"
+                    }
+                  ]
+                },
+                "confidence": "high",
+                "noteSource": {
+                  "date": "2026-06-03",
+                  "label": "call with Function Health"
+                },
+                "sourceQuote": "Then the last link in the chain is me. The warehouse team won't create the service account until security signs off — and with PHI in the schema they're strict about it."
+              },
+              "sourceQuote": "Then the last link in the chain is me. The warehouse team won't create the service account until security signs off — and with PHI in the schema they're strict about it.",
+              "confidence": "high"
+            }
+          ],
+          "orchestratorOutput": [
+            {
+              "id": "toolu_011mVftJfSQpZqRg3RdN2fmK_0",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Ines Ferreira to deliver the fully completed SIG Lite questionnaire to Freya Dunn. The document is 90% done; the security lead holds the last section. Recipient is Freya Dunn for her internal infosec review. Completion of this task unblocks the Function Health security review.",
+                "title": "Submit completed SIG Lite questionnaire to Freya Dunn",
+                "dueDate": "2026-06-05",
+                "ownerId": 3,
+                "phaseId": 27,
+                "draftRef": "d1",
+                "priority": "high",
+                "confidence": "high",
+                "sourceQuote": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th."
+              }
+            },
+            {
+              "id": "toolu_011mVftJfSQpZqRg3RdN2fmK_1",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Sam Whitfield to send the Q1 external penetration test report to Freya Dunn immediately after the June 3 working session. The report is ready. Freya needs it to upload the summary to the evidence portal (see dependent task).",
+                "title": "Email Q1 pen test summary to Freya Dunn",
+                "dueDate": "2026-06-03",
+                "ownerId": 4,
+                "phaseId": 27,
+                "draftRef": "d2",
+                "priority": "high",
+                "confidence": "high",
+                "sourceQuote": "I'll email it to you right after this call, it's ready to go."
+              }
+            },
+            {
+              "id": "toolu_011mVftJfSQpZqRg3RdN2fmK_2",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Freya Dunn to upload the penetration test summary to the customer evidence portal once Sam Whitfield provides the Q1 report. Summary must include scope and findings severity; the full report is not required. Uploading to the portal keeps all review evidence in one place for infosec.",
+                "title": "Upload pen test summary to evidence portal",
+                "dueDate": "2026-06-08",
+                "phaseId": 27,
+                "draftRef": "d3",
+                "priority": "high",
+                "dependsOn": [
+                  {
+                    "draftRef": "d2"
+                  }
+                ],
+                "confidence": "high",
+                "sourceQuote": "I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.",
+                "assigneeContactId": 2
+              }
+            },
+            {
+              "id": "toolu_011mVftJfSQpZqRg3RdN2fmK_3",
+              "tool": "create_task_draft",
+              "input": {
+                "notes": "Oliver Hartley to create the service account immediately after security sign-off, targeting June 10. Specifications agreed: read-only access, scoped to the ANALYTICS schema, key-pair authentication. No change advisory board review required; read-only analytics accounts were agreed internally last month to skip that process. PHI is present in the schema so the warehouse team requires security sign-off before proceeding.",
+                "title": "Provision read-only Snowflake service account (ANALYTICS schema)",
+                "dueDate": "2026-06-10",
+                "phaseId": 27,
+                "draftRef": "d4",
+                "priority": "high",
+                "dependsOn": [
+                  {
+                    "taskId": 1
+                  }
+                ],
+                "confidence": "high",
+                "sourceQuote": "Yes — read-only, scoped to the ANALYTICS schema, key-pair auth. I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th.",
+                "assigneeContactId": 1
+              }
+            },
+            {
+              "id": "toolu_011mVftJfSQpZqRg3RdN2fmK_4",
+              "tool": "match_to_existing_task_draft",
+              "input": {
+                "taskId": 1,
+                "changes": {
+                  "dependsOn": [
+                    {
+                      "draftRef": "d1"
+                    },
+                    {
+                      "draftRef": "d3"
+                    }
+                  ],
+                  "appendNotes": "Working session on June 3 established concrete deadlines for both blocking inputs: SIG Lite questionnaire to be submitted by June 5 (Ines Ferreira), pen test summary to be uploaded to the portal by June 8 (Freya Dunn). Freya will begin internal infosec review the week of June 9 if the questionnaire arrives on time."
+                },
+                "confidence": "high",
+                "sourceQuote": "the review is stuck because we're missing two inputs — your completed SIG Lite questionnaire and evidence from a recent penetration test. Handling patient lab results, our infosec team can't wave either through."
+              }
+            },
+            {
+              "id": "toolu_011mVftJfSQpZqRg3RdN2fmK_5",
+              "tool": "match_to_existing_task_draft",
+              "input": {
+                "taskId": 2,
+                "changes": {
+                  "dependsOn": [
+                    {
+                      "draftRef": "d4"
+                    }
+                  ]
+                },
+                "confidence": "high",
+                "sourceQuote": "Then the last link in the chain is me. The warehouse team won't create the service account until security signs off — and with PHI in the schema they're strict about it."
+              }
+            }
+          ],
+          "orchestratorExtraction": null
+        },
+        "error": null
+      },
+      "logs": [
+        "log [miniti] extraction (pass 1): input ~1250 prompt tokens, 5 open tasks",
+        "warn [miniti] extraction (pass 1) failed: Pass 1 returned no text block",
+        "log [miniti] orchestrator (pass 2): input ~1359 prompt tokens, 5 open tasks, 0 extracted items",
+        "log [miniti] orchestrator (pass 2): 2 content blocks, 6 draft proposals"
+      ],
+      "llmTrace": [
+        {
+          "request": {
+            "model": "claude-sonnet-4-6",
+            "max_tokens": 8000,
+            "thinking": {
+              "type": "adaptive"
+            },
+            "system": [
+              {
+                "type": "text",
+                "text": "You are Vector. Your job is FACT EXTRACTION from a B2B onboarding meeting (transcribed by Miniti). You do NOT decide what to do with the facts; another step takes care of that. Just find them faithfully.\n\nYou will receive a JSON context with:\n- meeting.title, meeting.date, meeting.summary, meeting.notes\n- meeting.transcript: the FULL meeting transcript, one turn per line as \"<speaker>: <words>\". The label before the first colon says who is talking; it is not part of what they said, so never copy it into a quote.\n- meeting.actionItems: Miniti's pre-extracted action items (strings)\n- openTasks, customerContacts, vendorUsers, phases (for reference only — DO NOT resolve to ids in this pass)\n- recorder: { id, name } of the person who recorded the meeting, or null when nobody has said who that is (see the rule on the recorder below)\n- today: today's ISO date\n\nThe recorder: the transcript labels whoever recorded the meeting as \"You\" (Miniti's own microphone, never a customer). They are on the vendor side, one of our own team. Treat \"You\" like any other named speaker: what they promise is an action item, with speaker \"You\" and mentionedOwner \"You\" when they said they'd do it.\n\nProduce a single JSON object with these arrays:\n\nactionItems[]: every concrete commitment surfaced anywhere in the transcript or in meeting.actionItems. For each one capture:\n  - claim: a short imperative summary of what was committed to (\"Send security questionnaire\").\n  - sourceQuote: ONE continuous passage copied word for word from a single speaker's turn in the transcript. Never join separate turns or speakers, never paraphrase, and never quote the meeting's summary, notes or key decisions. Only if the commitment appears nowhere in the transcript, use the exact wording of the matching meeting.actionItems entry instead.\n  - speaker: who said it (use the name from the transcript verbatim, e.g. \"Ian Ahuja\", \"Marco\", \"unknown\" if not attributable).\n  - mentionedOwner: the name of the person who said they'd do it, VERBATIM from the transcript (\"Marco\", \"Ian\", \"the customer's IT team\", or \"\" if not mentioned). DO NOT resolve to an id.\n  - mentionedDueDate: VERBATIM date phrasing (\"by Friday\", \"next week\", \"end of Q3\") or \"\" if no deadline mentioned. DO NOT convert to ISO.\n  - mentionedDependency: VERBATIM phrasing of any blocker mentioned (\"blocked on the SSO setup\", \"waiting for legal sign-off\") or \"\" if no dependency mentioned. This includes things that are not tasks (a sign-off, another team, an approval) and other action items from this same meeting (\"once the export is done\"). DO NOT match to a task id.\n  - firmness: \"firm\" (clear commitment with timing or owner), \"tentative\" (commitment but vague timing/owner, including a parked item that someone has taken on; see below), \"vague\" (someone mused about it but didn't commit and nobody took it on).\n  - notesSnippet: ~200 char verbatim transcript window around the commitment so the next pass has surrounding context. When the specifics that were agreed (scope, names of the things involved, audience, constraints, who to send it to) sit near the commitment, pick the window that contains them.\n  - details: short VERBATIM facts needed to carry out or verify this work: named files/metrics, comparison/reference systems, scope, audience, constraints and delivery instructions. Gather relevant facts from other turns too; the ~200 char notesSnippet is not a limit on these details. Preserve exclusions and negations. Use [] if no execution details were agreed. Progress percentages alone are not execution instructions.\n\nreportedCompletions[]: every claim that an existing piece of work is now done. (\"Data migration is complete\", \"we've signed the DPA\"). Each item has:\n  - claim, sourceQuote, speaker.\n\nexternalBlockers[]: external blockers mentioned that aren't tasks (\"customer's IT team is non-responsive\", \"legal review delays\"). Just short strings.\n\nmeetingTone: a single short label — one of \"kickoff\", \"status update\", \"casual catchup\", \"escalation\", \"planning\", \"review\", \"other\".\n\nRules:\n1. Be FAITHFUL. Every actionItem must point to a sourceQuote that is literally present, character for character, in one transcript turn (or, failing that, one meeting.actionItems entry). If you can't quote it that way, don't surface it.\n2. Capture EVERYTHING. Err on the side of including marginal items — Pass 2 decides whether they make it through.\n3. Keep mentioned-* fields as VERBATIM TEXT. Do NOT resolve names to ids, do NOT convert dates to ISO. That's Pass 2's job.\n4. If meeting.actionItems already lists an item that you find in the transcript too, surface it once with the most informative sourceQuote.\n5. If the meeting has zero commitments of any kind (no firm ones, no parked items someone took on, no promised check-ins; e.g. a casual catch-up), return actionItems: [] and let meetingTone tell the story.\n\nWhat counts as an action item (judgement rules; these refine rule 2, they do not loosen rule 1):\nA. Promises to do something \"right after this call\", \"straight after we hang up\", \"later today\" are action items like any other. People get distracted after calls. Mark them firm, with the timing phrase as mentionedDueDate.\nB. Parked work needs BOTH a concrete deliverable and someone taking responsibility for doing, tracking or revisiting it. Capture that as \"tentative\", undated unless timing was given, owned by the person who took it on. Merely naming a possible feature, asking \"maybe eventually?\", or saying \"not in this plan\" is not a commitment. Do not invent ownership by assigning it to whoever first mentioned the idea. Acknowledging that an idea exists is not agreeing to carry it forward.\n   \"Noted for later\" or \"noted as a nice-to-have\" in response to a specific requested deliverable DOES count as tracking it, even if nobody promises delivery now. Keep the requester as owner when it is their future work; use the teammate when they take on remembering it. This is different from speculative talk about a possible future product with no specific request or deliverable.\n   Example (different domain): \"Later on we'll need the delivery report split by region, not this quarter though.\" \"I'll keep that on my list.\" → tentative item \"Delivery report split by region\", owner = the person keeping it on their list.\n   NOT action items: vague musing with no concrete deliverable (\"it'd be great to be more data-driven someday\"), hypotheticals, opinions, descriptions of how things work today, and ideas that were raised and then explicitly rejected (\"actually, let's not\").\nC. When the customer says they are overwhelmed, stretched, or asks for space or time before taking on more, do NOT surface new work for the customer from that exchange. If the vendor side agrees to check back in (or it is clearly the vendor's job to pick it up again later), surface that as one vendor-owned action item (\"Check back in with <contact> about <topic>\"), with any timing that was discussed as mentionedDueDate.\nD. Updates to work that already exists count too: if someone restates, re-times, or hands over a piece of work that looks like it is already on openTasks, surface it as an action item with the new owner or timing as said, so the next pass can compare it against the board.\nE. Keep separate commitments even when one starts only after another. \"Once X is ready, I will do Y\" includes Y as its own action, with X in mentionedDependency. A dependency does not swallow the downstream deliverable.\n   If somebody is also responsible for obtaining/providing X, extract that work separately as well. An owned approval/sign-off action is still work; only an external condition with no committed action stays solely a blocker.\n   A concrete request for the speaker's own team to review an artifact before proceeding is such work, even when phrased as \"I'd like our team to review it\" rather than \"I'll obtain approval\". Capture the requested review, with that speaker coordinating it, and the required artifacts as dependencies. Do not reduce this to a blocker label on the artifact-producing task.\nF. Read every turn for commitments, including short replies and collective plans, not just sentences beginning \"I will\". Resolve \"it\", \"that\" and \"both\" from nearby turns in the claim, while keeping sourceQuote verbatim. \"I'll pass it on\" is separate recipient-owned hand-off work, not just a note on the sender's delivery. \"Once the inputs arrive, we load the archive\" commits to the later load even if no one repeats it in the closing recap. If a reply both requests information and promises a response after receiving it, capture each side's actual commitment with its own speaker and owner. Do not assign the response to whoever supplies the information.\n   For every extracted action, scan the preceding AND following turns for explicit prerequisite evidence. Carry all agreed inputs in mentionedDependency even when another speaker states them or their delivery is promised later in the call. \"You'll need the export to run this\" and a later offer to send the export establish the same relation as \"waiting for the export\". Preserve the exact evidence wording; do not invent prerequisites from ordinary workflow assumptions. A later clarification that work can proceed in parallel overrides a suspected dependency.\nG. Routine meeting recaps, calendar housekeeping, sign-offs and invitations to ask for help do not become onboarding work by themselves. Preserve substantive deliverables promised immediately after a call, such as sending an agreed artifact. Do not turn conversational closing remarks into a follow-up task.\n\nGLOBAL RULES — apply to all output:\n- Never use em dashes (—) or en dashes (–). Use commas, periods, parentheses, or \"and\" instead.\n\nToday is 2026-06-03 (Wednesday). This is normally the meeting date; if meeting.date differs, dates said in the meeting are relative to meeting.date.",
+                "cache_control": {
+                  "type": "ephemeral"
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "user",
+                "content": "{\"today\":\"2026-06-03\",\"meeting\":{\"id\":\"D02B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A02\",\"title\":\"Function Health security review — working session\",\"date\":\"2026-06-03T10:00:00Z\",\"summary\":\"Working session to unstick the Function Health security review (health-data infosec). Agreed the questionnaire handoff, the pen test evidence, and the service account provisioning sequence.\",\"actionItems\":[\"Ines to return completed SIG Lite questionnaire by June 5\",\"Freya to upload pen test summary to the portal by June 8\",\"Oliver to provision read-only Snowflake service account by June 10\"],\"keyDecisions\":[\"Service account provisioning proceeds immediately after security sign-off, no separate change board review\"],\"notes\":\"The health-data security review has been the blocking chain for three weeks; this session set concrete dates on each link.\",\"transcript\":\"Ines Ferreira: Thanks for making time, both. The goal today is to get the security review moving again — it's been the blocker for three weeks.\\nFreya Dunn: Honest answer from our side: the review is stuck because we're missing two inputs — your completed SIG Lite questionnaire and evidence from a recent penetration test. Handling patient lab results, our infosec team can't wave either through.\\nInes Ferreira: The questionnaire is ninety percent done, our security lead has the last section. I'll send the completed SIG Lite questionnaire back to Freya by June 5th.\\nFreya Dunn: Friday works. If I have it Friday, I can start the internal review the following week.\\nSam Whitfield: And the pen test — we have the Q1 report from our external testers. Do you need the full report or a summary?\\nFreya Dunn: A summary with scope and findings severity is enough. Actually, easier if it lives with the rest of the evidence — I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.\\nSam Whitfield: I'll email it to you right after this call, it's ready to go.\\nOliver Hartley: Then the last link in the chain is me. The warehouse team won't create the service account until security signs off — and with PHI in the schema they're strict about it.\\nInes Ferreira: Can we pre-agree the shape so it's a same-day job once you get the green light?\\nOliver Hartley: Yes — read-only, scoped to the ANALYTICS schema, key-pair auth. I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th.\\nFreya Dunn: That's realistic if the questionnaire lands Friday.\\nSam Whitfield: Do we need your change advisory board for the account creation? That added two weeks last time at another customer.\\nOliver Hartley: No — we agreed internally last month that read-only analytics accounts skip the change board. It goes straight through.\\nInes Ferreira: Excellent. So: questionnaire Friday the 5th, pen test summary Monday the 8th, service account Wednesday the 10th. That's the chain unblocked.\\nFreya Dunn: Agreed. Nice to have dates on it at last.\\nInes Ferreira: Thanks all — I'll recap in the portal after this.\"},\"openTasks\":[{\"id\":1,\"taskId\":\"FN-1\",\"title\":\"Complete Function Health security review\",\"status\":\"Blocked\",\"phaseId\":27,\"due\":\"2026-05-22\",\"ownerId\":null,\"priority\":\"high\",\"assigneeContactId\":2,\"description\":null,\"notes\":\"Waiting on SIG Lite questionnaire and pen test evidence.\",\"dependsOn\":[]},{\"id\":2,\"taskId\":\"FN-2\",\"title\":\"Connect dbt repo and warehouse to Quarry\",\"status\":\"Blocked\",\"phaseId\":28,\"due\":null,\"ownerId\":4,\"priority\":null,\"assigneeContactId\":null,\"description\":null,\"notes\":null,\"dependsOn\":[{\"taskId\":1}]},{\"id\":3,\"taskId\":\"FN-3\",\"title\":\"Model lab-results marts\",\"status\":\"Not started\",\"phaseId\":28,\"due\":\"2026-06-26\",\"ownerId\":4,\"priority\":null,\"assigneeContactId\":null,\"description\":null,\"notes\":null,\"dependsOn\":[]},{\"id\":4,\"taskId\":\"FN-4\",\"title\":\"Build member health dashboard\",\"status\":\"Not started\",\"phaseId\":28,\"due\":\"2026-07-10\",\"ownerId\":3,\"priority\":null,\"assigneeContactId\":null,\"description\":null,\"notes\":null,\"dependsOn\":[]},{\"id\":5,\"taskId\":\"FN-5\",\"title\":\"Run analyst training\",\"status\":\"Not started\",\"phaseId\":29,\"due\":\"2026-07-21\",\"ownerId\":3,\"priority\":null,\"assigneeContactId\":null,\"description\":null,\"notes\":null,\"dependsOn\":[]}],\"phases\":[{\"id\":26,\"name\":\"Kickoff\",\"isComplete\":false},{\"id\":27,\"name\":\"Configuration\",\"isComplete\":false},{\"id\":28,\"name\":\"Data Migration\",\"isComplete\":false},{\"id\":29,\"name\":\"Training\",\"isComplete\":false},{\"id\":30,\"name\":\"Go-Live\",\"isComplete\":false}],\"customerContacts\":[{\"id\":1,\"name\":\"Oliver Hartley\",\"email\":\"oliver.hartley@functionhealth.com\"},{\"id\":2,\"name\":\"Freya Dunn\",\"email\":\"freya.dunn@functionhealth.com\"}],\"vendorUsers\":[{\"id\":1,\"name\":\"Maya Lindqvist\",\"email\":\"maya@vector.test\"},{\"id\":2,\"name\":\"Theo Okonkwo\",\"email\":\"theo@vector.test\"},{\"id\":3,\"name\":\"Ines Ferreira\",\"email\":\"ines@vector.test\"},{\"id\":4,\"name\":\"Sam Whitfield\",\"email\":\"sam@vector.test\"},{\"id\":5,\"name\":\"Caroline Jaworsky\",\"email\":\"caroline@vector.test\"}],\"recorder\":{\"id\":1,\"name\":\"Maya Lindqvist\"}}"
+              }
+            ],
+            "output_config": {
+              "effort": "high",
+              "format": {
+                "type": "json_schema",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "actionItems": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "claim": {
+                            "type": "string"
+                          },
+                          "sourceQuote": {
+                            "type": "string"
+                          },
+                          "speaker": {
+                            "type": "string"
+                          },
+                          "mentionedOwner": {
+                            "type": "string"
+                          },
+                          "mentionedDueDate": {
+                            "type": "string"
+                          },
+                          "mentionedDependency": {
+                            "type": "string"
+                          },
+                          "firmness": {
+                            "type": "string",
+                            "enum": [
+                              "firm",
+                              "tentative",
+                              "vague"
+                            ]
+                          },
+                          "notesSnippet": {
+                            "type": "string"
+                          },
+                          "details": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "required": [
+                          "claim",
+                          "sourceQuote",
+                          "firmness",
+                          "details"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "reportedCompletions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "claim": {
+                            "type": "string"
+                          },
+                          "sourceQuote": {
+                            "type": "string"
+                          },
+                          "speaker": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "claim",
+                          "sourceQuote"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "externalBlockers": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "meetingTone": {
+                      "type": "string",
+                      "enum": [
+                        "kickoff",
+                        "status update",
+                        "casual catchup",
+                        "escalation",
+                        "planning",
+                        "review",
+                        "other"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "actionItems",
+                    "reportedCompletions",
+                    "externalBlockers",
+                    "meetingTone"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "response": {
+            "model": "claude-sonnet-4-6",
+            "id": "msg_011CgAJvbhA3HmVNcCKMrhCN",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "Let me analyze the transcript carefully to extract all action items, reported completions, external blockers, and determine the meeting tone.\n\n**Transcript analysis:**\n\n1. **Ines Ferreira** commits to sending the completed SIG Lite questionnaire back to Freya by June 5th.\n   - \"I'll send the completed SIG Lite questionnaire back to Freya by June 5th.\"\n\n2. **Freya Dunn** commits to uploading the pen test summary to the portal by Monday June 8th, once Sam shares it.\n   - \"I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.\"\n   \nSam commits to emailing the pen test report right after the call, Oliver commits to provisioning the read-only Snowflake service account once security signs off, targeting June 10th, and Ines mentions she'll recap in the portal afterward.\n\nI'm deciding Ines's portal recap counts as routine meeting housekeeping rather than a substantive deliverable, so I'll leave it out. Freya's comment about starting the internal review the following week if she has the report by Friday is a conditional commitment worth noting.\n\nSince this satisfies the deliverable-plus-owner rule, I'll keep it as a tentative item with Freya as owner, conditional on receiving the questionnaire. Now I'm working through the full list of action items, starting with Ines sending the SIG Lite questionnaire back to Freya by June 5th, firm commitment, then moving to the next item involving Sam.\n\nSam will email the pen test report to Freya right after the call, a firm commitment with no dependency. Next, Freya will upload the pen test summary to the portal by June 8th, firm but dependent on Sam sharing the report first. Then I'm noting that Oliver needs to provision a read-only Snowflake service account by June 10th.\n\nOliver plans to provision the account as soon as security signs off, targeting Wednesday, June 10th — a firm commitment. Separately, Freya says she can start the internal review the following week, but only if the questionnaire lands by Friday, making that item tentative and conditional.\n\nNow I'm also checking whether Ines's closing line about recapping in the portal counts as a commitment — per the rule, routine meeting recaps don't qualify as onboarding items.\n\nCross-checking the three meeting action items against the transcript, all are confirmed: Ines returning the questionnaire by June 5, Freya uploading the pen test summary by June 8, and Oliver provisioning the Snowflake account by June 10. Now I'm looking at reported completions, starting with the Q1 pen test report already being ready.\n\nActually, the pen test report being \"ready to go\" counts as a real reported completion - Sam finished the pen test and will send it right after the call. Similarly, the internal agreement that read-only analytics accounts skip the change board represents a completed decision that removes a blocker, even though the overall security review task remains open.\n\nFor external blockers, the real one is that the security review has been stalled three weeks waiting on the SIG Lite questionnaire and pen test evidence from infosec. I'm trying to distinguish that from internal policy issues like the warehouse team waiting on security sign-off before creating the service account.\n\nThe remaining question is whether security sign-off itself still counts as unresolved at the end of the meeting, since the action items address the missing documents but not the final approval.\n\nFor external blockers, I'll leave that list empty - this is an internal process step, not a true external blocker.\n\nAs for meeting tone, I'm weighing between \"status update\" and \"planning\" since they're both reviewing blockers and setting concrete dates for next steps. Given they're mapping out specific actions and timelines together, I'll classify this as \"planning.\"\n\nNow I'm pulling together the action items: Ines will send the completed SIG Lite questionnaire to Freya by June 5th, and Sam will email the Q1 pen test report to Freya right after this call.\n\nNext, Freya will upload the pen test summary to the portal by Monday, June 8th once Sam shares it, and then there's a fourth item about provisioning a read-only Snowflake service account by June 10th.\n\nOliver Hartley commits to provisioning that read-only Snowflake service account, scoped to the ANALYTICS schema with key-pair auth, targeting Wednesday June 10th once security signs off — firm but contingent on sign-off. Then Freya tentatively plans to start the internal security review the following week, conditional on receiving the questionnaire by Friday.\n\nI'm weighing whether Freya's review really counts as its own action item or is just downstream of item one — I'll keep it since it's part of the chain, but mark it tentative since \"I can start\" reads as a plan rather than a commitment. I'll also skip Ines's offer to recap in the portal since that's routine meeting wrap-up, not a real commitment.\n\nNow I'm moving into reported completions, starting with Sam Whitfield noting the Q1 pen test report from external testers is finished and available.\n\nI'm verifying the remaining quotes against the transcript, checking Ineira's commitment on the SIG Lite questionnaire, Sam Whitfield's email promise, and Freya Dunn's pen test summary upload commitment, all of which match the source text verbatim.\n\nI notice the transcript uses em dashes in some of these quotes, which conflicts with the global rule against using em dashes in output. I'm reasoning that this rule likely applies to my own writing rather than verbatim source quotes, since preserving exact transcript text requires keeping whatever punctuation was originally used.\n\nSo I'll try to select quote segments that naturally avoid em dashes when possible, like pulling just the portion of Freya's line about the pen test summary without the dash-containing clause, and doing the same for Oliver's quote about the Snowflake account.\n\nI keep testing different quote windows to avoid the em dash, but any version that includes the Wednesday June 10th commitment also includes it. I decide to prioritize faithfulness to the verbatim transcript over my own formatting rule, since that rule governs authored prose, not copied quotes, and move on to compiling the final JSON.\n\nOliver's provisioning note covers the Snowflake service account — read-only, scoped to ANALYTICS, key-pair auth, pending security sign-off and targeting June 10th. Freya's internal review note ties back to the Friday timeline for starting the following week.\n\nNow I'm trimming each notesSnippet to roughly 200 characters while keeping the wording verbatim, then moving into building out the details arrays, starting with the SIG Lite questionnaire entry.\n\nOliver's provisioning targets Wednesday, June 10th, pending security sign-off. Freya's internal infosec review would start the week of June 8, conditional on the questionnaire arriving by Friday June 5 — I should capture that dependency even though she phrased it tentatively with \"I can.\" Now I'm putting together the full JSON structure for the action items.\n\nI'm writing the first entry: Ines sending the completed SIG Lite questionnaire to Freya by June 5th, firm commitment, with details noting the questionnaire is ninety percent done and the security lead has the final section.\n\nThen I'm capturing Sam's commitment to email Freya the Q1 pen test summary right after the call, noting Freya only needs scope and severity findings rather than the full report—also a firm commitment since Sam said it's ready to go.\n\nNext I'm logging Freya's follow-up commitment to upload the pen test summary to the portal by Monday, June 8th, which depends on Sam sharing the report first.\n\nThen I'm capturing another claim: Freya says she can start the internal security review the following week, contingent on receiving the materials by Friday.\n\nNext I'm noting Oliver's commitment to provision the read-only Snowflake service account by Wednesday, June 10th, pending security sign-off.\n\nI'm noting the two reported completions — the Q1 pen test report being ready from external testers, and the internal agreement that read-only analytics accounts bypass the change board. Now I need to double-check how I'm handling the \"mentionedOwner\" field, specifically making sure it captures the actual speaker who made that statement.\n\nI'm deciding to use the speaker label names for self-commitments where someone says \"I'll do X,\" since there's no explicit name in the text itself, while using the verbatim spoken name when one person references another, like Freya naming Sam.\n\nFor self-commitments like Oliver saying \"I'll provision,\" the verbatim owner is just the speaker's own name from their label, while for mentions of others like Freya referencing \"Sam,\" I use that exact name as it appears in the text. So I'll default to full speaker label names for self-commitments and the exact quoted name for third-party mentions.\n\nOliver Hartley, that attribution checks out for item 5. All five owners look correctly matched to their speakers now.\n\n",
+                "signature": "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"
+              }
+            ],
+            "container": null,
+            "stop_reason": "max_tokens",
+            "stop_sequence": null,
+            "stop_details": null,
+            "usage": {
+              "input_tokens": 1458,
+              "cache_creation_input_tokens": 3055,
+              "cache_read_input_tokens": 0,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 3055,
+                "ephemeral_1h_input_tokens": 0
+              },
+              "output_tokens": 8000,
+              "output_tokens_details": {
+                "thinking_tokens": 8000
+              },
+              "service_tier": "standard",
+              "inference_geo": "global",
+              "speed": "standard"
+            },
+            "diagnostics": null
+          }
+        },
+        {
+          "request": {
+            "model": "claude-sonnet-4-6",
+            "max_tokens": 12000,
+            "thinking": {
+              "type": "adaptive"
+            },
+            "output_config": {
+              "effort": "high"
+            },
+            "system": [
+              {
+                "type": "text",
+                "text": "You are Vector. Propose reviewable onboarding task drafts from a meeting. Nothing is executed until a human approves.\n\nINPUT\nmeeting contains the speaker-labelled transcript and Miniti actionItems. extraction contains verbatim facts: actionItems (claim, sourceQuote, speaker, mentionedOwner, mentionedDueDate, mentionedDependency, firmness, notesSnippet, details), reportedCompletions, externalBlockers. openTasks contains the current board (ids, titles, descriptions, notes, owners, assignees, dates, priorities, dependencies). vendorUsers, customerContacts and phases are the only permitted ids. recorder identifies the vendor teammate labelled \"You\", or is null. meetingCalendar and relativeDateHints are calculated in code from the meeting date, not today's processing date.\n\nPROPOSE ONE COMPLETE BATCH\nCall propose_meeting_drafts once, containing every warranted create_task_draft, match_to_existing_task_draft and update_task_status_draft. These proposals do not execute work or return task ids. Assign each new task a unique draftRef (d1, d2, ...); dependencies may refer forward to another draft in this same batch. Do not wait for tool results. Use flag_no_action_items alone only when no new or changed work is warranted.\n\nDECIDE THE WORK BEFORE ITS FIELDS\n1. Identify each actual deliverable and whose job it is. Include concrete immediate promises, owned parked requests and dependent work. \"After A, we will do B\" includes B now as a draft, with A as its dependency. Include short recipient hand-offs and commitments expressed as collective plans. Exclude routine recaps, calendar administration, conversational sign-offs, speculative product ideas with no specific requested deliverable, and rejected ideas. Tentative work that someone explicitly agrees to track is eligible; mere acknowledgement of a general idea is not. Explicitly noting a specific requested deliverable for later preserves it as an undated, low-priority task.\n2. Compare the finished outcome with the board. Update only the SAME deliverable, never merely the same topic. A task waiting for an input is different from producing that input. Reviewing/commenting on an artifact is different from finalising the work that awaits that review. Create the separately owned input when it is absent from the board. If the SAME input is already on the board, update it. Do not split an implementation into duplicate tasks merely because its delivery is a PR; put its technical scope in that task's notes.\n3. A promised later response or coordination step is separate follow-up work, even if it concerns an existing event or milestone. Preserve the speaker's own commitment as a task rather than burying it in the milestone's notes. When another team's decision is still unknown, keep the vendor's promised response/check-back as an undated vendor reminder. Do not assign that response to the person who will supply the input. If a customer is overwhelmed or asks for space, do not create new work for them from that exchange; preserve the vendor's promised check-in instead.\n4. For an existing deliverable, propose ONE update containing only changes agreed for THAT task. Keep its owner, assignee, priority and deadline unchanged when only a prerequisite changes. A prerequisite's deadline is not a deadline for the waiting task, and cannot be used to reset its old date. A dependency-only update contains only changes.dependsOn and, if needed, genuinely new execution context in changes.appendNotes. Never infer a parent deadline from the input chain. An unchanged restatement needs no update. Reported completion of a board task uses update_task_status_draft with newStatus Done.\n\nOWNERS AND RECIPIENTS\nThe actor who commits to doing the work owns it. Match a vendor actor to vendorUsers via ownerId, or a customer actor to customerContacts via assigneeContactId. A recipient, reviewer being notified or person supplying a prerequisite does not become the owner of somebody else's action. Do not set both ownerId and assigneeContactId just to record who receives the result; put recipients in notes. A genuine handover changes the corresponding field on the SAME existing task.\nThe recorder: \"You\" is the vendor person who recorded the meeting, never a customer. Resolve their commitments with ownerId = recorder.id. If recorder is null, nobody has said who recorded the meeting: leave ownerId empty and set ownerFromRecorder: true on create_task_draft. Never guess the recorder from vendorUsers. Leave other unresolved owners empty too.\n\nDEPENDENCIES\nOnce all the deliverables are identified, connect them. Put every explicitly required input on the task that waits for it:\n- an existing board task: { taskId: its id }\n- another new task in this batch: { draftRef: its draftRef }\n- an external condition without an owned task: { text: short blocker wording }\nAn owned approval/review is work, not merely a text label. A review or verification can require both an artifact and a working environment when the meeting names both as its inputs. Inspect the surrounding turns, including later clarifications; do not rely only on mentionedDependency. Explicitly parallel work must stay independent. Do not invent dependencies from general workflow assumptions, self-links, cycles, or repeat links already on the board. For an existing task, add new links through changes.dependsOn without reassigning or re-timing it. Do not put blocker prose in notes.\n\nDATES\nOnly give a task a deadline when timing was stated for that task's own work. Use relativeDateHints for the action with the matching sourceQuote. These dates are computed from the meeting date. Use meetingCalendar for weekday lookups. Never move a task's date to accommodate a prerequisite, or label a date with the wrong weekday.\n- Explicit calendar dates win over inference.\n- by/on a weekday means its next occurrence after the meeting.\n- this week / end of the week means this week's Friday; early next week means next Tuesday; end of next week means next Friday; tomorrow means the next day.\n- right after this call / today / later today means the meeting day.\n- mid-month means the 15th; end of the month means the last day.\n- before/ahead of a dated event means the working day before it; by/at the event means its date.\n- A conditional event with no fixed date (once an input lands, within a day of approval) stays undated. Do not copy its prerequisite's deadline.\n- changes.dueDate = null only when this task's own deadline was explicitly removed.\nFor timing not covered by a code hint, explain inferred dates in a final, separate \"Due date:\" paragraph in notes/appendNotes. Code adds that paragraph for resolved relativeDateHints.\n\nEXECUTION NOTES\nPreserve each relevant extraction.details fact: exact names of files/systems/metrics, scope, audience, exclusions and negations, acceptance criteria, references, delivery destination, reviewer tagging and measurement instructions. Consult the transcript if details are missing. Use concise sentences without a one/two-sentence cap; never dump the transcript. A dependency removes only its blocker sentence from notes, not the work's other instructions. Optional cheap measurements can stay instructions on the main task rather than duplicate tasks. For an existing task, changes.appendNotes contains only genuinely new agreed information and never repeats unchanged board details. A progress percentage or unchanged status alone is not new execution scope.\n\nOUTPUT INTEGRITY\nEach sourceQuote is one continuous passage copied verbatim from a single speaker's turn, preferably the quote from extraction. Never join speakers, paraphrase quotes or use summary/notes as a quote. Only if the commitment is absent from the transcript may its verbatim Miniti actionItems entry be used. The speaker label is not part of the quote. Multiple changes to one deliverable use the most informative single quote.\nEvery create_task_draft needs a phaseId from phases; choose the best fitting phase, or the first incomplete phase. Use only supplied task/contact/user/phase ids. Confidence high means a clear commitment with owner and timing; medium means one is inferred/unclear; low means tentative work. Never guess missing fields.\nBefore emitting the batch, account for each eligible extraction item and completion, verify dependent work is present, and check there is only one update per existing task. Do not create no-op updates just to cover restatements.\n\nGLOBAL RULES — apply to all output:\n- Never use em dashes (—) or en dashes (–). Use commas, periods, parentheses, or \"and\" instead.\n\nToday is 2026-06-03 (Wednesday). Dates spoken in the meeting are relative to meeting.date when it differs.",
+                "cache_control": {
+                  "type": "ephemeral"
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "user",
+                "content": "{\"today\":\"2026-06-03\",\"meeting\":{\"id\":\"D02B3F4A-1C5E-4B7D-9A2F-6E8C1D3F5A02\",\"title\":\"Function Health security review — working session\",\"date\":\"2026-06-03T10:00:00Z\",\"summary\":\"Working session to unstick the Function Health security review (health-data infosec). Agreed the questionnaire handoff, the pen test evidence, and the service account provisioning sequence.\",\"actionItems\":[\"Ines to return completed SIG Lite questionnaire by June 5\",\"Freya to upload pen test summary to the portal by June 8\",\"Oliver to provision read-only Snowflake service account by June 10\"],\"keyDecisions\":[\"Service account provisioning proceeds immediately after security sign-off, no separate change board review\"],\"notes\":\"The health-data security review has been the blocking chain for three weeks; this session set concrete dates on each link.\",\"transcript\":\"Ines Ferreira: Thanks for making time, both. The goal today is to get the security review moving again — it's been the blocker for three weeks.\\nFreya Dunn: Honest answer from our side: the review is stuck because we're missing two inputs — your completed SIG Lite questionnaire and evidence from a recent penetration test. Handling patient lab results, our infosec team can't wave either through.\\nInes Ferreira: The questionnaire is ninety percent done, our security lead has the last section. I'll send the completed SIG Lite questionnaire back to Freya by June 5th.\\nFreya Dunn: Friday works. If I have it Friday, I can start the internal review the following week.\\nSam Whitfield: And the pen test — we have the Q1 report from our external testers. Do you need the full report or a summary?\\nFreya Dunn: A summary with scope and findings severity is enough. Actually, easier if it lives with the rest of the evidence — I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.\\nSam Whitfield: I'll email it to you right after this call, it's ready to go.\\nOliver Hartley: Then the last link in the chain is me. The warehouse team won't create the service account until security signs off — and with PHI in the schema they're strict about it.\\nInes Ferreira: Can we pre-agree the shape so it's a same-day job once you get the green light?\\nOliver Hartley: Yes — read-only, scoped to the ANALYTICS schema, key-pair auth. I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th.\\nFreya Dunn: That's realistic if the questionnaire lands Friday.\\nSam Whitfield: Do we need your change advisory board for the account creation? That added two weeks last time at another customer.\\nOliver Hartley: No — we agreed internally last month that read-only analytics accounts skip the change board. It goes straight through.\\nInes Ferreira: Excellent. So: questionnaire Friday the 5th, pen test summary Monday the 8th, service account Wednesday the 10th. That's the chain unblocked.\\nFreya Dunn: Agreed. Nice to have dates on it at last.\\nInes Ferreira: Thanks all — I'll recap in the portal after this.\"},\"openTasks\":[{\"id\":1,\"taskId\":\"FN-1\",\"title\":\"Complete Function Health security review\",\"status\":\"Blocked\",\"phaseId\":27,\"due\":\"2026-05-22\",\"ownerId\":null,\"priority\":\"high\",\"assigneeContactId\":2,\"description\":null,\"notes\":\"Waiting on SIG Lite questionnaire and pen test evidence.\",\"dependsOn\":[]},{\"id\":2,\"taskId\":\"FN-2\",\"title\":\"Connect dbt repo and warehouse to Quarry\",\"status\":\"Blocked\",\"phaseId\":28,\"due\":null,\"ownerId\":4,\"priority\":null,\"assigneeContactId\":null,\"description\":null,\"notes\":null,\"dependsOn\":[{\"taskId\":1}]},{\"id\":3,\"taskId\":\"FN-3\",\"title\":\"Model lab-results marts\",\"status\":\"Not started\",\"phaseId\":28,\"due\":\"2026-06-26\",\"ownerId\":4,\"priority\":null,\"assigneeContactId\":null,\"description\":null,\"notes\":null,\"dependsOn\":[]},{\"id\":4,\"taskId\":\"FN-4\",\"title\":\"Build member health dashboard\",\"status\":\"Not started\",\"phaseId\":28,\"due\":\"2026-07-10\",\"ownerId\":3,\"priority\":null,\"assigneeContactId\":null,\"description\":null,\"notes\":null,\"dependsOn\":[]},{\"id\":5,\"taskId\":\"FN-5\",\"title\":\"Run analyst training\",\"status\":\"Not started\",\"phaseId\":29,\"due\":\"2026-07-21\",\"ownerId\":3,\"priority\":null,\"assigneeContactId\":null,\"description\":null,\"notes\":null,\"dependsOn\":[]}],\"phases\":[{\"id\":26,\"name\":\"Kickoff\",\"isComplete\":false},{\"id\":27,\"name\":\"Configuration\",\"isComplete\":false},{\"id\":28,\"name\":\"Data Migration\",\"isComplete\":false},{\"id\":29,\"name\":\"Training\",\"isComplete\":false},{\"id\":30,\"name\":\"Go-Live\",\"isComplete\":false}],\"customerContacts\":[{\"id\":1,\"name\":\"Oliver Hartley\",\"email\":\"oliver.hartley@functionhealth.com\"},{\"id\":2,\"name\":\"Freya Dunn\",\"email\":\"freya.dunn@functionhealth.com\"}],\"vendorUsers\":[{\"id\":1,\"name\":\"Maya Lindqvist\",\"email\":\"maya@vector.test\"},{\"id\":2,\"name\":\"Theo Okonkwo\",\"email\":\"theo@vector.test\"},{\"id\":3,\"name\":\"Ines Ferreira\",\"email\":\"ines@vector.test\"},{\"id\":4,\"name\":\"Sam Whitfield\",\"email\":\"sam@vector.test\"},{\"id\":5,\"name\":\"Caroline Jaworsky\",\"email\":\"caroline@vector.test\"}],\"recorder\":{\"id\":1,\"name\":\"Maya Lindqvist\"},\"extraction\":null,\"meetingCalendar\":{\"meetingDate\":\"2026-06-03\",\"thisWeek\":{\"Monday\":\"2026-06-01\",\"Tuesday\":\"2026-06-02\",\"Wednesday\":\"2026-06-03\",\"Thursday\":\"2026-06-04\",\"Friday\":\"2026-06-05\",\"Saturday\":\"2026-06-06\",\"Sunday\":\"2026-06-07\"},\"nextWeek\":{\"Monday\":\"2026-06-08\",\"Tuesday\":\"2026-06-09\",\"Wednesday\":\"2026-06-10\",\"Thursday\":\"2026-06-11\",\"Friday\":\"2026-06-12\",\"Saturday\":\"2026-06-13\",\"Sunday\":\"2026-06-14\"}},\"relativeDateHints\":[]}"
+              }
+            ],
+            "tools": [
+              {
+                "name": "propose_meeting_drafts",
+                "description": "Submit the COMPLETE meeting review batch once. Each calls entry is a draft proposal, not an executed task. Include prerequisites, dependent tasks, existing-task updates and completions together; draftRefs can point forward within this batch. No tool results are needed. Use flag_no_action_items alone only when no draft is warranted.",
+                "input_schema": {
+                  "type": "object",
+                  "properties": {
+                    "calls": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "description": "Propose creating a new task. Use when an action item is a fresh commitment not covered by any existing open task. Fill in as many fields as the extraction supports; leave the rest null/omitted.",
+                            "properties": {
+                              "tool": {
+                                "type": "string",
+                                "const": "create_task_draft"
+                              },
+                              "input": {
+                                "type": "object",
+                                "properties": {
+                                  "draftRef": {
+                                    "type": "string",
+                                    "description": "REQUIRED. A short id for this draft, unique within this response: \"d1\", \"d2\", ... in the order you propose new tasks. Other drafts name it in dependsOn ({ draftRef }) when they wait on this one."
+                                  },
+                                  "title": {
+                                    "type": "string",
+                                    "description": "Short imperative task title, max 80 chars."
+                                  },
+                                  "description": {
+                                    "type": "string",
+                                    "description": "Optional longer description of what the task entails."
+                                  },
+                                  "ownerId": {
+                                    "type": "integer",
+                                    "description": "Vendor team-mate who owns this work. MUST be an id from vendorUsers. When the recorder (\"You\") made the commitment, recorder.id. Omit if not determinable."
+                                  },
+                                  "ownerFromRecorder": {
+                                    "type": "boolean",
+                                    "description": "true ONLY when the person who recorded the meeting (\"You\") made this commitment and recorder is null, so ownerId is left empty. Omit otherwise."
+                                  },
+                                  "assigneeContactId": {
+                                    "type": "integer",
+                                    "description": "Customer-side person responsible. MUST be an id from customerContacts. Omit if not determinable."
+                                  },
+                                  "dueDate": {
+                                    "type": "string",
+                                    "description": "ISO date YYYY-MM-DD if a deadline was committed. Empty string or omit if not."
+                                  },
+                                  "phaseId": {
+                                    "type": "integer",
+                                    "description": "REQUIRED. Must match a phase id from the phases array."
+                                  },
+                                  "priority": {
+                                    "type": "string",
+                                    "enum": [
+                                      "low",
+                                      "medium",
+                                      "high"
+                                    ]
+                                  },
+                                  "dependsOn": {
+                                    "type": "array",
+                                    "description": "What this task waits on (see JUDGEMENT RULES E). Each item is exactly ONE of: { taskId } for an open task on the board, { draftRef } for another new task you are proposing in this same response (its create_task_draft's draftRef), or { text } for a blocker that is not a task (a sign-off, another team, an external event). Omit when nothing blocks it.",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "taskId": {
+                                          "type": "integer",
+                                          "description": "An id from openTasks."
+                                        },
+                                        "draftRef": {
+                                          "type": "string",
+                                          "description": "The draftRef of another create_task_draft in this response."
+                                        },
+                                        "text": {
+                                          "type": "string",
+                                          "description": "The blocker in a few words."
+                                        }
+                                      },
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "notes": {
+                                    "type": "string",
+                                    "description": "Concise, in your own words: the crucial specifics agreed on the call (scope, names, audience, constraints, recipient), then any \"Due date: ...\" line explaining an inferred date. Blockers go in dependsOn, not here. Not a raw transcript dump."
+                                  },
+                                  "sourceQuote": {
+                                    "type": "string",
+                                    "description": "REQUIRED. Verbatim — use extraction.sourceQuote."
+                                  },
+                                  "confidence": {
+                                    "type": "string",
+                                    "enum": [
+                                      "low",
+                                      "medium",
+                                      "high"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "draftRef",
+                                  "title",
+                                  "phaseId",
+                                  "priority",
+                                  "sourceQuote",
+                                  "confidence"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "tool",
+                              "input"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "description": "Propose updating an existing open task instead of creating a duplicate. Use only for the SAME deliverable already in openTasks. Shared topic or a separate prerequisite in its notes is insufficient; propose that distinct work as create_task_draft. One draft per task: put EVERY change agreed on the call for that task in `changes` (new owner or assignee, new due date, new priority, notes to append, new blockers). Only include fields that differ from the board.",
+                            "properties": {
+                              "tool": {
+                                "type": "string",
+                                "const": "match_to_existing_task_draft"
+                              },
+                              "input": {
+                                "type": "object",
+                                "properties": {
+                                  "taskId": {
+                                    "type": "integer",
+                                    "description": "Must be an id from openTasks"
+                                  },
+                                  "changes": {
+                                    "type": "object",
+                                    "description": "The changes to apply to the task, all at once. At least one field.",
+                                    "properties": {
+                                      "ownerId": {
+                                        "type": "integer",
+                                        "description": "New vendor owner. MUST be an id from vendorUsers. Only when the work moved to a different vendor team-mate."
+                                      },
+                                      "assigneeContactId": {
+                                        "type": "integer",
+                                        "description": "New customer-side assignee. MUST be an id from customerContacts. Only when the work moved to a different customer contact."
+                                      },
+                                      "priority": {
+                                        "type": "string",
+                                        "enum": [
+                                          "low",
+                                          "medium",
+                                          "high"
+                                        ],
+                                        "description": "New priority."
+                                      },
+                                      "dueDate": {
+                                        "type": [
+                                          "string",
+                                          "null"
+                                        ],
+                                        "description": "New due date, ISO YYYY-MM-DD (see JUDGEMENT RULES, dates). null removes the task's due date: only when the call says there is no date for it any more."
+                                      },
+                                      "appendNotes": {
+                                        "type": "string",
+                                        "description": "Concise, in your own words: what the call added to this task (scope, names, audience, constraints, recipient), then any \"Due date: ...\" line explaining an inferred date. Appended to the task's notes as a new dated line; never repeat what the notes already say. Blockers go in dependsOn."
+                                      },
+                                      "dependsOn": {
+                                        "type": "array",
+                                        "description": "Blockers to ADD to this task (see JUDGEMENT RULES E). Only ones its dependsOn does not already list.",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "taskId": {
+                                              "type": "integer",
+                                              "description": "An id from openTasks."
+                                            },
+                                            "draftRef": {
+                                              "type": "string",
+                                              "description": "The draftRef of another create_task_draft in this response."
+                                            },
+                                            "text": {
+                                              "type": "string",
+                                              "description": "The blocker in a few words."
+                                            }
+                                          },
+                                          "additionalProperties": false
+                                        }
+                                      }
+                                    },
+                                    "minProperties": 1,
+                                    "additionalProperties": false
+                                  },
+                                  "sourceQuote": {
+                                    "type": "string"
+                                  },
+                                  "confidence": {
+                                    "type": "string",
+                                    "enum": [
+                                      "low",
+                                      "medium",
+                                      "high"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "taskId",
+                                  "changes",
+                                  "sourceQuote",
+                                  "confidence"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "tool",
+                              "input"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "description": "Propose marking an existing task as Done (or another status) when the transcript reports completion.",
+                            "properties": {
+                              "tool": {
+                                "type": "string",
+                                "const": "update_task_status_draft"
+                              },
+                              "input": {
+                                "type": "object",
+                                "properties": {
+                                  "taskId": {
+                                    "type": "integer",
+                                    "description": "Must be an id from openTasks"
+                                  },
+                                  "newStatus": {
+                                    "type": "string",
+                                    "enum": [
+                                      "Not started",
+                                      "In progress",
+                                      "Under investigation",
+                                      "Blocked",
+                                      "Done"
+                                    ]
+                                  },
+                                  "sourceQuote": {
+                                    "type": "string"
+                                  },
+                                  "confidence": {
+                                    "type": "string",
+                                    "enum": [
+                                      "low",
+                                      "medium",
+                                      "high"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "taskId",
+                                  "newStatus",
+                                  "sourceQuote",
+                                  "confidence"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "tool",
+                              "input"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "description": "Call exactly once if the meeting has no concrete action items worth surfacing.",
+                            "properties": {
+                              "tool": {
+                                "type": "string",
+                                "const": "flag_no_action_items"
+                              },
+                              "input": {
+                                "type": "object",
+                                "properties": {
+                                  "reason": {
+                                    "type": "string",
+                                    "description": "Brief explanation (e.g. 'casual catch-up', 'all items already covered by existing tasks')"
+                                  }
+                                },
+                                "required": [
+                                  "reason"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "tool",
+                              "input"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "calls"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            ],
+            "tool_choice": {
+              "type": "auto"
+            }
+          },
+          "response": {
+            "model": "claude-sonnet-4-6",
+            "id": "msg_011CgAK6yaa9miwJpCfysZZx",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "Let me analyze the meeting carefully to identify all action items and how they relate to existing tasks.\n\n## Meeting Summary\nA security review working session for Function Health. Three concrete commitments were made:\n1. Ines Ferreira (vendor user id:3) to return completed SIG Lite questionnaire by June 5\n2. Freya Dunn (customer contact id:2) to upload pen test summary to the portal by June 8 (once Sam shares it)\n3. Oliver Hartley (customer contact id:1) to provision read-only Snowflake service account by June 10 (after security sign-off)\n\nAlso: Sam Whitfield (vendor user id:4) committed to email the pen test summary to Freya right after the call.\nInes also committed to posting a recap in the portal after the call.\n\nNow I'm checking the existing open tasks to see how these commitments map onto them. FN-1, the main security review, is blocked pending the SIG Lite questionnaire and pen test evidence — the meeting's action items are really the inputs feeding that task rather than new standalone work. FN-2 is blocked on FN-1, FN-3 hasn't started, and I'm continuing to look at what FN-4 covers.\n\nMoving on to the action items I need to create: Ines will return the completed SIG Lite questionnaire by June 5th, which I should log as high priority since it directly unblocks FN-1's security review, tied to Phase 27 and owned by Ines. Next I'm noting that Sam committed to emailing the pen test summary to Freya right after the call, and I need to pin down the due date for that item.\n\nDue June 10, depending on security sign-off, scoped to read-only ANALYTICS access with key-pair auth. This also makes me think about FN-1, the Function Health security review ticket, which was blocked on the SIG Lite questionnaire and pen test evidence — now that concrete tasks exist for both, I should link those dependencies and update its status.\n\nRight, so FN-1 should depend on both the questionnaire (d1) and the pen test upload (d3) since Freya's review relies on those inputs. I'm also considering whether Ines's promise to recap in the portal counts as a separate follow-up task — it's a concrete immediate commitment, so it likely qualifies even though it's minor.\n\nThis is a routine recap, so I'll exclude it.\n\nNow moving to the Snowflake service account task - Oliver Hartley (customer contact id:1) committed to provisioning a read-only service account scoped to the ANALYTICS schema with key-pair auth, targeting June 10th, contingent on security sign-off which ties back to the security review.\n\nI'm now mapping out the dependency structure: Ines submitting the SIG Lite questionnaire by June 5, and Sam emailing the pen test summary to Freya today, both as vendor-owned items.\n\nFreya then uploads that pen test summary to the portal by June 8, depending on Sam's email, and Oliver provisions the Snowflake account by June 10, depending on the security review being resolved. I also need to update the security review item to add these new dependencies.\n\nI'm debating whether to change the security review's due date, but since it passed (2026-05-22) and the meeting never explicitly set a new one — only discussed the input deadlines — I'll leave the due date untouched and just add the dependency links.\n\nI should also keep the status on \"Blocked\" since the review itself hasn't moved, and then think through whether the Snowflake provisioning task is really a dependency of the warehouse connection task rather than the security review, since the meeting framed it as a prerequisite for that connection work.\n\nSince d4 already depends on FN-1, I should still explicitly add it as a dependency for FN-2 since Quarry's connection to the warehouse requires the provisioned service account. Now I'm laying out the finalized task list: SIG Lite questionnaire submission, pen test summary emailed and uploaded to the portal, and the service account provisioning step, each with owners and dates tied to the security review chain.\n\nI'm also deciding where the Snowflake service account task fits phase-wise -- leaning toward Configuration since it's about access setup rather than the actual migration work itself.\n\nI'll assign all four dependencies (questionnaire, pen test emails/upload, account provisioning) to phase 27, since they're all configuration-related. Now I'm pulling the verbatim source quote for d1, the questionnaire item, from the transcript.\n\nActually I should reconsider the FN-2 quote — Oliver's line about being \"the last link in the chain\" since the warehouse team won't create the service account until security signs off ties it directly to the dependency. I'm weighing whether FN-2 needs its own explicit link to d4, or whether its existing dependency on FN-1 already covers it implicitly.\n\nSince the meeting laid out the sequence explicitly as questionnaire, pen test, security review, service account, warehouse connection, I'll add d4 as an explicit dependency for FN-2 to make that chain clear. Now I'm drafting the deliverables: the SIG Lite questionnaire from Ines Ferreira, the pen test summary email from Sam Whitfield, and the pen test upload, each with owners, due dates, phases, and priority levels.\n\nI'm also adding a service account provisioning task for Oliver Hartley, read-only and scoped to the ANALYTICS schema with key-pair auth, depending on the FN-1 security sign-off. Then I'm updating FN-1 to depend on the questionnaire and pen test drafts, appending notes about the concrete input deadlines agreed in the working session.\n\nNow I'm linking FN-2 to the provisioning task and double-checking I haven't used any em or en dashes in my own notes, since those must only appear in verbatim source quotes. I'm also assigning confidence levels to each draft based on how clear the commitment, owner, and date were.\n\nd4 should depend on FN-1 since Oliver tied the service account to security sign-off directly, so taskId:1 is the right link. For the FN-1 update's source quote, I want the one that best captures what's blocking the review and the new plan around the missing inputs — the questionnaire and pen test evidence given the patient lab data context.\n\nFor the FN-1 update itself, I'll add dependencies on d1 and d3, plus an appendNote capturing the concrete deadlines established in the meeting: the SIG Lite questionnaire due June 5 from Ines, and the pen test summary due June 8 from Freya.\n\nFor FN-2, I only need to add a dependency on d4, citing Oliver's quote about provisioning the read-only Snowflake service account once security signs off. The chain is implied rather than stated directly — security review leads to the service account, which is the credential FN-2 needs for the warehouse connection — but I'm confident this link holds.\n\nNow I'm organizing my draft: the four new reference items (SIG Lite questionnaire, pen test summary email, evidence portal upload, and the Snowflake service account), plus the task updates for FN-1 and FN-2 with their respective dependencies and notes.\n\nI'm double-checking the dependency ordering to confirm each item only references tasks that already exist or precede it, then confirming I've got owner versus assignee roles correctly mapped for Ines Ferreira before finalizing the JSON call.\n\nI'll add Oliver's note about no change board review being needed, Freya's scope detail on the summary, and Oliver's own description of the read-only access requirements for d4. I'll skip Ines's portal recap as a routine admin note, and I'm noting that FN-1's due date has already passed while the review stays blocked, so the meeting's concrete input dates matter.\n\nFN-1's assignee (Freya) stays correct, and all four new tasks belong in phase 27 since they're all configuration-related inputs. I'm finalizing the structure: first task owned by Ines, due 2026-06-05, in phase 27.\n\nThe remaining tasks follow similarly, with d3 depending on d2 and d4 depending on the original security review task. I also need to update FN-1 to add dependencies and append notes, and update FN-2 with its new dependency. Now I'm ready to write the proposal, making sure I use regular hyphens instead of em or en dashes outside of quoted text, keep all IDs accurate, and use the right tense throughout.\n\nFor the source quotes, I'm pulling Freya's explanation about the missing SIG Lite questionnaire and penetration test evidence to justify why FN-1 needs those dependencies, and Oliver's quote about the service account being the last link for the FN-2 update.\n\n",
+                "signature": "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"
+              },
+              {
+                "type": "tool_use",
+                "id": "toolu_011mVftJfSQpZqRg3RdN2fmK",
+                "name": "propose_meeting_drafts",
+                "input": {
+                  "calls": [
+                    {
+                      "tool": "create_task_draft",
+                      "input": {
+                        "draftRef": "d1",
+                        "title": "Submit completed SIG Lite questionnaire to Freya Dunn",
+                        "phaseId": 27,
+                        "priority": "high",
+                        "ownerId": 3,
+                        "dueDate": "2026-06-05",
+                        "notes": "Ines Ferreira to deliver the fully completed SIG Lite questionnaire to Freya Dunn. The document is 90% done; the security lead holds the last section. Recipient is Freya Dunn for her internal infosec review. Completion of this task unblocks the Function Health security review.",
+                        "sourceQuote": "I'll send the completed SIG Lite questionnaire back to Freya by June 5th.",
+                        "confidence": "high"
+                      }
+                    },
+                    {
+                      "tool": "create_task_draft",
+                      "input": {
+                        "draftRef": "d2",
+                        "title": "Email Q1 pen test summary to Freya Dunn",
+                        "phaseId": 27,
+                        "priority": "high",
+                        "ownerId": 4,
+                        "dueDate": "2026-06-03",
+                        "notes": "Sam Whitfield to send the Q1 external penetration test report to Freya Dunn immediately after the June 3 working session. The report is ready. Freya needs it to upload the summary to the evidence portal (see dependent task).",
+                        "sourceQuote": "I'll email it to you right after this call, it's ready to go.",
+                        "confidence": "high"
+                      }
+                    },
+                    {
+                      "tool": "create_task_draft",
+                      "input": {
+                        "draftRef": "d3",
+                        "title": "Upload pen test summary to evidence portal",
+                        "phaseId": 27,
+                        "priority": "high",
+                        "assigneeContactId": 2,
+                        "dueDate": "2026-06-08",
+                        "notes": "Freya Dunn to upload the penetration test summary to the customer evidence portal once Sam Whitfield provides the Q1 report. Summary must include scope and findings severity; the full report is not required. Uploading to the portal keeps all review evidence in one place for infosec.",
+                        "dependsOn": [
+                          {
+                            "draftRef": "d2"
+                          }
+                        ],
+                        "sourceQuote": "I'll get the pen test summary uploaded to your portal by Monday, June 8th, once Sam shares it.",
+                        "confidence": "high"
+                      }
+                    },
+                    {
+                      "tool": "create_task_draft",
+                      "input": {
+                        "draftRef": "d4",
+                        "title": "Provision read-only Snowflake service account (ANALYTICS schema)",
+                        "phaseId": 27,
+                        "priority": "high",
+                        "assigneeContactId": 1,
+                        "dueDate": "2026-06-10",
+                        "notes": "Oliver Hartley to create the service account immediately after security sign-off, targeting June 10. Specifications agreed: read-only access, scoped to the ANALYTICS schema, key-pair authentication. No change advisory board review required; read-only analytics accounts were agreed internally last month to skip that process. PHI is present in the schema so the warehouse team requires security sign-off before proceeding.",
+                        "dependsOn": [
+                          {
+                            "taskId": 1
+                          }
+                        ],
+                        "sourceQuote": "Yes — read-only, scoped to the ANALYTICS schema, key-pair auth. I'll provision the read-only Snowflake service account as soon as security signs off — targeting Wednesday, June 10th.",
+                        "confidence": "high"
+                      }
+                    },
+                    {
+                      "tool": "match_to_existing_task_draft",
+                      "input": {
+                        "taskId": 1,
+                        "changes": {
+                          "appendNotes": "Working session on June 3 established concrete deadlines for both blocking inputs: SIG Lite questionnaire to be submitted by June 5 (Ines Ferreira), pen test summary to be uploaded to the portal by June 8 (Freya Dunn). Freya will begin internal infosec review the week of June 9 if the questionnaire arrives on time.",
+                          "dependsOn": [
+                            {
+                              "draftRef": "d1"
+                            },
+                            {
+                              "draftRef": "d3"
+                            }
+                          ]
+                        },
+                        "sourceQuote": "the review is stuck because we're missing two inputs — your completed SIG Lite questionnaire and evidence from a recent penetration test. Handling patient lab results, our infosec team can't wave either through.",
+                        "confidence": "high"
+                      }
+                    },
+                    {
+                      "tool": "match_to_existing_task_draft",
+                      "input": {
+                        "taskId": 2,
+                        "changes": {
+                          "dependsOn": [
+                            {
+                              "draftRef": "d4"
+                            }
+                          ]
+                        },
+                        "sourceQuote": "Then the last link in the chain is me. The warehouse team won't create the service account until security signs off — and with PHI in the schema they're strict about it.",
+                        "confidence": "high"
+                      }
+                    }
+                  ]
+                },
+                "caller": {
+                  "type": "direct"
+                }
+              }
+            ],
+            "container": null,
+            "stop_reason": "tool_use",
+            "stop_sequence": null,
+            "stop_details": null,
+            "usage": {
+              "input_tokens": 1943,
+              "cache_creation_input_tokens": 4130,
+              "cache_read_input_tokens": 0,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 4130,
+                "ephemeral_1h_input_tokens": 0
+              },
+              "output_tokens": 7473,
+              "output_tokens_details": {
+                "thinking_tokens": 6121
+              },
+              "service_tier": "standard",
+              "inference_geo": "global",
+              "speed": "standard"
+            },
+            "diagnostics": null
+          }
+        }
+      ]
+    }
+  ]
+}

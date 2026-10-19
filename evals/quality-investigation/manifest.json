@@ -1,0 +1,119 @@
+{
+  "model": "claude-sonnet-4-6",
+  "developmentCases": [
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "09",
+    "11",
+    "13",
+    "26",
+    "29"
+  ],
+  "confirmation": "Final Round2 candidate: r2-verified-full. All30cases, identical extraction/decision settings. First Round2 candidate rejected and preserved.",
+  "orchestratorSha256": "09266fedb447287a57f3dae04649a33df6cdd1c65941c09fde83cd824d1cfb9b",
+  "baselineCommit": "90bde62",
+  "answerKeyChanged": true,
+  "scorerChanged": false,
+  "firstConfirmationSourceSha256": "0876a3001e85ad48feeb8cd4adf76e4cdbf1224677890dc3aafabf37d1512520",
+  "secondConfirmationSourceSha256": "ed252470ea304d812da75e53daa3a654d30bb6b2cc54e953e3a4b32d3ed3b7e3",
+  "round1": {
+    "orchestratorSha256": "503acf06d042e85bb434d3553ab9c9b51b5be260abff864a474bcec30129b3e5",
+    "answerKeyChanged": false,
+    "scorerChanged": false,
+    "confirmation": "Third and last full sweep: dependency-quality-verified-*; first two broader checks exposed precision and parked-boundary issues, followed by targeted gates. No more paid iterations after verified sweep."
+  },
+  "status": "Final verification complete; paid calls stopped; residual model/key issues documented",
+  "answerKeyRevision": {
+    "case": "16",
+    "decision": "One task covers implementation and PR; separate vendor review. Explicit Caroline decision 2026-10-18.",
+    "originalExpectedCount": 81,
+    "currentExpectedCount": 80,
+    "archive": "answer-key-before-round2/16-working-session-ambiguous.json",
+    "oldSha256": "88e45e6f7f9231a27a3719ccabaf017a3eb69e03c2866113c79db83526ff91fd",
+    "currentSha256": "c9d4d3f883930b68b54e70284c84bf277698469656dd66458cefe0e695ac0219",
+    "comparableRound1": "../runs/2026-10-18-dependency-quality-round1-policy-baseline.json",
+    "extraNotesChecks": "Implementation scope preserved when combining the two tasks. Scorer algorithms and thresholds unchanged."
+  },
+  "round2": {
+    "model": "claude-sonnet-4-6",
+    "extraction": {
+      "temperature": 0.2,
+      "max_tokens": 6000,
+      "thinking": "disabled"
+    },
+    "decision": {
+      "tool_choice": "auto",
+      "max_tokens": 10000,
+      "thinking": {
+        "type": "enabled",
+        "budget_tokens": 1024
+      },
+      "temperature": "omitted; provider default"
+    },
+    "note": "Requested thinking budget is not a guaranteed observed cap. Same two model passes; no third call. This set is development data, not held out.",
+    "sourceSha256": {
+      "lib/ai/orchestrator.ts": "09266fedb447287a57f3dae04649a33df6cdd1c65941c09fde83cd824d1cfb9b",
+      "lib/ai/meeting-calendar.ts": "bc8371563d1f1f8b2f02277599d4c397d766c0522be746ada8e7d2fadda96c76",
+      "lib/ai/draft-eligibility.ts": "5807e93cf44606050d64c3a4701dcdba241fe105b9524e856bc2b246f51201d4",
+      "lib/ai/global-rules.ts": "4dfd9ab33002ad7b8fe124ba70d2b88c167dc6a6d5cc509694d595b0c98092ee",
+      "evals/scoring.ts": "e47a725b400ee77b8000bff020c3623460f22db1ed7173ea0a0e6d80e8c8e273",
+      "evals/run-golden.ts": "71b1f2a746a509bc30792b71c3fdbb16a067e5e8d31d14e4e647e2b33ebe0015",
+      "evals/harness/trace-llm.ts": "14ad8b16f991c72b364a07b8bf3a2d036f0034af50d0ddc77af759778c906033",
+      "app/api/integrations/miniti/webhook/route.ts": "cc180afa82984c898a60cde3c545b7043bf1c4ccbf5c3ff26aa1c01944886a19",
+      "app/api/external-events/[id]/assign/route.ts": "32fd809bd795184d39262d8f0625798ba10b1faf18606772fa73d382fbbdabf4",
+      "app/api/external-events/[id]/reprocess/route.ts": "45ade8ac1c7db04f6c167425a5bb5cf029e3022bf7f155a8c4f3676a89a74894",
+      "app/api/external-events/reprocess-all-stuck/route.ts": "7ceb5fc93de2372ab815dfc2bf812b37c60a5540095fb91db1fbaee8535f8824",
+      "lib/ai/draft-ownership.ts": "a64dd642bfea9502b7cbfae15ae70e5e5882c279b08ad9a22325168ed3374d84",
+      "lib/ai/draft-evidence.ts": "9189138a61c170522c158d37bcf12f94104801da18a4f138f34754ef4a8b7fdd"
+    },
+    "routeDurationSeconds": 300,
+    "liveFluidComputeVerified": false,
+    "firstFullSourceSha256": {
+      "lib/ai/orchestrator.ts": "a16234146ce7c821af8ed010639ffab2fd50075b63b48cdcb9b642d67da79198",
+      "lib/ai/meeting-calendar.ts": "bc8371563d1f1f8b2f02277599d4c397d766c0522be746ada8e7d2fadda96c76",
+      "lib/ai/draft-eligibility.ts": "5807e93cf44606050d64c3a4701dcdba241fe105b9524e856bc2b246f51201d4",
+      "lib/ai/global-rules.ts": "4dfd9ab33002ad7b8fe124ba70d2b88c167dc6a6d5cc509694d595b0c98092ee",
+      "evals/scoring.ts": "e47a725b400ee77b8000bff020c3623460f22db1ed7173ea0a0e6d80e8c8e273",
+      "evals/run-golden.ts": "71b1f2a746a509bc30792b71c3fdbb16a067e5e8d31d14e4e647e2b33ebe0015",
+      "evals/harness/trace-llm.ts": "14ad8b16f991c72b364a07b8bf3a2d036f0034af50d0ddc77af759778c906033",
+      "app/api/integrations/miniti/webhook/route.ts": "cc180afa82984c898a60cde3c545b7043bf1c4ccbf5c3ff26aa1c01944886a19",
+      "app/api/external-events/[id]/assign/route.ts": "32fd809bd795184d39262d8f0625798ba10b1faf18606772fa73d382fbbdabf4",
+      "app/api/external-events/[id]/reprocess/route.ts": "45ade8ac1c7db04f6c167425a5bb5cf029e3022bf7f155a8c4f3676a89a74894",
+      "app/api/external-events/reprocess-all-stuck/route.ts": "7ceb5fc93de2372ab815dfc2bf812b37c60a5540095fb91db1fbaee8535f8824",
+      "lib/ai/draft-ownership.ts": "a64dd642bfea9502b7cbfae15ae70e5e5882c279b08ad9a22325168ed3374d84"
+    },
+    "firstFullRun": "../runs/2026-10-18-dependency-quality-r2-confirmation-full.json",
+    "finalRun": "../runs/2026-10-18-dependency-quality-r2-verified-full.json",
+    "latency": {
+      "medianSeconds": 40.274,
+      "meanSeconds": 39.498400000000004,
+      "p95NearestRankSeconds": 70.724,
+      "maxSeconds": 104.575
+    },
+    "comparisonLatency": {
+      "medianSeconds": 21.4425,
+      "meanSeconds": 19.6081,
+      "p95NearestRankSeconds": 30.537,
+      "maxSeconds": 31.878
+    },
+    "decisionRequestSignature": "1a1c910b212fb796ce7c9be4c2a243c19e395e2c8ad8eb684f1f425092aff762",
+    "extractionRequestSignature": "586b0e5ec2f4be776eb14573a246dfcf2f4fb5164a92fdcec3dccdfa9cb9e069",
+    "validation": {
+      "unitTests": 422,
+      "typeScript": "pass",
+      "eslint": "pass, existing warnings",
+      "prismaValidate": "pass",
+      "prismaGenerate": "pass",
+      "isolatedProductionBuild": "pass",
+      "goldenStaticValidation": "pass"
+    },
+    "paidCallsStopped": true,
+    "report": "RESULTS.md",
+    "heldOut": false,
+    "finalRunSha256": "bf512a854822d0bb59f4c8c978e350c90407013d372e9a793fe55586bb2d0476"
+  }
+}

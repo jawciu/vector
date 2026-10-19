@@ -1,5 +1,33 @@
 # Product decisions
 
+## 2026-10-18 — Complete meeting draft batches and preserved execution details
+
+Pass 2 submits one complete proposal batch, decoded into the existing draft
+shapes before validation and persistence. Separate tool calls in a single
+response had omitted work the model had already planned. Dependencies describe
+relationships between drafts; waiting for a prerequisite does not postpone
+drafting the dependent work. Owned review/approval requests are actions too.
+
+Extraction carries execution facts across turns in `details[]`; drafting uses
+them as a checklist for task notes. Keep routine meeting administration and
+unchanged-task restatements out of task drafts. A specific requested deliverable
+explicitly noted for later is still tracked as undated work, without treating
+speculative future product ideas as commitments. Evaluation evidence and
+remaining limitations live in `evals/quality-investigation/README.md`.
+
+## 2026-10-18 — Single-line dependency names in task drafts
+
+Keep each dependency name on one line in previews and editor tags. Truncate
+long names with an ellipsis and retain the full name in the title attribute.
+Multiple dependencies may occupy separate rows, but each entry stays one line.
+
+## 2026-10-18 — Square checkboxes select draft cards
+
+Use the shared dropdown `Checkbox` for bulk selection on create-task and
+update-task draft cards. Its empty square, hover outline and checked fill make
+selection distinct from circular task completion. Keep the existing selection
+and bulk-action behavior.
+
 ## 2026-10-18 — Compact task draft notes and aligned metadata
 
 Create-task and update-task previews retain two columns, showing only a note icon and bold count of 1 when
@@ -87,3 +115,16 @@ need a personal-reviewer fallback. Follow-up email drafts remain owner-filtered
 in the interface. Their edit/approve/reject routes currently check authentication
 without enforcing the same owner-only boundary; explained this distinction, with
 no permission changes requested or made.
+
+## 2026-10-18 — Task grouping for implementation, PRs and pending choices
+
+Caroline confirmed that implementation and opening its PR are one task, with
+the technical scope, constraints and reviewer instructions in that task. Case 16
+now expects two tasks total: combined implementation/PR and the vendor review.
+The old answer key is archived; old model outputs must be rescored against the
+same revised key for comparison. This changes the expected count, not model quality.
+
+When extra workshop attendees are undecided and the vendor promises to adjust
+once numbers are known, keep a separate undated vendor follow-up reminder.
+Context on the main workshop task does not replace that reminder. The pending
+customer choice can remain a typed dependency, which does not affect health.
